@@ -26,13 +26,9 @@
         },
         {
             "toolType": "text",
-            "weight": null,
-            "height": null,
             "posX": 100,
             "posY": 300,
             "posZ": 1,
-            "outlineColor": null,
-            "innerColor": null,
             "text": {
                 "content": "이것은 text입니다.",
                 "size": 15,
