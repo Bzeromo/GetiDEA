@@ -1,0 +1,15 @@
+react 관련 사이트 모음 (MM 정리)
+
+김범수[대전_1반_B104]팀원
+오후 3:44
+https://github.com/muaz-khan/Canvas-Designer 프론트 참조 좋은거 드립니다
+
+정연우[대전_1반_B104]팀원
+오후 3:52
+https://velog.io/@endmoseung/%EB%8F%84%ED%98%95-%EB%A7%8C%EB%93%A4%EA%B3%A0-%EC%9D%B4%EB%8F%99%ED%95%98%EA%B8%B0-featReact 도형 만들고 이동하기
+https://velog.io/@pbs1014/React-react-beautiful-dnd dnd라이브러리를 이용해 Drag and Drop 구현
+
+강준규[대전_1반_B104]팀원
+오후 3:53
+https://github.com/konvajs/react-konva
+https://github.com/Flipboard/react-canvas
