@@ -24,3 +24,12 @@ https://galvanized-citron-903.notion.site/5e8bcd6df7a24fae9107b7b1d23c03ae?v=2dd
 
 3. 내용 및 storyPoint 변경
 - 필요한 경우, 팀장에게 공유 후 내용 수정
+
+<h1>240117_개발일지</h1>
+
+### Konva 개발 방향
+- 레이어 앞, 뒤 위치 조정
+- 컴포넌트 구현
+- 컴포넌트 아이템 추가 구현
+- 속성 변경 내용 구현
+- Konva 우선 학습 필!
