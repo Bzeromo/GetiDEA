@@ -3,7 +3,7 @@
 
 <메인 페이지>
 
-![메인 페이지](https://github.com/Liveral/Algorithm_study/assets/101503612/76646074-4051-4c68-98d7-ccfddeb01279)
+![테스트4](https://github.com/Liveral/fastcampus-project-board/assets/101503612/8011d9b2-8641-4021-82c2-b7b22105c75e)
 
 
 <화이트보드>
