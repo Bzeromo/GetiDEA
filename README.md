@@ -15,6 +15,7 @@ https://galvanized-citron-903.notion.site/5e8bcd6df7a24fae9107b7b1d23c03ae?v=2dd
 1. 매일 아침 각자의 스케줄 확인
 - 날짜 & 이름 선택 후 확인 
 - **storyPoint == 8** 확인 필수!
+- 업무 시작 시, 진행중 표시 / 완료 표시 후 다른 작업 진행중 표시
 
 2. 스토리 머리말 **"월.일**(ex. 01.15) " 로 통일
 - 검색 용이
