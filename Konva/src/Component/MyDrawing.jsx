@@ -6,6 +6,7 @@ import {
   Circle,
   RegularPolygon,
   Transformer,
+  Line,
 } from "react-konva";
 
 const Rectangle = ({ shapeProps, isSelected, onSelect, onChange }) => {
@@ -26,13 +27,7 @@ const Rectangle = ({ shapeProps, isSelected, onSelect, onChange }) => {
       ...shapeProps,
       draggable: true,
       onClick: onSelect,
-      onDragEnd: (e) => {
-        onChange({
-          ...shapeProps,
-          x: e.target.x(),
-          y: e.target.y(),
-        });
-      },
+
       onTransformEnd: () => {
         const node = shapeRef.current;
         const scaleX = node.scaleX();
@@ -52,12 +47,15 @@ const Rectangle = ({ shapeProps, isSelected, onSelect, onChange }) => {
     };
 
     switch (shapeProps.type) {
-      case 'Rect':
+      case "Rect":
         return <Rect {...commonProps} />;
-      case 'Circle':
+      case "Circle":
         return <Circle {...commonProps} />;
-      case 'RegularPolygon':
+      case "RegularPolygon":
         return <RegularPolygon {...commonProps} />;
+      case "Line":
+        return <Line {...commonProps} />;
+
       default:
         return null;
     }
@@ -70,13 +68,6 @@ const Rectangle = ({ shapeProps, isSelected, onSelect, onChange }) => {
         {...shapeProps}
         draggable
         onClick={onSelect}
-        onDragEnd={(e) => {
-          onChange({
-            ...shapeProps,
-            x: e.target.x(),
-            y: e.target.y(),
-          });
-        }}
         onTransformEnd={() => {
           const node = shapeRef.current;
           const scaleX = node.scaleX();
@@ -111,37 +102,114 @@ const Rectangle = ({ shapeProps, isSelected, onSelect, onChange }) => {
   );
 };
 
+const LineComponent = ({ lineProps, isSelected, onSelect, onChange }) => {
+  const lineRef = useRef();
+  const transformerRef = useRef();
+
+  useEffect(() => {
+    if (isSelected) {
+      transformerRef.current.nodes([lineRef.current]);
+      transformerRef.current.getLayer().batchDraw();
+    }
+  }, [isSelected]);
+
+  return (
+    <>
+      <Line
+        ref={lineRef}
+        {...lineProps}
+        draggable
+        onClick={onSelect}
+      />
+      {isSelected && <Transformer ref={transformerRef} />}
+    </>
+  );
+};
+
 const MyDrawing = () => {
-  const [shapes, setShapes] = useState([
-    { id: "rect1", x: 50, y: 50, width: 50, height: 100, fill: "red" },
-    { id: "rect2", x: 100, y: 50, width: 50, height: 100, fill: "green" },
-    { id: "rect3", x: 150, y: 50, width: 50, height: 100, fill: "blue" },
-    { id: "rect4", x: 200, y: 50, width: 50, height: 100, fill: "violet" },
-  ]);
+  const [shapes, setShapes] = useState([]);
+  const [history, setHistory] = useState([]);
+
+  const [lines, setLines] = useState([]);
 
   const [selectedId, setSelectedId] = useState(null);
+  const [fillColor, setFillColor] = useState("black");
 
-  // const addShape = (type) => {
-  //   const newShape = {
-  // id: `${type}-${shapes.length + 1}`,
-  //     x: Math.random() * window.innerWidth * 0.5,
-  //     y: Math.random() * window.innerHeight * 0.5,
-  //     width: 100,
-  //     height: 100,
-  //     fill: type === 'rect' ? 'red' : 'blue', // 여기서 다른 도형과 색상을 설정할 수 있습니다.
-  //   };
-  //   setShapes([...shapes, newShape]);
-  // };
+  const [selectStroke, setSelectStroke] = useState("");
+
+  const [drawing, setDrawing] = useState(false);
+  const [currentLine, setCurrentLine] = useState([]);
+
+  const [startWrite, setStartWrite] = useState(false);
+
+  const [startEraser, setStartEraser] = useState(false)
+
+  useEffect(() => {
+    setHistory([...history, shapes]);
+    // setHistory([...history, lines]);
+    // setHistory([...history, drawing]);
+  }, [shapes]);
+
+
+  const handleMouseDown = (e) => {
+    if (!startWrite) return; // startWrite가 false이면 기능 비활성화
+    setDrawing(true);
+    const pos = e.target.getStage().getPointerPosition();
+    setCurrentLine([pos.x, pos.y]);
+    console.log(pos.x + "    " + pos.y);
+  };
+
+  const handleMouseMove = (e) => {
+    if (!drawing || !startWrite) return; // startWrite가 false이면 기능 비활성화
+    const stage = e.target.getStage();
+    const point = stage.getPointerPosition();
+    setCurrentLine(currentLine.concat([point.x, point.y]));
+    console.log(point.x + "    " + point.y);
+  };
+
+  const handleMouseUp = () => {
+    if (!startWrite) return; // startWrite가 false이면 기능 비활성화
+    setDrawing(false);
+    setLines([
+      ...lines,
+      { points: currentLine, stroke: fillColor, strokeWidth: 5 },
+    ]);
+  };
+
+  const renderColor = (color) => {
+    setFillColor(color);
+  };
+
+  const changeWrite = () => {
+    setStartWrite(!startWrite);
+  };
+
+  const changeStrokeColor = (color) => {
+    setSelectStroke(color);
+  }
+
+  const changeEraser = () => {
+    setStartEraser(!startEraser);
+  }
+
+  const undo = () => {
+    if (history.length === 0) return; // 되돌릴 내용이 없는 경우
+
+    const previous = history[history.length - 2]; // 마지막 변경 사항 전의 상태
+    setShapes(previous); // 이전 상태로 도형 설정
+    setHistory(history.slice(0, -1)); // 마지막 변경 사항 제거
+  };
 
   const addRectangle = (type) => {
     const newShape = {
       id: `${type}-${shapes.length + 1}`,
       type: "Rect",
+      stroke : selectStroke,
       x: 50,
       y: 50,
       width: 100,
       height: 100,
-      fill: "green",
+      fill: fillColor,
     };
     setShapes([...shapes, newShape]);
   };
@@ -150,10 +218,11 @@ const MyDrawing = () => {
     const newShape = {
       id: `${type}-${shapes.length + 1}`,
       type: "Circle",
+      stroke : selectStroke,
       x: 150,
       y: 150,
       radius: 50,
-      fill: "blue",
+      fill: fillColor,
     };
     setShapes([...shapes, newShape]);
   };
@@ -162,32 +231,100 @@ const MyDrawing = () => {
     const newShape = {
       id: `${type}-${shapes.length + 1}`,
       type: "RegularPolygon",
+      stroke : selectStroke,
       x: 250,
       y: 150,
       sides: 3,
       radius: 50,
-      fill: "red",
+      fill: fillColor,
     };
     setShapes([...shapes, newShape]);
   };
 
+  const addLine = (type) => {
+    const newLine = {
+      id: `${type}-${lines.length + 1}`,
+      points: [50, 50, 250, 50],
+      stroke: fillColor,
+      strokeWidth: 10,
+      lineCap: "round",
+      lineJoin: "round",
+    };
+    setLines([...lines, newLine]);
+  };
+
+  const addDashedLine = (type) => {
+    const newLine = {
+      id: `${type}-${lines.length + 1}`,
+      points: [50, 50, 250, 50],
+      stroke: fillColor,
+      strokeWidth: 5,
+      lineJoin: "round",
+      dash: [33, 10],
+    };
+    setLines([...lines, newLine]);
+  };
+
+  const addDottedLine = (type) => {
+    const newLine = {
+      id: `${type}-${lines.length + 1}`,
+      points: [50, 50, 250, 50],
+      stroke: fillColor,
+      strokeWidth: 10,
+      lineCap: "round",
+      lineJoin: "round",
+      dash: [29, 20, 0.001, 20],
+    };
+    setLines([...lines, newLine]);
+  };
+
   return (
     <div>
+      <div>그리기</div>
+      <button onClick={() => changeWrite()}>write</button>
+      <br />
+      <div>지우개</div>
+      <button onClick={() => changeEraser()}>Erager</button>
+      <br />
+      <div>되돌리기</div>
+      <button onClick={() => undo()}>undo</button>
+      <br />
+      <div>도형 만들기</div>
       <button onClick={() => addRectangle("Rect")}>Add Rectangle</button>
       <button onClick={() => addCircle("Circle")}>Add Rectangle</button>
-      <button onClick={() => addTriangle("RegularPolygon")}>Add Rectangle</button>
+      <button onClick={() => addTriangle("RegularPolygon")}>
+        Add Rectangle
+      </button>
+      <br />
+      <div>컬러 바꾸기</div>
+      <button onClick={() => renderColor("blue")}>blue</button>
+      <button onClick={() => renderColor("red")}>red</button>
+      <button onClick={() => renderColor("green")}>green</button>
+      <button onClick={() => renderColor("violet")}>violet</button>
+      <button onClick={() => renderColor("")}>clear</button>
+      <br />
+      <div>테두리 색 변경</div>
+      <button onClick={() => changeStrokeColor("black")}>black</button>
+      <button onClick={() => changeStrokeColor("blue")}>blue</button>
+      <button onClick={() => changeStrokeColor("red")}>red</button>
+      <button onClick={() => changeStrokeColor("green")}>green</button>
+      <button onClick={() => changeStrokeColor("")}>clean</button>
+      <br />
+      <div>선 변경</div>
+      <button onClick={() => addLine("Line")}>Line</button>
+      <button onClick={() => addDashedLine("Dashed")}>DashedLine</button>
+      <button onClick={() => addDottedLine("Dotted")}>DottedLine</button>
       <Stage
         width={window.innerWidth}
         height={window.innerHeight}
-        onMouseDown={(e) => {
-          // Stage를 클릭했을 때 도형이 선택되지 않도록 합니다.
-          const clickedOnEmpty = e.target === e.target.getStage();
-          if (clickedOnEmpty) {
-            setSelectedId(null);
-          }
-        }}
+        onMouseDown={handleMouseDown}
+        onMousemove={handleMouseMove}
+        onMouseup={handleMouseUp}
       >
         <Layer>
+          {drawing && (
+            <Line points={currentLine} stroke={fillColor} strokeWidth={5} />
+          )}
           {shapes.map((shape) => (
             <Rectangle
               key={shape.id}
@@ -200,6 +337,24 @@ const MyDrawing = () => {
                 const newShapes = shapes.map((s) =>
                   s.id === shape.id ? newAttrs : s
                 );
+                setShapes(newShapes); // 상태 업데이트
+              }}
+            />
+          ))}
+          {lines.map((line, i) => (
+            <LineComponent
+              key={i}
+              lineProps={line}
+              isSelected={line.id === selectedId}
+              onSelect={() => {
+                setSelectedId(line.id);
+              }}
+              
+              onChange={(newAttrs) => {
+                const newLines = lines.map((l) =>
+                  l.id === line.id ? newAttrs : l
+                );
+                setLines(newLines);
               }}
             />
           ))}
