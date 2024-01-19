@@ -200,6 +200,24 @@ const MyDrawing = () => {
     setHistory(history.slice(0, -1)); // 마지막 변경 사항 제거
   };
 
+  const deleteSelectedShape = () => {
+    const newShapes = shapes.filter(shape => shape.id !== selectedId);
+    setShapes(newShapes);
+    setSelectedId(null); // 선택 해제
+  };
+
+  const deleteSelectedLine = () => {
+    const newLines = lines.filter(line => line.id !== selectedId);
+    setLines(newLines);
+    setSelectedId(null); // 선택 해제
+  };
+
+  const deleteSelectedDrawing = () => {
+    const newDrawing = drawing.filter(draw => draw.id !== selectedId);
+    setDrawing(newDrawing);
+    setSelectedId(null); // 선택 해제
+  };
+
   const addRectangle = (type) => {
     const newShape = {
       id: `${type}-${shapes.length + 1}`,
@@ -285,6 +303,9 @@ const MyDrawing = () => {
       <br />
       <div>지우개</div>
       <button onClick={() => changeEraser()}>Erager</button>
+      <button onClick={() => deleteSelectedShape()}>DeleteShape</button>
+      <button onClick={() => deleteSelectedLine()}>DeleteLine</button>
+      <button onClick={() => deleteSelectedDrawing()}>DeleteDrawing</button>
       <br />
       <div>되돌리기</div>
       <button onClick={() => undo()}>undo</button>
