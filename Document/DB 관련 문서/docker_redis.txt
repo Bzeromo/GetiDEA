@@ -1,0 +1,33 @@
+docker run --name redisTest -p 6379:6379 -d redis:7.2.4
+
+Docker를 사용하여 Redis 서버를 실행하고, Another Redis Desktop Manager 같은 Redis 클라이언트를 사용하여 이에 접속하려면 다음과 같은 단계를 따르면 됩니다.
+
+1. **Redis 컨테이너 실행**: 다음과 같이 Docker 명령어를 사용하여 Redis 컨테이너를 실행합니다. 여기서 `-p` 플래그는 호스트와 컨테이너 간의 포트를 매핑합니다.
+
+```sh
+docker run --name some-redis -p 6379:6379 -d redis
+```
+
+이 명령은 호스트의 6379 포트를 컨테이너의 6379 포트에 매핑합니다. `some-redis`는 컨테이너의 이름입니다.
+
+2. **Redis 서버 상태 확인**: 다음 명령어를 사용하여 Redis 서버가 실행 중인지 확인합니다.
+
+```sh
+docker ps
+```
+
+3. **Another Redis Desktop Manager 실행**: Redis 클라이언트를 실행합니다.
+
+4. **새 연결 추가**: 클라이언트에서 "새 연결 추가" 또는 "Connect to Redis Server" 옵션을 선택합니다.
+
+5. **연결 정보 입력**: 다음 정보를 입력합니다:
+   - **Name**: 연결에 대한 이름을 입력합니다.
+   - **Host**: `localhost` 또는 Docker Redis 서버가 실행 중인 호스트의 IP 주소를 입력합니다.
+   - **Port**: 매핑한 Redis 포트 번호를 입력합니다(기본적으로 6379).
+   - **Password**: Redis 서버에 비밀번호가 설정되어 있다면, 해당 비밀번호를 입력합니다. 기본적으로 Redis는 비밀번호 없이 설정됩니다.
+
+6. **연결 테스트 및 저장**: 제공된 정보가 올바른지 확인하기 위해 "Test Connection" 또는 "Connect"를 클릭합니다. 성공적으로 연결되면, 설정을 저장합니다.
+
+7. **Redis 편집 및 관리**: 연결이 성공하면 Another Redis Desktop Manager를 사용하여 Redis 인스턴스를 편집하고 관리할 수 있습니다.
+
+위의 단계를 통해 Another Redis Desktop Manager를 통해 Docker에서 실행 중인 Redis 인스턴스에 접속하여 데이터를 조회하고 편집할 수 있습니다. Redis 컨테이너에 대한 보안 설정, 데이터 영속성, 백업과 복원 전략 등 추가적인 고려 사항도 고려해야 합니다.
