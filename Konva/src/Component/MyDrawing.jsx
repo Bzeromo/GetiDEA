@@ -7,6 +7,7 @@ import {
   RegularPolygon,
   Transformer,
   Line,
+  Text,
 } from "react-konva";
 
 const Rectangle = ({ shapeProps, isSelected, onSelect, onChange }) => {
@@ -55,7 +56,8 @@ const Rectangle = ({ shapeProps, isSelected, onSelect, onChange }) => {
         return <RegularPolygon {...commonProps} />;
       case "Line":
         return <Line {...commonProps} />;
-
+      case "Text":
+        return <Text {...commonProps} />;
       default:
         return null;
     }
@@ -63,7 +65,7 @@ const Rectangle = ({ shapeProps, isSelected, onSelect, onChange }) => {
 
   return (
     <>
-      <Rect
+      {/* <Rect
         ref={shapeRef}
         {...shapeProps}
         draggable
@@ -84,7 +86,7 @@ const Rectangle = ({ shapeProps, isSelected, onSelect, onChange }) => {
             height: Math.max(node.height() * scaleY, 5),
           });
         }}
-      />
+      /> */}
       {renderShape()}
       {isSelected && (
         <Transformer
@@ -115,12 +117,26 @@ const LineComponent = ({ lineProps, isSelected, onSelect, onChange }) => {
 
   return (
     <>
-      <Line
-        ref={lineRef}
-        {...lineProps}
-        draggable
-        onClick={onSelect}
-      />
+      <Line ref={lineRef} {...lineProps} draggable onClick={onSelect} />
+      {isSelected && <Transformer ref={transformerRef} />}
+    </>
+  );
+};
+
+const TextComponent = ({ textProps, isSelected, onSelect, onChange }) => {
+  const textRef = useRef();
+  const transformerRef = useRef();
+
+  useEffect(() => {
+    if (isSelected) {
+      transformerRef.current.nodes([textRef.current]);
+      transformerRef.current.getLayer().batchDraw();
+    }
+  }, [isSelected]);
+
+  return (
+    <>
+      <Text ref={textRef} {...textProps} draggable onClick={onSelect} />
       {isSelected && <Transformer ref={transformerRef} />}
     </>
   );
@@ -132,6 +148,8 @@ const MyDrawing = () => {
 
   const [lines, setLines] = useState([]);
 
+  const [texts, setTexts] = useState([]);
+
   const [selectedId, setSelectedId] = useState(null);
   const [fillColor, setFillColor] = useState("black");
 
@@ -142,14 +160,17 @@ const MyDrawing = () => {
 
   const [startWrite, setStartWrite] = useState(false);
 
-  const [startEraser, setStartEraser] = useState(false)
+  const [startEraser, setStartEraser] = useState(false);
+
+  const [newTextValue, setNewTextValue] = useState("내용을 입력하세요");
+
+  // const [text, setText] = useState(""); // 텍스트 입력 상태 추가
 
   useEffect(() => {
     setHistory([...history, shapes]);
     // setHistory([...history, lines]);
     // setHistory([...history, drawing]);
   }, [shapes]);
-
 
   const handleMouseDown = (e) => {
     if (!startWrite) return; // startWrite가 false이면 기능 비활성화
@@ -186,11 +207,11 @@ const MyDrawing = () => {
 
   const changeStrokeColor = (color) => {
     setSelectStroke(color);
-  }
+  };
 
   const changeEraser = () => {
     setStartEraser(!startEraser);
-  }
+  };
 
   const undo = () => {
     if (history.length === 0) return; // 되돌릴 내용이 없는 경우
@@ -201,19 +222,19 @@ const MyDrawing = () => {
   };
 
   const deleteSelectedShape = () => {
-    const newShapes = shapes.filter(shape => shape.id !== selectedId);
+    const newShapes = shapes.filter((shape) => shape.id !== selectedId);
     setShapes(newShapes);
     setSelectedId(null); // 선택 해제
   };
 
   const deleteSelectedLine = () => {
-    const newLines = lines.filter(line => line.id !== selectedId);
+    const newLines = lines.filter((line) => line.id !== selectedId);
     setLines(newLines);
     setSelectedId(null); // 선택 해제
   };
 
   const deleteSelectedDrawing = () => {
-    const newDrawing = drawing.filter(draw => draw.id !== selectedId);
+    const newDrawing = drawing.filter((draw) => draw.id !== selectedId);
     setDrawing(newDrawing);
     setSelectedId(null); // 선택 해제
   };
@@ -222,7 +243,7 @@ const MyDrawing = () => {
     const newShape = {
       id: `${type}-${shapes.length + 1}`,
       type: "Rect",
-      stroke : selectStroke,
+      stroke: selectStroke,
       x: 50,
       y: 50,
       width: 100,
@@ -236,7 +257,7 @@ const MyDrawing = () => {
     const newShape = {
       id: `${type}-${shapes.length + 1}`,
       type: "Circle",
-      stroke : selectStroke,
+      stroke: selectStroke,
       x: 150,
       y: 150,
       radius: 50,
@@ -249,7 +270,7 @@ const MyDrawing = () => {
     const newShape = {
       id: `${type}-${shapes.length + 1}`,
       type: "RegularPolygon",
-      stroke : selectStroke,
+      stroke: selectStroke,
       x: 250,
       y: 150,
       sides: 3,
@@ -296,6 +317,22 @@ const MyDrawing = () => {
     setLines([...lines, newLine]);
   };
 
+  const addText = () => {
+    if (newTextValue) {
+      const newText = {
+        id: `Text-${texts.length + 1}`,
+        type: "Text",
+        text: newTextValue,
+        x: 100, // 텍스트 위치 조절
+        y: 100, // 텍스트 위치 조절
+        fontSize: 18, // 텍스트 폰트 크기 조절
+        fill: selectStroke, // 텍스트 색상 설정
+      };
+      setTexts([...texts, newText]);
+      setNewTextValue(""); // 텍스트 입력 초기화
+    }
+  };
+
   return (
     <div>
       <div>그리기</div>
@@ -310,6 +347,15 @@ const MyDrawing = () => {
       <div>되돌리기</div>
       <button onClick={() => undo()}>undo</button>
       <br />
+      <div>텍스트 추가</div>
+      <input
+        type="text"
+        placeholder="텍스트를 입력하세요"
+        value={newTextValue}
+        onChange={(e) => setNewTextValue(e.target.value)}
+      />
+      <button onClick={() => addText()}>추가</button>
+      <br></br>
       <div>도형 만들기</div>
       <button onClick={() => addRectangle("Rect")}>Add Rectangle</button>
       <button onClick={() => addCircle("Circle")}>Add Rectangle</button>
@@ -370,12 +416,27 @@ const MyDrawing = () => {
               onSelect={() => {
                 setSelectedId(line.id);
               }}
-              
               onChange={(newAttrs) => {
                 const newLines = lines.map((l) =>
                   l.id === line.id ? newAttrs : l
                 );
                 setLines(newLines);
+              }}
+            />
+          ))}
+          {texts.map((text, i) => (
+            <TextComponent
+              key={i}
+              textProps={text}
+              isSelected={text.id === selectedId}
+              onSelect={() => {
+                setSelectedId(text.id);
+              }}
+              onChange={(newAttrs) => {
+                const newTexts = texts.map((t) =>
+                  t.id === text.id ? newAttrs : t
+                );
+                setTexts(newTexts);
               }}
             />
           ))}
