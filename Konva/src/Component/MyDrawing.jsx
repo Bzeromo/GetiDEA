@@ -329,7 +329,7 @@ const MyDrawing = () => {
         fill: selectStroke, // 텍스트 색상 설정
       };
       setTexts([...texts, newText]);
-      setNewTextValue(""); // 텍스트 입력 초기화
+      setNewTextValue("내용을 입력하세요"); // 텍스트 입력 초기화
     }
   };
 
