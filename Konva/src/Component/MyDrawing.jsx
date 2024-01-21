@@ -65,28 +65,6 @@ const Rectangle = ({ shapeProps, isSelected, onSelect, onChange }) => {
 
   return (
     <>
-      {/* <Rect
-        ref={shapeRef}
-        {...shapeProps}
-        draggable
-        onClick={onSelect}
-        onTransformEnd={() => {
-          const node = shapeRef.current;
-          const scaleX = node.scaleX();
-          const scaleY = node.scaleY();
-
-          node.scaleX(1);
-          node.scaleY(1);
-
-          onChange({
-            ...shapeProps,
-            x: node.x(),
-            y: node.y(),
-            width: Math.max(5, node.width() * scaleX),
-            height: Math.max(node.height() * scaleY, 5),
-          });
-        }}
-      /> */}
       {renderShape()}
       {isSelected && (
         <Transformer
@@ -134,8 +112,6 @@ const TextComponent = ({
   const transformerRef = useRef();
   const [editing, setEditing] = useState(false);
   const [text, setText] = useState(textProps.text);
-  const [showInput, setsetShowInput] = useState(text);
-  const [position, setPosition] = useState({ x: 0, y: 0 });
 
   useEffect(() => {
     if (isSelected) {
@@ -146,8 +122,8 @@ const TextComponent = ({
 
   const handleDoubleClick = () => {
     console.log("더블 클릭됨"); // 로그 추가
+    setEditing((prevEditing) => !prevEditing);
     console.log(editing);
-    setEditing(true);
     // console.log(editing);
   };
 
@@ -177,7 +153,10 @@ const TextComponent = ({
             position: "absolute",
             top: `${textProps.y}px`, // 확인: 정확한 위치 설정
             left: `${textProps.x}px`, // 확인: 정확한 위치 설정
+            zIndex: "5",
             // 추가 스타일링이 필요한 경우 여기에 추가
+            width: "100px",
+            height: "50px",
           }}
           autoFocus
         />
@@ -603,7 +582,7 @@ const MyDrawing = () => {
               }}
               onChange={(newAttrs) => {
                 const newTexts = texts.map((t) =>
-                  t.id === text.id ? newAttrs : t
+                  t.id === text.id ? { ...t, ...newAttrs } : t
                 );
                 setTexts(newTexts);
               }}
