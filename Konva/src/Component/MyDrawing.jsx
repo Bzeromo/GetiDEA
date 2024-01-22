@@ -8,7 +8,10 @@ import {
   Transformer,
   Line,
   Text,
+  Arrow,
+  Image,
 } from "react-konva";
+// import Konva from "konva";
 
 const Rectangle = ({ shapeProps, isSelected, onSelect, onChange }) => {
   const shapeRef = useRef();
@@ -56,6 +59,8 @@ const Rectangle = ({ shapeProps, isSelected, onSelect, onChange }) => {
         return <RegularPolygon {...commonProps} />;
       case "Line":
         return <Line {...commonProps} />;
+      case "Arrow":
+        return <Arrow {...commonProps} />;
       case "Text":
         return <Text {...commonProps} />;
       default:
@@ -98,6 +103,57 @@ const LineComponent = ({ lineProps, isSelected, onSelect, onChange }) => {
       <Line ref={lineRef} {...lineProps} draggable onClick={onSelect} />
       {isSelected && <Transformer ref={transformerRef} />}
     </>
+  );
+};
+
+const ArrowComponent = ({ lineProps, isSelected, onSelect, onChange }) => {
+  const lineRef = useRef();
+  const transformerRef = useRef();
+
+  useEffect(() => {
+    if (isSelected) {
+      transformerRef.current.nodes([lineRef.current]);
+      transformerRef.current.getLayer().batchDraw();
+    }
+  }, [isSelected]);
+
+  return (
+    <>
+      <Arrow ref={lineRef} {...lineProps} draggable onClick={onSelect} />
+      {isSelected && <Transformer ref={transformerRef} />}
+    </>
+  );
+};
+
+const ImageList = ({ onImageSelect, isSelected }) => {
+  const images = [
+    "/img/강아지.jpg",
+    "/img/고양이.jpg",
+    "/img/아기사슴.jpg",
+    "/img/햄스터.jpg",
+  ]; // 이미지 경로 목록
+  const imageRef = useRef();
+  const transformerRef = useRef();
+
+  useEffect(() => {
+    if (isSelected) {
+      transformerRef.current.nodes([imageRef.current]);
+      transformerRef.current.getLayer().batchDraw();
+    }
+  }, [isSelected]);
+
+  return (
+    <div>
+      {images.map((src, index) => (
+        <img
+          key={index}
+          src={src}
+          alt={`image-${index}`}
+          onClick={() => onImageSelect(src)}
+          style={{ width: "100px", cursor: "pointer" }}
+        />
+      ))}
+    </div>
   );
 };
 
@@ -175,6 +231,33 @@ const TextComponent = ({
 };
 
 const MyDrawing = () => {
+  const [imageIdCounter, setImageIdCounter] = useState(0);
+
+  const handleImageSelect = (src) => {
+    const img = new window.Image();
+    img.src = src;
+    img.onload = () => {
+      // 이미지 객체에 ID 추가
+      setImages([...images, { id: imageIdCounter, img }]);
+      // ID 카운터 증가
+      setImageIdCounter(imageIdCounter + 1);
+    };
+  };
+
+  const handleImageClick = (id) => {
+    setSelectedId(id);
+  };
+
+  const deleteSelectedImage = () => {
+    if (selectedId) {
+      const newImages = images.filter(
+        (image) => `image-${image.id}` !== selectedId
+      );
+      setImages(newImages);
+      setSelectedId(null); // 이미지 삭제 후 선택된 이미지 ID 초기화
+    }
+  };
+
   const [shapes, setShapes] = useState([]);
   const [history, setHistory] = useState([]);
 
@@ -184,13 +267,17 @@ const MyDrawing = () => {
 
   const [texts, setTexts] = useState([]);
 
+  const [images, setImages] = useState([]);
+
   const [selectedId, setSelectedId] = useState(null);
 
   const [fillColor, setFillColor] = useState("black");
 
+  // const [strokeColor, setStrokeColor] = useState("black");
+
   const [currentColor, setCurrentColor] = useState(fillColor);
 
-  const [currentStrokeColor, setCurrentStrokeColor] = useState();
+  // const [currentStrokeColor, setCurrentStrokeColor] = useState(strokeColor);
 
   const [shapeMenuToggle, setShapeMenuToggle] = useState(false);
 
@@ -201,6 +288,11 @@ const MyDrawing = () => {
   const [currentColorMenuToggle, setCurrentColorMenuToggle] = useState(false);
 
   const [strokeColorMenuToggle, setStrokeColorMenuToggle] = useState(false);
+
+  const [CurrentStrokeColorMenuToggle, setCurrentStrokeColorMenuToggle] =
+    useState(false);
+
+  const [imgMenuToggle, setImgMenuToggle] = useState(false);
 
   const [selectStroke, setSelectStroke] = useState("");
 
@@ -241,8 +333,8 @@ const MyDrawing = () => {
   const handleMouseUp = () => {
     if (!startWrite) return; // startWrite가 false이면 기능 비활성화
     setDrawing(false);
-    setLines([
-      ...lines,
+    setDrawingList([
+      ...drawingList,
       { points: currentLine, stroke: fillColor, strokeWidth: 5 },
     ]);
   };
@@ -250,6 +342,10 @@ const MyDrawing = () => {
   const renderColor = (color) => {
     setCurrentColor(color);
   };
+
+  // const renderLineColor = (color) => {
+  //   setCurrentColor(color);
+  // };
 
   const changeWrite = () => {
     setStartWrite(!startWrite);
@@ -283,6 +379,14 @@ const MyDrawing = () => {
     setStrokeColorMenuToggle(!strokeColorMenuToggle);
   };
 
+  const currentStrokeToggle = () => {
+    setCurrentStrokeColorMenuToggle(!CurrentStrokeColorMenuToggle);
+  };
+
+  const imgToggle = () => {
+    setImgMenuToggle(!imgMenuToggle);
+  };
+
   const undo = () => {
     if (history.length === 0) return; // 되돌릴 내용이 없는 경우
 
@@ -304,13 +408,19 @@ const MyDrawing = () => {
   };
 
   const deleteSelectedDrawing = () => {
-    setLines([]);
+    setDrawingList([]);
     console.log("삭제 완료");
   };
 
   const deleteSelectedText = () => {
     const newTexts = texts.filter((text) => text.id !== selectedId);
     setTexts(newTexts);
+    setSelectedId(null);
+  };
+
+  const deleteSelectedImg = () => {
+    const newImages = images.filter((image) => image.id !== selectedId);
+    setImages(newImages);
     setSelectedId(null);
   };
 
@@ -328,6 +438,20 @@ const MyDrawing = () => {
     setShapes(updatedShapes);
   };
 
+  // const changeSelectedLineColor = (color) => {
+  //   if (!selectedId) return; // 선택된 도형이 없으면 함수 종료
+
+  //   // 선택된 도형 찾기
+  //   const updatedLines = lines.map((line) => {
+  //     if (line.id === selectedId) {
+  //       return { ...line, fill: color }; // 색상 변경
+  //     }
+  //     return line;
+  //   });
+
+  //   setLines(updatedLines);
+  // };
+
   const changeSelectedStrokeColor = (color) => {
     if (!selectedId) return; // 선택된 도형이 없으면 함수 종료
 
@@ -344,7 +468,7 @@ const MyDrawing = () => {
 
   const addRectangle = (type) => {
     const newShape = {
-      id: `${type}-${shapes.length + 1}`,
+      id: `${type}${shapes.length + 1}`,
       type: "Rect",
       stroke: selectStroke,
       x: 50,
@@ -358,7 +482,7 @@ const MyDrawing = () => {
 
   const addCircle = (type) => {
     const newShape = {
-      id: `${type}-${shapes.length + 1}`,
+      id: `${type}${shapes.length + 1}`,
       type: "Circle",
       stroke: selectStroke,
       x: 150,
@@ -371,7 +495,7 @@ const MyDrawing = () => {
 
   const addTriangle = (type) => {
     const newShape = {
-      id: `${type}-${shapes.length + 1}`,
+      id: `${type}${shapes.length + 1}`,
       type: "RegularPolygon",
       stroke: selectStroke,
       x: 250,
@@ -385,37 +509,55 @@ const MyDrawing = () => {
 
   const addLine = (type) => {
     const newLine = {
-      id: `${type}-${lines.length + 1}`,
+      id: `${type}${lines.length + 1}`,
       points: [50, 50, 250, 50],
-      stroke: fillColor,
+      stroke: currentColor,
       strokeWidth: 10,
       lineCap: "round",
       lineJoin: "round",
+      fill: currentColor,
     };
     setLines([...lines, newLine]);
   };
 
   const addDashedLine = (type) => {
     const newLine = {
-      id: `${type}-${lines.length + 1}`,
+      id: `${type}${lines.length + 1}`,
       points: [50, 50, 250, 50],
-      stroke: fillColor,
+      stroke: currentColor,
       strokeWidth: 5,
       lineJoin: "round",
       dash: [33, 10],
+      fill: currentColor,
     };
     setLines([...lines, newLine]);
   };
 
   const addDottedLine = (type) => {
     const newLine = {
-      id: `${type}-${lines.length + 1}`,
+      id: `${type}${lines.length + 1}`,
       points: [50, 50, 250, 50],
-      stroke: fillColor,
+      stroke: currentColor,
       strokeWidth: 10,
       lineCap: "round",
       lineJoin: "round",
       dash: [29, 20, 0.001, 20],
+      fill: currentColor,
+    };
+    setLines([...lines, newLine]);
+  };
+
+  const addArrowLine = (type) => {
+    const newLine = {
+      id: `${type}${lines.length + 1}`,
+      type: "Arrow",
+      points: [50, 50, 250, 50],
+      pointerLength: 20,
+      // pointerLength: 20,
+      stroke: currentColor,
+      strokeWidth: 10,
+      strokeWidth: 4,
+      fill: currentColor,
     };
     setLines([...lines, newLine]);
   };
@@ -447,6 +589,7 @@ const MyDrawing = () => {
       <button onClick={() => deleteSelectedLine()}>DeleteLine</button>
       <button onClick={() => deleteSelectedDrawing()}>DeleteDrawing</button>
       <button onClick={() => deleteSelectedText()}>DeleteText</button>
+      <button onClick={() => deleteSelectedImage()}>DeleteImg</button>
       <br />
       <div>되돌리기</div>
       <button onClick={() => undo()}>undo</button>
@@ -505,6 +648,25 @@ const MyDrawing = () => {
           </>
         )}
       </div>
+      {/* <br />
+      <div>
+        <button onClick={currentColorToggle}>currentLineColor</button>
+        {currentColorMenuToggle && (
+          <>
+            <button onClick={() => changeSelectedLineColor("blue")}>
+              blue
+            </button>
+            <button onClick={() => changeSelectedLineColor("red")}>red</button>
+            <button onClick={() => changeSelectedLineColor("green")}>
+              green
+            </button>
+            <button onClick={() => changeSelectedLineColor("violet")}>
+              violet
+            </button>
+            <button onClick={() => changeSelectedLineColor("")}>clear</button>
+          </>
+        )}
+      </div> */}
       <br />
       <div>
         <button onClick={strokeToggle}>stroke</button>
@@ -520,15 +682,47 @@ const MyDrawing = () => {
       </div>
       <br />
       <div>
+        <button onClick={currentStrokeToggle}>CurrentStroke</button>
+        {CurrentStrokeColorMenuToggle && (
+          <>
+            <button onClick={() => changeSelectedStrokeColor("black")}>
+              black
+            </button>
+            <button onClick={() => changeSelectedStrokeColor("blue")}>
+              blue
+            </button>
+            <button onClick={() => changeSelectedStrokeColor("red")}>
+              red
+            </button>
+            <button onClick={() => changeSelectedStrokeColor("green")}>
+              green
+            </button>
+            <button onClick={() => changeSelectedStrokeColor("")}>clean</button>
+          </>
+        )}
+      </div>
+      <br />
+      <div>
         <button onClick={lineToggle}>line</button>
         {lineMenuToggle && (
           <>
             <button onClick={() => addLine("Line")}>Line</button>
             <button onClick={() => addDashedLine("Dashed")}>DashedLine</button>
             <button onClick={() => addDottedLine("Dotted")}>DottedLine</button>
+            <button onClick={() => addArrowLine("Arrow")}>ArrowLine</button>
           </>
         )}
       </div>
+      <br />
+      <div>
+        <button onClick={imgToggle}>img</button>
+        {imgMenuToggle && (
+          <>
+            <ImageList onImageSelect={handleImageSelect} />
+          </>
+        )}
+      </div>
+
       <Stage
         width={window.innerWidth}
         height={window.innerHeight}
@@ -540,6 +734,9 @@ const MyDrawing = () => {
           {drawing && (
             <Line points={currentLine} stroke={fillColor} strokeWidth={5} />
           )}
+          {drawingList.map((drawing, i) => (
+            <Line key={i} {...drawing} />
+          ))}
           {shapes.map((shape) => (
             <Rectangle
               key={shape.id}
@@ -556,22 +753,43 @@ const MyDrawing = () => {
               }}
             />
           ))}
-          {lines.map((line, i) => (
-            <LineComponent
-              key={i}
-              lineProps={line}
-              isSelected={line.id === selectedId}
-              onSelect={() => {
-                setSelectedId(line.id);
-              }}
-              onChange={(newAttrs) => {
-                const newLines = lines.map((l) =>
-                  l.id === line.id ? newAttrs : l
-                );
-                setLines(newLines);
-              }}
-            />
-          ))}
+          {lines.map((line, i) => {
+            if (line.type === "Arrow") {
+              return (
+                <ArrowComponent
+                  key={i}
+                  lineProps={line}
+                  isSelected={line.id === selectedId}
+                  onSelect={() => {
+                    setSelectedId(line.id);
+                  }}
+                  onChange={(newAttrs) => {
+                    const newLines = lines.map((l) =>
+                      l.id === line.id ? newAttrs : l
+                    );
+                    setLines(newLines);
+                  }}
+                />
+              );
+            } else {
+              return (
+                <LineComponent
+                  key={i}
+                  lineProps={line}
+                  isSelected={line.id === selectedId}
+                  onSelect={() => {
+                    setSelectedId(line.id);
+                  }}
+                  onChange={(newAttrs) => {
+                    const newLines = lines.map((l) =>
+                      l.id === line.id ? newAttrs : l
+                    );
+                    setLines(newLines);
+                  }}
+                />
+              );
+            }
+          })}
           {texts.map((text, i) => (
             <TextComponent
               key={i}
@@ -588,6 +806,35 @@ const MyDrawing = () => {
               }}
             />
           ))}
+
+          {images.map((imageObj, index) => (
+            <Image
+              key={index}
+              id={`image-${imageObj.id}`} // 고유 ID 설정
+              image={imageObj.img}
+              x={20}
+              y={20}
+              width={100}
+              height={100}
+              draggable
+              onClick={() => setSelectedId(`image-${imageObj.id}`)} // onClick에서 ID 설정
+            />
+          ))}
+
+          {selectedId && (
+            <Transformer
+              ref={(node) => {
+                if (node) {
+                  const selectedNode = node
+                    .getStage()
+                    .findOne(`#${selectedId}`);
+                  if (selectedNode) {
+                    node.attachTo(selectedNode);
+                  }
+                }
+              }}
+            />
+          )}
         </Layer>
       </Stage>
     </div>
