@@ -308,11 +308,14 @@ const MyDrawing = () => {
 
   const deleteSelectedImage = () => {
     if (selectedId) {
-      const newImages = images.filter(
-        (image) => `image${image.id}` !== selectedId
-      );
+      const imageId = parseInt(selectedId.split('-')[1]);
+
+      // 해당 ID를 가진 이미지를 제외한 새로운 배열 생성
+      const newImages = images.filter(image => image.id !== imageId);
+  
       setImages(newImages);
       setSelectedId(null); // 이미지 삭제 후 선택된 이미지 ID 초기화
+      console.log(shapes)
     }
   };
 
@@ -397,7 +400,7 @@ const MyDrawing = () => {
     setCurrentLine(currentLine.concat([x, y]));
 
     // setCurrentLine(currentLine.concat([point.x, point.y]));
-    // console.log(point.x + "    " + point.y);
+    console.log(pointer.x + "    " + pointer.y);
   };
 
   const handleMouseUp = () => {
