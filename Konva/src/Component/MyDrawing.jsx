@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import {
   Stage,
   Layer,
@@ -244,6 +244,64 @@ const MyDrawing = () => {
     };
   };
 
+  const initialScaleValue = { x: 1, y: 1 };
+  const initialPositionValue = { x: 0, y: 0 };
+
+  const stageRef = useRef(null);
+
+  const [stageScale, setStageScale] = useState(initialScaleValue);
+  const [stagePosition, setStagePosition] = useState(initialPositionValue);
+
+  const zoomOnWheel = useCallback((e) => {
+    e.evt.preventDefault();
+    const stage = stageRef.current;
+    if (!stage) {
+      return;
+    }
+    const zoomDirection = e.evt.deltaY > 0 ? 1 : -1;
+    const scaleBy = 1.1;
+    const oldScale = stage.scaleX();
+
+    const pointer = stage.getPointerPosition();
+
+    if (!pointer) {
+      return;
+    }
+
+    const mousePointTo = {
+      x: (pointer.x - stage.x()) / oldScale,
+      y: (pointer.y - stage.y()) / oldScale,
+    };
+
+    const newScale =
+      zoomDirection > 0 ? oldScale * scaleBy : oldScale / scaleBy;
+
+    stage.scale({ x: newScale, y: newScale });
+
+    // 상태 업데이트 함수 사용
+    setStageScale({ x: newScale, y: newScale });
+
+    const newPos = {
+      x: pointer.x - mousePointTo.x * newScale,
+      y: pointer.y - mousePointTo.y * newScale,
+    };
+    stage.position(newPos);
+
+    // 상태 업데이트 함수 사용
+    setStagePosition(newPos);
+  }, []);
+
+  const resetZoom = useCallback(() => {
+    const stage = stageRef.current;
+    if (!stage) {
+      return;
+    }
+    stage.scale({ x: 1, y: 1 });
+    stage.position({ x: 0, y: 0 });
+    stagePosition({ x: 0, y: 0 });
+    setStageScale({ x: 1, y: 1 });
+  }, []);
+
   const handleImageClick = (id) => {
     setSelectedId(id);
   };
@@ -251,7 +309,7 @@ const MyDrawing = () => {
   const deleteSelectedImage = () => {
     if (selectedId) {
       const newImages = images.filter(
-        (image) => `image-${image.id}` !== selectedId
+        (image) => `image${image.id}` !== selectedId
       );
       setImages(newImages);
       setSelectedId(null); // 이미지 삭제 후 선택된 이미지 ID 초기화
@@ -260,6 +318,7 @@ const MyDrawing = () => {
 
   const [shapes, setShapes] = useState([]);
   const [history, setHistory] = useState([]);
+  const [draggable, setDraggable] = useState(false);
 
   const [lines, setLines] = useState([]);
 
@@ -317,17 +376,28 @@ const MyDrawing = () => {
   const handleMouseDown = (e) => {
     if (!startWrite) return; // startWrite가 false이면 기능 비활성화
     setDrawing(true);
-    const pos = e.target.getStage().getPointerPosition();
-    setCurrentLine([pos.x, pos.y]);
-    // console.log(pos.x + "    " + pos.y);
+    const stage = e.target.getStage();
+    const pointer = stage.getPointerPosition();
+
+    // 스테이지의 스케일과 위치를 고려하여 마우스 포인터의 위치를 조정
+    const x = (pointer.x - stage.x()) / stage.scaleX();
+    const y = (pointer.y - stage.y()) / stage.scaleY();
+
+    setCurrentLine([x, y]);
   };
 
   const handleMouseMove = (e) => {
     if (!drawing || !startWrite) return; // startWrite가 false이면 기능 비활성화
     const stage = e.target.getStage();
-    const point = stage.getPointerPosition();
-    setCurrentLine(currentLine.concat([point.x, point.y]));
-    console.log(point.x + "    " + point.y);
+    const pointer = stage.getPointerPosition();
+
+    const x = (pointer.x - stage.x()) / stage.scaleX();
+    const y = (pointer.y - stage.y()) / stage.scaleY();
+
+    setCurrentLine(currentLine.concat([x, y]));
+
+    // setCurrentLine(currentLine.concat([point.x, point.y]));
+    // console.log(point.x + "    " + point.y);
   };
 
   const handleMouseUp = () => {
@@ -386,6 +456,10 @@ const MyDrawing = () => {
   const imgToggle = () => {
     setImgMenuToggle(!imgMenuToggle);
   };
+
+  const changedraggable= () => {
+    setDraggable(!draggable)
+  }
 
   const undo = () => {
     if (history.length === 0) return; // 되돌릴 내용이 없는 경우
@@ -583,6 +657,8 @@ const MyDrawing = () => {
       <div>그리기</div>
       <button onClick={() => changeWrite()}>write</button>
       <br />
+      <button onClick={() => changedraggable()}>draggable</button>
+      <br />
       <div>지우개</div>
       <button onClick={() => changeEraser()}>Erager</button>
       <button onClick={() => deleteSelectedShape()}>DeleteShape</button>
@@ -724,11 +800,18 @@ const MyDrawing = () => {
       </div>
 
       <Stage
-        width={window.innerWidth}
-        height={window.innerHeight}
+        ref={stageRef}
+        width={window.innerWidth * 0.8}
+        height={window.innerHeight * 0.8}
+        draggable={!draggable}
+        onWheel={zoomOnWheel}
         onMouseDown={handleMouseDown}
         onMousemove={handleMouseMove}
         onMouseup={handleMouseUp}
+        style={{ border: "1px solid grey" }}
+        onDragEnd={(e) => {
+          setStagePosition({ x: e.target.x(), y: e.target.y() });
+        }}
       >
         <Layer>
           {drawing && (
