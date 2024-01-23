@@ -32,4 +32,4 @@ https://galvanized-citron-903.notion.site/5e8bcd6df7a24fae9107b7b1d23c03ae?v=2dd
 - 컴포넌트 구현
 - 컴포넌트 아이템 추가 구현
 - 속성 변경 내용 구현
-- Konva 우선 학습 필!
+- Konva 우선 학습 필! 
