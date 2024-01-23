@@ -7,7 +7,7 @@ spring:
       uri: mongodb://test:1234@192.168.31.199:27017
 
   datasource:
-    url: jdbc:mysql://192.168.31.199:3306/test?useSSL=false&serverTimezone=UTC
+    url: jdbc:mysql://localhost:3306:3306/test?useSSL=false&serverTimezone=UTC
     username: test
     password: 1234
 
