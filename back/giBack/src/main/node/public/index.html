@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Websocket Chatting</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script src="http://192.168.31.199:8000/socket.io/socket.io.js"></script>
 </head>
 <body class="bg-gray-100 h-screen flex items-center justify-center">
     <div class="container mx-auto px-4">
@@ -19,33 +20,31 @@
         </div>
     </div>
     <script>
-        const ws = new WebSocket("ws://192.168.31.199:8000")
+        const socket = io("192.168.31.199:8000");
 
         function clearMessage() {
-            document.getElementById("message").value = ""
+            document.getElementById("message").value = "";
         }
 
-      // 메세지 전송
+        // 메세지 전송
         function sendMessage() {
-            const nickname = document.getElementById("nickname").value
-            const message = document.getElementById("message").value
-            const fullMessage = `${nickname}: ${message}`
+            const nickname = document.getElementById("nickname").value;
+            const message = document.getElementById("message").value;
+            const fullMessage = `${nickname}: ${message}`;
 
-            ws.send(fullMessage)
-            clearMessage()
+            socket.emit('message', fullMessage);
+            clearMessage();
         }
 
-      // 메세지 수신
-        function receiveMessage(event) {
-            const chat = document.createElement("div")
-            const message = document.createTextNode(event.data)
-            chat.appendChild(message)
-        
-            const chatLog = document.getElementById("chat-log")
-            chatLog.appendChild(chat)
-         }
-    
-        ws.onmessage = receiveMessage
+        // 메세지 수신
+        socket.on('message', (data) => {
+            const chat = document.createElement("div");
+            const message = document.createTextNode(data);
+            chat.appendChild(message);
+
+            const chatLog = document.getElementById("chat-log");
+            chatLog.appendChild(chat);
+        });
     </script>
 </body>
 </html>

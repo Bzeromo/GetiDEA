@@ -31,4 +31,4 @@ services:
       - "8000:8000" # 웹 소켓 서버
     volumes:
       - ./src/main/node:/usr/src/app
-    command: node app.js
+    command: node server.js

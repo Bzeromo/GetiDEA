@@ -1,7 +1,7 @@
 FROM node:14
 
 # 앱 디렉토리 생성
-WORKDIR /usr/src/app
+WORKDIR /usr/src/server
 
 # 앱 의존성 설치
 COPY package*.json ./
@@ -11,4 +11,4 @@ RUN npm install
 COPY . .
 
 EXPOSE 3000
-CMD ["node", "app.js"]
+CMD ["node", "server.js"]
