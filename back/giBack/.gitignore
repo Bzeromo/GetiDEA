@@ -1,5 +1,5 @@
 .env
-.yml
+*.yml
 *.log
 node_modules/
 HELP.md
