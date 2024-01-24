@@ -5,7 +5,7 @@ spring:
       port: 6379
 
     mongodb:
-      uri: mongodb://test:1234@localhost:27017/mongotest
+      uri: mongodb://test:1234@localhost:27017
 
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver

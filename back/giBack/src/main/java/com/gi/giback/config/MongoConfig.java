@@ -1,5 +1,6 @@
 package com.gi.giback.config;
 
+import com.mongodb.client.MongoClients;
 import org.springframework.beans.factory.annotation.Value;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -27,6 +28,7 @@ public class MongoConfig {
     private final MongoMappingContext mongoMappingContext;
     @Value("${spring.data.mongodb.uri}") // application.yml에서 설정한 MongoDB URI를 가져옵니다.
     private String mongoUri;
+
     @Bean
     public MappingMongoConverter mappingMongoConverter(MongoDatabaseFactory mongoDatabaseFactory,
         MongoMappingContext mongoMappingContext) {
@@ -37,8 +39,8 @@ public class MongoConfig {
     }
 
     @Bean
-    public MongoTemplate mongoTemplate() {
+    public MongoTemplate mongoTemplate() throws Exception {
         // application.yml에서 가져온 MongoDB 연결 정보를 사용하여 MongoTemplate 빈을 설정합니다.
-        return new MongoTemplate(new SimpleMongoClientDatabaseFactory(mongoUri));
+        return new MongoTemplate(MongoClients.create("mongodb://test:1234@localhost:27017"), "test");
     }
 }

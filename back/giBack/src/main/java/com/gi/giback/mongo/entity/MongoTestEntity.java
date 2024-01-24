@@ -6,16 +6,14 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
-@Document(collection = "test")
+@Document
 @Data
 @NoArgsConstructor
 public class MongoTestEntity{
     @Id
     private String id;
 
-    @Field(name="name")
     private String name;
 
-    @Field(name="age")
     private int age;
 }
