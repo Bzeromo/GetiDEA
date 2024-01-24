@@ -1,18 +1,17 @@
 package com.gi.giback.mongo.entity;
 
-import jakarta.persistence.Id;
+import java.util.Map;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.mongodb.core.mapping.Document;
-
+import jakarta.persistence.Id;
 @Document
 @Data
 @NoArgsConstructor
-public class MongoTestEntity{
+public class ProjectEntity {
     @Id
     private String id;
+    private Map<String, Object> data;
 
-    private String name;
-
-    private int age;
+    // getters and setters
 }
