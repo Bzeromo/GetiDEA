@@ -32,6 +32,8 @@ module.exports = {
   },
     extend: {
       fontFamily: {
+        poppins: ['Poppins' ],
+        IBM : ['IBM Plex Sans KR', 'sans-serif'],
         inter:['Inter'],
         Nanum:['NanumSquare'],
       },
