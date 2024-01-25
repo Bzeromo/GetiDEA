@@ -22,13 +22,3 @@ services:
     image: 'redis:latest'
     ports:
       - '6379:6379'
-  websocket-app:
-    build:
-      context: ./src/main/node
-      dockerfile: Dockerfile
-    ports:
-      - "3000:3000" # 웹 서버
-      - "8000:8000" # 웹 소켓 서버
-    volumes:
-      - ./src/main/node:/usr/src/app
-    command: node server.js
