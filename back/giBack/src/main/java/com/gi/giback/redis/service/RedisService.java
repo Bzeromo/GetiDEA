@@ -9,7 +9,7 @@ import org.springframework.data.redis.core.ListOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
-@Service
+//@Service
 public class RedisService {
 
     private static final int MAX_CHANGES_PER_USER = 30;
