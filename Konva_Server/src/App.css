@@ -1,0 +1,14 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.App {
+  text-align: center;
+  display: flex;
+  flex-direction: row;
+}
+
+.App .SideTool{
+  background-color: red;
+  width: 100px;
+}
