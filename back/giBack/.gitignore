@@ -1,8 +1,5 @@
 .env
-<<<<<<< HEAD
-=======
 *.yml
->>>>>>> 47b6bbe684437ae6db6a9c3d34870852955fa39e
 *.log
 node_modules/
 HELP.md
