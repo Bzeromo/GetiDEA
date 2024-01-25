@@ -160,10 +160,11 @@ const MyDrawing = () => {
   //토글 온오프 기능
   const shapeToggle = () => {
     setShapeMenuToggle(!shapeMenuToggle);
-
+    setLineMenuToggle(false);
   };
   const lineToggle = () => {
     setLineMenuToggle(!lineMenuToggle);
+    setShapeMenuToggle(false);
   };
   const colorToggle = () => {
     setColorMenuToggle(!colorMenuToggle);
@@ -224,7 +225,7 @@ const MyDrawing = () => {
               <div className="absolute top-[120px] left-[55px]  bg-white rounded-md w-[50px] h-[140px] flex items-center flex-col shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]">
                 <svg className="hover:stroke-blue w-6 h-6 mt-3 cursor-pointer" onClick={() => addRectangle("Rect")} fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24"  xmlns="http://www.w3.org/2000/svg"><rect height="18" rx="2" ry="2" width="18" x="3" y="3"/></svg>
                 <svg className="hover:stroke-blue w-6 h-6 mt-5 cursor-pointer" fill="none" onClick={() => addCircle("Circle")} stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24"  xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="10"/></svg>
-                <svg fill="none" className="hover:stroke-blue w-6 h-6 mt-5 cursor-pointer stroke-black" onClick={() => addTriangle("RegularPolygon")} viewBox="0 0 15 15"  xmlns="http://www.w3.org/2000/svg"><path d="M7.5 1.5L0.5 13.5H14.5L7.5 1.5Z"  stroke-width="1.3" stroke-linejoin="round"/></svg>
+                <svg fill="none" className="hover:stroke-blue w-6 h-6 mt-4 cursor-pointer stroke-black" onClick={() => addTriangle("RegularPolygon")} viewBox="0 0 15 15"  xmlns="http://www.w3.org/2000/svg"><path d="M7.5 1.5L0.5 13.5H14.5L7.5 1.5Z"  stroke-width="1.3" stroke-linejoin="round"/></svg>
               </div>
             )}
           </div>
@@ -233,11 +234,21 @@ const MyDrawing = () => {
           <div>
               <img src="/line.svg" alt="" className='w-7 h-7 mt-7 cursor-pointer'  onClick={lineToggle}/>
               {lineMenuToggle && (
-                <div className="absolute top-[180px] left-[55px]  bg-white rounded-md w-[50px] h-[140px] flex items-center flex-col shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]">
+                <div className="absolute top-[180px] left-[55px]  bg-white rounded-md w-[50px] h-[120px] flex items-center flex-col shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" onClick={() => addLine("Line")} viewBox="0 0 24 24" strokeWidth={2}   stroke="currentColor" className="hover:stroke-blue w-[50px] h-[80px] mt-2  cursor-pointer">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14" />
+                  </svg>
+                  <svg  className="hover:stroke-blue  cursor-pointer" onClick={() => addDottedLine("Dotted")} viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path
+                      fill-rule="evenodd"
+                      clip-rule="evenodd"
+                      d="M0 7.5C0 7.22386 0.223858 7 0.5 7H3C3.27614 7 3.5 7.22386 3.5 7.5C3.5 7.77614 3.27614 8 3 8H0.5C0.223858 8 0 7.77614 0 7.5ZM5.75 7.5C5.75 7.22386 5.97386 7 6.25 7H8.75C9.02614 7 9.25 7.22386 9.25 7.5C9.25 7.77614 9.02614 8 8.75 8H6.25C5.97386 8 5.75 7.77614 5.75 7.5ZM12 7C11.7239 7 11.5 7.22386 11.5 7.5C11.5 7.77614 11.7239 8 12 8H14.5C14.7761 8 15 7.77614 15 7.5C15 7.22386 14.7761 7 14.5 7H12Z"
+                      fill="#000000"
+                    />
+                  </svg>
+                  <svg  onClick={() => addArrowLine("Arrow")} viewBox="0 0 24 24" id="right-arrow" data-name="Flat Color" xmlns="http://www.w3.org/2000/svg" className="hover:stroke-blue mt-1 mb-2 w-15  hover:fill-blue stroke-black cursor-pointer"><path id="primary" d="M21.71,11.29l-3-3a1,1,0,0,0-1.42,1.42L18.59,11H3a1,1,0,0,0,0,2H18.59l-1.3,1.29a1,1,0,0,0,0,1.42,1,1,0,0,0,1.42,0l3-3A1,1,0,0,0,21.71,11.29Z" ></path></svg>
                   
-                  <svg className="hover:stroke-blue w-6 h-6 mt-3 cursor-pointer" onClick={() => addDashedLine("Dashed")} fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24"  xmlns="http://www.w3.org/2000/svg"><rect height="18" rx="2" ry="2" width="18" x="3" y="3"/></svg>
-                  <svg className="hover:stroke-blue w-6 h-6 mt-5 cursor-pointer" fill="none" onClick={() => addDottedLine("Dotted")} stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24"  xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="10"/></svg>
-                  <svg fill="none" className="hover:stroke-blue w-6 h-6 mt-5 cursor-pointer stroke-black" onClick={() => addArrowLine("Arrow")} viewBox="0 0 15 15"  xmlns="http://www.w3.org/2000/svg"><path d="M7.5 1.5L0.5 13.5H14.5L7.5 1.5Z"  stroke-width="1.3" stroke-linejoin="round"/></svg>
+		  
                 </div>
               )}
           </div>
