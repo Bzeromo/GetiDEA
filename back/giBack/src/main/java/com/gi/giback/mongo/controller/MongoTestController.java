@@ -1,6 +1,6 @@
 package com.gi.giback.mongo.controller;
 
-import com.gi.giback.mongo.entity.MongoTestDto;
+import com.gi.giback.mongo.dto.MongoTestDto;
 import com.gi.giback.mongo.entity.MongoTestEntity;
 import com.gi.giback.mongo.service.MongoTestService;
 import org.springframework.beans.factory.annotation.Autowired;
