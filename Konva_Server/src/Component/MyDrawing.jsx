@@ -22,7 +22,7 @@ const MyDrawing = () => {
 
     socket.onopen = () => {
       console.log("WebSocket 연결이 열렸습니다.");
-      setSocket(socket); 
+      setSocket(socket);
     };
 
     socket.onmessage = (event) => {
@@ -41,7 +41,7 @@ const MyDrawing = () => {
     socket.onerror = (error) => {
       console.error("WebSocket 오류 발생:", error);
     };
-    
+
 
     socket.onclose = () => {
       console.log("WebSocket 연결이 닫혔습니다.");
@@ -80,45 +80,71 @@ const MyDrawing = () => {
     // }
 
     if (socket && socket.readyState === WebSocket.OPEN) {
-      const dataToSend = { 
+      const dataToSend = {
         shapes: shapes, // shapes 배열
         drawingList: drawingList, // drawings 배열
         lines: lines, // lines 배열
         // texts: texts, // texts 배열
-       };
+        nickname: nickname,
+        chattings: chattings,
+      };
       socket.send(JSON.stringify(dataToSend));
     }
   };
 
   const applyDataToStage = (receivedData) => {
-    const { shapes, drawingList, lines} = receivedData;
-  
-    setShapes(prevShapes => {
-      const newShapes = shapes.filter(shape => !prevShapes.some(prev => prev.id === shape.id));
-      return [...prevShapes, ...newShapes];
-    });
-  
-    setDrawingList(setDrawingList => {
-      const newDrawingList = drawingList.filter(drawingList => !setDrawingList.some(prev => prev.id === drawingList.id));
-      return [...setDrawingList, ...newDrawingList];
-    });
+    const { shapes, drawingList, lines, nickname, chattings } = receivedData;
 
-    setLines(prevLines => {
-      const newLines = lines.filter(lines => !prevLines.some(prev => prev.id === lines.id));
-      return [...prevLines, ...newLines];
-    });
+    // setShapes(prevShapes => {
+    //   const newShapes = shapes.filter(shape => !prevShapes.some(prev => prev.id === shape.id));
+    //   return [...prevShapes, ...newShapes];
+    // });
 
-  
+    // setDrawingList(setDrawingList => {
+    //   const newDrawingList = drawingList.filter(drawingList => !setDrawingList.some(prev => prev.id === drawingList.id));
+    //   return [...setDrawingList, ...newDrawingList];
+    // });
+
+    // setLines(prevLines => {
+    //   const newLines = lines.filter(lines => !prevLines.some(prev => prev.id === lines.id));
+    //   return [...prevLines, ...newLines];
+    // });
+
     // setTexts((prevTexts) => [...prevTexts, ...texts]);
 
-console.log("TEST" + JSON.stringify(shapes));
-console.log("TEST" + JSON.stringify(drawingList));
-console.log("TEST" + JSON.stringify(lines));
+    // 징 추가
+    // setNickname(prevNickname => {
+    //   const newNickname = nickname.filter(nickname => !prevNickname.some(prev => prev.id === nickname.id));
+    //   return [...prevNickname, ...newNickname];
+    // });
+
+    // setChattings(prevChattings => {
+    //   const newChattings = chattings.filter(chattings => !prevChattings.some(prev => prev.id === chattings.id));
+    //   return [...prevChattings, ...newChattings];
+    // });
+
+    setNickname(prevNickname => {
+      // const newNickName = receivedData.nickname;
+
+      return [...prevNickname, ...nickname];
+    });
+
+    setChattings(prevChattings => {
+      // const newPrevChattings = receivedData.chattings;
+      return [...prevChattings, ...chattings];
+    });
+
+
+    console.log("TEST" + JSON.stringify(shapes));
+    console.log("TEST" + JSON.stringify(drawingList));
+    console.log("TEST" + JSON.stringify(lines));
+    console.log(JSON.stringify(nickname));
+    console.log(JSON.stringify(chattings));
 
     // console.log("TEST"+texts);
-    console.log("TEST"+socket);
+    console.log("TEST" + socket);
   };
-  
+
 
   //스테이지 초기화
   const initialScaleValue = { x: 1, y: 1 };
@@ -153,6 +179,21 @@ console.log("TEST" + JSON.stringify(lines));
 
   // const [startEraser, setStartEraser] = useState(false);
   // const [text, setText] = useState(""); // 텍스트 입력 상태 추가
+
+  // 채팅 메시지
+  const [nickname, setNickname] = useState('');
+  const [chattings, setChattings] = useState('');
+  // const [fullMessage, setFullMessage] = useState([]);
+
+  const [chatLog, setChatLog] = useState([]);
+
+  const sendMessage = () => {
+    const fullMessage = `${nickname}: ${chattings}`;
+    // socket.emit('message', fullMessage); // 메시지 전송
+    setChatLog([fullMessage.nickname, fullMessage.chattings])
+    setChattings(''); // 입력 필드 초기화
+    // console.log(fullMessage);
+  };
 
   //토글 목록
   const [eraserToggle, setEraserToggle] = useState(false);
@@ -424,12 +465,48 @@ console.log("TEST" + JSON.stringify(lines));
       </div>
       <br />
       <button
-  className="absolute top-[720px] left-6 bg-blue-500 rounded-md px-4 py-2 text-white"
-  onClick={sendInfoToServer.bind(this)}
->
+        className="absolute top-[720px] left-6 bg-blue-500 rounded-md px-4 py-2 text-white"
+        onClick={sendInfoToServer.bind(this)}
+      >
         정보 보내기
       </button>
-      
+
+      {/* 채팅창 */}
+      <div className="container w-1/2 ml-auto px-4">
+        <div className="bg-white p-6 rounded-lg shadow-lg">
+          <div className="mb-4">
+            <input
+              type="text"
+              value={nickname}
+              onChange={(e) => setNickname(e.target.value)}
+              placeholder="닉네임"
+              className="border p-2 rounded mr-2"
+            />
+            <input
+              type="text"
+              value={chattings}
+              onChange={(e) => setChattings(e.target.value)}
+              placeholder="메세지"
+              className="border p-2 rounded flex-1"
+            />
+            <button
+              onClick={applyDataToStage}
+              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ml-2"
+            >
+              전송
+            </button>
+          </div>
+          <div id="chat-log" className="h-64 overflow-auto p-4 bg-gray-200 rounded">
+            
+            {/* chatLog 배열을 사용하여 메시지를 표시합니다. */}
+            {chatLog.map((fullMessage, index) => (
+              <div key={index}>{fullMessage.nickname}: {fullMessage.chattings}</div>
+            ))}
+
+          </div>
+        </div>
+      </div>
+
 
       {/* 그리는 구역 */}
       <div className="ml-24 mt-24 h-full w-full">
@@ -534,7 +611,7 @@ console.log("TEST" + JSON.stringify(lines));
                 height={100}
                 draggable
                 onClick={() => setSelectedId(`image-${imageObj.id}`)} // onClick에서 ID 설정
-                // onClick={() => handleImageClick}
+              // onClick={() => handleImageClick}
               />
             ))}
 
