@@ -1,22 +1,34 @@
-const addFunction = (  shapes, setShapes, 
-  lines, setLines, 
-  texts, setTexts, 
-  currentColor, 
-  selectStroke, 
-  newTextValue, setNewTextValue
-  ,
-  images, setImages, setImageIdCounter, imageIdCounter) =>{
-    
-const addRectangle = (type) => {
+const addFunction = (
+  shapes,
+  setShapes,
+  lines,
+  setLines,
+  texts,
+  setTexts,
+  currentColor,
+  selectStroke,
+  newTextValue,
+  setNewTextValue,
+  images,
+  setImages,
+  setImageIdCounter,
+  imageIdCounter,
+  rectPosition,
+
+) => {
+  const addRectangle = (type) => {
     const newShape = {
       id: `${type}${shapes.length + 1}`,
       type: "Rect",
       stroke: selectStroke,
-      x: 50,
-      y: 50,
+      x: rectPosition.x,
+      y: rectPosition.y,
       width: 100,
       height: 100,
       fill: currentColor,
+      // draagable: true,
+      // ondragend: {handleDragEnd},
+      
     };
     setShapes([...shapes, newShape]);
   };
@@ -26,8 +38,8 @@ const addRectangle = (type) => {
       id: `${type}${shapes.length + 1}`,
       type: "Circle",
       stroke: selectStroke,
-      x: 150,
-      y: 150,
+      x: rectPosition.x,
+      y: rectPosition.y,
       radius: 50,
       fill: currentColor,
     };
@@ -39,8 +51,8 @@ const addRectangle = (type) => {
       id: `${type}${shapes.length + 1}`,
       type: "RegularPolygon",
       stroke: selectStroke,
-      x: 250,
-      y: 150,
+      x: rectPosition.x,
+      y: rectPosition.y,
       sides: 3,
       radius: 50,
       fill: currentColor,
@@ -60,6 +72,8 @@ const addRectangle = (type) => {
     };
     setLines([...lines, newLine]);
   };
+
+  
 
   const addDashedLine = (type) => {
     const newLine = {
@@ -125,11 +139,11 @@ const addRectangle = (type) => {
       // 이미지 객체에 ID 추가
 
       const newImage = {
-        id: `img${images.length+1}`,
+        id: `img${images.length + 1}`,
         img,
-        x:20,
-        y:20,
-      }
+        x: 20,
+        y: 20,
+      };
       setImages([...images, newImage]);
       // ID 카운터 증가
       setImageIdCounter(imageIdCounter + 1);
@@ -146,9 +160,7 @@ const addRectangle = (type) => {
     addArrowLine,
     addText,
     addImage,
-
-  }
-}
-
+  };
+};
 
 export default addFunction;
