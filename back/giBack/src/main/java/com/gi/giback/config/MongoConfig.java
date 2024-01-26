@@ -1,14 +1,10 @@
 package com.gi.giback.config;
 
-import com.mongodb.client.MongoClients;
-import org.springframework.beans.factory.annotation.Value;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.mongodb.MongoDatabaseFactory;
 import org.springframework.data.mongodb.config.EnableMongoAuditing;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.SimpleMongoClientDatabaseFactory;
 import org.springframework.data.mongodb.core.convert.DbRefResolver;
 import org.springframework.data.mongodb.core.convert.DefaultDbRefResolver;
 import org.springframework.data.mongodb.core.convert.DefaultMongoTypeMapper;
@@ -19,15 +15,9 @@ import org.springframework.data.mongodb.repository.config.EnableMongoRepositorie
 @Configuration
 @RequiredArgsConstructor
 @EnableMongoAuditing
-@EnableMongoRepositories(
-    basePackages = "com.gi.giback.mongo",
-    mongoTemplateRef = "mongoTemplate"
-)
+@EnableMongoRepositories(basePackages = "com.gi.giback.mongo")
 public class MongoConfig {
-
     private final MongoMappingContext mongoMappingContext;
-    @Value("${spring.data.mongodb.uri}") // application.yml에서 설정한 MongoDB URI를 가져옵니다.
-    private String mongoUri;
 
     @Bean
     public MappingMongoConverter mappingMongoConverter(MongoDatabaseFactory mongoDatabaseFactory,
@@ -36,11 +26,5 @@ public class MongoConfig {
         MappingMongoConverter converter = new MappingMongoConverter(dbRefResolver, mongoMappingContext);
         converter.setTypeMapper(new DefaultMongoTypeMapper(null));
         return converter;
-    }
-
-    @Bean
-    public MongoTemplate mongoTemplate() throws Exception {
-        // application.yml에서 가져온 MongoDB 연결 정보를 사용하여 MongoTemplate 빈을 설정합니다.
-        return new MongoTemplate(MongoClients.create("mongodb://test:1234@localhost:27017"), "test");
     }
 }
