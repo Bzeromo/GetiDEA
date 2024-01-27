@@ -26,6 +26,7 @@ const addFunction = (
       width: 100,
       height: 100,
       fill: currentColor,
+      ty: "Shape",
       // draagable: true,
       // ondragend: {handleDragEnd},
       
@@ -42,6 +43,7 @@ const addFunction = (
       y: rectPosition.y,
       radius: 50,
       fill: currentColor,
+      ty: "Shape",
     };
     setShapes([...shapes, newShape]);
   };
@@ -56,6 +58,7 @@ const addFunction = (
       sides: 3,
       radius: 50,
       fill: currentColor,
+      ty: "Shape",
     };
     setShapes([...shapes, newShape]);
   };
@@ -69,6 +72,7 @@ const addFunction = (
       lineCap: "round",
       lineJoin: "round",
       fill: currentColor,
+      ty: "Line",
     };
     setLines([...lines, newLine]);
   };
@@ -84,6 +88,7 @@ const addFunction = (
       lineJoin: "round",
       dash: [33, 10],
       fill: currentColor,
+      ty: "Line",
     };
     setLines([...lines, newLine]);
   };
@@ -98,6 +103,7 @@ const addFunction = (
       lineJoin: "round",
       dash: [29, 20, 0.001, 20],
       fill: currentColor,
+      ty: "Line",
     };
     setLines([...lines, newLine]);
   };
@@ -112,6 +118,7 @@ const addFunction = (
       stroke: currentColor,
       strokeWidth: 10,
       fill: currentColor,
+      ty: "Line",
     };
     setLines([...lines, newLine]);
   };
@@ -121,7 +128,7 @@ const addFunction = (
       const newText = {
         id: `Text-${texts.length + 1}`,
         type: "Text",
-        text: newTextValue,
+        text: "ㅇㄴㅁㅇㄴㅁㅇㄴㅁ",
         x: 100, // 텍스트 위치 조절
         y: 100, // 텍스트 위치 조절
         fontSize: 18, // 텍스트 폰트 크기 조절
@@ -129,6 +136,7 @@ const addFunction = (
       };
       setTexts([...texts, newText]);
       setNewTextValue(""); // 텍스트 입력 초기화
+      console.log("TExt 생성")
     }
   };
 

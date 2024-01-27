@@ -11,6 +11,7 @@ import useEventHandlers from "./funciton/useEventHandlers";
 import redoUndoFunction from "./funciton/redoUndoFunciton";
 import deleteFunction from "./funciton/deleteFunction";
 import changeFunction from "./funciton/changeFunction";
+import LayerFunction from "./funciton/LayerFunction";
 
 const MyDrawing = () => {
   const [imageIdCounter, setImageIdCounter] = useState(0);
@@ -26,6 +27,9 @@ const MyDrawing = () => {
   const [stageScale, setStageScale] = useState(initialScaleValue);
   const [stagePosition, setStagePosition] = useState(initialPositionValue);
 
+  //레이어 변경
+  const layerRef = useRef();
+
   //채팅방
   const [chatLog, setChatLog] = useState([]);
   const [chatInput, setChatInput] = useState({ nickname: "", message: "" });
@@ -39,6 +43,13 @@ const MyDrawing = () => {
   const [texts, setTexts] = useState([]);
   const [images, setImages] = useState([]);
   const [currentLine, setCurrentLine] = useState([]);
+
+  //전체 드래그 기능 구현
+  const [selectedIds, setSelectedIds] = useState([]);
+  const [selectionRect, setSelectionRect] = useState({});
+  const selectionRectRef = useRef();
+  const transformerRef = useRef();
+
 
   //초기값
   const [fillColor, setFillColor] = useState("black");
@@ -122,6 +133,7 @@ const MyDrawing = () => {
     deleteSelectedDrawing,
     deleteSelectedText,
     deleteSelectedImage,
+    deleteSelected,
   } = deleteFunction(
     shapes,
     selectedId,
@@ -130,6 +142,7 @@ const MyDrawing = () => {
     lines,
     setLines,
     setDrawingList,
+    drawingList,
     texts,
     setTexts,
     images,
@@ -280,12 +293,17 @@ const MyDrawing = () => {
     const newChatsArray = Array.isArray(newChat) ? newChat : [newChat];
 
     // chatLog에 newChat 추가
-    setChatLog((prevChatLog) => {
-      const newChatLog = newChatsArray.filter(
-        (chat) => !prevChatLog.some((prev) => prev.id === chat.id)
-      );
-      return [...prevChatLog, ...newChatLog];
-    });
+    if (newChat && newChat.nickname !== "") {
+      setChatLog((prevChatLog) => {
+        const newChatsArray = Array.isArray(newChat) ? newChat : [newChat];
+
+        // 빈 닉네임을 가진 채팅은 제외하고 필터링
+        const newChatLog = newChatsArray.filter(
+          (chat) => chat.nickname.trim() !== "" && !prevChatLog.some((prev) => prev.id === chat.id)
+        );
+        return [...prevChatLog, ...newChatLog];
+      });
+    }
 
     // setTexts((prevTexts) => [...prevTexts, ...texts]);
 
@@ -300,7 +318,13 @@ const MyDrawing = () => {
   };
 
   const handleMouseDown = (e) => {
-    if (!startWrite) return; // startWrite가 false이면 기능 비활성화
+    // if (!startWrite) return; // startWrite가 false이면 기능 비활성화
+    if (!startWrite || selectedId){
+      const { x, y } = e.target.getStage().getPointerPosition();
+      setSelectionRect({ x, y, width: 0, height: 0 });
+      setSelectedIds([]);
+      return;
+    } // startWrite가 false이면 기능 비활성화
     setDrawing(true);
     const stage = e.target.getStage();
     const pointer = stage.getPointerPosition();
@@ -313,7 +337,28 @@ const MyDrawing = () => {
   };
 
   const handleMouseMove = (e) => {
-    if (!drawing || !startWrite) return; // startWrite가 false이면 기능 비활성화
+    // if (!drawing || !startWrite) return; // startWrite가 false이면 기능 비활성화
+    if (!drawing || !startWrite || selectedId){
+      if (!selectionRect.x) return; // 선택 영역이 없으면 종료
+
+      const { x, y } = e.target.getStage().getPointerPosition();
+      const newSelectionRect = {
+        ...selectionRect,
+        width: x - selectionRect.x,
+        height: y - selectionRect.y,
+      };
+      setSelectionRect(newSelectionRect);
+      const selected = shapes.filter((rect) => {
+        return (
+          rect.x > selectionRect.x &&
+          rect.y > selectionRect.y &&
+          rect.x + rect.width < x &&
+          rect.y + rect.height < y
+        );
+      });
+      setSelectedIds(selected.map((s) => s.id));
+      return;
+    } // startWrite가 false이면 기능 비활성화
     const stage = e.target.getStage();
     const pointer = stage.getPointerPosition();
 
@@ -328,7 +373,11 @@ const MyDrawing = () => {
   };
 
   const handleMouseUp = (shapes) => {
-    if (!startWrite) return; // startWrite가 false이면 기능 비활성화
+    // if (!startWrite) return; // startWrite가 false이면 기능 비활성화
+    if (!startWrite) {
+      setSelectionRect({});
+      return;
+    }; // startWrite가 false이면 기능 비활성화
     setDrawing(false);
     setDrawingList([
       ...drawingList,
@@ -336,6 +385,7 @@ const MyDrawing = () => {
     ]);
     // sendInfoToServer.bind(this);
     sendInfoToServer();
+    // shapes.getLayer().batchDraw();
 
     console.log(shapes);
   };
@@ -441,6 +491,11 @@ const MyDrawing = () => {
     redoHistory,
     history
   );
+
+  //Layer 변경 건(이건 색 변경 확인 후에 다시 가는 걸로)
+  const {moveDown, moveUp, moveToBottom, moveToTop} = LayerFunction(
+    layerRef, selectedId
+  )
 
   useEffect(() => {
     setHistory([...history, shapes]);
@@ -672,7 +727,7 @@ const MyDrawing = () => {
         </div>
 
         {/* 텍스트 상자 툴 */}
-        <img src="/text.svg" alt="" className="w-6 h-6 mt-7" />
+        <img src="/text.svg" alt="" className="w-6 h-6 mt-7" onClick={() => addText()} />
 
         {/* 기타 툴 */}
         <img src="/dots.svg" alt="" className="w-4 h-4 mt-7" />
@@ -681,7 +736,7 @@ const MyDrawing = () => {
       {/* 삭제 버튼 */}
       <div
         className="cursor-pointer absolute top-[540px] left-6  bg-white rounded-md w-[50px] h-[50px] flex justify-center items-center shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]"
-        onClick={() => deleteSelectedShape()}
+        onClick={() => deleteSelected()}
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
