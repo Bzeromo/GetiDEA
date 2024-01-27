@@ -27,14 +27,8 @@ const MyDrawing = () => {
   const [stagePosition, setStagePosition] = useState(initialPositionValue);
 
   //채팅방
-  const [nickname, setNickname] = useState([]);
-  const [message, setMessage] = useState([]);
-  const [userId, setUserId] = useState([]);
-  const [chatLog, setChatLog] = useState({
-    userId,
-    nickname,
-    message,
-  });
+  const [chatLog, setChatLog] = useState([]);
+  const [chatInput, setChatInput] = useState({ nickname: "", message: "" });
 
   //인자값 변경
   const [shapes, setShapes] = useState([]);
@@ -235,6 +229,9 @@ const MyDrawing = () => {
     //   socket.send(jsonInfo);
 
     // }
+    const newChat = { ...chatInput, id: new Date().getTime() };
+    // 새로운 채팅 메시지를 chatLog에 추가
+    setChatLog((prevChatLog) => [...prevChatLog, newChat]);
 
     if (socket && socket.readyState === WebSocket.OPEN) {
       const dataToSend = {
@@ -242,15 +239,16 @@ const MyDrawing = () => {
         // drawingList: drawingList, // drawings 배열
         lines: lines, // lines 배열
         // texts: texts, // texts 배열
-        nickname: nickname,
-        message: message,
+        newChat: newChat,
       };
       socket.send(JSON.stringify(dataToSend));
     }
+
+    setChatInput({ nickname: "", message: "" });
   };
 
   const applyDataToStage = (receivedData) => {
-    const { shapes, lines, nickname, message } = receivedData;
+    const { shapes, lines, newChat } = receivedData;
 
     // setShapes((prevShapes) => {
     //   const newShapes = shapes.filter(
@@ -279,23 +277,26 @@ const MyDrawing = () => {
       return [...prevLines, ...newLines];
     });
 
-    setNickname((prevNickname) => [...prevNickname, nickname]);
-    setMessage((prevMessage) => [...prevMessage, message]);
+    const newChatsArray = Array.isArray(newChat) ? newChat : [newChat];
 
-    setChatLog((prevChatLog) => [prevChatLog, ...nickname, ...message]);
+    // chatLog에 newChat 추가
+    setChatLog((prevChatLog) => {
+      const newChatLog = newChatsArray.filter(
+        (chat) => !prevChatLog.some((prev) => prev.id === chat.id)
+      );
+      return [...prevChatLog, ...newChatLog];
+    });
 
     // setTexts((prevTexts) => [...prevTexts, ...texts]);
 
     console.log("TEST" + JSON.stringify(shapes));
-    // console.log("TEST" + JSON.stringify(drawingList));
     console.log("TEST" + JSON.stringify(lines));
-    console.log("TEST" + JSON.stringify(nickname));
-    console.log("TEST" + JSON.stringify(message));
-
     console.log(JSON.stringify(chatLog));
+  };
 
-    // // console.log("TEST"+texts);
-    // console.log("TEST" + socket);
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setChatInput((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleMouseDown = (e) => {
@@ -741,28 +742,29 @@ const MyDrawing = () => {
       </div>
 
       {/* 채팅방 영역 */}
-
       <div className="absolute top-20 right-10 w-80 p-7 z-20 justify-center container w-1/4 ml-auto px-4">
         <div className="bg-white p-6 rounded-lg shadow-lg">
           <div className="mb-4">
             <input
               type="text"
-              // value={nickname}
-              onChange={(e) => setNickname(e.target.value)}
+              name="nickname"
+              value={chatInput.nickname}
+              onChange={handleInputChange}
               placeholder="닉네임"
               className="border p-2 rounded mr-2"
             />
             <input
               type="text"
-              // value={message}
-              onChange={(e) => setMessage(e.target.value)}
+              name="message"
+              value={chatInput.message}
+              onChange={handleInputChange}
               placeholder="메세지"
               className="border p-2 rounded flex-1"
             />
           </div>
           <button
             onClick={sendInfoToServer}
-            // className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ml-2"
+            className="bg-blue-500 hover:bg-blue-700 text-black font-bold py-2 px-4 rounded ml-2"
           >
             전송
           </button>
@@ -770,16 +772,11 @@ const MyDrawing = () => {
             id="chat-log"
             className="h-64 overflow-auto p-4 bg-gray-200 rounded"
           >
-            {/* chatLog 배열을 사용하여 메시지를 표시합니다. */}
-            {/* {chatLog.map((chat, index) => (
-              <div key={index}>
+            {chatLog.map((chat) => (
+              <div key={chat.id}>
                 {chat.nickname}: {chat.message}
               </div>
-            ))} */}
-            {Array.isArray(nickname) &&
-              nickname.map((name, index) => <div key={index}>{name}</div>)}
-            {Array.isArray(message) &&
-              message.map((msg, index) => <div key={index}>{msg}</div>)}
+            ))}
           </div>
         </div>
       </div>
