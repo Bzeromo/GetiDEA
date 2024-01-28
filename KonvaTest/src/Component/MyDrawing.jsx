@@ -12,6 +12,7 @@ import redoUndoFunction from "./funciton/redoUndoFunciton";
 import deleteFunction from "./funciton/deleteFunction";
 import changeFunction from "./funciton/changeFunction";
 import LayerFunction from "./funciton/LayerFunction";
+import TextBox from "./funciton/TextBox";
 
 const MyDrawing = () => {
   const [imageIdCounter, setImageIdCounter] = useState(0);
@@ -269,116 +270,141 @@ const MyDrawing = () => {
   };
   const applyDataToStage = (receivedData) => {
     // const newReceivedData = JSON.stringify(receivedData);
-    console.log("receiveData" + receivedData)
+    console.log("receiveData" + receivedData);
     const { shapes, lines, newChat } = receivedData;
 
     setShapes((prevShapes) => {
       // 새로운 도형 추가
       const newShapes = receivedData.shapes.filter(
-        newShape => !prevShapes.some(shape => shape.id === newShape.id)
+        (newShape) => !prevShapes.some((shape) => shape.id === newShape.id)
       );
       return [...prevShapes, ...newShapes];
     });
-    
+
+    //위 로직을 바꾸는 걸로 해보자 할 수 있다.
+    // setShapes((prevShapes) =>
+    //   prevShapes.map((shape) =>
+    //     shape.id === selectedId ? { ...shape, x: shapes.x, y: shapes.y } : shape
+    //   )
+    // );
+
     setLines((prevLines) => {
       // 새로운 선 추가
       const newLines = receivedData.lines.filter(
-        newLine => !prevLines.some(line => line.id === newLine.id)
+        (newLine) => !prevLines.some((line) => line.id === newLine.id)
       );
       return [...prevLines, ...newLines];
     });
 
-  if (
-    newChat &&
-    newChat.nickname.trim() !== "" &&
-    newChat.message.trim() !== ""
-  ) {
-    setChatLog((prevChatLog) => {
-      const newChatsArray = Array.isArray(newChat) ? newChat : [newChat];
+    if (
+      newChat &&
+      newChat.nickname.trim() !== "" &&
+      newChat.message.trim() !== ""
+    ) {
+      setChatLog((prevChatLog) => {
+        const newChatsArray = Array.isArray(newChat) ? newChat : [newChat];
 
-      const newChatLog = newChatsArray.filter(
-        (chat) =>
-          chat.nickname.trim() !== "" &&
-          chat.message.trim() !== "" &&
-          !prevChatLog.some((prev) => prev.id === chat.id)
+        const newChatLog = newChatsArray.filter(
+          (chat) =>
+            chat.nickname.trim() !== "" &&
+            chat.message.trim() !== "" &&
+            !prevChatLog.some((prev) => prev.id === chat.id)
+        );
+        return [...prevChatLog, ...newChatLog];
+      });
+
+      setShapes((prevShapes) =>
+        prevShapes.map((prevShape) => {
+          const updatedShape = receivedData.shapes.find(
+            (shape) => shape.id === prevShape.id
+          );
+          return updatedShape
+            ? { ...prevShape, x: updatedShape.x, y: updatedShape.y }
+            : prevShape;
+        })
       );
-      return [...prevChatLog, ...newChatLog];
-    });
 
-    // setShapes((prevShapes) => {
-    //   const updatedShapes = newShapes.filter(
-    //     (shape) => !prevShapes.some((prev) => prev.id === shape.id)
-    //   );
-    //   return [...prevShapes, ...updatedShapes];
-    // });
-    // setShapes((prevShapes) => {
-    //   // 새로운 도형 데이터를 기존 상태에 병합
-    //   const updatedShapes = newShapes.map((newShape) => {
-    //     const existingShape = prevShapes.find((s) => s.id === newShape.id);
-    //     return existingShape ? { ...existingShape, ...newShape } : newShape;
-    //   });
+      setLines((prevLines) =>
+        prevLines.map((prevLine) => {
+          const updatedLine = receivedData.lines.find(
+            (line) => line.id === prevLine.id
+          );
+          return updatedLine
+            ? { ...prevLine, x: updatedLine.x, y: updatedLine.y }
+            : prevLine;
+        })
+      );
 
-    //   return updatedShapes;
-    // });
+      // setShapes((prevShapes) => {
+      //   const updatedShapes = newShapes.filter(
+      //     (shape) => !prevShapes.some((prev) => prev.id === shape.id)
+      //   );
+      //   return [...prevShapes, ...updatedShapes];
+      // });
+      // setShapes((prevShapes) => {
+      //   // 새로운 도형 데이터를 기존 상태에 병합
+      //   const updatedShapes = newShapes.map((newShape) => {
+      //     const existingShape = prevShapes.find((s) => s.id === newShape.id);
+      //     return existingShape ? { ...existingShape, ...newShape } : newShape;
+      //   });
 
+      //   return updatedShapes;
+      // });
 
+      // setDrawingList((setDrawingList) => {
+      //   const newDrawingList = drawingList.filter(
+      //     (drawingList) =>
+      //       !setDrawingList.some((prev) => prev.id === drawingList.id)
+      //   );
+      //   return [...setDrawingList, ...newDrawingList];
+      // });
 
-    // setDrawingList((setDrawingList) => {
-    //   const newDrawingList = drawingList.filter(
-    //     (drawingList) =>
-    //       !setDrawingList.some((prev) => prev.id === drawingList.id)
-    //   );
-    //   return [...setDrawingList, ...newDrawingList];
-    // });
+      // setLines((prevLines) => {
+      //   // 새로운 선 데이터를 기존 상태에 병합
+      //   const updatedLines = newLines.map((newLine) => {
+      //     const existingLine = prevLines.find((l) => l.id === newLine.id);
+      //     return existingLine ? { ...existingLine, ...newLine } : newLine;
+      //   });
 
-    // setLines((prevLines) => {
-    //   // 새로운 선 데이터를 기존 상태에 병합
-    //   const updatedLines = newLines.map((newLine) => {
-    //     const existingLine = prevLines.find((l) => l.id === newLine.id);
-    //     return existingLine ? { ...existingLine, ...newLine } : newLine;
-    //   });
+      //   return updatedLines;
+      // });
 
-    //   return updatedLines;
-    // });
+      // setShapes((prevShapes) => {
+      //   // 새로운 도형과 기존 도형 병합
+      //   const updatedShapes = newShapes.map(newShape => {
+      //     const existingShape = prevShapes.find(shape => shape.id === newShape.id);
+      //     return existingShape ? { ...existingShape, ...newShape } : newShape;
+      //   });
 
+      //   // 기존에 없는 새 도형 추가
+      //   return updatedShapes;
+      // });
 
-    // setShapes((prevShapes) => {
-    //   // 새로운 도형과 기존 도형 병합
-    //   const updatedShapes = newShapes.map(newShape => {
-    //     const existingShape = prevShapes.find(shape => shape.id === newShape.id);
-    //     return existingShape ? { ...existingShape, ...newShape } : newShape;
-    //   });
-  
-    //   // 기존에 없는 새 도형 추가
-    //   return updatedShapes;
-    // });
-  
-    // // 선 상태 업데이트
-    // setLines((prevLines) => {
-    //   // 새로운 선과 기존 선 병합
-    //   const updatedLines = newLines.map(newLine => {
-    //     const existingLine = prevLines.find(line => line.id === newLine.id);
-    //     return existingLine ? { ...existingLine, ...newLine } : newLine;
-    //   });
-  
-    //   // 기존에 없는 새 선 추가
-    //   return updatedLines;
-    // });
+      // // 선 상태 업데이트
+      // setLines((prevLines) => {
+      //   // 새로운 선과 기존 선 병합
+      //   const updatedLines = newLines.map(newLine => {
+      //     const existingLine = prevLines.find(line => line.id === newLine.id);
+      //     return existingLine ? { ...existingLine, ...newLine } : newLine;
+      //   });
 
-    // const newChatsArray = Array.isArray(newChat) ? newChat : [newChat];
+      //   // 기존에 없는 새 선 추가
+      //   return updatedLines;
+      // });
 
-    // chatLog에 newChat 추가
+      // const newChatsArray = Array.isArray(newChat) ? newChat : [newChat];
 
+      // chatLog에 newChat 추가
     }
 
     // setTexts((prevTexts) => [...prevTexts, ...texts]);
 
-    console.log("TE@"+JSON.stringify(shapes))
-    console.log("TE!"+JSON.stringify(lines))
+    console.log("TE@" + JSON.stringify(shapes));
+    console.log("TE!" + JSON.stringify(lines));
 
     // console.log("GET" + JSON.stringify(setShapes));
     // console.log("GET" + JSON.stringify(setLines));
-    console.log(JSON.stringify("TE#"+ newChat));
+    console.log(JSON.stringify("TE#" + newChat));
   };
 
   const handleInputChange = (e) => {
@@ -403,7 +429,6 @@ const MyDrawing = () => {
     const y = (pointer.y - stage.y()) / stage.scaleY();
 
     setCurrentLine([x, y]);
-
   };
 
   const handleMouseMove = (e) => {
@@ -437,7 +462,6 @@ const MyDrawing = () => {
 
     setCurrentLine(currentLine.concat([x, y]));
 
-
     // setCurrentLine(currentLine.concat([point.x, point.y]));
     // console.log(pointer.x + "    " + pointer.y);
     // sendInfoToServer();
@@ -459,7 +483,6 @@ const MyDrawing = () => {
     // shapes.getLayer().batchDraw();
 
     // console.log(shapes);
-
   };
 
   const handleDragEnd = (e) => {
@@ -556,10 +579,16 @@ const MyDrawing = () => {
     setShapes(updatedShapes);
   };
 
-  const checkObject = () => {
+  const checkObject = (shapeId, newX, newY) => {
     console.log(shapes);
     console.log(lines);
-  }
+
+    setShapes((prevShapes) =>
+      prevShapes.map((shape) =>
+        shape.id === shapeId ? { ...shape, x: newX, y: newY } : shape
+      )
+    );
+  };
 
   const { redo, undo } = redoUndoFunction(
     setRedoHistory,
@@ -614,6 +643,23 @@ const MyDrawing = () => {
   };
   const changeEraserMenuToggle = () => {
     setEraserToggle(!eraserToggle);
+  };
+
+  const addTextBox = () => {
+    const newText = {
+      id: texts.length + 1,
+      text: "텍스트입니다",
+      x: 100,
+      y: 100,
+    };
+    setTexts([...texts, newText]);
+  };
+
+  const handleTextChange = (id, newText) => {
+    const updatedTexts = texts.map((t) =>
+      t.id === id ? { ...t, text: newText } : t
+    );
+    setTexts(updatedTexts);
   };
 
   return (
@@ -946,7 +992,7 @@ const MyDrawing = () => {
           viewBox="0 0 24 24"
           strokeWidth={1.5}
           stroke="currentColor"
-          onClick={() => checkObject()}
+          onClick={() => addTextBox()}
         >
           <path
             strokeLinecap="round"
@@ -1029,20 +1075,13 @@ const MyDrawing = () => {
                 );
               }
             })}
-            {texts.map((text, i) => (
-              <TextComponent
-                key={i}
-                textProps={text}
-                isSelected={text.id === selectedId}
-                onSelect={() => {
-                  setSelectedId(text.id);
-                }}
-                onChange={(newAttrs) => {
-                  const newTexts = texts.map((t) =>
-                    t.id === text.id ? { ...t, ...newAttrs } : t
-                  );
-                  setTexts(newTexts);
-                }}
+            {texts.map((text) => (
+              <TextBox
+                key={text.id}
+                text={text.text}
+                x={text.x}
+                y={text.y}
+                onTextChange={(newText) => handleTextChange(text.id, newText)}
               />
             ))}
 
