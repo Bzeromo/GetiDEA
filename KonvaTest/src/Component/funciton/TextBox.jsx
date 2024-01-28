@@ -4,6 +4,7 @@ import { Text, Transformer } from 'react-konva';
 const TextBox = ({ text, x, y, onTextChange }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [textBox, setTextBox] = useState(null);
+  const [position, setPosition] = useState({ x, y });
 
   const handleDblClick = () => {
     setIsEditing(true);
@@ -12,8 +13,8 @@ const TextBox = ({ text, x, y, onTextChange }) => {
     const input = document.createElement('input');
     input.value = text;
     input.style.position = 'absolute';
-    input.style.top = textBox.absolutePosition().y +90 +  'px';
-    input.style.left = textBox.absolutePosition().x + 140+'px';
+    input.style.top = textBox.absolutePosition().y + 90 + 'px';
+    input.style.left = textBox.absolutePosition().x + 140 + 'px';
     input.style.width = textBox.width() + 20 + 'px';
 
     document.body.appendChild(input);
@@ -32,12 +33,16 @@ const TextBox = ({ text, x, y, onTextChange }) => {
   return (
     <Text
       text={text}
-      x={x}
-      y={y}
+      x={position.x}
+      y={position.y}
       fontSize={20}
       draggable
+      onDragEnd={(e) => {
+        // 드래그 종료 시 위치 정보 업데이트
+        setPosition({ x: e.target.x(), y: e.target.y() });
+      }}
       onDblClick={isEditing ? null : handleDblClick}
-      ref={node => setTextBox(node)}
+      ref={(node) => setTextBox(node)}
     />
   );
 };

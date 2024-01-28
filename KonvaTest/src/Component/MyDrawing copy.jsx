@@ -322,12 +322,109 @@ const MyDrawing = () => {
         return [...prevChatLog, ...newChatLog];
       });
 
+    //   setShapes((prevShapes) =>
+    //     prevShapes.map((prevShape) => {
+    //       const updatedShape = receivedData.shapes.find(
+    //         (shape) => shape.id === prevShape.id
+    //       );
+    //       return updatedShape
+    //         ? { ...prevShape, x: updatedShape.x, y: updatedShape.y }
+    //         : prevShape;
+    //     })
+    //   );
+
+    //   setLines((prevLines) =>
+    //     prevLines.map((prevLine) => {
+    //       const updatedLine = receivedData.lines.find(
+    //         (line) => line.id === prevLine.id
+    //       );
+    //       return updatedLine
+    //         ? { ...prevLine, x: updatedLine.x, y: updatedLine.y }
+    //         : prevLine;
+    //     })
+    //   );
+
+    //   setTexts((prevTexts) =>
+    //   prevTexts.map((prevTexts) => {
+    //     const updatedText = receivedData.texts.find(
+    //       (text) => text.id === prevTexts.id
+    //     );
+    //     return updatedText
+    //       ? { ...prevTexts, updatedText}
+    //       : prevTexts;
+    //   })
+    // );
+
+      // setShapes((prevShapes) => {
+      //   const updatedShapes = newShapes.filter(
+      //     (shape) => !prevShapes.some((prev) => prev.id === shape.id)
+      //   );
+      //   return [...prevShapes, ...updatedShapes];
+      // });
+      // setShapes((prevShapes) => {
+      //   // 새로운 도형 데이터를 기존 상태에 병합
+      //   const updatedShapes = newShapes.map((newShape) => {
+      //     const existingShape = prevShapes.find((s) => s.id === newShape.id);
+      //     return existingShape ? { ...existingShape, ...newShape } : newShape;
+      //   });
+
+      //   return updatedShapes;
+      // });
+
+      // setDrawingList((setDrawingList) => {
+      //   const newDrawingList = drawingList.filter(
+      //     (drawingList) =>
+      //       !setDrawingList.some((prev) => prev.id === drawingList.id)
+      //   );
+      //   return [...setDrawingList, ...newDrawingList];
+      // });
+
+      // setLines((prevLines) => {
+      //   // 새로운 선 데이터를 기존 상태에 병합
+      //   const updatedLines = newLines.map((newLine) => {
+      //     const existingLine = prevLines.find((l) => l.id === newLine.id);
+      //     return existingLine ? { ...existingLine, ...newLine } : newLine;
+      //   });
+
+      //   return updatedLines;
+      // });
+
+      // setShapes((prevShapes) => {
+      //   // 새로운 도형과 기존 도형 병합
+      //   const updatedShapes = newShapes.map(newShape => {
+      //     const existingShape = prevShapes.find(shape => shape.id === newShape.id);
+      //     return existingShape ? { ...existingShape, ...newShape } : newShape;
+      //   });
+
+      //   // 기존에 없는 새 도형 추가
+      //   return updatedShapes;
+      // });
+
+      // // 선 상태 업데이트
+      // setLines((prevLines) => {
+      //   // 새로운 선과 기존 선 병합
+      //   const updatedLines = newLines.map(newLine => {
+      //     const existingLine = prevLines.find(line => line.id === newLine.id);
+      //     return existingLine ? { ...existingLine, ...newLine } : newLine;
+      //   });
+
+      //   // 기존에 없는 새 선 추가
+      //   return updatedLines;
+      // });
+
+      // const newChatsArray = Array.isArray(newChat) ? newChat : [newChat];
+
+      // chatLog에 newChat 추가
     }
+
+    // setTexts((prevTexts) => [...prevTexts, ...texts]);
 
     console.log("TE@" + JSON.stringify(shapes));
     console.log("TE!" + JSON.stringify(lines));
     console.log("TEST" + JSON.stringify(texts));
 
+    // console.log("GET" + JSON.stringify(setShapes));
+    // console.log("GET" + JSON.stringify(setLines));
     console.log(JSON.stringify("TE#" + newChat));
   };
 
@@ -840,7 +937,7 @@ const MyDrawing = () => {
       {/* 복구 버튼 */}
       <div
         className="cursor-pointer absolute top-[670px] left-6  hover:stroke-blue bg-white rounded-md w-[50px] h-[50px] flex justify-center items-center shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]"
-        onClick={() => redo()}
+        onClick={() => undo()}
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
