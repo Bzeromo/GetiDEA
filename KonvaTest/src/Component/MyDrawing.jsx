@@ -50,7 +50,6 @@ const MyDrawing = () => {
   const selectionRectRef = useRef();
   const transformerRef = useRef();
 
-
   //초기값
   const [fillColor, setFillColor] = useState("black");
   const [selectedId, setSelectedId] = useState(null);
@@ -222,58 +221,46 @@ const MyDrawing = () => {
   }, []);
 
   const sendInfoToServer = () => {
-    // console.log("shapes:", shapes);
-    // console.log("drawingList:", drawingList);
-    // console.log("lines:", lines);
-    // console.log("test send")
-    // console.log("texts:", texts);
-    // console.log("socket:", socket);
-
-    // if (socket) {
-    //   const infoToSend = {
-    //     shapes: shapes, // shapes 배열
-    //     drawingList: drawingList, // drawings 배열
-    //     lines: lines, // lines 배열
-    //     // texts: texts, // texts 배열
-    //   };
-
-    //   const jsonInfo = JSON.stringify(infoToSend);
-
-    //   socket.send(jsonInfo);
-
-    // }
-    const newChat = { ...chatInput, id: new Date().getTime() };
-    // 새로운 채팅 메시지를 chatLog에 추가
-    setChatLog((prevChatLog) => [...prevChatLog, newChat]);
-
+    // 채팅 메시지가 있는 경우에만 채팅 로그를 업데이트합니다.
+    if (chatInput.nickname.trim() !== "" && chatInput.message.trim() !== "") {
+      const newChat = { ...chatInput, id: new Date().getTime() };
+      setChatLog((prevChatLog) => [...prevChatLog, newChat]);
+      setChatInput({ nickname: "", message: "" }); // 입력 필드 초기화
+    }
+  
+    // 서버에 데이터 전송
     if (socket && socket.readyState === WebSocket.OPEN) {
       const dataToSend = {
-        shapes: shapes, // shapes 배열
-        // drawingList: drawingList, // drawings 배열
-        lines: lines, // lines 배열
-        // texts: texts, // texts 배열
-        newChat: newChat,
+        shapes: shapes, // 항상 도형 데이터를 포함합니다.
+        lines: lines,
+        newChat: chatInput.nickname.trim() !== "" && chatInput.message.trim() !== "" ? { ...chatInput, id: new Date().getTime() } : null, // 채팅 메시지가 있을 때만 전송
       };
       socket.send(JSON.stringify(dataToSend));
     }
-
-    setChatInput({ nickname: "", message: "" });
   };
-
   const applyDataToStage = (receivedData) => {
-    const { shapes, lines, newChat } = receivedData;
+    const { shapes: newShapes, lines: newLines, newChat } = receivedData;
 
+    setShapes((prevShapes) => {
+      const updatedShapes = newShapes.filter(
+        (shape) => !prevShapes.some((prev) => prev.id === shape.id)
+      );
+      return [...prevShapes, ...updatedShapes];
+    });
     // setShapes((prevShapes) => {
-    //   const newShapes = shapes.filter(
-    //     (shape) => !prevShapes.some((prev) => prev.id === shape.id)
-    //   );
-    //   return [...prevShapes, ...newShapes];
+    //   // 새로운 도형 데이터를 기존 상태에 병합
+    //   const updatedShapes = newShapes.map((newShape) => {
+    //     const existingShape = prevShapes.find((s) => s.id === newShape.id);
+    //     return existingShape ? { ...existingShape, ...newShape } : newShape;
+    //   });
+
+    //   return updatedShapes;
     // });
-    setShapes((prevShapes) =>
-      prevShapes.map((shape) =>
-        shape.id === selectedId ? { ...shape, shape } : shape
-      )
-    );
+
+    // setShapes(prevShapes => prevShapes.map(shape => {
+    //   const newShapeData = newShapes.find(s => s.id === shape.id);
+    //   return newShapeData ? { ...shape, x: newShapeData.x, y: newShapeData.y } : shape;
+    // }));
 
     // setDrawingList((setDrawingList) => {
     //   const newDrawingList = drawingList.filter(
@@ -284,22 +271,31 @@ const MyDrawing = () => {
     // });
 
     setLines((prevLines) => {
-      const newLines = lines.filter(
-        (lines) => !prevLines.some((prev) => prev.id === lines.id)
-      );
-      return [...prevLines, ...newLines];
+      // 새로운 선 데이터를 기존 상태에 병합
+      const updatedLines = newLines.map((newLine) => {
+        const existingLine = prevLines.find((l) => l.id === newLine.id);
+        return existingLine ? { ...existingLine, ...newLine } : newLine;
+      });
+
+      return updatedLines;
     });
 
-    const newChatsArray = Array.isArray(newChat) ? newChat : [newChat];
+    // const newChatsArray = Array.isArray(newChat) ? newChat : [newChat];
 
     // chatLog에 newChat 추가
-    if (newChat && newChat.nickname !== "") {
+    if (
+      newChat &&
+      newChat.nickname.trim() !== "" &&
+      newChat.message.trim() !== ""
+    ) {
       setChatLog((prevChatLog) => {
         const newChatsArray = Array.isArray(newChat) ? newChat : [newChat];
 
-        // 빈 닉네임을 가진 채팅은 제외하고 필터링
         const newChatLog = newChatsArray.filter(
-          (chat) => chat.nickname.trim() !== "" && !prevChatLog.some((prev) => prev.id === chat.id)
+          (chat) =>
+            chat.nickname.trim() !== "" &&
+            chat.message.trim() !== "" &&
+            !prevChatLog.some((prev) => prev.id === chat.id)
         );
         return [...prevChatLog, ...newChatLog];
       });
@@ -319,7 +315,7 @@ const MyDrawing = () => {
 
   const handleMouseDown = (e) => {
     // if (!startWrite) return; // startWrite가 false이면 기능 비활성화
-    if (!startWrite || selectedId){
+    if (!startWrite || selectedId) {
       const { x, y } = e.target.getStage().getPointerPosition();
       setSelectionRect({ x, y, width: 0, height: 0 });
       setSelectedIds([]);
@@ -338,7 +334,7 @@ const MyDrawing = () => {
 
   const handleMouseMove = (e) => {
     // if (!drawing || !startWrite) return; // startWrite가 false이면 기능 비활성화
-    if (!drawing || !startWrite || selectedId){
+    if (!drawing || !startWrite || selectedId) {
       if (!selectionRect.x) return; // 선택 영역이 없으면 종료
 
       const { x, y } = e.target.getStage().getPointerPosition();
@@ -377,7 +373,7 @@ const MyDrawing = () => {
     if (!startWrite) {
       setSelectionRect({});
       return;
-    }; // startWrite가 false이면 기능 비활성화
+    } // startWrite가 false이면 기능 비활성화
     setDrawing(false);
     setDrawingList([
       ...drawingList,
@@ -493,9 +489,10 @@ const MyDrawing = () => {
   );
 
   //Layer 변경 건(이건 색 변경 확인 후에 다시 가는 걸로)
-  const {moveDown, moveUp, moveToBottom, moveToTop} = LayerFunction(
-    layerRef, selectedId
-  )
+  const { moveDown, moveUp, moveToBottom, moveToTop } = LayerFunction(
+    layerRef,
+    selectedId
+  );
 
   useEffect(() => {
     setHistory([...history, shapes]);
@@ -727,7 +724,12 @@ const MyDrawing = () => {
         </div>
 
         {/* 텍스트 상자 툴 */}
-        <img src="/text.svg" alt="" className="w-6 h-6 mt-7" onClick={() => addText()} />
+        <img
+          src="/text.svg"
+          alt=""
+          className="w-6 h-6 mt-7"
+          onClick={() => addText()}
+        />
 
         {/* 기타 툴 */}
         <img src="/dots.svg" alt="" className="w-4 h-4 mt-7" />
@@ -854,6 +856,25 @@ const MyDrawing = () => {
         </svg>
       </div>
 
+      {/* 오른쪽 윗 블록 */}
+      <div className="absolute top-6 right-12 justify-center bg-white rounded-md w-16 h-[50px] flex  items-center flex-row shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]">
+        <svg
+          className="hover:stroke-blue w-7 h-7 cursor-pointer"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          strokeWidth={1.5}
+          stroke="currentColor"
+          onClick={() => addText()}
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M8.625 9.75a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375m-13.5 3.01c0 1.6 1.123 2.994 2.707 3.227 1.087.16 2.185.283 3.293.369V21l4.184-4.183a1.14 1.14 0 0 1 .778-.332 48.294 48.294 0 0 0 5.83-.498c1.585-.233 2.708-1.626 2.708-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z"
+          />
+        </svg>
+      </div>
+
       {/* 그리는 구역 */}
       <div className="ml-36 mt-24 h-full w-full">
         <Stage
@@ -871,8 +892,8 @@ const MyDrawing = () => {
             {drawing && (
               <Line points={currentLine} stroke={fillColor} strokeWidth={5} />
             )}
-            {drawingList.map((drawing, i) => (
-              <Line key={i} {...drawing} />
+            {drawingList.map((drawing, id) => (
+              <Line key={id} {...drawing} />
             ))}
             {shapes.map((shape) => (
               <ShapeComponent
@@ -890,11 +911,11 @@ const MyDrawing = () => {
                 }}
               />
             ))}
-            {lines.map((line, i) => {
+            {lines.map((line, id) => {
               if (line.type === "Arrow") {
                 return (
                   <ArrowComponent
-                    key={i}
+                    key={id}
                     lineProps={line}
                     isSelected={line.id === selectedId}
                     onSelect={() => {
@@ -911,7 +932,7 @@ const MyDrawing = () => {
               } else {
                 return (
                   <LineComponent
-                    key={i}
+                    key={id}
                     lineProps={line}
                     isSelected={line.id === selectedId}
                     onSelect={() => {
