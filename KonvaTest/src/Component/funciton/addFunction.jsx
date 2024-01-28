@@ -14,6 +14,7 @@ const addFunction = (
   setImageIdCounter,
   imageIdCounter,
   rectPosition,
+  linePosition,
 
 ) => {
   const addRectangle = (type) => {
@@ -21,8 +22,8 @@ const addFunction = (
       id: `${type}${shapes.length + 1}`,
       type: "Rect",
       stroke: selectStroke,
-      x: rectPosition.x,
-      y: rectPosition.y,
+      x: 50,
+      y: 50,
       width: 100,
       height: 100,
       fill: currentColor,
@@ -39,8 +40,8 @@ const addFunction = (
       id: `${type}${shapes.length + 1}`,
       type: "Circle",
       stroke: selectStroke,
-      x: rectPosition.x,
-      y: rectPosition.y,
+      x: 50,
+      y: 50,
       radius: 50,
       fill: currentColor,
       ty: "Shape",
@@ -53,8 +54,8 @@ const addFunction = (
       id: `${type}${shapes.length + 1}`,
       type: "RegularPolygon",
       stroke: selectStroke,
-      x: rectPosition.x,
-      y: rectPosition.y,
+      x: 50,
+      y: 50,
       sides: 3,
       radius: 50,
       fill: currentColor,
@@ -66,13 +67,15 @@ const addFunction = (
   const addLine = (type) => {
     const newLine = {
       id: `${type}${lines.length + 1}`,
-      points: [50, 50, 250, 50],
+      points: [linePosition.startX, linePosition.startY, linePosition.endX, linePosition.endY],
       stroke: currentColor,
       strokeWidth: 10,
       lineCap: "round",
       lineJoin: "round",
       fill: currentColor,
       ty: "Line",
+      x: rectPosition.x,
+      y: rectPosition.y,
     };
     setLines([...lines, newLine]);
   };
@@ -82,13 +85,15 @@ const addFunction = (
   const addDashedLine = (type) => {
     const newLine = {
       id: `${type}${lines.length + 1}`,
-      points: [50, 50, 250, 50],
+      points: [linePosition.startX, linePosition.startY, linePosition.endX, linePosition.endY],
       stroke: currentColor,
       strokeWidth: 5,
       lineJoin: "round",
       dash: [33, 10],
       fill: currentColor,
       ty: "Line",
+      x: rectPosition.x,
+      y: rectPosition.y,
     };
     setLines([...lines, newLine]);
   };
@@ -96,7 +101,7 @@ const addFunction = (
   const addDottedLine = (type) => {
     const newLine = {
       id: `${type}${lines.length + 1}`,
-      points: [50, 50, 250, 50],
+      points: [linePosition.startX, linePosition.startY, linePosition.endX, linePosition.endY],
       stroke: currentColor,
       strokeWidth: 10,
       lineCap: "round",
@@ -104,6 +109,8 @@ const addFunction = (
       dash: [29, 20, 0.001, 20],
       fill: currentColor,
       ty: "Line",
+      x: rectPosition.x,
+      y: rectPosition.y,
     };
     setLines([...lines, newLine]);
   };
@@ -112,13 +119,15 @@ const addFunction = (
     const newLine = {
       id: `${type}${lines.length + 1}`,
       type: "Arrow",
-      points: [50, 50, 250, 50],
+      points: [linePosition.startX, linePosition.startY, linePosition.endX, linePosition.endY],
       pointerLength: 20,
       // pointerLength: 20,
       stroke: currentColor,
       strokeWidth: 10,
       fill: currentColor,
       ty: "Line",
+      x: rectPosition.x,
+      y: rectPosition.y,
     };
     setLines([...lines, newLine]);
   };

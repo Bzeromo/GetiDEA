@@ -24,6 +24,7 @@ wss.on('connection', (ws) => {
     wss.clients.forEach(client => {
         if (client.readyState === WebSocket.OPEN) {
           client.send(message);
+          console.log("메시지를 보냈습니다.")
         }
       });
   });

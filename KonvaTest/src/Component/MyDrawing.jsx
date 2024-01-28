@@ -17,6 +17,12 @@ const MyDrawing = () => {
   const [imageIdCounter, setImageIdCounter] = useState(0);
 
   const [rectPosition, setRectPosition] = useState({ x: 50, y: 50 });
+  const [linePosition, setLinePosition] = useState({
+    startX: 50,
+    startY: 50,
+    endX: 250,
+    endY: 50,
+  });
 
   //스테이지 초기화
   const initialScaleValue = { x: 1, y: 1 };
@@ -123,7 +129,8 @@ const MyDrawing = () => {
     setImages,
     setImageIdCounter,
     imageIdCounter,
-    rectPosition
+    rectPosition,
+    linePosition
   );
 
   const {
@@ -221,32 +228,89 @@ const MyDrawing = () => {
   }, []);
 
   const sendInfoToServer = () => {
-    // 채팅 메시지가 있는 경우에만 채팅 로그를 업데이트합니다.
+    // console.log("shapes:", shapes);
+    // console.log("drawingList:", drawingList);
+    // console.log("lines:", lines);
+    // console.log("test send")
+    // console.log("texts:", texts);
+    // console.log("socket:", socket);
+
+    // if (socket) {
+    //   const infoToSend = {
+    //     shapes: shapes, // shapes 배열
+    //     drawingList: drawingList, // drawings 배열
+    //     lines: lines, // lines 배열
+    //     // texts: texts, // texts 배열
+    //   };
+
+    //   const jsonInfo = JSON.stringify(infoToSend);
+
+    //   socket.send(jsonInfo);
+
+    // }
     if (chatInput.nickname.trim() !== "" && chatInput.message.trim() !== "") {
       const newChat = { ...chatInput, id: new Date().getTime() };
       setChatLog((prevChatLog) => [...prevChatLog, newChat]);
       setChatInput({ nickname: "", message: "" }); // 입력 필드 초기화
     }
-  
+
     // 서버에 데이터 전송
     if (socket && socket.readyState === WebSocket.OPEN) {
       const dataToSend = {
         shapes: shapes, // 항상 도형 데이터를 포함합니다.
         lines: lines,
-        newChat: chatInput.nickname.trim() !== "" && chatInput.message.trim() !== "" ? { ...chatInput, id: new Date().getTime() } : null, // 채팅 메시지가 있을 때만 전송
+        newChat:
+          chatInput.nickname.trim() !== "" && chatInput.message.trim() !== ""
+            ? { ...chatInput, id: new Date().getTime() }
+            : null, // 채팅 메시지가 있을 때만 전송
       };
       socket.send(JSON.stringify(dataToSend));
     }
   };
   const applyDataToStage = (receivedData) => {
-    const { shapes: newShapes, lines: newLines, newChat } = receivedData;
+    // const newReceivedData = JSON.stringify(receivedData);
+    console.log("receiveData" + receivedData)
+    const { shapes, lines, newChat } = receivedData;
 
     setShapes((prevShapes) => {
-      const updatedShapes = newShapes.filter(
-        (shape) => !prevShapes.some((prev) => prev.id === shape.id)
+      // 새로운 도형 추가
+      const newShapes = receivedData.shapes.filter(
+        newShape => !prevShapes.some(shape => shape.id === newShape.id)
       );
-      return [...prevShapes, ...updatedShapes];
+      return [...prevShapes, ...newShapes];
     });
+    
+    setLines((prevLines) => {
+      // 새로운 선 추가
+      const newLines = receivedData.lines.filter(
+        newLine => !prevLines.some(line => line.id === newLine.id)
+      );
+      return [...prevLines, ...newLines];
+    });
+
+  if (
+    newChat &&
+    newChat.nickname.trim() !== "" &&
+    newChat.message.trim() !== ""
+  ) {
+    setChatLog((prevChatLog) => {
+      const newChatsArray = Array.isArray(newChat) ? newChat : [newChat];
+
+      const newChatLog = newChatsArray.filter(
+        (chat) =>
+          chat.nickname.trim() !== "" &&
+          chat.message.trim() !== "" &&
+          !prevChatLog.some((prev) => prev.id === chat.id)
+      );
+      return [...prevChatLog, ...newChatLog];
+    });
+
+    // setShapes((prevShapes) => {
+    //   const updatedShapes = newShapes.filter(
+    //     (shape) => !prevShapes.some((prev) => prev.id === shape.id)
+    //   );
+    //   return [...prevShapes, ...updatedShapes];
+    // });
     // setShapes((prevShapes) => {
     //   // 새로운 도형 데이터를 기존 상태에 병합
     //   const updatedShapes = newShapes.map((newShape) => {
@@ -257,10 +321,7 @@ const MyDrawing = () => {
     //   return updatedShapes;
     // });
 
-    // setShapes(prevShapes => prevShapes.map(shape => {
-    //   const newShapeData = newShapes.find(s => s.id === shape.id);
-    //   return newShapeData ? { ...shape, x: newShapeData.x, y: newShapeData.y } : shape;
-    // }));
+
 
     // setDrawingList((setDrawingList) => {
     //   const newDrawingList = drawingList.filter(
@@ -270,42 +331,54 @@ const MyDrawing = () => {
     //   return [...setDrawingList, ...newDrawingList];
     // });
 
-    setLines((prevLines) => {
-      // 새로운 선 데이터를 기존 상태에 병합
-      const updatedLines = newLines.map((newLine) => {
-        const existingLine = prevLines.find((l) => l.id === newLine.id);
-        return existingLine ? { ...existingLine, ...newLine } : newLine;
-      });
+    // setLines((prevLines) => {
+    //   // 새로운 선 데이터를 기존 상태에 병합
+    //   const updatedLines = newLines.map((newLine) => {
+    //     const existingLine = prevLines.find((l) => l.id === newLine.id);
+    //     return existingLine ? { ...existingLine, ...newLine } : newLine;
+    //   });
 
-      return updatedLines;
-    });
+    //   return updatedLines;
+    // });
+
+
+    // setShapes((prevShapes) => {
+    //   // 새로운 도형과 기존 도형 병합
+    //   const updatedShapes = newShapes.map(newShape => {
+    //     const existingShape = prevShapes.find(shape => shape.id === newShape.id);
+    //     return existingShape ? { ...existingShape, ...newShape } : newShape;
+    //   });
+  
+    //   // 기존에 없는 새 도형 추가
+    //   return updatedShapes;
+    // });
+  
+    // // 선 상태 업데이트
+    // setLines((prevLines) => {
+    //   // 새로운 선과 기존 선 병합
+    //   const updatedLines = newLines.map(newLine => {
+    //     const existingLine = prevLines.find(line => line.id === newLine.id);
+    //     return existingLine ? { ...existingLine, ...newLine } : newLine;
+    //   });
+  
+    //   // 기존에 없는 새 선 추가
+    //   return updatedLines;
+    // });
 
     // const newChatsArray = Array.isArray(newChat) ? newChat : [newChat];
 
     // chatLog에 newChat 추가
-    if (
-      newChat &&
-      newChat.nickname.trim() !== "" &&
-      newChat.message.trim() !== ""
-    ) {
-      setChatLog((prevChatLog) => {
-        const newChatsArray = Array.isArray(newChat) ? newChat : [newChat];
 
-        const newChatLog = newChatsArray.filter(
-          (chat) =>
-            chat.nickname.trim() !== "" &&
-            chat.message.trim() !== "" &&
-            !prevChatLog.some((prev) => prev.id === chat.id)
-        );
-        return [...prevChatLog, ...newChatLog];
-      });
     }
 
     // setTexts((prevTexts) => [...prevTexts, ...texts]);
 
-    console.log("TEST" + JSON.stringify(shapes));
-    console.log("TEST" + JSON.stringify(lines));
-    console.log(JSON.stringify(chatLog));
+    console.log("TE@"+JSON.stringify(shapes))
+    console.log("TE!"+JSON.stringify(lines))
+
+    // console.log("GET" + JSON.stringify(setShapes));
+    // console.log("GET" + JSON.stringify(setLines));
+    console.log(JSON.stringify("TE#"+ newChat));
   };
 
   const handleInputChange = (e) => {
@@ -330,6 +403,7 @@ const MyDrawing = () => {
     const y = (pointer.y - stage.y()) / stage.scaleY();
 
     setCurrentLine([x, y]);
+
   };
 
   const handleMouseMove = (e) => {
@@ -363,6 +437,7 @@ const MyDrawing = () => {
 
     setCurrentLine(currentLine.concat([x, y]));
 
+
     // setCurrentLine(currentLine.concat([point.x, point.y]));
     // console.log(pointer.x + "    " + pointer.y);
     // sendInfoToServer();
@@ -383,7 +458,8 @@ const MyDrawing = () => {
     sendInfoToServer();
     // shapes.getLayer().batchDraw();
 
-    console.log(shapes);
+    // console.log(shapes);
+
   };
 
   const handleDragEnd = (e) => {
@@ -479,6 +555,11 @@ const MyDrawing = () => {
 
     setShapes(updatedShapes);
   };
+
+  const checkObject = () => {
+    console.log(shapes);
+    console.log(lines);
+  }
 
   const { redo, undo } = redoUndoFunction(
     setRedoHistory,
@@ -865,7 +946,7 @@ const MyDrawing = () => {
           viewBox="0 0 24 24"
           strokeWidth={1.5}
           stroke="currentColor"
-          onClick={() => addText()}
+          onClick={() => checkObject()}
         >
           <path
             strokeLinecap="round"
