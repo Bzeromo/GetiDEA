@@ -46,4 +46,4 @@ https://galvanized-citron-903.notion.site/5e8bcd6df7a24fae9107b7b1d23c03ae?v=2dd
 # 오늘 한 일: gerrit 및 gitlab 이슈 해결
 
 
-## gerrit 테스트
+## gerrit 테스트 2
