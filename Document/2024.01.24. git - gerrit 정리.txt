@@ -1,0 +1,29 @@
+2024.01.24. git - gerrit 정리
+
+[gerrit 시작]
+1. 클론 받기 : repositories > (main) > Download HTTP 첫번째줄 > clone
+2. 각자 ssafy01 등 넘버로 로그인하기 & 비밀번호는 각자의 HTTP Credentials
+3. cd S10P12B104/
+4. checkout 시 원격 연결 : git checkout -b backend origin/backend
+5. git add .   >   git commit -m '메시지'   >   git push origin HEAD:refs/for/backend
+
+
+[브랜치 생성법] => backend / frontend 각각 상의해서 생성!
+git branch -b develop
+git push origin develop
+
+
+(그냥 push)
+git push origin front
+(gerrit 사용하기)
+git push origin HEAD:refs/for/front
+
+
+(gitlab으로 remote 변경)
+git remote set-url origin "https://lab.ssafy.com/s10-webmobile1-sub2/S10P12B104.git"
+(gerrit으로 remote 변경)
+git remote set-url origin "https://ssafy01@i10b104.p.ssafy.io:8989/a/S10P12B104"
+
+(remote 확인)
+git remote -v
+
