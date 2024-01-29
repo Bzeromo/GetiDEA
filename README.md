@@ -1,4 +1,4 @@
-프로젝트 가보자구~~!
+프로젝트 가보자구~~~!
 
 ### TypeScript 사용법 써놓음
 https://galvanized-citron-903.notion.site/779510c51b2b4859bcd3dc1f7062834f?pvs=4
