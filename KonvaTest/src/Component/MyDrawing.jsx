@@ -58,7 +58,7 @@ const MyDrawing = () => {
   const transformerRef = useRef();
 
   //초기값
-  const [fillColor, setFillColor] = useState("black");
+  const [fillColor, setFillColor] = useState("#000000");
   const [selectedId, setSelectedId] = useState(null);
   const [currentColor, setCurrentColor] = useState(fillColor);
   const [selectStroke, setSelectStroke] = useState("");
@@ -229,7 +229,6 @@ const MyDrawing = () => {
   }, []);
 
   const sendInfoToServer = () => {
-
     if (chatInput.nickname.trim() !== "" && chatInput.message.trim() !== "") {
       const newChat = { ...chatInput, id: new Date().getTime() };
       setChatLog((prevChatLog) => [...prevChatLog, newChat]);
@@ -308,26 +307,53 @@ const MyDrawing = () => {
     // });
 
     // 위 로직을 바꾸는 걸로 해보자 할 수 있다.
+    // setShapes((prevShapes) =>
+    //   prevShapes.map((shape) =>
+    //     shape.id === selectedId ? { ...shape, x: shapes.x, y: shapes.y } : shape
+    //   )
+    // );
+
+    // setShapes([...shapes, ...newShapes])
+
     setShapes((prevShapes) => {
-      return prevShapes.map((shape) => {
-        const newShapeData = receivedData.shapes.find((s) => s.id === shape.id);
-        return newShapeData ? { ...shape, ...newShapeData } : shape;
-      });
+      // 새로운 선 추가
+      const newLines = receivedData.shapes.filter((newLine) =>
+        prevShapes.some((shape) => shape.id === newLine.id)
+      );
+      return [...prevShapes, ...newLines];
     });
-    
 
     setLines((prevLines) => {
       // 새로운 선 추가
       const newLines = receivedData.lines.filter(
-        (newLine) => !prevLines.some((line) => line.id === newLine.id)
+        (newLine) => prevLines.some((line) => line.id === newLine.id)
       );
       return [...prevLines, ...newLines];
     });
 
+    // setLines(receivedData.lines);
+
+    // setLines((prevLines) => {
+    //   const updatedLines = receivedData.lines.map((newLine) => {
+    //     const existingLine = prevLines.find((line) => line.id === newLine.id);
+    //     if (existingLine) {
+    //       // 새로운 선의 데이터로 기존 선을 업데이트하되, x와 y 좌표는 기존 선의 값을 유지합니다.
+    //       return { ...existingLine, ...newLine, x: existingLine.x, y: existingLine.y };
+    //     }
+    //     return newLine;
+    //   });
+
+    //   const existingLinesNotUpdated = prevLines.filter(
+    //     (line) => !receivedData.lines.some((newLine) => newLine.id === line.id)
+    //   );
+
+    //   return [...updatedLines, ...existingLinesNotUpdated];
+    // });
+
     setTexts((prevTexts) => {
       // 새로운 선 추가
-      const newTexts = receivedData.texts.filter(
-        (newTexts) => !prevTexts.some((text) => text.id === newTexts.id)
+      const newTexts = receivedData.texts.filter((newTexts) =>
+        prevTexts.some((text) => text.id === newTexts.id)
       );
       return [...prevTexts, ...newTexts];
     });
@@ -438,39 +464,71 @@ const MyDrawing = () => {
   const handleDragEnd = (e) => {
     // 사용자가 드래그를 마치면 호출되는 콜백 함수
     const id = e.target.id();
+    const ty = e.target.attrs.ty;
 
     // 새로운 위치 정보를 가져옵니다.
     const newPos = { x: e.target.x(), y: e.target.y() };
 
+    if (ty === "Line") {
+      setLines((prevLines) =>
+        prevLines.map((line) => {
+          if (line.id === id) {
+            return { ...line, x: newPos.x, y: newPos.y };
+          }
+          return line;
+        })
+      );
+    } else if (ty === "Shape") {
+      setShapes((prevShapes) =>
+        prevShapes.map((shapes) => {
+          if (shapes.id === id) {
+            // 드래그된 도형의 위치를 업데이트합니다.
+            return { ...shapes, x: newPos.x, y: newPos.y };
+          }
+          return shapes;
+        })
+      );
+      console.log("TEST")
+    } else {
+      setTexts((prevTexts) =>
+        prevTexts.map((text) => {
+          if (text.id === id) {
+            return { ...text, x: newPos.x, y: newPos.y };
+          }
+          return text;
+        })
+      );
+    }
+
     // 도형의 배열을 업데이트합니다.
-    setShapes((prevShapes) =>
-      prevShapes.map((shapes) => {
-        if (shapes.id === id) {
-          // 드래그된 도형의 위치를 업데이트합니다.
-          return { ...shapes, x: newPos.x, y: newPos.y };
-        }
-        return shapes;
-      })
-    );
+    // setShapes((prevShapes) =>
+    //   prevShapes.map((shapes) => {
+    //     if (shapes.id === id) {
+    //       // 드래그된 도형의 위치를 업데이트합니다.
+    //       return { ...shapes, x: newPos.x, y: newPos.y };
+    //     }
+    //     return shapes;
+    //   })
+    // );
 
-    setLines((prevLines) =>
-      prevLines.map((line) => {
-        if (line.id === id) {
-          return { ...line, x: newPos.x, y: newPos.y };
-        }
-        return line;
-      })
-    );
+    // setLines((prevLines) =>
+    //   prevLines.map((line) => {
+    //     if (line.id === id) {
+    //       return { ...line, x: newPos.x, y: newPos.y };
+    //     }
+    //     return line;
+    //   })
+    // );
 
-    setTexts((prevTexts) =>
-      prevTexts.map((text) => {
-        if (text.id === id) {
-          return { ...text, x: newPos.x, y: newPos.y };
-        }
-        return text;
-      })
-    );
-    sendInfoToServer.bind(this);
+    // setTexts((prevTexts) =>
+    //   prevTexts.map((text) => {
+    //     if (text.id === id) {
+    //       return { ...text, x: newPos.x, y: newPos.y };
+    //     }
+    //     return text;
+    //   })
+    // );
+
     sendInfoToServer();
   };
 
@@ -687,7 +745,7 @@ const MyDrawing = () => {
         {/* 펜 툴 */}
         <svg
           className="w-6 h-6 mt-7 cursor-pointer"
-          fill={!writeToggle ? "black" : "#0064FF"}
+          fill={!writeToggle ? "#000000" : "#0064FF"}
           onClick={() => writeSetToggle()}
           viewBox="0 0 128 128"
           xmlns="http://www.w3.org/2000/svg"
@@ -704,7 +762,7 @@ const MyDrawing = () => {
             fill="none"
             height="24"
             onClick={shapeToggle}
-            stroke={!shapeMenuToggle ? "black" : "#0064FF"}
+            stroke={!shapeMenuToggle ? "#000000" : "#0064FF"}
             stroke-linecap="round"
             stroke-linejoin="round"
             stroke-width="2"
@@ -717,7 +775,7 @@ const MyDrawing = () => {
             <circle cx="17" cy="17" r="3" />
             <rect height="6" rx="1" width="6" x="4" y="14" />
           </svg>
-          {/* <img src="/shape.svg" alt="" className={`'w-7 h-7 mt-7 cursor-pointer ' stroke-current ${shapeMenuToggle ? 'text-black' : 'text-blue'}`}  onClick={shapeToggle}/> */}
+          {/* <img src="/shape.svg" alt="" className={`'w-7 h-7 mt-7 cursor-pointer ' stroke-current ${shapeMenuToggle ? 'text-black0' : 'text-blue'}`}  onClick={shapeToggle}/> */}
           {shapeMenuToggle && (
             <div className="absolute top-[120px] left-[55px]  bg-white rounded-md w-[50px] h-[140px] flex items-center flex-col shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]">
               <svg
@@ -767,8 +825,8 @@ const MyDrawing = () => {
         <div>
           <svg
             className="w-7 h-7 mt-7 cursor-pointer"
-            stroke={!lineMenuToggle ? "black" : "#0064FF"}
-            fill={!lineMenuToggle ? "black" : "#0064FF"}
+            stroke={!lineMenuToggle ? "#000000" : "#0064FF"}
+            fill={!lineMenuToggle ? "#000000" : "#0064FF"}
             viewBox="0 0 32 32"
             onClick={lineToggle}
             xmlns="http://www.w3.org/2000/svg"
@@ -816,7 +874,7 @@ const MyDrawing = () => {
                 id="right-arrow"
                 data-name="Flat Color"
                 xmlns="http://www.w3.org/2000/svg"
-                className="hover:stroke-blue mt-1 mb-2 w-15  hover:fill-blue stroke-black cursor-pointer"
+                className="hover:stroke-blue mt-1 mb-2 w-15  hover:fill-blue stroke-black0 cursor-pointer"
               >
                 <path
                   id="primary"

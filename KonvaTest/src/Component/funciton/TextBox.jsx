@@ -33,10 +33,10 @@ const TextBox = ({ text, x, y, onTextChange }) => {
   return (
     <Text
       text={text}
-      x={position.x}
-      y={position.y}
       fontSize={20}
       draggable
+      x={position.x}
+      y={position.y}
       onDragEnd={(e) => {
         // 드래그 종료 시 위치 정보 업데이트
         setPosition({ x: e.target.x(), y: e.target.y() });
