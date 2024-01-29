@@ -11,8 +11,11 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @NoArgsConstructor
 public class ProjectEntity {
     @Id
-    private String id;
+    private String projectId;
+    private String templateId;
     private String projectName;
+    private String thumbnail;
     private LocalDateTime lasUpdateTime;
     private org.bson.Document data;
+    private org.bson.Document chatLog;
 }

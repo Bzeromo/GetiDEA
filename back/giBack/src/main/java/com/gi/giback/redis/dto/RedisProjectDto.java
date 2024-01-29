@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 public class RedisProjectDto {
     private String projectId;
     private String userId;
+    private String propId;
     private Map<String, Object> preData;
     private Map<String, Object> newData;
 }

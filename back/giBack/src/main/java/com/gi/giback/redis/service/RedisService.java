@@ -1,10 +1,12 @@
 package com.gi.giback.redis.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.gi.giback.redis.dto.ProjectData;
 import com.gi.giback.redis.dto.RedisProjectDto;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,6 +28,7 @@ public class RedisService {
         Map<String,Object> combinedData = new HashMap<>();
         LocalDateTime now = LocalDateTime.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        combinedData.put("propId", data.getPropId());
         combinedData.put("updateTime", now.format(formatter));
         combinedData.put("preData", data.getPreData());
         combinedData.put("newData", data.getNewData());
@@ -45,22 +48,24 @@ public class RedisService {
         return data != null && !data.isEmpty() ? data.get(0) : null;
     }
 
-    public List<Object> getAllProjectData(String projectId) {
-        return redisTemplate.opsForList().range(projectId, 0, -1);
-    }
-
-    public List<Object> getAllDataForProject(String projectId) {
-        List<Object> results = new ArrayList<>();
+    // projectId가 일치하는 곳의 모든 사용자의 변경사항 시간 순서로 정렬후 리턴
+    public List<ProjectData> getAllDataProject(String projectId) {
+        List<ProjectData> results = new ArrayList<>();
+        ObjectMapper objectMapper = new ObjectMapper();
         try (Cursor<byte[]> cursor = (Cursor) redisTemplate.getConnectionFactory().getConnection().scan(
             ScanOptions.scanOptions().match(projectId + ":*").count(1000).build())) {
             while (cursor.hasNext()) {
                 String key = new String(cursor.next());
                 List<Object> data = redisTemplate.opsForList().range(key, 0, -1);
-                results.addAll(data);
+                for (Object o : data) {
+                    ProjectData projectData = objectMapper.readValue((String) o, ProjectData.class);
+                    results.add(projectData);
+                }
             }
         } catch (Exception e) {
             // 예외 처리
         }
+        results.sort(Comparator.comparing(ProjectData::getUpdateTime));
         return results;
     }
 

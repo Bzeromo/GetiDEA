@@ -24,12 +24,15 @@ public class MongoController {
     public String addProject(@RequestBody ProjectDto data){
         ProjectEntity entity = new ProjectEntity();
 
-        entity.setId(data.getId());
-        entity.setProjectName(data.getId());
+        entity.setProjectId(data.getProjectId());
+        entity.setProjectName(data.getProjectName());
+        entity.setThumbnail(data.getThumbnail());
+        entity.setTemplateId(data.getTemplateId());
         LocalDateTime now = LocalDateTime.now();
         String formattedDateTime = now.toString();
         entity.setLasUpdateTime(LocalDateTime.parse(formattedDateTime));
         entity.setData(new org.bson.Document(data.getData()));
+        entity.setChatLog(new org.bson.Document(data.getChatLog()));
 
         boolean result;
         result = service.addProject(entity);

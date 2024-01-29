@@ -1,6 +1,7 @@
 package com.gi.giback.redis.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.gi.giback.redis.dto.ProjectData;
 import com.gi.giback.redis.dto.RedisProjectDto;
 import com.gi.giback.redis.service.RedisService;
 import java.util.List;
@@ -40,8 +41,8 @@ public class RedisController {
     }
 
     @GetMapping("/{projectId}") // merge를 위한 변경사항 전체
-    public ResponseEntity<List<Object>> getUserData(@PathVariable("projectId") String projectId) {
-        List<Object> data = redisService.getAllDataForProject(projectId);
+    public ResponseEntity<List<ProjectData>> getUserData(@PathVariable("projectId") String projectId) {
+        List<ProjectData> data = redisService.getAllDataProject(projectId);
         return ResponseEntity.ok(data);
     }
 //
