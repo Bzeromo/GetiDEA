@@ -1,0 +1,39 @@
+docker run --name mongoTest -p 27017:27017 -d mongo:7.0.5
+
+Docker로 MongoDB 서버를 실행하고 MongoDB Compass를 사용하여 접속하는 방법은 다음과 같습니다:
+
+1. **MongoDB 도커 이미지 받기**: 먼저 Docker Hub에서 MongoDB 이미지를 pull합니다.
+
+```sh
+docker pull mongo
+```
+
+2. **MongoDB 컨테이너 실행**: 컨테이너를 실행하고, 포트 매핑을 설정합니다. 아래 명령은 호스트의 27017 포트를 컨테이너의 27017 포트에 매핑합니다.
+
+```sh
+docker run --name some-mongo -p 27017:27017 -d mongo
+```
+
+`some-mongo`는 여기서 생성할 컨테이너의 이름입니다.
+
+3. **MongoDB 서버 상태 확인**: 다음 명령어를 사용하여 MongoDB 서버가 실행 중인지 확인합니다.
+
+```sh
+docker ps
+```
+
+4. **MongoDB Compass 실행**: MongoDB Compass 클라이언트를 실행합니다.
+
+5. **새 연결 설정**: MongoDB Compass에서 `New Connection` 버튼을 클릭하거나 `Connect` 탭을 엽니다.
+
+6. **연결 정보 입력**: 연결 대화 상자에서 호스트 이름과 포트를 입력합니다. Docker에서 실행하는 경우 일반적으로 호스트는 `localhost`이며, 포트는 위에서 매핑한 `27017`입니다. 연결 문자열을 직접 입력할 수도 있습니다. 예를 들면:
+
+```
+mongodb://localhost:27017
+```
+
+7. **연결**: 입력한 정보가 맞다면, `Connect` 버튼을 클릭하여 MongoDB 인스턴스에 연결합니다.
+
+8. **MongoDB 편집 및 관리**: 연결이 성공하면 MongoDB Compass를 사용하여 데이터베이스를 탐색하고, 콜렉션을 조회 및 편집하고, 쿼리를 실행할 수 있습니다.
+
+이 과정을 통해 MongoDB Compass를 통해 Docker에서 실행 중인 MongoDB 인스턴스에 접속하여 데이터를 관리할 수 있습니다. MongoDB 인스턴스에 대한 보안 설정, 데이터 볼륨 설정, 백업 전략 등의 추가적인 구성이 필요할 수도 있습니다.
