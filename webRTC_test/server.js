@@ -14,6 +14,7 @@ const io = new Server(server, {
   },
 });
 
+// const PORT = process.env.PORT || 8000;
 const PORT = process.env.PORT || 8080;
 
 // 어떤 방에 어떤 유저가 들어있는지
