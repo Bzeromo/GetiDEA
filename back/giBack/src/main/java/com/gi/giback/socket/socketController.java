@@ -1,5 +1,6 @@
 package com.gi.giback.socket;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.gi.giback.mongo.entity.ProjectEntity;
 import com.gi.giback.mongo.entity.TemplateEntity;
 import com.gi.giback.mongo.service.ProjectService;
@@ -67,7 +68,8 @@ public class socketController {
     }
 
     @PostMapping("/{projectId}")
-    public ResponseEntity<?> saveProject(@PathVariable("projectId") String projectId) {
+    public ResponseEntity<?> saveProject(@PathVariable("projectId") String projectId)
+        throws JsonProcessingException {
         List<ProjectData> redisData = redisService.getAllDataProject(projectId);
 
         if(projectService.updateData(projectId, redisData))
