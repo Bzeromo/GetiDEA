@@ -5,14 +5,13 @@ import ImgComponent from "./Add/ImgComponent";
 import ShapeComponent from "./Add/ShapeComponent";
 import LineComponent from "./Add/LineComponent";
 import ArrowComponent from "./Add/ArrowComponent";
-import TextComponent from "./Add/TextComponent";
 import addFunction from "./funciton/addFunction";
 import useEventHandlers from "./funciton/useEventHandlers";
 import redoUndoFunction from "./funciton/redoUndoFunciton";
 import deleteFunction from "./funciton/deleteFunction";
 import changeFunction from "./funciton/changeFunction";
 import LayerFunction from "./funciton/LayerFunction";
-import TextBox from "./funciton/TextBox";
+import TextBox from "./funciton/TextComponent";
 
 const MyDrawing = () => {
   const [imageIdCounter, setImageIdCounter] = useState(0);
@@ -40,6 +39,9 @@ const MyDrawing = () => {
   //채팅방
   const [chatLog, setChatLog] = useState([]);
   const [chatInput, setChatInput] = useState({ nickname: "", message: "" });
+
+  //드래그 끝남 여부 확인(비동기 처리 필요)
+  const [dragEnded, setDragEnded] = useState(false);
 
   //인자값 변경
   const [shapes, setShapes] = useState([]);
@@ -115,6 +117,7 @@ const MyDrawing = () => {
     addDottedLine,
     addArrowLine,
     addImage,
+    addTextBox
   } = addFunction(
     shapes,
     setShapes,
@@ -131,7 +134,9 @@ const MyDrawing = () => {
     setImageIdCounter,
     imageIdCounter,
     rectPosition,
-    linePosition
+    linePosition,
+    selectedId,
+    setTexts
   );
 
   const {
@@ -376,13 +381,8 @@ const MyDrawing = () => {
       { points: currentLine, stroke: fillColor, strokeWidth: 5 },
     ]);
 
-    // sendInfoToServer();
-    // shapes.getLayer().batchDraw();
-
     console.log(shapes);
   };
-
-  const [dragEnded, setDragEnded] = useState(false);
 
   const handleDragEnd = async (e) => {
     // 사용자가 드래그를 마치면 호출되는 콜백 함수
@@ -391,6 +391,8 @@ const MyDrawing = () => {
 
     // 새로운 위치 정보를 가져옵니다.
     const newPos = { x: e.target.x(), y: e.target.y() };
+
+    console.log("newpos 확인 용" + newPos.x + "  " + newPos.y)
 
     if (ty === "Line") {
       setLines((prevLines) =>
@@ -411,7 +413,7 @@ const MyDrawing = () => {
           return shapes;
         })
       );
-    } else {
+    } else if(ty ==="Text"){
       setTexts((prevTexts) =>
         prevTexts.map((text) => {
           if (text.id === id) {
@@ -495,20 +497,6 @@ const MyDrawing = () => {
     stagePosition({ x: 0, y: 0 });
     setStageScale({ x: 1, y: 1 });
   }, []);
-
-  const changeSelectedShapePosition = (RectPosition) => {
-    if (!selectedId) return; // 선택된 도형이 없으면 함수 종료
-
-    // 선택된 도형 찾기
-    const updatedShapes = shapes.map((shape) => {
-      if (shape.id === selectedId) {
-        return { ...shape, x: RectPosition.x, y: RectPosition.y }; // 색상 변경
-      }
-      return shape;
-    });
-
-    setShapes(updatedShapes);
-  };
 
   const checkObject = (shapeId, newX, newY) => {
     console.log(shapes);
@@ -594,15 +582,6 @@ const MyDrawing = () => {
     setEraserToggle(!eraserToggle);
   };
 
-  const addTextBox = () => {
-    const newText = {
-      id: texts.length + 1,
-      text: "텍스트입니다",
-      x: 100,
-      y: 100,
-    };
-    setTexts([...texts, newText]);
-  };
 
   const handleTextChange = (id, newText) => {
     const updatedTexts = texts.map((t) =>
@@ -1062,6 +1041,7 @@ const MyDrawing = () => {
                 x={text.x}
                 y={text.y}
                 isSelected={text.id === selectedId}
+                onDragEnd={handleDragEnd}
                 onSelect={(e) => {
                   handleShapeClick(text.id, e);
                 }}
