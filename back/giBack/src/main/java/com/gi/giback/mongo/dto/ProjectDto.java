@@ -16,5 +16,4 @@ public class ProjectDto {
     private String thumbnail;
     private LocalDateTime lasUpdateTime;
     private org.bson.Document data;
-    private org.bson.Document chatLog;
 }

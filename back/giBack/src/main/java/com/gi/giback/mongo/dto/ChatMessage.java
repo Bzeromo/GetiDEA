@@ -1,4 +1,4 @@
-package com.gi.giback.redis.dto;
+package com.gi.giback.mongo.dto;
 
 import java.time.LocalDateTime;
 import lombok.Data;
@@ -6,7 +6,9 @@ import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-public class ChatMessage {
+public class
+
+ChatMessage {
     private String userId;
     private String profileImg;
     private String message;

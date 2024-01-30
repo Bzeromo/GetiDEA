@@ -3,7 +3,6 @@ package com.gi.giback.mongo.service;
 import com.gi.giback.mongo.entity.ProjectEntity;
 import com.gi.giback.mongo.repository.ProjectRepository;
 import com.gi.giback.redis.dto.ProjectData;
-import com.gi.giback.redis.dto.RedisProjectDto;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -13,7 +12,6 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.GetMapping;
 
 @Service
 public class ProjectService {
@@ -34,8 +32,9 @@ public class ProjectService {
     }
 
 
-    // Redis 업데이트 정보와 MongoDB Project 정보 Merge
+    // Redis 업데이트 정보(datas)와 MongoDB Project 정보 Merge
     public boolean updateData(String projectId, List<ProjectData> datas){
+        // Mongo에서 projectId기준으로 쿼리 생성
         Query query = new Query(Criteria.where("projectId").is(projectId));
 
         for (ProjectData data : datas) { // 레디스에서 가져온 리스트 만큼 반복

@@ -1,17 +1,12 @@
 package com.gi.giback.redis.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.gi.giback.redis.dto.ChatMessage;
 import com.gi.giback.redis.dto.ProjectData;
 import com.gi.giback.redis.dto.RedisProjectDto;
-import com.gi.giback.redis.service.RedisChatService;
 import com.gi.giback.redis.service.RedisService;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.SimpleTimeZone;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -25,9 +20,6 @@ public class RedisController {
 
     @Autowired
     private RedisService redisService;
-
-    @Autowired
-    private RedisChatService redisChatService;
 
     @PostMapping("/save") // Redis에 변경사항 저장
     public ResponseEntity<?> saveData(@RequestBody RedisProjectDto data)
@@ -60,23 +52,23 @@ public class RedisController {
 //        redisService.removeData(projectId);
 //        return ResponseEntity.ok().build();
 //    }
-
-    // 채팅 저장 restapi
-    @PostMapping("/chat/{projectId}")
-    public ResponseEntity<?> saveChat(@PathVariable("projectId")String projectId, @RequestBody
-        ChatMessage chatMessage) {
-        if(redisChatService.addChatLog(projectId, chatMessage)) {
-            return ResponseEntity.ok().build();
-        }
-        return ResponseEntity.badRequest().build();
-    }
-
-    // 채팅 로그 불러서 저장하기 위한 GetMapping
-    @GetMapping("/chat/{projectId}")
-    public ResponseEntity<List<ChatMessage>> getChatLog(@PathVariable("projectId") String projectId) {
-        List<ChatMessage> list = new ArrayList<>();
-        list = redisChatService.getChatLog(projectId);
-        return ResponseEntity.ok(list);
-    }
+//
+//    // 채팅 저장 restapi
+//    @PostMapping("/chat/{projectId}")
+//    public ResponseEntity<?> saveChat(@PathVariable("projectId")String projectId, @RequestBody
+//        ChatMessage chatMessage) {
+//        if(redisChatService.addChatLog(projectId, chatMessage)) {
+//            return ResponseEntity.ok().build();
+//        }
+//        return ResponseEntity.badRequest().build();
+//    }
+//
+//    // 채팅 로그 불러서 저장하기 위한 GetMapping
+//    @GetMapping("/chat/{projectId}")
+//    public ResponseEntity<List<ChatMessage>> getChatLog(@PathVariable("projectId") String projectId) {
+//        List<ChatMessage> list = new ArrayList<>();
+//        list = redisChatService.getChatLog(projectId);
+//        return ResponseEntity.ok(list);
+//    }
 
 }

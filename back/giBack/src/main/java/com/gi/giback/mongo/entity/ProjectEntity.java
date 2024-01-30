@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Data
-@Document
+@Document(collection = "projects")
 @NoArgsConstructor
 public class ProjectEntity {
     @Id
@@ -17,5 +17,4 @@ public class ProjectEntity {
     private String thumbnail;
     private LocalDateTime lasUpdateTime;
     private org.bson.Document data;
-    private org.bson.Document chatLog;
 }
