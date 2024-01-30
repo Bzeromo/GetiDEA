@@ -6,6 +6,7 @@ import com.gi.giback.mongo.entity.ProjectEntity;
 import com.gi.giback.mongo.service.ChatService;
 import com.gi.giback.mongo.service.ProjectService;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/mongo")
+@Tag(name = "Mongo 테스트", description = "몽고DB 테스트용 API")
 public class MongoController {
     @Autowired
     private ProjectService service;
@@ -41,6 +43,7 @@ public class MongoController {
         entity.setData(new org.bson.Document(data.getData()));
 
         boolean result;
+        System.out.println(entity.toString());
         result = service.addProject(entity);
 
         if(result) return "ok";

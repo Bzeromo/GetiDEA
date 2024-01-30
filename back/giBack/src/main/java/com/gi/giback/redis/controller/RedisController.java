@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.gi.giback.redis.dto.ProjectData;
 import com.gi.giback.redis.dto.RedisProjectDto;
 import com.gi.giback.redis.service.RedisService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/redis")
+@Tag(name = "Redis 테스트", description = "Redis 테스트용 API")
 public class RedisController {
 
     @Autowired
