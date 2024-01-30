@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Data
-@Document
+@Document(collection = "templates")
 @NoArgsConstructor
 public class TemplateEntity {
     @Id
