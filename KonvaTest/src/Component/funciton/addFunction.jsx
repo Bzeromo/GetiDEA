@@ -132,22 +132,22 @@ const addFunction = (
     setLines([...lines, newLine]);
   };
 
-  const addText = () => {
-    if (newTextValue) {
-      const newText = {
-        id: `Text-${texts.length + 1}`,
-        type: "Text",
-        text: "ㅇㄴㅁㅇㄴㅁㅇㄴㅁ",
-        x: 100, // 텍스트 위치 조절
-        y: 100, // 텍스트 위치 조절
-        fontSize: 18, // 텍스트 폰트 크기 조절
-        fill: selectStroke, // 텍스트 색상 설정
-      };
-      setTexts([...texts, newText]);
-      setNewTextValue(""); // 텍스트 입력 초기화
-      console.log("TExt 생성")
-    }
-  };
+  // const addText = () => {
+  //   if (newTextValue) {
+  //     const newText = {
+  //       id: `Text-${texts.length + 1}`,
+  //       type: "Text",
+  //       text: "ㅇㄴㅁㅇㄴㅁㅇㄴㅁ",
+  //       x: 100, // 텍스트 위치 조절
+  //       y: 100, // 텍스트 위치 조절
+  //       fontSize: 18, // 텍스트 폰트 크기 조절
+  //       fill: selectStroke, // 텍스트 색상 설정
+  //     };
+  //     setTexts([...texts, newText]);
+  //     setNewTextValue(""); // 텍스트 입력 초기화
+  //     console.log("TExt 생성")
+  //   }
+  // };
 
   const addImage = (src) => {
     const img = new window.Image();
@@ -167,6 +167,17 @@ const addFunction = (
     };
   };
 
+  const addTextBox = () => {
+    const newText = {
+      id: texts.length + 1,
+      text: "텍스트입니다",
+      x: rectPosition.x,
+      y: rectPosition.y,
+      ty: "Text"
+    };
+    setTexts([...texts, newText]);
+  };
+
   return {
     addRectangle,
     addCircle,
@@ -175,8 +186,8 @@ const addFunction = (
     addDashedLine,
     addDottedLine,
     addArrowLine,
-    addText,
     addImage,
+    addTextBox
   };
 };
 

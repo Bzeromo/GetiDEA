@@ -298,7 +298,7 @@ const MyDrawing = () => {
     });
 
     setTexts((prevTexts) => {
-      // 새로운 선 추가
+      // 새로운 텍스트 추가
       const newTexts = receivedData.texts.filter(
         (newTexts) => !prevTexts.some((text) => text.id === newTexts.id)
       );
@@ -455,24 +455,24 @@ const MyDrawing = () => {
   const handleMouseMove = (e) => {
     // if (!drawing || !startWrite) return; // startWrite가 false이면 기능 비활성화
     if (!drawing || !startWrite || selectedId) {
-      if (!selectionRect.x) return; // 선택 영역이 없으면 종료
+      // if (!selectionRect.x) return; // 선택 영역이 없으면 종료
 
-      const { x, y } = e.target.getStage().getPointerPosition();
-      const newSelectionRect = {
-        ...selectionRect,
-        width: x - selectionRect.x,
-        height: y - selectionRect.y,
-      };
-      setSelectionRect(newSelectionRect);
-      const selected = shapes.filter((rect) => {
-        return (
-          rect.x > selectionRect.x &&
-          rect.y > selectionRect.y &&
-          rect.x + rect.width < x &&
-          rect.y + rect.height < y
-        );
-      });
-      setSelectedIds(selected.map((s) => s.id));
+      // const { x, y } = e.target.getStage().getPointerPosition();
+      // const newSelectionRect = {
+      //   ...selectionRect,
+      //   width: x - selectionRect.x,
+      //   height: y - selectionRect.y,
+      // };
+      // setSelectionRect(newSelectionRect);
+      // const selected = shapes.filter((rect) => {
+      //   return (
+      //     rect.x > selectionRect.x &&
+      //     rect.y > selectionRect.y &&
+      //     rect.x + rect.width < x &&
+      //     rect.y + rect.height < y
+      //   );
+      // });
+      // setSelectedIds(selected.map((s) => s.id));
       return;
     } // startWrite가 false이면 기능 비활성화
     const stage = e.target.getStage();
@@ -491,7 +491,7 @@ const MyDrawing = () => {
   const handleMouseUp = (shapes) => {
     // if (!startWrite) return; // startWrite가 false이면 기능 비활성화
     if (!startWrite) {
-      setSelectionRect({});
+      // setSelectionRect({});
       return;
     } // startWrite가 false이면 기능 비활성화
     setDrawing(false);

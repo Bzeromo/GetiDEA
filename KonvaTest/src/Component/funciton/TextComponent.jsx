@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { Text, Transformer } from 'react-konva';
 
-const TextBox = ({ text, x, y, onTextChange }) => {
+const TextBox = ({ text, x, y, onTextChange, onDragEnd }) => {
   const [isEditing, setIsEditing] = useState(false);
-  const [textBox, setTextBox] = useState(null);
+  const [textBox, setTextBox] = useState(text);
   const [position, setPosition] = useState({ x, y });
 
   const handleDblClick = () => {
@@ -28,19 +28,28 @@ const TextBox = ({ text, x, y, onTextChange }) => {
         document.body.removeChild(input);
       }
     });
+
+    
+    
+  };
+  const handleDragEnd = (e) => {
+    // 드래그 종료 시 새로운 위치 정보로 상태 업데이트
+    const newPos = { x: e.target.x(), y: e.target.y() };
+    setPosition(newPos);
+    // 부모 컴포넌트에 새 위치 정보 전달 (옵셔널)
+    if(onDragEnd) {
+      onDragEnd(newPos);
+    }
   };
 
   return (
     <Text
       text={text}
-      x={position.x}
-      y={position.y}
       fontSize={20}
       draggable
-      onDragEnd={(e) => {
-        // 드래그 종료 시 위치 정보 업데이트
-        setPosition({ x: e.target.x(), y: e.target.y() });
-      }}
+      x={position.x}
+      y={position.y}
+      onDragEnd={handleDragEnd}
       onDblClick={isEditing ? null : handleDblClick}
       ref={(node) => setTextBox(node)}
     />
