@@ -5,9 +5,9 @@ import com.gi.giback.mongo.dto.ProjectDto;
 import com.gi.giback.mongo.entity.ProjectEntity;
 import com.gi.giback.mongo.service.ChatService;
 import com.gi.giback.mongo.service.ProjectService;
-
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +37,7 @@ public class MongoController {
         entity.setProjectName(data.getProjectName());
         entity.setThumbnail(data.getThumbnail());
         entity.setTemplateId(data.getTemplateId());
-        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime now = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
         String formattedDateTime = now.toString();
         entity.setLasUpdateTime(LocalDateTime.parse(formattedDateTime));
         entity.setData(new org.bson.Document(data.getData()));

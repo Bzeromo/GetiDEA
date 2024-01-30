@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,7 +57,7 @@ public class SocketController {
             project.setProjectName(projectName);
             project.setTemplateId(templateId);
             project.setThumbnail(template.getThumbnail());
-            project.setLasUpdateTime(LocalDateTime.now());
+            project.setLasUpdateTime(LocalDateTime.now(ZoneId.of("Asia/Seoul")));
             project.setData(template.getData());
             if (projectService.addProject(project))
                 return ResponseEntity.ok().build();

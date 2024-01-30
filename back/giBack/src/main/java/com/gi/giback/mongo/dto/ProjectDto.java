@@ -1,8 +1,7 @@
 package com.gi.giback.mongo.dto;
 
-import jakarta.persistence.Id;
+import org.springframework.data.annotation.Id;
 import java.time.LocalDateTime;
-import java.util.Map;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 

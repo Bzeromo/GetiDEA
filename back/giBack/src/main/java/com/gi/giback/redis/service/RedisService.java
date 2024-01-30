@@ -5,6 +5,7 @@ import com.gi.giback.mongo.service.ProjectService;
 import com.gi.giback.redis.dto.ProjectData;
 import com.gi.giback.redis.dto.RedisProjectDto;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -35,7 +36,7 @@ public class RedisService {
         ListOperations<String, Object> listOps = redisTemplate.opsForList();
 
         Map<String,Object> combinedData = new HashMap<>();
-        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime now = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         combinedData.put("propId", data.getPropId());
         combinedData.put("updateTime", now.format(formatter));

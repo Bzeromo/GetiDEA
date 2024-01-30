@@ -4,6 +4,7 @@ import com.gi.giback.mongo.entity.ProjectEntity;
 import com.gi.giback.mongo.repository.ProjectRepository;
 import com.gi.giback.redis.dto.ProjectData;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,7 +43,7 @@ public class ProjectService {
             Update update = new Update().set("data.$[elem]", data).filterArray(Criteria.where("elem.dataId").is(propId));
             mongoTemplate.updateFirst(query, update, ProjectEntity.class); // 일치한 첫번쨰 data에 업데이트 작업
         }
-        Update update = new Update().set("updateTime", LocalDateTime.now());
+        Update update = new Update().set("updateTime", LocalDateTime.now(ZoneId.of("Asia/Seoul")));
         mongoTemplate.updateFirst(query, update, ProjectEntity.class);
 
         return true;

@@ -1,6 +1,6 @@
 package com.gi.giback.mongo.entity;
 
-import jakarta.persistence.Id;
+import org.springframework.data.annotation.Id;
 import java.time.LocalDateTime;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -10,8 +10,10 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document(collection = "projects")
 @NoArgsConstructor
 public class ProjectEntity {
+
     @Id
     private String projectId;
+
     private String templateId;
     private String projectName;
     private String thumbnail;

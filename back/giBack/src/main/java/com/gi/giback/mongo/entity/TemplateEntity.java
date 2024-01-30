@@ -1,6 +1,6 @@
 package com.gi.giback.mongo.entity;
 
-import jakarta.persistence.Id;
+import org.springframework.data.annotation.Id;
 import java.time.LocalDateTime;
 import lombok.Data;
 import lombok.NoArgsConstructor;
