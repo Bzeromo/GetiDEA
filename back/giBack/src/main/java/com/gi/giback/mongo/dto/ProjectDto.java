@@ -10,8 +10,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ProjectDto {
     @Id
-    private String id;
+    private String projectId;
+    private String templateId;
     private String projectName;
+    private String thumbnail;
     private LocalDateTime lasUpdateTime;
-    private Map<String, Object> data;
+    private org.bson.Document data;
 }

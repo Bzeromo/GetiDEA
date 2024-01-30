@@ -1,5 +1,8 @@
 프로젝트 가보자구~~!
 
+
+Test    
+
 ### TypeScript 사용법 써놓음
 https://galvanized-citron-903.notion.site/779510c51b2b4859bcd3dc1f7062834f?pvs=4
 
@@ -43,4 +46,8 @@ https://galvanized-citron-903.notion.site/5e8bcd6df7a24fae9107b7b1d23c03ae?v=2dd
 # 오늘 한 일: gerrit 및 gitlab 이슈 해결
 
 
+<<<<<<< HEAD
+## gerrit 테스트 2
+=======
 ## gerrit 테스트
+>>>>>>> a62bfb0c721e39aa08a1b27cc845265e01c0c1e5

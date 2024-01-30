@@ -1,96 +1,134 @@
 package com.gi.giback.redis.service;
-
-import com.gi.giback.redis.entity.UserChange;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.gi.giback.mongo.service.ProjectService;
+import com.gi.giback.redis.dto.ProjectData;
+import com.gi.giback.redis.dto.RedisProjectDto;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.ListOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
-//@Service
+@Service
 public class RedisService {
 
-    private static final int MAX_CHANGES_PER_USER = 30;
-    private static final int RETAIN_CHANGES = 5;
+    private final int remainData = 5;
 
     @Autowired
-    private RedisTemplate<String, UserChange> redisTemplate;
+    private RedisTemplate<String,Object> redisTemplate;
 
-    // 데이터 삽입 - 데이터 초과시 제거 로직도 구현
-    public void addUserChange(String projectId, String userId, UserChange userChange) {
-        String userKey = generateKey(projectId, userId);
-        ListOperations<String, UserChange> listOps = redisTemplate.opsForList();
+    @Autowired
+    private ProjectService projectService;
 
-        // 각 사용자에 대한 UserChange 추가
-        listOps.rightPush(userKey, userChange);
+    public void saveData(RedisProjectDto data) throws JsonProcessingException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        String projectId = data.getProjectId();
+        String key= data.getProjectId() + ":" + data.getUserId();
+        ListOperations<String, Object> listOps = redisTemplate.opsForList();
 
-        // 특정 유저의 UserChange 리스트 크기 검사
-        if (listOps.size(userKey) > MAX_CHANGES_PER_USER) {
-            // 프로젝트 내 모든 유저의 UserChange 리스트를 하나로 합친 후 정렬
-            List<UserChange> allChanges = getAllUserChangesForProject(projectId);
-            allChanges.sort(Comparator.comparing(UserChange::getUpdateTime));
+        Map<String,Object> combinedData = new HashMap<>();
+        LocalDateTime now = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        combinedData.put("propId", data.getPropId());
+        combinedData.put("updateTime", now.format(formatter));
+        combinedData.put("preData", data.getPreData());
+        combinedData.put("newData", data.getNewData());
+        String jsonData = objectMapper.writeValueAsString(combinedData);
 
-            trimUserChangesForAllUsers(projectId);
+        listOps.rightPush(key, jsonData);
+        Long size = listOps.size(key);
+        if (size != null && size > 30) { // 만약 크기가 30이 넘어가면 merge 작업 수행
+            // 병합 작업 수행
+            List<ProjectData> redisData = getAllDataProject(projectId);
+            projectService.updateData(projectId, redisData);
         }
+        
     }
 
-    // ProjectId에 속한 모든 user의 변경 정보를 가져와서 시간 순서로 정렬
-    private List<UserChange> getAllUserChangesForProject(String projectId) {
-        List<UserChange> allChanges = new ArrayList<>();
-        for (String userId : getAllUserIds(projectId)) {
-            String key = generateKey(projectId, userId);
-            allChanges.addAll(redisTemplate.opsForList().range(key, 0, -1));
+    public Object getLastProjectData(String projectId, String userId) { // 되돌리기에서 사용
+        String key = projectId + ":" + userId;
+        if(Boolean.TRUE.equals(redisTemplate.hasKey(key))){
+            return redisTemplate.opsForList().rightPop(key);
+            // 마지막 값 pop 작업 수행 후 반환
+            // if 앞으로 돌리기 작업 추가시 꺼내온 값을 다른 곳에 임시 저장 필요
         }
-        return allChanges;
+        return null;
     }
 
-    // ProjectId의 모든 user의 데이터를 5개만 남기고 제거
-    private void trimUserChangesForAllUsers(String projectId) {
-        for (String userId : getAllUserIds(projectId)) {
-            trimUserChangesForUser(projectId, userId);
+    // projectId가 일치하는 곳의 모든 사용자의 변경사항 시간 순서로 정렬후 리턴
+    public List<ProjectData> getAllDataProject(String projectId) throws JsonProcessingException {
+        List<ProjectData> results = new ArrayList<>();
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        Set<String> keys = redisTemplate.keys(projectId + ":*");
+
+        assert keys != null;
+        for (String key : keys) {
+            List<Object> data = redisTemplate.opsForList().range(key, 0, -1);
+            assert data != null;
+            for (Object o : data) {
+                ProjectData projectData = objectMapper.readValue((String) o, ProjectData.class);
+                results.add(projectData);
+            }
+
+            int currentSize = 0;
+            if(!data.isEmpty())
+                currentSize = data.size();
+
+            int maxDataSize = 5; // 최대로 남길 데이터 개수
+            if (currentSize > maxDataSize) {
+                int excessData = currentSize - maxDataSize;
+                // 초과하는 데이터를 삭제
+                for (int i = 0; i < excessData; i++) {
+                    redisTemplate.opsForList().rightPop(key);
+                }
+            }
+
+            // 되돌리기에 사용될 최대 5개 데이터만 남기고 삭제하는 방식
+//            List<Object> tempData = new ArrayList<>();
+//            int dataSize = redisTemplate.opsForList().size(key).intValue(); // 현재 데이터 개수
+//            for (int i = 0; i < Math.min(dataSize, remainData); i++) {
+//                Object tmp = redisTemplate.opsForList().rightPop(key);
+//                if (tmp != null) {
+//                    tempData.add(tmp);
+//                }
+//            }
+//            redisTemplate.delete(key);
+//
+//            for (Object tmp : tempData) {
+//                // saveDto 에 맞춰줘야함
+//                ProjectData projectData = objectMapper.readValue((String) tmp, ProjectData.class);
+//
+//                redisTemplate.opsForList().leftPush(key, data);
+//            }
         }
+
+        results.sort(Comparator.comparing(ProjectData::getUpdateTime));
+        return results;
     }
 
-    // ProjectId의 userId에 데이터를 5개만 남기고 제거
-    private void trimUserChangesForUser(String projectId, String userId) {
-        String key = generateKey(projectId, userId);
-        ListOperations<String, UserChange> listOps = redisTemplate.opsForList();
-        long size = listOps.size(key);
-
-        if (size > RETAIN_CHANGES) {
-            listOps.trim(key, size - RETAIN_CHANGES, size - 1);
-        }
+    // projectId + UserId 기준으로 어떤 사용자가 프로젝트를 종료했을때 호출하여
+    // 해당 사용자의 기록을 지움
+    public boolean deleteData(String projectId, String userId) {
+        String key = projectId + ":" + userId;
+        redisTemplate.delete(key);
+        return true;
     }
 
-
-    public List<UserChange> getAllUserChanges(String projectId) {
-        // 동일 프로젝트 내 모든 유저의 UserChange 목록을 조회하고 정렬
-        // 프로젝트 내의 모든 유저 ID 목록 필요
-        List<UserChange> allChanges = new ArrayList<>();
-        for (String userId : getAllUserIds(projectId)) {
-            String key = generateKey(projectId, userId);
-            List<UserChange> changes = redisTemplate.opsForList().range(key, 0, -1);
-            allChanges.addAll(changes);
-        }
-
-        allChanges.sort(Comparator.comparing(UserChange::getUpdateTime));
-        return allChanges;
+    // projectId에 해당하는 프로젝트에 사용자가 하나도 남지 않았을때
+    // 저장을 하고 호출하여 프로젝트 정보를 삭제
+    public boolean deleteAllDataByProjectId(String projectId) {
+        Set<String> keysToDelete = redisTemplate.keys(projectId + ":*");
+        redisTemplate.delete(keysToDelete);
+        return true;
     }
 
-    // 되돌리기 작업 수행시 마지막 작업을 빼내고 제거
-    public UserChange getLastChangeAndRemove(String projectId, String userId) {
-        String key = generateKey(projectId, userId);
-        return redisTemplate.opsForList().rightPop(key);
-    }
-
-    private String generateKey(String projectId, String userId) {
-        return projectId + ":" + userId;
-    }
-
-    private List<String> getAllUserIds(String projectId) {
-        // 프로젝트에 속한 모든 유저의 ID 목록을 반환하는 로직 구현 필요
-        return new ArrayList<>();
-    }
 }

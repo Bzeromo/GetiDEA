@@ -1,0 +1,15 @@
+
+E
+java:S1068"*Remove this unused "userId" private field.(Â—‹¼úÿÿÿÿ
+G
+java:S1068",Remove this unused "userName" private field.(Û”øÚøÿÿÿÿ
+C
+java:S1068"-Remove this unused "userEmail" private field.(©’‘Ñ
+I
+java:S1068".Remove this unused "profileImg" private field.(ßâÊ¼úÿÿÿÿ
+G
+java:S1068",Remove this unused "provider" private field.(ò²Ø½þÿÿÿÿ
+J
+java:S1068"/Remove this unused "accessToken" private field.(ù‰ôÅøÿÿÿÿ
+A
+java:S1068"+Remove this unused "isAdmin" private field.(ÒŒÞÇ

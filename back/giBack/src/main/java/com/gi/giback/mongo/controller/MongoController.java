@@ -1,9 +1,13 @@
 package com.gi.giback.mongo.controller;
 
+import com.gi.giback.mongo.dto.ChatMessage;
 import com.gi.giback.mongo.dto.ProjectDto;
 import com.gi.giback.mongo.entity.ProjectEntity;
+import com.gi.giback.mongo.service.ChatService;
 import com.gi.giback.mongo.service.ProjectService;
+
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -20,12 +24,17 @@ public class MongoController {
     @Autowired
     private ProjectService service;
 
+    @Autowired
+    private ChatService chatService;
+
     @PostMapping("/project")
     public String addProject(@RequestBody ProjectDto data){
         ProjectEntity entity = new ProjectEntity();
 
-        entity.setId(data.getId());
-        entity.setProjectName(data.getId());
+        entity.setProjectId(data.getProjectId());
+        entity.setProjectName(data.getProjectName());
+        entity.setThumbnail(data.getThumbnail());
+        entity.setTemplateId(data.getTemplateId());
         LocalDateTime now = LocalDateTime.now();
         String formattedDateTime = now.toString();
         entity.setLasUpdateTime(LocalDateTime.parse(formattedDateTime));
@@ -43,6 +52,18 @@ public class MongoController {
         Optional<ProjectEntity> entity = service.getProject(projectId);
         if(entity.isPresent()) return ResponseEntity.ok(entity);
         return ResponseEntity.badRequest().build();
+    }
+
+    @PostMapping("/chat/{projectId}")
+    public ResponseEntity<Void> addChatMessage(@PathVariable String projectId, @RequestBody ChatMessage chatMessage) {
+        chatService.addChatLog(projectId, chatMessage);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/chat/{projectId}")
+    public ResponseEntity<List<ChatMessage>> getChatLogs(@PathVariable String projectId) {
+        List<ChatMessage> chatLogs = chatService.getChatLogsByProjectId(projectId);
+        return ResponseEntity.ok(chatLogs);
     }
 
 }
