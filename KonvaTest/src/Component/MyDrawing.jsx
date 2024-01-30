@@ -156,27 +156,10 @@ const MyDrawing = () => {
     setImages
   );
 
-  // const { zoomOnWheel, handleMouseDown, handleMouseMove, handleMouseUp } =
-  //   useEventHandlers(
-  //     startWrite,
-  //     setDrawing,
-  //     setCurrentLine,
-  //     drawing,
-  //     currentLine,
-  //     setDrawingList,
-  //     drawingList,
-  //     fillColor,
-
-  //     useCallback,
-  //     stageRef,
-  //     setStageScale,
-  //     setStagePosition
-  //   );
-
   const [socket, setSocket] = useState(null);
 
   useEffect(() => {
-    const socket = new WebSocket("ws://localhost:8000");
+    const socket = new WebSocket("ws://192.168.31.198:8000");
 
     socket.onopen = () => {
       console.log("WebSocket 연결이 열렸습니다.");
@@ -191,6 +174,7 @@ const MyDrawing = () => {
         textDataPromise
           .then((jsonData) => {
             const receivedData = JSON.parse(jsonData);
+            // updateShapes(receivedData);
             applyDataToStage(receivedData);
           })
           .catch((error) => {
@@ -199,17 +183,8 @@ const MyDrawing = () => {
       } else {
         // 이미 문자열인 경우 바로 JSON 파싱
         const receivedData = JSON.parse(event.data);
-        applyDataToStage(receivedData);
       }
-      // const receivedData = JSON.parse(event.data);
 
-      // setShapes(receivedData.shapes);
-      // setDrawingList(receivedData.drawingList);
-      // setLines(receivedData.lines);
-      // setTexts(receivedData.texts);
-
-      // console.log(receivedData);
-      // applyDataToStage(receivedData);
     };
 
     socket.onerror = (error) => {
@@ -235,23 +210,6 @@ const MyDrawing = () => {
       setChatInput({ nickname: "", message: "" }); // 입력 필드 초기화
     }
 
-    // setShapes((prevShapes) => {
-    //   return shapes.map((newShape) => {
-    //     // 기존의 도형 찾기
-    //     const existingShape = prevShapes.find(
-    //       (shape) => shape.id === newShape.id
-    //     );
-
-    //     if (existingShape) {
-    //       // 기존 도형이 있으면 새로운 속성으로 업데이트
-    //       return { ...existingShape, ...newShape };
-    //     } else {
-    //       // 기존 도형이 없으면 새로운 도형 추가
-    //       return newShape;
-    //     }
-    //   });
-    // });
-
     // 서버에 데이터 전송
     if (socket && socket.readyState === WebSocket.OPEN) {
       const dataToSend = {
@@ -272,90 +230,51 @@ const MyDrawing = () => {
     console.log("receiveData" + receivedData);
     const { shapes, lines, newChat, texts } = receivedData;
 
-    // setShapes((prevShapes) => {
-    //   return shapes.map((newShape) => {
-    //     // 기존의 도형 찾기
-    //     const existingShape = prevShapes.find(
-    //       (shape) => shape.id === newShape.id
-    //     );
-
-    //     if (existingShape) {
-    //       // 기존 도형이 있으면 새로운 속성으로 업데이트
-    //       return { ...existingShape, ...newShape };
-    //     } else {
-    //       // 기존 도형이 없으면 새로운 도형 추가
-    //       return newShape;
-    //     }
-    //   });
-    // });
-
-    // setLines((prevLines) => {
-    //   return lines.map((newLines) => {
-    //     // 기존의 도형 찾기
-    //     const existingLine = prevLines.find(
-    //       (line) => line.id === newLines.id
-    //     );
-
-    //     if (existingLine) {
-    //       // 기존 도형이 있으면 새로운 속성으로 업데이트
-    //       return { ...existingLine, x: newLines.x, y: newLines.y };
-    //     } else {
-    //       // 기존 도형이 없으면 새로운 도형 추가
-    //       return newLines;
-    //     }
-    //   });
-    // });
-
-    // 위 로직을 바꾸는 걸로 해보자 할 수 있다.
-    // setShapes((prevShapes) =>
-    //   prevShapes.map((shape) =>
-    //     shape.id === selectedId ? { ...shape, x: shapes.x, y: shapes.y } : shape
-    //   )
-    // );
-
-    // setShapes([...shapes, ...newShapes])
-
     setShapes((prevShapes) => {
-      // 새로운 선 추가
-      const newLines = receivedData.shapes.filter((newLine) =>
-        prevShapes.some((shape) => shape.id === newLine.id)
-      );
-      return [...prevShapes, ...newLines];
+      return shapes.map((newShape) => {
+        // 기존의 도형 찾기
+        const existingShape = prevShapes.find(
+          (shape) => shape.id === newShape.id
+        );
+
+        if (existingShape) {
+          // 기존 도형이 있으면 새로운 속성으로 업데이트
+          return { ...existingShape, ...newShape };
+        } else {
+          // 기존 도형이 없으면 새로운 도형 추가
+          return newShape;
+        }
+      });
     });
 
     setLines((prevLines) => {
-      // 새로운 선 추가
-      const newLines = receivedData.lines.filter(
-        (newLine) => prevLines.some((line) => line.id === newLine.id)
-      );
-      return [...prevLines, ...newLines];
+      return lines.map((newLines) => {
+        // 기존의 도형 찾기
+        const existingLine = prevLines.find((line) => line.id === newLines.id);
+
+        if (existingLine) {
+          // 기존 도형이 있으면 새로운 속성으로 업데이트
+          return { ...existingLine, x: newLines.x, y: newLines.y };
+        } else {
+          // 기존 도형이 없으면 새로운 도형 추가
+          return newLines;
+        }
+      });
     });
 
-    // setLines(receivedData.lines);
-
-    // setLines((prevLines) => {
-    //   const updatedLines = receivedData.lines.map((newLine) => {
-    //     const existingLine = prevLines.find((line) => line.id === newLine.id);
-    //     if (existingLine) {
-    //       // 새로운 선의 데이터로 기존 선을 업데이트하되, x와 y 좌표는 기존 선의 값을 유지합니다.
-    //       return { ...existingLine, ...newLine, x: existingLine.x, y: existingLine.y };
-    //     }
-    //     return newLine;
-    //   });
-
-    //   const existingLinesNotUpdated = prevLines.filter(
-    //     (line) => !receivedData.lines.some((newLine) => newLine.id === line.id)
-    //   );
-
-    //   return [...updatedLines, ...existingLinesNotUpdated];
-    // });
-
     setTexts((prevTexts) => {
-      // 새로운 선 추가
-      const newTexts = receivedData.texts.filter((newTexts) =>
-        prevTexts.some((text) => text.id === newTexts.id)
-      );
-      return [...prevTexts, ...newTexts];
+      return texts.map((newTexts) => {
+        // 기존의 도형 찾기
+        const existingText = prevTexts.find((text) => text.id === newTexts.id);
+
+        if (existingText) {
+          // 기존 도형이 있으면 새로운 속성으로 업데이트
+          return { ...existingText, x: newTexts.x, y: newTexts.y };
+        } else {
+          // 기존 도형이 없으면 새로운 도형 추가
+          return newTexts;
+        }
+      });
     });
 
     if (
@@ -405,6 +324,7 @@ const MyDrawing = () => {
     const y = (pointer.y - stage.y()) / stage.scaleY();
 
     setCurrentLine([x, y]);
+    sendInfoToServer();
   };
 
   const handleMouseMove = (e) => {
@@ -438,9 +358,10 @@ const MyDrawing = () => {
 
     setCurrentLine(currentLine.concat([x, y]));
 
-    // setCurrentLine(currentLine.concat([point.x, point.y]));
-    // console.log(pointer.x + "    " + pointer.y);
-    // sendInfoToServer();
+    if (selectedId) {
+      // 객체가 드래그되고 있을 때
+      const newPos = { x: e.target.x(), y: e.target.y() };
+    }
   };
 
   const handleMouseUp = (shapes) => {
@@ -454,14 +375,16 @@ const MyDrawing = () => {
       ...drawingList,
       { points: currentLine, stroke: fillColor, strokeWidth: 5 },
     ]);
-    // sendInfoToServer.bind(this);
+
     // sendInfoToServer();
     // shapes.getLayer().batchDraw();
 
-    // console.log(shapes);
+    console.log(shapes);
   };
 
-  const handleDragEnd = (e) => {
+  const [dragEnded, setDragEnded] = useState(false);
+
+  const handleDragEnd = async (e) => {
     // 사용자가 드래그를 마치면 호출되는 콜백 함수
     const id = e.target.id();
     const ty = e.target.attrs.ty;
@@ -488,7 +411,6 @@ const MyDrawing = () => {
           return shapes;
         })
       );
-      console.log("TEST")
     } else {
       setTexts((prevTexts) =>
         prevTexts.map((text) => {
@@ -500,37 +422,29 @@ const MyDrawing = () => {
       );
     }
 
-    // 도형의 배열을 업데이트합니다.
-    // setShapes((prevShapes) =>
-    //   prevShapes.map((shapes) => {
-    //     if (shapes.id === id) {
-    //       // 드래그된 도형의 위치를 업데이트합니다.
-    //       return { ...shapes, x: newPos.x, y: newPos.y };
-    //     }
-    //     return shapes;
-    //   })
-    // );
+    setDragEnded(true);
 
-    // setLines((prevLines) =>
-    //   prevLines.map((line) => {
-    //     if (line.id === id) {
-    //       return { ...line, x: newPos.x, y: newPos.y };
-    //     }
-    //     return line;
-    //   })
-    // );
-
-    // setTexts((prevTexts) =>
-    //   prevTexts.map((text) => {
-    //     if (text.id === id) {
-    //       return { ...text, x: newPos.x, y: newPos.y };
-    //     }
-    //     return text;
-    //   })
-    // );
-
-    sendInfoToServer();
   };
+
+  useEffect(() => {
+    // 드래그 작업이 완료되었고, 상태가 변경되었다면 서버에 전송
+    if (dragEnded) {
+      sendInfoToServer();
+      // 다음 상태 변경을 위해 dragEnded를 다시 false로 설정
+      setDragEnded(false);
+    }
+  }, [dragEnded]); 
+
+  // const updateShapePosition = (id, newPos) => {
+  //   setShapes((prevShapes) =>
+  //     prevShapes.map((shape) => {
+  //       if (shape.id === id) {
+  //         return { ...shape, ...newPos };
+  //       }
+  //       return shape;
+  //     })
+  //   );
+  // };
 
   const zoomOnWheel = useCallback((e) => {
     e.evt.preventDefault();
