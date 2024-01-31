@@ -1,6 +1,7 @@
 # 음성채팅 구현 (webRTC 활용) 필요 내용 정리
 
 ## 진행 사항
+SSAFY GIT에 webRTC 관련 명세서가 있음! => backend/frontend 관련해서 내용 정리되어 있으니 확인 바람! <br>
 webRTC_test 폴더 내용 : createOffer, sendOffer 됨 / createAnswer 부터 안되는데 이유를 모르겠음.
 
 ## webRTC 개념 학습 관련
