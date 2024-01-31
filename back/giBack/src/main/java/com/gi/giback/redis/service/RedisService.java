@@ -46,7 +46,7 @@ public class RedisService {
 
         listOps.rightPush(key, jsonData);
         Long size = listOps.size(key);
-        if (size != null && size > 30) { // 만약 크기가 30이 넘어가면 merge 작업 수행
+        if (size != null && size > 10) { // 만약 크기가 30이 넘어가면 merge 작업 수행
             // 병합 작업 수행
             List<ProjectData> redisData = getAllDataProject(projectId);
             projectService.updateData(projectId, redisData);

@@ -17,6 +17,6 @@ public class ProjectEntity {
     private String templateId;
     private String projectName;
     private String thumbnail;
-    private LocalDateTime lasUpdateTime;
+    private LocalDateTime lastUpdateTime;
     private org.bson.Document data;
 }
