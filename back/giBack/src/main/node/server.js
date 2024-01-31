@@ -1,7 +1,8 @@
 import express from "express";
 import { createServer } from "http";
 import { Server as SocketIOServer } from "socket.io";
-import axios from 'axios';
+import { MongoClient } from "mongodb";
+import redis from "redis";
 
 // httpServer 인식
 const app = express();
@@ -13,7 +14,7 @@ const SOCKET_PORT = 8000;
 
 const ioServer = new SocketIOServer(httpServer, {
     cors: {
-        origin: "http://localhost:3000",  // 클라이언트 페이지의 URL
+        origin: ["http://localhost:3000", "http://localhost:8000", "http://127.0.0.1:8000"],  // 클라이언트 페이지의 URL
         methods: ["GET", "POST"]          // 허용할 HTTP 메소드
     }
 });
@@ -28,58 +29,102 @@ ioServer.listen(SOCKET_PORT, () => {
     console.log(`웹소켓 서버가 ${SOCKET_PORT}번 포트에서 실행됩니다.`);
 });
 
+const uri = "mongodb://test:1234@localhost:27017";
+const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+
+const redisClient = redis.createClient({
+    // Docker Compose 서비스 이름을 호스트로 사용
+    host: 'redis',
+    port: 6379 // 기본 Redis 포트
+});
+
+// Redis 연결
+redisClient.on('connect', function() {
+    console.log('Redis에 연결됨');
+});
+
+// Redis 오류 처리
+redisClient.on('error', function (err) {
+    console.log('오류 ' + err);
+});
+
+// locationIds 배열 속에 locationId가 있는 project를 탐색하는 함수
+async function findProjectIdByLocationId(locationId) {
+    try {
+        await client.connect(); // MongoDB 클라이언트 연결
+        const database = client.db("test"); // 사용할 데이터베이스 이름
+        const projects = database.collection("projects"); // 사용할 컬렉션 이름
+
+        // 주어진 locationId가 locationIds 배열 안에 있는 단 하나의 프로젝트를 검색
+        const query = { "locationIds": locationId };
+        const project = await projects.findOne(query, { projection: { _id: 0, projectId: 1 } });
+
+        if (project) {
+            console.log("Found projectId:", project.projectId);
+            return project.projectId; // 찾았으면 프로젝트 Id 반환
+        } else {
+            console.log("No project found containing the given locationId");
+            return null; // 프로젝트를 찾지 못한 경우 null 반환
+        }
+    } catch (error) {
+        console.error("Error finding projectId by locationId:", error);
+        return null; // 에러 발생 시 null 반환
+    } finally {
+        await client.close(); // 사용이 끝난 후 클라이언트 연결 종료
+    }
+}
+
 ioServer.on('connection', (socket) => {
     console.log('새로운 연결이 감지되었습니다.');
 
+    // 프로젝트 입장 시 locationId를 통해 project 방을 찾아 분류
+    socket.on("joinProject", locationId => {
+        findProjectIdByLocationId(locationId).then(projectId => {
+            if (projectId) {
+                console.log(`${projectId} is found.`);
+                socket.join(projectId); // projectId에 해당하는 서버 방에 유저가 매핑
+            } else {
+                console.log("No project found for the specified locationId.");
+                socket.emit("redirectToHome", "Project not found");
+            }
+        }).catch(error => {
+            console.error(error);
+        });
+    })
+
+    // 채팅방 입장 (locationId를 통해 이미 방을 찾아왔음을 가정한다, roomId === projectId)
     socket.on("message", (data) => {
-        ioServer.emit("message", data);
+        const { roomId, message } = data; // 클라이언트로부터 방 ID와 메시지를 받습니다.
+        ioServer.to(roomId).emit("message", message); // 해당 방의 모든 사용자에게 메시지를 전송합니다.
+        console.log(`방 ${roomId}에 메시지를 전송했습니다: ${message}`);
     });
 
-    socket.on('disconnect', () => {
-        console.log('연결이 끊어졌습니다.');
+    // 프로젝트 상태 변경사항 공유
+    socket.on('updateState', (data) => {
+        io.to(data.projectId).emit('stateUpdated', data.newData);
+        
+        const redisProjectDto = {
+            projectId: data.projectId,
+            userId: data.userId,
+            propId: data.propId,
+            preData: JSON.stringify(data.preData),
+            newData: JSON.stringify(data.newData)
+        };
+    
+        // Redis에 저장
+        redisClient.hset('projects', redisProjectDto.projectId, JSON.stringify(redisProjectDto), (err, reply) => {
+            if (err) throw err;
+            console.log(reply);
+        });
     });
 
-    // mongo db 연동 후, REST API를 이용해 db 내 데이터를 가져오면 작동 가능
-    // // 소켓과 프로젝트가 연결되었을 때
-    // socket.on('joinProject', async (projectId, userId) => {
-    //     socket.join(projectId);
-    //     console.log(`User joined project ${projectId}`);
-    //
-    //     // 스프링 서비스의 REST API 호출
-    //     try {
-    //          await axios.post('http://localhost:8080/api/joinProject', { projectId, userId });
-    //          console.log(`User ${userId} joined project ${projectId}`);
-    //     } catch (error) {
-    //          console.error('joinProject API 호출 중 오류 발생:', error);
-    //     }
-    //
-    //     // 나머지 로직
-    // });
-    //
-    // // 프로젝트 방에서 나가기
-    // socket.on('leaveProject', async (projectId, userId) => {
-    //     socket.leave(projectId);
-    //     console.log(`User left project ${projectId}`);
-    //
-    //     // 스프링 서비스의 REST API 호출
-    //     try {
-    //          await axios.post('http://localhost:8080/api/leaveProject', { projectId, userId });
-    //          console.log(`User ${userId} left project ${projectId}`);
-    //      } catch (error) {
-    //          console.error('leaveProject API 호출 중 오류 발생:', error);
-    //      }
-    //
-    //     // 나머지 로직...
-    // });
-    //
-    // // 프로젝트 방에 메시지 보내기
-    // socket.on('sendMessage', (data) => {
-    //     io.to(data.projectId).emit('receiveMessage', data.message);
-    // });
-    //
-    // // 프로젝트 상태 변경사항 공유
-    // socket.on('updateState', (data) => {
-    //     io.to(data.projectId).emit('stateUpdated', data.newState);
-    // });
+    // 프로젝트 방에서 나가기
+    socket.on('leaveProject', async (projectId, locationId) => {
+        socket.leave(projectId);
+        console.log(`유저가 ${projectId} 프로젝트를 나갔습니다.`);
+    
+        // redis에 병합 요청 보내기 (내일 합시다.)
+    });
+    
 });
 
