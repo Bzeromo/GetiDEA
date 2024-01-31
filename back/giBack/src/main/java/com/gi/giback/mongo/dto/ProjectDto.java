@@ -1,8 +1,7 @@
 package com.gi.giback.mongo.dto;
 
-import jakarta.persistence.Id;
+import org.springframework.data.annotation.Id;
 import java.time.LocalDateTime;
-import java.util.Map;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -16,5 +15,4 @@ public class ProjectDto {
     private String thumbnail;
     private LocalDateTime lasUpdateTime;
     private org.bson.Document data;
-    private org.bson.Document chatLog;
 }

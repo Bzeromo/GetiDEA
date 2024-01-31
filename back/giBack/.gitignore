@@ -2,6 +2,7 @@
 *.yml
 *.log
 init-mongo.js
+init-mysql.sql
 node_modules/
 HELP.md
 .gradle

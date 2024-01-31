@@ -3,6 +3,7 @@ package com.gi.giback.mysql.controller;
 import com.gi.giback.mysql.dto.MySqlTestDto;
 import com.gi.giback.mysql.dto.ResponseDto;
 import com.gi.giback.mysql.service.MySqlTestService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Slf4j
+@Tag(name = "MySQL 테스트", description = "MySQL 테스트용 API")
 public class MySqlTestController {
 
     @Autowired
