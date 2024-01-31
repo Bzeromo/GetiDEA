@@ -1,5 +1,13 @@
 
 O
-java:S1611
-"2Remove the parentheses around the "csrf" parameter(ÃçÌ¯8ŒŸ‹¿Õ1
-X	java:S125"<This block of commented-out lines of code should be removed.(Î¶îÌ8×Ô¿Õ1
+java:S1611"2Remove the parentheses around the "csrf" parameter(ÃçÌ¯8ŒŸ‹¿Õ1
+O
+java:S1611"3Remove the parentheses around the "login" parameter(Šİ·A8æ›†ÀÕ1
+U
+java:S1611"3Remove the parentheses around the "basic" parameter(ö“§Œıÿÿÿÿ8ç›†ÀÕ1
+V
+java:S1611"4Remove the parentheses around the "oauth2" parameter(¸ÖÑ€ÿÿÿÿÿ8ç›†ÀÕ1
+a
+java:S1611"DRemove the parentheses around the "userInfoEndpointConfig" parameter(•òôÄ8è›†ÀÕ1
+O
+java:S1611"2Remove the parentheses around the "auth" parameter(ò‚öí8è›†ÀÕ1
