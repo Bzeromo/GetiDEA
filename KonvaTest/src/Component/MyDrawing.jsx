@@ -26,6 +26,7 @@ const MyDrawing = () => {
   });
 
   const textRef = useRef();
+  const lineRef = useRef();
 
   //스테이지 초기화
   const initialScaleValue = { x: 1, y: 1 };
@@ -238,14 +239,20 @@ const MyDrawing = () => {
     }
   }, [texts]); // texts 상태가 변경될 때마다 실행
 
+  useEffect(() => {
+    if (lineRef.current) {
+      lineRef.current.getLayer().batchDraw();
+    }
+  }, [lines]); // texts 상태가 변경될 때마다 실행
+
   const applyDataToStage = (receivedData) => {
     // const newReceivedData = JSON.stringify(receivedData);
     // console.log("receiveData" + receivedData);
     const { shapes, lines, newChat, texts } = receivedData;
 
-    console.log(JSON.stringify(receivedData) + "fdsfds");
-    console.log(JSON.stringify(receivedData.texts) + "fdsfds");
-    console.log(JSON.stringify(texts) + "fdsfds");
+    // console.log(JSON.stringify(receivedData) + "fdsfds");
+    // console.log(JSON.stringify(receivedData.lines) + "fdsfds");
+    // console.log(JSON.stringify(texts) + "fdsfds");
 
     setShapes((prevShapes) => {
       return shapes.map((newShape) => {
@@ -271,7 +278,7 @@ const MyDrawing = () => {
 
         if (existingLine) {
           // 기존 도형이 있으면 새로운 속성으로 업데이트
-          return { ...existingLine, x: newLines.x, y: newLines.y };
+          return { ...existingLine, ...newLines };
         } else {
           // 기존 도형이 없으면 새로운 도형 추가
           return newLines;
@@ -310,7 +317,7 @@ const MyDrawing = () => {
 
     // console.log("TE@" + JSON.stringify(shapes));
     // console.log("TE!" + JSON.stringify(lines));
-    console.log("TEST" + JSON.stringify(texts));
+    // console.log("TEST" + JSON.stringify(texts));
 
     // console.log(JSON.stringify("TE#" + newChat));
   };
@@ -406,10 +413,10 @@ const MyDrawing = () => {
       return;
     }
 
-    console.log(e.target); // e.target 객체 확인
-    console.log(typeof e.target); // e.target의 타입 확인
-    console.log(e.target.id); // e.target의 id 속성 값 확인
-    console.log(e.target.constructor.name);
+    // console.log(e.target); // e.target 객체 확인
+    // console.log(typeof e.target); // e.target의 타입 확인
+    // console.log(e.target.id); // e.target의 id 속성 값 확인
+    // console.log(e.target.constructor.name);
 
     const id = e.target.id();
     const id2 = e.target.attrs.id;
@@ -418,25 +425,30 @@ const MyDrawing = () => {
     // 새로운 위치 정보를 가져옵니다.
     const newPos = { x: e.target.x(), y: e.target.y() };
     const newData = e.target.attrs.text;
+    const newRotate = e.target.rotation();
 
     if (!id) {
-      console.log("id 확인 " + "혹시 null인가?" + id);
+      console.log("id 확인 " + "혹시 null인가?");
     } else {
       console.log("오예 성공! " + id);
     }
-    console.log(newData + "newdata확인용");
-    console.log(ty + "ty확인용");
-    console.log(id2 + "체크해보자");
+    console.log(id + "  id");
+    console.log(id2 + "  id2");
+    // console.log(newData + "  newdata확인용");
+    console.log(ty + "  ty확인용");
+    // console.log(id2 + "체크해보자");
+    console.log(newRotate);
 
-    console.log("newpos 확인 용" + newPos.x + "  " + newPos.y);
+    // console.log("newpos 확인 용" + newPos.x + "  " + newPos.y);
 
     if (ty === "Line") {
       setLines((prevLines) =>
-        prevLines.map((line) => {
-          if (line.id === id) {
-            return { ...line, x: newPos.x, y: newPos.y };
+        prevLines.map((lines) => {
+          if (lines.id === id) {
+            console.log("나 맞는디?");
+            return { ...lines, rotation: newRotate, x: newPos.x, y: newPos.y };
           }
-          return line;
+          return lines;
         })
       );
     } else if (ty === "Shape") {
@@ -444,7 +456,7 @@ const MyDrawing = () => {
         prevShapes.map((shapes) => {
           if (shapes.id === id) {
             // 드래그된 도형의 위치를 업데이트합니다.
-            return { ...shapes, x: newPos.x, y: newPos.y };
+            return { ...shapes, rotation: newRotate, x: newPos.x, y: newPos.y };
           }
           return shapes;
         })
@@ -453,9 +465,10 @@ const MyDrawing = () => {
       setTexts((prevTexts) =>
         prevTexts.map((texts) => {
           if (texts.id === id) {
-            console.log(texts.id + "이거만 되면 끝이다");
-            console.log(texts.id + "tewarewasf");
-            return { ...texts, x: newPos.x, y: newPos.y, text: newData };
+            // console.log(texts.id + "이거만 되면 끝이다");
+            // console.log(texts.id + "tewarewasf");
+            console.log();
+            return { ...texts, text: newData, x: newPos.x, y: newPos.y };
           }
           return texts;
         })
@@ -468,16 +481,15 @@ const MyDrawing = () => {
   const handleTransformEnd = (e) => {
     // e.target은 변형된 Konva.Node 인스턴스를 참조합니다.
     const node = e.target;
-  
+
     // 회전 정보를 가져옵니다.
     const rotationAngle = node.rotation();
-  
+
     // 회전 정보를 콘솔에 출력합니다.
     console.log(`Rotation angle: ${rotationAngle}`);
-    
+
     // 필요하다면 여기에서 회전 정보를 상태에 저장하거나 처리합니다.
   };
-  
 
   useEffect(() => {
     // 드래그 작업이 완료되었고, 상태가 변경되었다면 서버에 전송
@@ -1075,6 +1087,7 @@ const MyDrawing = () => {
                   <LineComponent
                     key={line.id}
                     lineProps={line}
+                    ref={lineRef}
                     isSelected={line.id === selectedId}
                     onSelect={(e) => {
                       handleShapeClick(line.id, e);
