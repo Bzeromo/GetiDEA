@@ -549,8 +549,8 @@ const MyDrawing = () => {
 
   //Layer 변경 건(이건 색 변경 확인 후에 다시 가는 걸로)
   const { moveDown, moveUp, moveToBottom, moveToTop } = LayerFunction(
+    selectedId,
     layerRef,
-    selectedId
   );
 
   useEffect(() => {

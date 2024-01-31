@@ -20,6 +20,7 @@ const addFunction = (
   const addRectangle = (type) => {
     const newShape = {
       id: `${type}${shapes.length + 1}`,
+      
       type: "Rect",
       stroke: selectStroke,
       x: 50,
