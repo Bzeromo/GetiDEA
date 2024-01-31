@@ -41,6 +41,12 @@ dependencies {
     implementation 'io.jsonwebtoken:jjwt-jackson:0.12.3'
     //간단 테스트를 위한 mustache 의존성 추가
     implementation 'org.springframework.boot:spring-boot-starter-mustache'
+    // S3 저장 관련 의존성
+    compileOnly 'org.springframework.cloud:spring-cloud-starter-aws:2.0.2.RELEASE'
+    implementation platform('com.amazonaws:aws-java-sdk-bom:1.11.228')
+    implementation 'com.amazonaws:aws-java-sdk-s3'
+    // 파일 처리 의존성
+    implementation 'commons-io:commons-io:2.6'
 
     compileOnly 'org.projectlombok:lombok'
 
