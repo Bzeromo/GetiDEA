@@ -169,7 +169,7 @@ const addFunction = (
 
   const addTextBox = () => {
     const newText = {
-      id: texts.length + 1,
+      id: `Text-${texts.length+1}`,
       text: "텍스트입니다",
       x: rectPosition.x,
       y: rectPosition.y,
