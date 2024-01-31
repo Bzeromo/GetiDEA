@@ -2,14 +2,15 @@ pipeline {
     agent any
 
     // 환경 변수를 정의할 수 있습니다. 예를 들어, 빌드에 필요한 변수나 API 키 등을 설정할 수 있습니다.
-    environment {
-        // 예: MY_ENV_VAR = 'some_value'
-    }
+//     environment {
+//         // 예: MY_ENV_VAR = 'some_value'
+//     }
 
     stages {
         stage('Checkout') {
             steps {
                 // 현재 파이프라인이 실행된 브랜치에 따라 소스 코드를 체크아웃합니다.
+                echo 'Checking out code...'
                 checkout scm
             }
         }

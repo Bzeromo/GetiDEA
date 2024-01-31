@@ -12,6 +12,7 @@ import deleteFunction from "./funciton/deleteFunction";
 import changeFunction from "./funciton/changeFunction";
 import LayerFunction from "./funciton/LayerFunction";
 import TextBox from "./funciton/TextComponent";
+// import TextComponent from "./Add/TextComponent";
 
 const MyDrawing = () => {
   const [imageIdCounter, setImageIdCounter] = useState(0);
@@ -23,6 +24,8 @@ const MyDrawing = () => {
     endX: 250,
     endY: 50,
   });
+
+  const textRef = useRef();
 
   //스테이지 초기화
   const initialScaleValue = { x: 1, y: 1 };
@@ -164,7 +167,7 @@ const MyDrawing = () => {
   const [socket, setSocket] = useState(null);
 
   useEffect(() => {
-    const socket = new WebSocket("ws://192.168.31.198:8000");
+    const socket = new WebSocket("ws://localhost:8000/");
 
     socket.onopen = () => {
       console.log("WebSocket 연결이 열렸습니다.");
@@ -329,7 +332,7 @@ const MyDrawing = () => {
     const y = (pointer.y - stage.y()) / stage.scaleY();
 
     setCurrentLine([x, y]);
-    sendInfoToServer();
+    // sendInfoToServer();
   };
 
   const handleMouseMove = (e) => {
@@ -378,15 +381,24 @@ const MyDrawing = () => {
     setDrawing(false);
     setDrawingList([
       ...drawingList,
-      { points: currentLine, stroke: fillColor, strokeWidth: 5 },
+      { points: currentLine, stroke: currentColor, strokeWidth: 5 },
     ]);
 
     console.log(shapes);
+    sendInfoToServer();
   };
 
   const handleDragEnd = async (e) => {
     // 사용자가 드래그를 마치면 호출되는 콜백 함수
+
+    if(!e.target){
+      console.error("drag event has no target");
+      return;
+    }
+
     const id = e.target.id();
+    // const id = textRef.current.id();
+    // const id2 = e.target.attrs.id;
     const ty = e.target.attrs.ty;
 
     // 새로운 위치 정보를 가져옵니다.
@@ -976,7 +988,7 @@ const MyDrawing = () => {
         >
           <Layer ref={layerRef}>
             {drawing && (
-              <Line points={currentLine} stroke={fillColor} strokeWidth={5} />
+              <Line points={currentLine} stroke={currentColor} strokeWidth={5} />
             )}
             {drawingList.map((drawing, id) => (
               <Line key={id} {...drawing} />
@@ -1037,6 +1049,8 @@ const MyDrawing = () => {
             {texts.map((text) => (
               <TextBox
                 key={text.id}
+                ref={textRef}
+                textProps={text}
                 text={text.text}
                 x={text.x}
                 y={text.y}
