@@ -120,7 +120,7 @@ const MyDrawing = () => {
     addDottedLine,
     addArrowLine,
     addImage,
-    addTextBox
+    addTextBox,
   } = addFunction(
     shapes,
     setShapes,
@@ -192,7 +192,6 @@ const MyDrawing = () => {
         // 이미 문자열인 경우 바로 JSON 파싱
         const receivedData = JSON.parse(event.data);
       }
-
     };
 
     socket.onerror = (error) => {
@@ -233,10 +232,20 @@ const MyDrawing = () => {
     }
   };
 
+  useEffect(() => {
+    if (textRef.current) {
+      textRef.current.getLayer().batchDraw();
+    }
+  }, [texts]); // texts 상태가 변경될 때마다 실행
+
   const applyDataToStage = (receivedData) => {
     // const newReceivedData = JSON.stringify(receivedData);
-    console.log("receiveData" + receivedData);
+    // console.log("receiveData" + receivedData);
     const { shapes, lines, newChat, texts } = receivedData;
+
+    console.log(JSON.stringify(receivedData) + "fdsfds");
+    console.log(JSON.stringify(receivedData.texts) + "fdsfds");
+    console.log(JSON.stringify(texts) + "fdsfds");
 
     setShapes((prevShapes) => {
       return shapes.map((newShape) => {
@@ -272,14 +281,10 @@ const MyDrawing = () => {
 
     setTexts((prevTexts) => {
       return texts.map((newTexts) => {
-        // 기존의 도형 찾기
         const existingText = prevTexts.find((text) => text.id === newTexts.id);
-
         if (existingText) {
-          // 기존 도형이 있으면 새로운 속성으로 업데이트
-          return { ...existingText, x: newTexts.x, y: newTexts.y };
+          return { ...existingText, ...newTexts };
         } else {
-          // 기존 도형이 없으면 새로운 도형 추가
           return newTexts;
         }
       });
@@ -303,17 +308,23 @@ const MyDrawing = () => {
       });
     }
 
-    console.log("TE@" + JSON.stringify(shapes));
-    console.log("TE!" + JSON.stringify(lines));
+    // console.log("TE@" + JSON.stringify(shapes));
+    // console.log("TE!" + JSON.stringify(lines));
     console.log("TEST" + JSON.stringify(texts));
 
-    console.log(JSON.stringify("TE#" + newChat));
+    // console.log(JSON.stringify("TE#" + newChat));
   };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setChatInput((prev) => ({ ...prev, [name]: value }));
   };
+
+  useEffect(() => {
+    if (layerRef.current) {
+      layerRef.current.batchDraw();
+    }
+  }, [texts]);
 
   const handleMouseDown = (e) => {
     // if (!startWrite) return; // startWrite가 false이면 기능 비활성화
@@ -366,10 +377,10 @@ const MyDrawing = () => {
 
     setCurrentLine(currentLine.concat([x, y]));
 
-    if (selectedId) {
-      // 객체가 드래그되고 있을 때
-      const newPos = { x: e.target.x(), y: e.target.y() };
-    }
+    // if (selectedId) {
+    //   // 객체가 드래그되고 있을 때
+    //   const newPos = { x: e.target.x(), y: e.target.y() };
+    // }
   };
 
   const handleMouseUp = (shapes) => {
@@ -384,27 +395,40 @@ const MyDrawing = () => {
       { points: currentLine, stroke: currentColor, strokeWidth: 5 },
     ]);
 
-    console.log(shapes);
+    // console.log(shapes);
     sendInfoToServer();
   };
 
   const handleDragEnd = async (e) => {
-    // 사용자가 드래그를 마치면 호출되는 콜백 함수
-
-    if(!e.target){
-      console.error("drag event has no target");
+    if (!e || !e.target) {
+      // e 또는 e.target이 undefined인 경우
+      console.error("이벤트 또는 대상 요소가 정의되지 않았습니다.");
       return;
     }
 
+    console.log(e.target); // e.target 객체 확인
+    console.log(typeof e.target); // e.target의 타입 확인
+    console.log(e.target.id); // e.target의 id 속성 값 확인
+    console.log(e.target.constructor.name);
+
     const id = e.target.id();
-    // const id = textRef.current.id();
-    // const id2 = e.target.attrs.id;
+    const id2 = e.target.attrs.id;
     const ty = e.target.attrs.ty;
 
     // 새로운 위치 정보를 가져옵니다.
     const newPos = { x: e.target.x(), y: e.target.y() };
+    const newData = e.target.attrs.text;
 
-    console.log("newpos 확인 용" + newPos.x + "  " + newPos.y)
+    if (!id) {
+      console.log("id 확인 " + "혹시 null인가?" + id);
+    } else {
+      console.log("오예 성공! " + id);
+    }
+    console.log(newData + "newdata확인용");
+    console.log(ty + "ty확인용");
+    console.log(id2 + "체크해보자");
+
+    console.log("newpos 확인 용" + newPos.x + "  " + newPos.y);
 
     if (ty === "Line") {
       setLines((prevLines) =>
@@ -425,20 +449,35 @@ const MyDrawing = () => {
           return shapes;
         })
       );
-    } else if(ty ==="Text"){
+    } else if (ty === "Text") {
       setTexts((prevTexts) =>
-        prevTexts.map((text) => {
-          if (text.id === id) {
-            return { ...text, x: newPos.x, y: newPos.y };
+        prevTexts.map((texts) => {
+          if (texts.id === id) {
+            console.log(texts.id + "이거만 되면 끝이다");
+            console.log(texts.id + "tewarewasf");
+            return { ...texts, x: newPos.x, y: newPos.y, text: newData };
           }
-          return text;
+          return texts;
         })
       );
     }
 
     setDragEnded(true);
-
   };
+
+  const handleTransformEnd = (e) => {
+    // e.target은 변형된 Konva.Node 인스턴스를 참조합니다.
+    const node = e.target;
+  
+    // 회전 정보를 가져옵니다.
+    const rotationAngle = node.rotation();
+  
+    // 회전 정보를 콘솔에 출력합니다.
+    console.log(`Rotation angle: ${rotationAngle}`);
+    
+    // 필요하다면 여기에서 회전 정보를 상태에 저장하거나 처리합니다.
+  };
+  
 
   useEffect(() => {
     // 드래그 작업이 완료되었고, 상태가 변경되었다면 서버에 전송
@@ -447,7 +486,7 @@ const MyDrawing = () => {
       // 다음 상태 변경을 위해 dragEnded를 다시 false로 설정
       setDragEnded(false);
     }
-  }, [dragEnded]); 
+  }, [dragEnded]);
 
   // const updateShapePosition = (id, newPos) => {
   //   setShapes((prevShapes) =>
@@ -550,7 +589,7 @@ const MyDrawing = () => {
   //Layer 변경 건(이건 색 변경 확인 후에 다시 가는 걸로)
   const { moveDown, moveUp, moveToBottom, moveToTop } = LayerFunction(
     selectedId,
-    layerRef,
+    layerRef
   );
 
   useEffect(() => {
@@ -593,7 +632,6 @@ const MyDrawing = () => {
   const changeEraserMenuToggle = () => {
     setEraserToggle(!eraserToggle);
   };
-
 
   const handleTextChange = (id, newText) => {
     const updatedTexts = texts.map((t) =>
@@ -976,8 +1014,8 @@ const MyDrawing = () => {
       <div className="ml-36 mt-24 h-full w-full">
         <Stage
           ref={stageRef}
-          width={window.innerWidth * 1}
-          height={window.innerHeight * 1}
+          width={window.innerWidth}
+          height={window.innerHeight}
           draggable={!draggable}
           onWheel={zoomOnWheel}
           onMouseDown={handleMouseDown}
@@ -988,7 +1026,11 @@ const MyDrawing = () => {
         >
           <Layer ref={layerRef}>
             {drawing && (
-              <Line points={currentLine} stroke={currentColor} strokeWidth={5} />
+              <Line
+                points={currentLine}
+                stroke={currentColor}
+                strokeWidth={5}
+              />
             )}
             {drawingList.map((drawing, id) => (
               <Line key={id} {...drawing} />
@@ -998,6 +1040,7 @@ const MyDrawing = () => {
                 key={shape.id}
                 shapeProps={shape}
                 isSelected={shape.id === selectedId}
+                onTransformEnd={handleTransformEnd}
                 onSelect={(e) => {
                   handleShapeClick(shape.id, e);
                 }}
@@ -1009,11 +1052,11 @@ const MyDrawing = () => {
                 }}
               />
             ))}
-            {lines.map((line, id) => {
+            {lines.map((line) => {
               if (line.type === "Arrow") {
                 return (
                   <ArrowComponent
-                    key={id}
+                    key={line.id}
                     lineProps={line}
                     isSelected={line.id === selectedId}
                     onSelect={(e) => {
@@ -1030,7 +1073,7 @@ const MyDrawing = () => {
               } else {
                 return (
                   <LineComponent
-                    key={id}
+                    key={line.id}
                     lineProps={line}
                     isSelected={line.id === selectedId}
                     onSelect={(e) => {
@@ -1055,9 +1098,15 @@ const MyDrawing = () => {
                 x={text.x}
                 y={text.y}
                 isSelected={text.id === selectedId}
-                onDragEnd={handleDragEnd}
+                // onDragEnd={handleDragEnd}
                 onSelect={(e) => {
                   handleShapeClick(text.id, e);
+                }}
+                onChange={(newAttrs) => {
+                  const newTexts = texts.map((t) =>
+                    t.id === text.id ? newAttrs : t
+                  );
+                  setTexts(newTexts); // 상태 업데이트
                 }}
                 onTextChange={(newText) => handleTextChange(text.id, newText)}
               />

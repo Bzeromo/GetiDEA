@@ -1,14 +1,38 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Text, Transformer } from "react-konva";
 
-const TextComponent = ({ text, x, y, onTextChange, onDragEnd, onTextEdit }) => {
+const TextComponent = ({ text, x, y, onTextChange, onDragEnd, isSelected, textProps }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [textBox, setTextBox] = useState(text);
   const [position, setPosition] = useState({ x, y });
   // const [text, setText] = useState(textProps.text);
   const [showInput, setShowInput] = useState(true);
+  const transformerRef = useRef();
+  const textRef = useRef();
+
+  const lineRef = useRef();
+  // const transformerRef = useRef();
+
+  useEffect(() => {
+    if (isSelected) {
+      // 현재 도형에 Transformer 연결
+      transformerRef.current.nodes([textRef.current]);
+      transformerRef.current.getLayer().batchDraw();
+    }
+  }, [isSelected]);
+
+  useEffect(() => {
+    setTextBox(textRef.current); // textRef.current를 textBox에 할당
+    // 기타 로직...
+  }, []);
 
   const handleDblClick = () => {
+
+    if (!textBox) {
+      console.error('TextBox가 아직 설정되지 않았습니다.');
+      return;
+    }
+
     setIsEditing(true);
 
     // 텍스트 입력을 위한 HTML 텍스트 입력 필드 생성
@@ -31,30 +55,19 @@ const TextComponent = ({ text, x, y, onTextChange, onDragEnd, onTextEdit }) => {
       }
     });
   };
-  const handleDragEnd = (e) => {
-    // 드래그 종료 시 새로운 위치 정보로 상태 업데이트
-    const newPos = { x: e.target.x(), y: e.target.y() };
-    const id = e.target.id();
-    console.log(id)
-    console.log("TEST + " + newPos.x)
-    setPosition(newPos);
-    // 부모 컴포넌트에 새 위치 정보 전달 (옵셔널)
-    if (onDragEnd) {
-      onDragEnd(newPos);
-    }
-  };
-  
 
   return (
     <Text
+      ref={textRef} {...textProps}
       text={text}
       fontSize={20}
       draggable
       x={position.x}
       y={position.y}
+      ty="Text"
       // onDragEnd={handleDragEnd}
       onDblClick={isEditing ? null : handleDblClick}
-      ref={(node) => setTextBox(node)}
+      // ref={(node) => setTextBox(node)}
     />
   );
 };

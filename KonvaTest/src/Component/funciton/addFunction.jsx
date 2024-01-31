@@ -23,6 +23,7 @@ const addFunction = (
       
       type: "Rect",
       stroke: selectStroke,
+      text: "텍스트상자입니다",
       x: 50,
       y: 50,
       width: 100,
@@ -176,6 +177,7 @@ const addFunction = (
       y: rectPosition.y,
       ty: "Text"
     };
+    console.log(newText)
     setTexts([...texts, newText]);
   };
 
