@@ -21,7 +21,20 @@ public class S3Controller {
     public ResponseEntity<String> uploadThumbnailImage(@RequestParam("thumbnailImage") MultipartFile multipartFile) {
         String result;
         try {
-            result = s3UploadService.saveFile(multipartFile);
+            result = s3UploadService.saveThumbnailImage(multipartFile);
+        } catch (IOException e) {
+            return ResponseEntity.badRequest().build();
+        }
+        return ResponseEntity.ok(result);
+    }
+
+    @PostMapping("/userId/profileImage")
+    public ResponseEntity<String> updateProfileImage(@RequestParam("userId") String userId,
+        @RequestParam("profileImage") MultipartFile multipartFile) {
+
+        String result;
+        try {
+            result = s3UploadService.saveProfileImage(multipartFile, userId);
         } catch (IOException e) {
             return ResponseEntity.badRequest().build();
         }
