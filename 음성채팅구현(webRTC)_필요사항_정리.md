@@ -3,8 +3,8 @@
 ## 진행 사항
 - SSAFY GIT에 webRTC 관련 명세서가 있음! => backend/frontend 관련해서 내용 정리되어 있으니 확인 바람! <br>
 - webRTC_test 폴더 관련 내용
-1) createOffer, sendOffer 됨 / createAnswer 부터 안되는데 이유를 모르겠음.
-2) VideoCall.jsx 로 구현 연습 ( VideoCallType.tsx 는 완전히 미완성! )
+1. createOffer, sendOffer 됨 / createAnswer 부터 안되는데 이유를 모르겠음.
+2. VideoCall.jsx 로 구현 연습 ( VideoCallType.tsx 는 완전히 미완성! )
 
 ## webRTC 개념 학습 관련
 - mdn 공식문서 <br>
