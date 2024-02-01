@@ -1,6 +1,7 @@
 import express from "express";
 import { createServer } from "http";
 import { Server as SocketIOServer } from "socket.io";
+import axios from "axios";
 import { MongoClient } from "mongodb";
 import redis from "redis";
 
@@ -74,6 +75,17 @@ async function findProjectIdByLocationId(locationId) {
     }
 }
 
+// // Spring Boot REST API에서 데이터 가져오기 예시
+// app.get('/api/data', async (req, res) => {
+//     try {
+//         const response = await axios.get('http://localhost:8080/api/endpoint');
+//         res.json(response.data);
+//     } catch (error) {
+//         console.error(error);
+//         res.status(500).send("API 호출 중 오류 발생");
+//     }
+// });
+
 ioServer.on('connection', (socket) => {
     console.log('새로운 연결이 감지되었습니다.');
 
@@ -123,8 +135,14 @@ ioServer.on('connection', (socket) => {
         socket.leave(projectId);
         console.log(`유저가 ${projectId} 프로젝트를 나갔습니다.`);
     
-        // redis에 병합 요청 보내기 (내일 합시다.)
+        // redis에 병합 요청 보내기
     });
     
 });
 
+axios.get("http://192.168.31.172:8080/data/test/1 ")
+.then(data => {
+    console.log(data.console.info);
+}).catch(err => {
+    console.error(err);
+})
