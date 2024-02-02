@@ -1,4 +1,4 @@
-package com.gi.giback.mysql.oauth;
+package com.gi.giback.mysql.user.oauth;
 
 public interface OAuth2Response {
     //OAuth를 통해 플랫폼으로부터 정보를 가져왔을 때 어떤 데이터를 구체적으로 사용할 것인지에 대한 인터페이스

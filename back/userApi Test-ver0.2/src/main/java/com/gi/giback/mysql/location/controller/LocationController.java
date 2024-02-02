@@ -6,5 +6,4 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @Tag(name = "Location 컨트롤러")
 public class LocationController {
-
 }

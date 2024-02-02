@@ -1,4 +1,4 @@
-package com.gi.giback.mysql.oauth;
+package com.gi.giback.mysql.user.oauth;
 
 import java.util.Map;
 

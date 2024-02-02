@@ -1,6 +1,6 @@
 package com.gi.giback.config;
 
-import com.gi.giback.mysql.oauth.CustomOAuth2UserService;
+import com.gi.giback.mysql.user.oauth.CustomOAuth2UserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;

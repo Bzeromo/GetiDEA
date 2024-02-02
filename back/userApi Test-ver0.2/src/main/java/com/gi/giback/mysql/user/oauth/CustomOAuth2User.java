@@ -1,6 +1,5 @@
-package com.gi.giback.mysql.oauth;
+package com.gi.giback.mysql.user.oauth;
 
-import com.gi.giback.mysql.oauth.OAuth2Response;
 import java.util.Collection;
 import java.util.Map;
 import org.springframework.security.core.GrantedAuthority;

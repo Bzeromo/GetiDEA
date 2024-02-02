@@ -33,8 +33,25 @@ public class LocationEntity {
     private String projectId;
 
     @Column(name = "authority")
-    private String authority;
+    private boolean authority;
 
     @Column(name = "bookmark")
     private boolean bookmark;
+
+    public boolean getBookmark(){
+        return this.bookmark;
+    }
+
+    public boolean getAuthority(){
+        return this.authority;
+    }
+
+    public void setBookmark(){
+        this.bookmark = !this.bookmark;
+    }
+
+    public void setAuthority(){
+        this.authority = !this.authority;
+    }
+
 }
