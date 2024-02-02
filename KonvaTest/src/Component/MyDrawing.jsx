@@ -13,6 +13,7 @@ import deleteFunction from "./funciton/deleteFunction";
 import changeFunction from "./funciton/changeFunction";
 import LayerFunction from "./funciton/LayerFunction";
 import TextBox from "./funciton/TextComponent";
+import postData from "./axios/postData";
 
 const MyDrawing = () => {
   const [imageIdCounter, setImageIdCounter] = useState(0);
@@ -27,6 +28,7 @@ const MyDrawing = () => {
 
   const textRef = useRef();
   const lineRef = useRef();
+  const shapeRef = useRef();
 
   //프로젝트 이름
   const [projectName, setProjectName] = useState("초기 프로젝트");
@@ -115,6 +117,16 @@ const MyDrawing = () => {
   );
 
   const {
+    PostRect,
+    PostCircle,
+    PostTriangle,
+    PostText,
+    PostLine,
+    PostDot,
+    PostArrow,
+  } = postData(axios);
+
+  const {
     addText,
     addRectangle,
     addCircle,
@@ -183,6 +195,7 @@ const MyDrawing = () => {
                 setTexts((prevTexts) => updateArray(prevTexts, item, key));
                 break;
               case "Shape":
+                console.log(JSON.stringify(item) + "짜잔?");
                 setShapes((prevShapes) => updateArray(prevShapes, item, key));
                 break;
               case "Line":
@@ -225,7 +238,7 @@ const MyDrawing = () => {
     };
 
     socket.onmessage = (event) => {
-      // console.log("서버로부터 메시지를 받았습니다:", event.data);
+      console.log("서버로부터 메시지를 받았습니다:", event.data);
 
       if (event.data instanceof Blob) {
         const textDataPromise = new Response(event.data).text();
@@ -241,6 +254,7 @@ const MyDrawing = () => {
       } else {
         // 이미 문자열인 경우 바로 JSON 파싱
         const receivedData = JSON.parse(event.data);
+        applyDataToStage(receivedData)
       }
     };
 
@@ -289,6 +303,12 @@ const MyDrawing = () => {
   }, [texts]); // texts 상태가 변경될 때마다 실행
 
   useEffect(() => {
+    if (shapeRef.current) {
+      shapeRef.current.getLayer().batchDraw();
+    }
+  }, [shapes]); // texts 상태가 변경될 때마다 실행
+
+  useEffect(() => {
     if (lineRef.current) {
       lineRef.current.getLayer().batchDraw();
     }
@@ -296,7 +316,7 @@ const MyDrawing = () => {
 
   const applyDataToStage = (receivedData) => {
     // const newReceivedData = JSON.stringify(receivedData);
-    // console.log("receiveData" + receivedData);
+    console.log("receiveData" + receivedData);
     const { shapes, lines, texts, newChat } = receivedData;
 
     // console.log(JSON.stringify(receivedData) + "fdsfds");
@@ -364,9 +384,9 @@ const MyDrawing = () => {
       });
     }
 
-    // console.log("TE@" + JSON.stringify(shapes));
-    // console.log("TE!" + JSON.stringify(lines));
-    // console.log("TEST" + JSON.stringify(texts));
+    // console.log("shape" + JSON.stringify(shapes));
+    // console.log("line" + JSON.stringify(lines));
+    // console.log("text" + JSON.stringify(texts));
 
     // console.log(JSON.stringify("TE#" + newChat));
   };
@@ -455,129 +475,6 @@ const MyDrawing = () => {
     sendInfoToServer();
   };
 
-  const PostText = (e) => {
-    if (!e || !e.target) {
-      console.error("이벤트 또는 대상 요소가 정의되지 않았습니다.");
-      return;
-    }
-    const postData = {
-      projectId: "test",
-      userId: "강준규",
-      propId: e.target.attrs.id,
-      preData: {},
-      newData: {
-        id: e.target.attrs.id,
-        text : e.target.attrs.text,
-        x: e.target.attrs.x,
-        y: e.target.attrs.y,
-        ty: e.target.attrs.ty, 
-        fontSize : e.target.attrs.fontSize,
-        draggable: e.target.attrs.draggable,
-        fill: e.target.attrs.fill,
-        rotation: e.target.attrs.rotation,
-        scaleX : e.target.attrs.scaleX,
-        scaleY : e.target.attrs.scaleY,
-        offsetX : e.target.attrs.offsetX,
-        offsetY : e.target.attrs.offsetY,
-        skewX : e.target.attrs.skewX,
-        skewY : e.target.attrs.skewY,
-      },
-    };
-    axios
-      .post("http://192.168.31.172:8080/changes", postData)
-      .then((response) => {
-        // console.log(response);
-        console.log(response.data);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  };
-
-  const PostShape = (e) => {
-    if (!e || !e.target) {
-      console.error("이벤트 또는 대상 요소가 정의되지 않았습니다.");
-      return;
-    }
-    const postData = {
-      projectId: "test",
-      userId: "강준규",
-      propId: e.target.attrs.id,
-      preData: {},
-      newData: {
-        id: e.target.attrs.id,
-        type : e.target.attrs.type,
-        stroke : e.target.attrs.stroke,
-        x: e.target.attrs.x,
-        y: e.target.attrs.y,
-        side : e.target.attrs.side,
-        radius : e.target.attrs.radius,
-        fill: e.target.attrs.fill,
-        ty: e.target.attrs.ty,
-        draggable: e.target.attrs.draggable,
-        rotation: e.target.attrs.rotation,
-        scaleX : e.target.attrs.scaleX,
-        scaleY : e.target.attrs.scaleY,
-        offsetX : e.target.attrs.offsetX,
-        offsetY : e.target.attrs.offsetY,
-        skewX : e.target.attrs.skewX,
-        skewY : e.target.attrs.skewY,
-      },
-    };
-    axios
-      .post("http://192.168.31.172:8080/changes", postData)
-      .then((response) => {
-        // console.log(response);
-        console.log(response.data);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  };
-
-  const PostLine = (e) => {
-    if (!e || !e.target) {
-      console.error("이벤트 또는 대상 요소가 정의되지 않았습니다.");
-      return;
-    }
-    const postData = {
-      projectId: "test",
-      userId: "강준규",
-      propId: e.target.attrs.id,
-      preData: {},
-      newData: {
-        id: e.target.attrs.id,
-        points : e.target.attrs.points,
-        stroke : e.target.attrs.stroke,
-        strokeWidth : e.target.attrs.strokeWidth,
-        rotation: e.target.attrs.rotation,
-        lineCap : e.target.attrs.lineCap,
-        lineJoin : e.target.attrs.lineJoin,
-        fill: e.target.attrs.fill,
-        ty: e.target.attrs.ty,
-        x: e.target.attrs.x,
-        y: e.target.attrs.y,
-        draggable: e.target.attrs.draggable,
-        fontSize: e.target.attrs.fontSize,
-        scaleX : e.target.attrs.scaleX,
-        scaleY : e.target.attrs.scaleY,
-        offsetX : e.target.attrs.offsetX,
-        offsetY : e.target.attrs.offsetY,
-        skewX : e.target.attrs.skewX,
-        skewY : e.target.attrs.skewY,
-      },
-    };
-    axios
-      .post("http://192.168.31.172:8080/changes", postData)
-      .then((response) => {
-        // console.log(response);
-        console.log(response.data);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  };
-
   const handleDragEnd = async (e) => {
     if (!e || !e.target) {
       // e 또는 e.target이 undefined인 경우
@@ -593,6 +490,7 @@ const MyDrawing = () => {
     const id = e.target.id();
     const id2 = e.target.attrs.id;
     const ty = e.target.attrs.ty;
+    const type = e.target.attrs.type;
 
     // 새로운 위치 정보를 가져옵니다.
     const newPos = { x: e.target.x(), y: e.target.y() };
@@ -606,69 +504,106 @@ const MyDrawing = () => {
     }
     // console.log(id + "  id");
     // console.log(id2 + "  id2");
-    console.log(JSON.stringify(newData));
+    // console.log(JSON.stringify(newData));
     // console.log(ty + "  ty확인용");
     // console.log(id2 + "체크해보자");
     // console.log(newRotate);
+    console.log(type);
 
     // console.log("newpos 확인 용" + newPos.x + "  " + newPos.y);
 
-    if (id.includes("Line")) {
-      if (ty === "Line") {
-        setLines((prevLines) =>
-          prevLines.map((lines) => {
-            if (lines.id === id) {
-              const updatedLine = { ...lines, ...newData };
-              // PostLine({ target:  { attrs: updatedLine } }); // 필요한 데이터만 전송
-              return updatedLine;
-            }
-            return lines;
-          })
-        );
-      }
-    } else if (id.includes("Rect") || id.includes("Circle") || id.includes("RegularPolygon") ) {
-      if (ty === "Shape") {
-        setShapes((prevShapes) =>
-          prevShapes.map((shapes) => {
-            if (shapes.id === id) {
-              // 드래그된 도형의 위치를 업데이트합니다.
-              const updatedShape = { ...shapes, ...newData };
-              // PostShape({ target: { attrs: updatedShape } }); // 필요한 데이터만 전송
-              return updatedShape;
-            }
-            return shapes;
-          })
-        );
-      }
-    } else if (id.includes("Text")) {
-      if (ty === "Text") {
-        setTexts((prevTexts) =>
-          prevTexts.map((texts) => {
-            if (texts.id === id) {
-              const updatedText = { ...texts, ...newData };
-              // PostText({ target: { attrs: updatedText } }); // 필요한 데이터만 전송
-              return updatedText;
-            }
-            return texts;
-          })
-        );
-      }
+    console.log(newData);
+    if (ty === "Line" && type === "Dot") {
+      setLines((prevLines) =>
+        prevLines.map((lines) => {
+          if (lines.id === id) {
+            const updatedLine = { ...lines, ...newData };
+            // PostDot({ target: { attrs: updatedLine } }); // 필요한 데이터만 전송
+            return updatedLine;
+          }
+          return lines;
+        })
+      );
+    } else if (ty === "Line" && type === "Arrow") {
+      setLines((prevLines) =>
+        prevLines.map((lines) => {
+          if (lines.id === id) {
+            const updatedLine = { ...lines, ...newData };
+            // PostArrow({ target: { attrs: updatedLine } }); // 필요한 데이터만 전송
+            return updatedLine;
+          }
+          return lines;
+        })
+      );
+    } else if (ty === "Line" && type === "Line") {
+      setLines((prevLines) =>
+        prevLines.map((lines) => {
+          if (lines.id === id) {
+            const updatedLine = { ...lines, ...newData };
+            // PostLine({ target: { attrs: updatedLine } }); // 필요한 데이터만 전송
+            return updatedLine;
+          }
+          return lines;
+        })
+      );
+    } else if (ty === "Shape" && type === "Rect") {
+      setShapes((prevShapes) =>
+        prevShapes.map((shapes) => {
+          if (shapes.id === id) {
+            // 드래그된 도형의 위치를 업데이트합니다.
+            const updatedShape = { ...shapes, ...newData };
+            // PostRect({ target: { attrs: updatedShape } }); // 필요한 데이터만 전송
+            return updatedShape;
+          }
+          return shapes;
+        })
+      );
+    } else if (ty === "Shape" && type === "RegularPolygon") {
+      setShapes((prevShapes) =>
+        prevShapes.map((shapes) => {
+          if (shapes.id === id) {
+            // 드래그된 도형의 위치를 업데이트합니다.
+            const updatedShape = { ...shapes, ...newData };
+            // PostTriangle({ target: { attrs: updatedShape } }); // 필요한 데이터만 전송
+            return updatedShape;
+          }
+          return shapes;
+        })
+      );
+    } else if (ty === "Shape" && type === "Circle") {
+      setShapes((prevShapes) =>
+        prevShapes.map((shapes) => {
+          if (shapes.id === id) {
+            // 드래그된 도형의 위치를 업데이트합니다.
+            const updatedShape = { ...shapes, ...newData };
+            // PostCircle({ target: { attrs: updatedShape } }); // 필요한 데이터만 전송
+            return updatedShape;
+          }
+          return shapes;
+        })
+      );
+    } else if (ty === "Text" && ty === "Text") {
+      setTexts((prevTexts) =>
+        prevTexts.map((texts) => {
+          if (texts.id === id) {
+            const updatedText = { ...texts, ...newData };
+            // PostText({ target: { attrs: updatedText } }); // 필요한 데이터만 전송
+            return updatedText;
+          }
+          return texts;
+        })
+      );
     }
 
     setDragEnded(true);
   };
 
   const handleTransformEnd = (e) => {
-    // e.target은 변형된 Konva.Node 인스턴스를 참조합니다.
     const node = e.target;
 
-    // 회전 정보를 가져옵니다.
     const rotationAngle = node.rotation();
 
-    // 회전 정보를 콘솔에 출력합니다.
     console.log(`Rotation angle: ${rotationAngle}`);
-
-    // 필요하다면 여기에서 회전 정보를 상태에 저장하거나 처리합니다.
   };
 
   useEffect(() => {
@@ -679,17 +614,6 @@ const MyDrawing = () => {
       setDragEnded(false);
     }
   }, [dragEnded]);
-
-  // const updateShapePosition = (id, newPos) => {
-  //   setShapes((prevShapes) =>
-  //     prevShapes.map((shape) => {
-  //       if (shape.id === id) {
-  //         return { ...shape, ...newPos };
-  //       }
-  //       return shape;
-  //     })
-  //   );
-  // };
 
   const zoomOnWheel = useCallback((e) => {
     e.evt.preventDefault();
@@ -1154,7 +1078,7 @@ const MyDrawing = () => {
 
       {/* 오른쪽 윗 블록 */}
       <div className="absolute top-6 right-32 justify-center bg-white rounded-md w-16 h-[50px] flex  items-center flex-row shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]">
-      <button onClick={() => checkObject()}>Check</button>
+        <button onClick={() => checkObject()}>Check</button>
       </div>
 
       {/* 오른쪽 윗 블록 */}
@@ -1164,7 +1088,7 @@ const MyDrawing = () => {
 
       {/* 오른쪽 윗 블록 */}
       <div className="absolute top-6 right-52 justify-center bg-white rounded-md w-16 h-[50px] flex  items-center flex-row shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]">
-              <button onClick={() => GetData()}>Get</button>
+        <button onClick={() => GetData()}>Get</button>
       </div>
 
       {/* 오른쪽 윗 블록 */}
@@ -1235,6 +1159,7 @@ const MyDrawing = () => {
               <ShapeComponent
                 key={shape.id}
                 shapeProps={shape}
+                ref={shapeRef}
                 isSelected={shape.id === selectedId}
                 onTransformEnd={handleTransformEnd}
                 onSelect={(e) => {
@@ -1253,6 +1178,7 @@ const MyDrawing = () => {
                 return (
                   <ArrowComponent
                     key={line.id}
+                    ref={lineRef}
                     lineProps={line}
                     isSelected={line.id === selectedId}
                     onSelect={(e) => {
