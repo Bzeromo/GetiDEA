@@ -23,7 +23,6 @@ const addFunction = (
       
       type: "Rect",
       stroke: selectStroke,
-      text: "텍스트상자입니다",
       x: 50,
       y: 50,
       width: 100,
@@ -77,6 +76,7 @@ const addFunction = (
       lineJoin: "round",
       fill: currentColor,
       ty: "Line",
+      type: "Line",
       x: rectPosition.x,
       y: rectPosition.y,
     };
@@ -96,6 +96,7 @@ const addFunction = (
       dash: [33, 10],
       fill: currentColor,
       ty: "Line",
+      type : "Dot",
       x: rectPosition.x,
       y: rectPosition.y,
     };
@@ -114,6 +115,7 @@ const addFunction = (
       dash: [29, 20, 0.001, 20],
       fill: currentColor,
       ty: "Line",
+      type : "Dot",
       x: rectPosition.x,
       y: rectPosition.y,
     };
@@ -132,6 +134,7 @@ const addFunction = (
       strokeWidth: 10,
       fill: currentColor,
       ty: "Line",
+      type : "Arrow",
       x: rectPosition.x,
       y: rectPosition.y,
     };

@@ -1,5 +1,4 @@
 const getData = () => {
-  useEffect(() => {
     axios
       .get("http://192.168.31.172:8080/data/test/1")
       .then((response) => {
@@ -7,7 +6,6 @@ const getData = () => {
       })
       .catch((error) => {
         console.error(error);
-      });
   }, []);
 };
 
