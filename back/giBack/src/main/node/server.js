@@ -29,7 +29,7 @@ ioServer.listen(SOCKET_PORT, () => {
     console.log(`웹소켓 서버가 ${SOCKET_PORT}번 포트에서 실행됩니다.`);
 });
 
-const uri = "mongodb://test:1234@localhost:27017";
+const uri = "mongodb://user1:1234@192.168.31.172:27017";
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
 
 const redisClient = redis.createClient({
