@@ -2,9 +2,12 @@ pipeline {
     agent any
 
     // 환경 변수를 정의할 수 있습니다. 예를 들어, 빌드에 필요한 변수나 API 키 등을 설정할 수 있습니다.
-//     environment {
-//         // 예: MY_ENV_VAR = 'some_value'
-//     }
+    environment {
+        def gitlabApiUrl = "https://gitlab.com/api/v4/projects/YOUR_PROJECT_ID/packages/maven"
+        def gitlabToken = "YOUR_GITLAB_ACCESS_TOKEN"
+
+
+    }
 
     stages {
         stage('Checkout') {

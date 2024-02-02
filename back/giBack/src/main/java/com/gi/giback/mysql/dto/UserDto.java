@@ -8,7 +8,7 @@ import lombok.Setter;
 // lombok으로 Getter, Setter 생성
 public class UserDto { // User DTO
 
-    private Long userId;
+    private String userId;
 
     private String userName;
 
