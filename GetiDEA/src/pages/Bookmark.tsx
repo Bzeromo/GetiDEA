@@ -25,11 +25,7 @@ const Bookmark: React.FC = () => {
     );
   };
 
-  // 프로필 드롭다운 함수
-  const toggleDropdown = (event: React.MouseEvent) => {
-    event.stopPropagation();
-    setIsOpen(!isOpen);
-  };
+ 
 
   // 외부 클릭 처리 함수
   const handleClickOutside = (event: MouseEvent) => {
@@ -49,7 +45,7 @@ const Bookmark: React.FC = () => {
     <div className="flex  min-h-screen  flex-col bg-gray-100">
 
         <Topbar/>
-        <div className='mt-20 ml-28 font-Nanum rotate-[-0.03deg] font-semibold text-xl'>북마크</div>
+        <div className='mt-12 ml-28 font-Nanum rotate-[-0.03deg] font-semibold text-xl'>북마크</div>
 
         <div className=' flex flex-row flex-wrap gap-16 ml-32 mt-12'>
 

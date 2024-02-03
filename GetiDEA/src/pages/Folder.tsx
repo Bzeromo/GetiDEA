@@ -12,6 +12,7 @@ const Folder: React.FC = () => {
     const [isEditing, setIsEditing] = useState<boolean>(false);
     const [text, setText] = useState<string>('선보고 후조치');
 
+
     // 북마크 관련 함수
     const select = (idx: number): void => {
       const arr = [...isSelected]; // 기존 배열의 상태를 복사
@@ -28,11 +29,7 @@ const Folder: React.FC = () => {
       );
     };
   
-    // 프로필 드롭다운 함수
-    const toggleDropdown = (event: React.MouseEvent) => {
-      event.stopPropagation();
-      setIsOpen(!isOpen);
-    };
+   
   
     // 외부 클릭 처리 함수
     const handleClickOutside = (event: MouseEvent) => {
@@ -54,8 +51,15 @@ const Folder: React.FC = () => {
       setIsEditing(true);
     };
   
-    const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-      setText(e.target.value);
+     const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+
+        const inputText = e.target.value;
+        const length = Array.from(inputText).length;
+
+         if (length <= 10) {
+          setText(inputText);
+        } 
+
     };
   
     const handleKeyPress = (e: KeyboardEvent<HTMLInputElement>) => {
@@ -80,7 +84,7 @@ const Folder: React.FC = () => {
     <div className="flex  min-h-screen  flex-col bg-gray-100">
 
       <Topbar/>
-      <div className="flex  relative mt-12 ml-28">
+      <div className="flex  relative  ml-28">
 
         {/* 검색바 */}
         <div className="flex relative">

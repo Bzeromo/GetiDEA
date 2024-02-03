@@ -9,19 +9,15 @@ const ProjectNameInput: React.FC = () => {
     const navigate = useNavigate();
 
     const [projectName, setProjectName] = useState<string>('');
-    const [isExceeded, setIsExceeded] = useState<boolean>(false);
 
     const onChange = (e: ChangeEvent<HTMLInputElement>) => {
-        
+
         const inputText = e.target.value;
         const length = Array.from(inputText).length;
 
          if (length <= 10) {
             setProjectName(inputText);
-            setIsExceeded(false);
-        } else {
-            setIsExceeded(true);
-        }
+        } 
 
     };
 

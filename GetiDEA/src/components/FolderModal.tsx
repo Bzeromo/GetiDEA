@@ -11,8 +11,7 @@ interface ProfileModalProps {
 const FolderModal: React.FC<ProfileModalProps> = ({ isOpen, closeModal }) => {
 
     const [folderName, setFolderName] = useState<string>('');
-     //폴더 생성 10자 제한 초과 여부
-    const [isExceeded, setIsExceeded] = useState<boolean>(false);
+    
 
     const nameChange = (e: ChangeEvent<HTMLInputElement>) => {
 
@@ -21,11 +20,8 @@ const FolderModal: React.FC<ProfileModalProps> = ({ isOpen, closeModal }) => {
         const length = Array.from(inputText).length; // ES6 스프레드 연산자를 사용하여 문자열을 배열로 변환 후, length 계산
 
         if (length <= 10) {
-        setFolderName(inputText);
-        setIsExceeded(false);
-        } else {
-        setIsExceeded(true);
-        }
+            setFolderName(inputText);
+        } 
 
     };
 
