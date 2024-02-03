@@ -1,10 +1,9 @@
 // App.tsx
 import React from 'react';
-import Sidebar from '../Sidebar';
-import Topbar from '../TopBar';
-import MainContent from '../MainContent';
-import Widget from '../Widget';
-import AddedIdea from '../AddedIdea';
+import Topbar from '../components/TopBar';
+import MainContent from '../components/MainContent';
+import SubContent from '../components/SubContent';
+import AddedIdea from '../components/AddedIdea';
 const Home: React.FC = () => {
   return (
     <div className="flex min-h-screen bg-gray-100">
