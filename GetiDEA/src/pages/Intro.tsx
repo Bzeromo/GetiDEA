@@ -1,6 +1,7 @@
 // App.tsx
 import React from 'react';
 import { useState } from 'react';
+import LoginModal from '../components/LoginModal';
 
 interface CarouselImageProps {
   url: string;
@@ -33,6 +34,7 @@ const Intro: React.FC = () => {
 
     const [activeIndex, setActiveIndex] = useState(0);
     const [isSelected, setIsSelected] = useState<boolean[]>( [true,false,false,false]);
+    const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
     // 소개 페이지 탭 선택 함수
     const select = (idx: number): void => {
@@ -47,9 +49,14 @@ const Intro: React.FC = () => {
       select(idx);
     };
     
+    // 로그인 창 띄우는 함수
+    const openModal = () => setIsModalOpen(true);
+    const closeModal = () => setIsModalOpen(false);
 
   return (
     <div className=' h-screen pt-10'>
+      <LoginModal isOpen={isModalOpen} closeModal={closeModal}></LoginModal>
+
       <div className='h-[90%] bg-white '>
         <div className='flex flex-row  h-[95%]'>
           <div className=' w-[50%] pl-24 '>
@@ -75,7 +82,7 @@ const Intro: React.FC = () => {
             
 
              {/* 시작하기 */}
-            <div className='absolute w-36 h-12 top-[550px] cursor-pointer rotate-[-0.03deg] bg-main rounded-lg justify-center flex items-center font-SCoreDream font-medium text-xl text-white'>시작하기</div>
+            <div className='absolute w-36 h-12 top-[550px] cursor-pointer rotate-[-0.03deg] bg-main rounded-lg justify-center flex items-center font-SCoreDream font-medium text-xl text-white' onClick={openModal}>시작하기</div>
 
 
             </div>
