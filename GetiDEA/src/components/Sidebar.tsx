@@ -11,6 +11,8 @@ const Sidebar = () => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   // 폴더 늘어나면 수정해야되는 부분
   const [isSelected, setIsSelected] = useState<boolean[]>( [true,false,false,false,false]);
+  //폴더 생성 10자 제한 초과 여부
+  const [isExceeded, setIsExceeded] = useState(false);
   
   const select = (idx: number): void => {
       const arr: boolean[] = Array(5).fill(false);

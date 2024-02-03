@@ -1,11 +1,39 @@
 import React from 'react';
+import { useState,useEffect,useRef,ChangeEvent, } from 'react';
+import axios from 'axios';
 
-interface FolderModalProps {
+interface ProfileModalProps {
   isOpen: boolean;
   closeModal: () => void;
 }
 
-const FolderModal: React.FC<FolderModalProps> = ({ isOpen, closeModal }) => {
+
+const FolderModal: React.FC<ProfileModalProps> = ({ isOpen, closeModal }) => {
+
+    const [folderName, setFolderName] = useState<string>('');
+     //폴더 생성 10자 제한 초과 여부
+    const [isExceeded, setIsExceeded] = useState<boolean>(false);
+
+    const nameChange = (e: ChangeEvent<HTMLInputElement>) => {
+
+        const inputText = e.target.value;
+        // 입력된 텍스트의 길이를 계산합니다. 한글 포함.
+        const length = Array.from(inputText).length; // ES6 스프레드 연산자를 사용하여 문자열을 배열로 변환 후, length 계산
+
+        if (length <= 10) {
+        setFolderName(inputText);
+        setIsExceeded(false);
+        } else {
+        setIsExceeded(true);
+        }
+
+    };
+
+    const close =()=> {
+        closeModal();
+        setFolderName('');
+    }
+
   if (!isOpen) return null;
 
   return (
@@ -28,21 +56,28 @@ const FolderModal: React.FC<FolderModalProps> = ({ isOpen, closeModal }) => {
       }}>
         <div className="fixed grid place-items-center backdrop-blur-sm top-0 right-0 left-0 z-50 w-full inset-0 h-modal h-full justify-center items-center">
             <div className="relative container m-auto px-6">
-                <div className="w-[400px] ">
-                    <div className="rounded-xl h-80 bg-white dark:bg-gray-800 shadow-xl">
+                <div className="w-[500px] ">
+                    <div className="rounded-xl h-[280px]  rotate-[-0.03deg] bg-white dark:bg-gray-800 shadow-xl">
                         <div className="px-8 py-4">
-                            <svg  onClick={closeModal} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-7 h-7 ml-80 text-light_gray cursor-pointer">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
-                            </svg>
-
-                            <div className="space-y-4 mt-5">
-                                <h2 className="mb-8 text-2xl text-center text-Nanum dark:text-white font-light rotate-[-0.03deg]">폴더 생성
-                                </h2>
-                            </div>
-                            <div className="mt-12 grid space-y-4">
-
                             
-                        </div>
+
+                            <div className=" mt-3 flex flex-row gap-72 items-center justify-center ">
+                                <h2 className="text-2xl mt-2 text-center font-Nanum  dark:text-white font-bold rotate-[-0.03deg]">폴더 생성
+                                </h2>
+                                <svg  onClick={close} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-7 h-7 ml-6  text-light_gray cursor-pointer">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
+                                </svg>
+                            </div>
+                            <div className="flex flex-row mt-5 h-32">
+                              
+                                <div className='flex flex-col text-base font-Inter ml-10 py-5 h-full w-[70%] rotate-[-0.03deg]'>
+                                    <input className={`w-full h-12 rounded-md border-2 px-3 bg-white border-line_gray`} type="text" placeholder='폴더 명을 입력해주세요(최대 10자)' value={folderName} onChange={nameChange} spellCheck={false}/>
+                                </div>
+                            </div>
+                            <div className='flex flex-row justify-end gap-2 h-10 font-Nanum'>
+                                <button className='bg-white rounded-md border-[1.5px] text-opacity-80 text-black text-sm font-regular border-line_gray w-16 h-8' onClick={close}>취소</button>       
+                                <button className='bg-blue bg-opacity-80 rounded-md  text-opacity-80 text-white text-sm w-16 h-8' >저장</button>
+                            </div>
                       
                     </div>
                 </div>
