@@ -1,4 +1,4 @@
-package com.gi.giback.mysql.dto;
+package com.gi.giback.mysql.oauth;
 
 public class CustomOAuth2User {
 

@@ -1,4 +1,4 @@
-package com.gi.giback.mysql.controller;
+package com.gi.giback.mysql.oauth;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;

@@ -1,8 +1,8 @@
-package com.gi.giback.mysql.service;
+package com.gi.giback.mysql.test;
 
-import com.gi.giback.mysql.dto.MySqlTestDto;
-import com.gi.giback.mysql.entity.MySqlTestEntity;
-import com.gi.giback.mysql.repository.MySqlTestRepository;
+import com.gi.giback.mysql.test.MySqlTestDto;
+import com.gi.giback.mysql.test.MySqlTestEntity;
+import com.gi.giback.mysql.test.MySqlTestRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

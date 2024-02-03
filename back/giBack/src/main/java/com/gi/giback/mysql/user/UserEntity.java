@@ -1,4 +1,4 @@
-package com.gi.giback.mysql.entity;
+package com.gi.giback.mysql.user;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -17,7 +17,7 @@ public class UserEntity {
 
     @Id // JPA - PK
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long userId;
+    private String userId;
 
     @Column(nullable = false)
     private String userName;
@@ -25,12 +25,14 @@ public class UserEntity {
     @Column(nullable = false)
     private String userEmail;
 
+    @Column(nullable = false)
     private String profileImg;
 
+    @Column(nullable = false)
     private String provider;
 
-    private String accessToken;
-
+    @Column(nullable = false)
     private boolean isAdmin;
 
+    private String accessToken;
 }

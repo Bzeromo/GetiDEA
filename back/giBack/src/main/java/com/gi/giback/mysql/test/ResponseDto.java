@@ -1,4 +1,4 @@
-package com.gi.giback.mysql.dto;
+package com.gi.giback.mysql.test;
 
 public class ResponseDto {
     private String message;

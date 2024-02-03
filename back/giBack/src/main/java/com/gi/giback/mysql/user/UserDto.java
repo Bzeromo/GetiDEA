@@ -1,4 +1,4 @@
-package com.gi.giback.mysql.dto;
+package com.gi.giback.mysql.user;
 
 import lombok.Getter;
 import lombok.Setter;

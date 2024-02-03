@@ -1,8 +1,8 @@
-package com.gi.giback.mysql.service;
+package com.gi.giback.mysql.user;
 
-import com.gi.giback.mysql.dto.UserDto;
-import com.gi.giback.mysql.entity.UserEntity;
-import com.gi.giback.mysql.repository.UserRepository;
+import com.gi.giback.mysql.user.UserDto;
+import com.gi.giback.mysql.user.UserEntity;
+import com.gi.giback.mysql.user.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

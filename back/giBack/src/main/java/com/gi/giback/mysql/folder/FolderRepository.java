@@ -1,4 +1,4 @@
-package com.gi.giback.mysql.repository;
+package com.gi.giback.mysql.folder;
 
 import org.springframework.stereotype.Repository;
 

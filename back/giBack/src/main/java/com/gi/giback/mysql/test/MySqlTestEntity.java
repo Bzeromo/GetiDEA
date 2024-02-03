@@ -1,4 +1,4 @@
-package com.gi.giback.mysql.entity;
+package com.gi.giback.mysql.test;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;

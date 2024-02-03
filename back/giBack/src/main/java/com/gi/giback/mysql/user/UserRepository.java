@@ -1,6 +1,6 @@
-package com.gi.giback.mysql.repository;
+package com.gi.giback.mysql.user;
 
-import com.gi.giback.mysql.entity.UserEntity;
+import com.gi.giback.mysql.user.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

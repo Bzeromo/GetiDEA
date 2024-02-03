@@ -1,4 +1,4 @@
-package com.gi.giback.mysql.entity;
+package com.gi.giback.mysql.location;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -17,16 +17,18 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor // 전체 필드에 대한 생성자를 만들어준다
 @Builder // 영속성을 위한 어노테이션
 @Entity
-@Table(name = "folders")
-public class FolderEntity {
+@Table(name = "locations")
+public class LocationEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "folder_id")
+    private String locationId;
+
     private Long folderId;
 
-    @Column(name = "user_id")
-    private Long userId;
+    private String userId;
 
-    @Column(name = "folder_name")
-    private String folderName;
+    private String projectId;
+
+    private Integer authority;
+
+    private Boolean bookmark;
 }

@@ -1,4 +1,4 @@
-package com.gi.giback.mysql.repository;
+package com.gi.giback.mysql.location;
 
 public interface LocationRepository {
 

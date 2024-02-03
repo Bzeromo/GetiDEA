@@ -35,6 +35,14 @@ CREATE TABLE `folders` (
     FOREIGN KEY (`userId`) REFERENCES `users`(`userId`)
 );
 
+--folder 확인용 더미데이터 추가
+
+INSERT INTO folders (userId, userId, folderName)
+VALUES
+    ('test1', 'hs', 'Folder A'),
+    ('test2', 'hs', 'Folder B'),
+    ('test3', 'hs', 'Folder C');
+
 -- locations 테이블
 CREATE TABLE `locations` (
     `locationId` VARCHAR(30) NOT NULL,

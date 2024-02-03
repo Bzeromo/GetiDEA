@@ -1,6 +1,6 @@
-package com.gi.giback.mysql.repository;
+package com.gi.giback.mysql.test;
 
-import com.gi.giback.mysql.entity.MySqlTestEntity;
+import com.gi.giback.mysql.test.MySqlTestEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
