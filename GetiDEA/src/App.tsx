@@ -9,7 +9,7 @@ import Projects from './pages/Projects';
 import Folder from './pages/Folder';
 import TemplateSelect from './pages/TempleteSelect';
 import ProjectNameInput from './pages/ProjectNameInput';
-// import Board from './pages/Board';
+import Board from './pages/Board';
 import { Routes, Route } from 'react-router-dom';
 
 const App: React.FC = () => {
@@ -27,7 +27,7 @@ const App: React.FC = () => {
           </Route>
         <Route path="/templateSelect" element={<TemplateSelect />} />
         <Route path="/projectnameinput" element={<ProjectNameInput />} />
-        {/* <Route path="/board" element={<Board />} /> */}
+        <Route path="/board" element={<Board />} />
       </Routes>
   );
 };
