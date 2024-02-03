@@ -2,7 +2,7 @@ import React from 'react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
-import LoginModal from './LoginModal';
+import FolderModal from './FolderModal';
 
 const Sidebar = () => {
 
@@ -30,7 +30,7 @@ const Sidebar = () => {
   return (
     <div className="flex-shrink-0 min-h-svh w-80 bg-side scrollbar  scrollbar-thumb-red ">
 
-      <LoginModal isOpen={isModalOpen} closeModal={closeModal}></LoginModal>
+      <FolderModal isOpen={isModalOpen} closeModal={closeModal}></FolderModal>
 
       <Link to="/home"  className='flex flex-row mt-16 mb-10 p-4 justify-center items-center' onClick={()=>{select(0)}}>
          {/* 로고 이미지*/}
