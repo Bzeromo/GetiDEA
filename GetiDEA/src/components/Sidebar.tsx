@@ -32,7 +32,7 @@ const Sidebar = () => {
 
       <LoginModal isOpen={isModalOpen} closeModal={closeModal}></LoginModal>
 
-      <Link to="/"  className='flex flex-row mt-16 mb-10 p-4 justify-center items-center' onClick={()=>{select(0)}}>
+      <Link to="/home"  className='flex flex-row mt-16 mb-10 p-4 justify-center items-center' onClick={()=>{select(0)}}>
          {/* 로고 이미지*/}
         <div className=" flex justify-center items-center">
         <img src="/logo.svg" alt="" className="object-cover h-12 w-12 "/>
@@ -49,7 +49,7 @@ const Sidebar = () => {
       <ul>
         {/* 홈 버튼 */}
         <li className="flex justify-center mb-3 ">
-          <Link to="/" className={!isSelected[0]?"flex flex-row text-center cursor-pointer  block  rounded py-4 px-4 hover:opacity-80 hover:text-blue  text-black ":"flex flex-row text-center  block  rounded py-4 px-4  text-blue "}
+          <Link to="/home" className={!isSelected[0]?"flex flex-row text-center cursor-pointer  block  rounded py-4 px-4 hover:opacity-80 hover:text-blue  text-black ":"flex flex-row text-center  block  rounded py-4 px-4  text-blue "}
              onClick={() => select(0)}>
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 mr-5 opacity-80">
               <path strokeLinecap="round" strokeLinejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
