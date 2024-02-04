@@ -15,6 +15,8 @@ const addFunction = (
   imageIdCounter,
   rectPosition,
   linePosition,
+  fontSize,
+  setFontSize,
 
 ) => {
   const addRectangle = (type) => {
@@ -139,53 +141,35 @@ const addFunction = (
       y: rectPosition.y,
     };
     setLines([...lines, newLine]);
-  };
+  }
 
-  // const addText = () => {
-  //   if (newTextValue) {
-  //     const newText = {
-  //       id: `Text-${texts.length + 1}`,
-  //       type: "Text",
-  //       text: "ㅇㄴㅁㅇㄴㅁㅇㄴㅁ",
-  //       x: 100, // 텍스트 위치 조절
-  //       y: 100, // 텍스트 위치 조절
-  //       fontSize: 18, // 텍스트 폰트 크기 조절
-  //       fill: selectStroke, // 텍스트 색상 설정
-  //     };
-  //     setTexts([...texts, newText]);
-  //     setNewTextValue(""); // 텍스트 입력 초기화
-  //     console.log("TExt 생성")
-  //   }
-  // };
-
-  const addImage = (src) => {
-    const img = new window.Image();
-    img.src = src;
-    img.onload = () => {
-      // 이미지 객체에 ID 추가
-
-      const newImage = {
-        id: `img${images.length + 1}`,
-        img,
-        x: 20,
-        y: 20,
-      };
-      setImages([...images, newImage]);
-      // ID 카운터 증가
-      setImageIdCounter(imageIdCounter + 1);
-    };
-  };
 
   const addTextBox = () => {
     const newText = {
       id: `Text-${texts.length+1}`,
       text: "텍스트입니다",
-      x: rectPosition.x,
-      y: rectPosition.y,
-      ty: "Text"
+      x: 100,
+      y: 100,
+      z: 200,
+      ty: "Text",
+      fontSize : 10,
     };
     console.log(newText)
     setTexts([...texts, newText]);
+    console.log(texts)
+  };
+
+  
+  const addImage = (src) => {
+    console.log(`Adding image to layer: ${src}`); // 이미지 추가 로그
+    const newImage = {
+      id: `image_${images.length}`,
+      src,
+      x: 50,
+      y: 50,
+    };
+    setImages([...images, newImage]);
+    console.log(images); // 상태 업데이트 후 이미지 목록 로그
   };
 
   return {

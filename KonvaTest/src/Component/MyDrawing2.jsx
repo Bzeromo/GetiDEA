@@ -1,18 +1,21 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import { Stage, Layer, Transformer, Line, Image } from "react-konva";
+import axios from "axios";
+import useImage from "use-image";
+import URLImage from "./Add/URLImage";
 
 import ImgComponent from "./Add/ImgComponent";
 import ShapeComponent from "./Add/ShapeComponent";
 import LineComponent from "./Add/LineComponent";
 import ArrowComponent from "./Add/ArrowComponent";
-import TextComponent from "./Add/TextComponent";
 import addFunction from "./funciton/addFunction";
-import useEventHandlers from "./funciton/useEventHandlers";
 import redoUndoFunction from "./funciton/redoUndoFunciton";
 import deleteFunction from "./funciton/deleteFunction";
 import changeFunction from "./funciton/changeFunction";
 import LayerFunction from "./funciton/LayerFunction";
-import TextBox from "./funciton/TextBox";
+import postData from "./axios/postData";
+import TextComponent from "./Add/TextComponent";
+import useEventHandler from "./funciton/useEventHandler";
 
 const MyDrawing = () => {
   const [imageIdCounter, setImageIdCounter] = useState(0);
@@ -25,6 +28,17 @@ const MyDrawing = () => {
     endY: 50,
   });
 
+  const textRef = useRef();
+  const lineRef = useRef();
+  const shapeRef = useRef();
+
+  const [selectedImage, setSelectedImage] = useState(null);
+
+  const [selectedImageSrc, setSelectedImageSrc] = useState(""); // 선택된 이미지 경로 상태
+
+  //프로젝트 이름
+  const [projectName, setProjectName] = useState("초기 프로젝트");
+
   //스테이지 초기화
   const initialScaleValue = { x: 1, y: 1 };
   const initialPositionValue = { x: 0, y: 0 };
@@ -35,11 +49,14 @@ const MyDrawing = () => {
   const [stagePosition, setStagePosition] = useState(initialPositionValue);
 
   //레이어 변경
-  const layerRef = useRef();
+  const layerRef = useRef(null);
 
   //채팅방
   const [chatLog, setChatLog] = useState([]);
   const [chatInput, setChatInput] = useState({ nickname: "", message: "" });
+
+  //드래그 끝남 여부 확인(비동기 처리 필요)
+  const [dragEnded, setDragEnded] = useState(false);
 
   //인자값 변경
   const [shapes, setShapes] = useState([]);
@@ -58,11 +75,12 @@ const MyDrawing = () => {
   const transformerRef = useRef();
 
   //초기값
-  const [fillColor, setFillColor] = useState("black");
+  const [fillColor, setFillColor] = useState("#000000");
   const [selectedId, setSelectedId] = useState(null);
   const [currentColor, setCurrentColor] = useState(fillColor);
   const [selectStroke, setSelectStroke] = useState("");
   const [newTextValue, setNewTextValue] = useState("");
+  const [fontSize, setFontSize] = useState(10);
 
   //설정 변경
   const [startWrite, setStartWrite] = useState(false);
@@ -106,6 +124,16 @@ const MyDrawing = () => {
   );
 
   const {
+    PostRect,
+    PostCircle,
+    PostTriangle,
+    PostText,
+    PostLine,
+    PostDot,
+    PostArrow,
+  } = postData(axios);
+
+  const {
     addText,
     addRectangle,
     addCircle,
@@ -115,6 +143,7 @@ const MyDrawing = () => {
     addDottedLine,
     addArrowLine,
     addImage,
+    addTextBox,
   } = addFunction(
     shapes,
     setShapes,
@@ -131,7 +160,11 @@ const MyDrawing = () => {
     setImageIdCounter,
     imageIdCounter,
     rectPosition,
-    linePosition
+    linePosition,
+    selectedId,
+    setTexts,
+    fontSize,
+    setFontSize
   );
 
   const {
@@ -156,27 +189,68 @@ const MyDrawing = () => {
     setImages
   );
 
-  // const { zoomOnWheel, handleMouseDown, handleMouseMove, handleMouseUp } =
-  //   useEventHandlers(
-  //     startWrite,
-  //     setDrawing,
-  //     setCurrentLine,
-  //     drawing,
-  //     currentLine,
-  //     setDrawingList,
-  //     drawingList,
-  //     fillColor,
+  const [selectedImageUrl, setSelectedImageUrl] = useState(null); // 선택된 이미지 URL을 저장하는 상태
+  const [selectedImageUrls, setSelectedImageUrls] = useState([]);
 
-  //     useCallback,
-  //     stageRef,
-  //     setStageScale,
-  //     setStagePosition
-  //   );
+  const handleImageSelect = (src) => {
+    setSelectedImage(src);
+  };
+
+  useEffect(() => {
+    console.log("업데이트됨" + selectedId);
+  }, [selectedId]);
+
+  const GetData = () => {
+    axios
+      .get("http://192.168.31.172:8080/data/test/1")
+      .then((response) => {
+        if (response.data && response.data.data) {
+          const dataItems = response.data.data;
+
+          Object.keys(dataItems).forEach((key) => {
+            const item = dataItems[key];
+
+            switch (item.ty) {
+              case "Text":
+                setTexts((prevTexts) => updateArray(prevTexts, item, key));
+                break;
+              case "Shape":
+                console.log(JSON.stringify(item) + "짜잔?");
+                setShapes((prevShapes) => updateArray(prevShapes, item, key));
+                break;
+              case "Line":
+                setLines((prevLines) => updateArray(prevLines, item, key));
+                break;
+              default:
+                // 기타 타입 처리
+                break;
+            }
+          });
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  };
+
+  function updateArray(array, item, key) {
+    const index = array.findIndex((element) => element.id === key);
+
+    if (index >= 0) {
+      // 기존 항목 업데이트
+      return array.map((element, i) =>
+        i === index ? { ...element, ...item } : element
+      );
+    } else {
+      // 새 항목 추가
+      return [...array, { id: key, ...item }];
+    }
+  }
 
   const [socket, setSocket] = useState(null);
 
   useEffect(() => {
-    const socket = new WebSocket("ws://localhost:8000");
+    const socket = new WebSocket("ws://localhost:8000/");
 
     socket.onopen = () => {
       console.log("WebSocket 연결이 열렸습니다.");
@@ -184,13 +258,14 @@ const MyDrawing = () => {
     };
 
     socket.onmessage = (event) => {
-      // console.log("서버로부터 메시지를 받았습니다:", event.data);
+      console.log("서버로부터 메시지를 받았습니다:", event.data);
 
       if (event.data instanceof Blob) {
         const textDataPromise = new Response(event.data).text();
         textDataPromise
           .then((jsonData) => {
             const receivedData = JSON.parse(jsonData);
+            // updateShapes(receivedData);
             applyDataToStage(receivedData);
           })
           .catch((error) => {
@@ -201,15 +276,6 @@ const MyDrawing = () => {
         const receivedData = JSON.parse(event.data);
         applyDataToStage(receivedData);
       }
-      // const receivedData = JSON.parse(event.data);
-
-      // setShapes(receivedData.shapes);
-      // setDrawingList(receivedData.drawingList);
-      // setLines(receivedData.lines);
-      // setTexts(receivedData.texts);
-
-      // console.log(receivedData);
-      // applyDataToStage(receivedData);
     };
 
     socket.onerror = (error) => {
@@ -229,26 +295,6 @@ const MyDrawing = () => {
   }, []);
 
   const sendInfoToServer = () => {
-    // console.log("shapes:", shapes);
-    // console.log("drawingList:", drawingList);
-    // console.log("lines:", lines);
-    // console.log("test send")
-    // console.log("texts:", texts);
-    // console.log("socket:", socket);
-
-    // if (socket) {
-    //   const infoToSend = {
-    //     shapes: shapes, // shapes 배열
-    //     drawingList: drawingList, // drawings 배열
-    //     lines: lines, // lines 배열
-    //     // texts: texts, // texts 배열
-    //   };
-
-    //   const jsonInfo = JSON.stringify(infoToSend);
-
-    //   socket.send(jsonInfo);
-
-    // }
     if (chatInput.nickname.trim() !== "" && chatInput.message.trim() !== "") {
       const newChat = { ...chatInput, id: new Date().getTime() };
       setChatLog((prevChatLog) => [...prevChatLog, newChat]);
@@ -260,7 +306,7 @@ const MyDrawing = () => {
       const dataToSend = {
         shapes: shapes, // 항상 도형 데이터를 포함합니다.
         lines: lines,
-        texts : texts,
+        texts: texts,
         newChat:
           chatInput.nickname.trim() !== "" && chatInput.message.trim() !== ""
             ? { ...chatInput, id: new Date().getTime() }
@@ -269,40 +315,75 @@ const MyDrawing = () => {
       socket.send(JSON.stringify(dataToSend));
     }
   };
+
+  useEffect(() => {
+    if (textRef.current) {
+      textRef.current.getLayer().batchDraw();
+    }
+  }, [texts]); // texts 상태가 변경될 때마다 실행
+
+  useEffect(() => {
+    if (shapeRef.current) {
+      shapeRef.current.getLayer().batchDraw();
+    }
+  }, [shapes]); // texts 상태가 변경될 때마다 실행
+
+  useEffect(() => {
+    if (lineRef.current) {
+      lineRef.current.getLayer().batchDraw();
+    }
+  }, [lines]); // texts 상태가 변경될 때마다 실행
+
   const applyDataToStage = (receivedData) => {
     // const newReceivedData = JSON.stringify(receivedData);
     console.log("receiveData" + receivedData);
-    const { shapes, lines, newChat, texts } = receivedData;
+    const { shapes, lines, texts, newChat } = receivedData;
+
+    // console.log(JSON.stringify(receivedData) + "fdsfds");
+    // console.log(JSON.stringify(receivedData.lines) + "fdsfds");
+    // console.log(JSON.stringify(texts) + "fdsfds");
 
     setShapes((prevShapes) => {
-      // 새로운 도형 추가
-      const newShapes = receivedData.shapes.filter(
-        (newShape) => !prevShapes.some((shape) => shape.id === newShape.id)
-      );
-      return [...prevShapes, ...newShapes];
+      return shapes.map((newShape) => {
+        // 기존의 도형 찾기
+        const existingShape = prevShapes.find(
+          (shape) => shape.id === newShape.id
+        );
+
+        if (existingShape) {
+          // 기존 도형이 있으면 새로운 속성으로 업데이트
+          return { ...existingShape, ...newShape };
+        } else {
+          // 기존 도형이 없으면 새로운 도형 추가
+          return newShape;
+        }
+      });
     });
 
-    //위 로직을 바꾸는 걸로 해보자 할 수 있다.
-    // setShapes((prevShapes) =>
-    //   prevShapes.map((shape) =>
-    //     shape.id === selectedId ? { ...shape, x: shapes.x, y: shapes.y } : shape
-    //   )
-    // );
-
     setLines((prevLines) => {
-      // 새로운 선 추가
-      const newLines = receivedData.lines.filter(
-        (newLine) => !prevLines.some((line) => line.id === newLine.id)
-      );
-      return [...prevLines, ...newLines];
+      return lines.map((newLines) => {
+        // 기존의 도형 찾기
+        const existingLine = prevLines.find((line) => line.id === newLines.id);
+
+        if (existingLine) {
+          // 기존 도형이 있으면 새로운 속성으로 업데이트
+          return { ...existingLine, ...newLines };
+        } else {
+          // 기존 도형이 없으면 새로운 도형 추가
+          return newLines;
+        }
+      });
     });
 
     setTexts((prevTexts) => {
-      // 새로운 텍스트 추가
-      const newTexts = receivedData.texts.filter(
-        (newTexts) => !prevTexts.some((text) => text.id === newTexts.id)
-      );
-      return [...prevTexts, ...newTexts];
+      return texts.map((newTexts) => {
+        const existingText = prevTexts.find((text) => text.id === newTexts.id);
+        if (existingText) {
+          return { ...existingText, ...newTexts };
+        } else {
+          return newTexts;
+        }
+      });
     });
 
     if (
@@ -321,117 +402,35 @@ const MyDrawing = () => {
         );
         return [...prevChatLog, ...newChatLog];
       });
-
-    //   setShapes((prevShapes) =>
-    //     prevShapes.map((prevShape) => {
-    //       const updatedShape = receivedData.shapes.find(
-    //         (shape) => shape.id === prevShape.id
-    //       );
-    //       return updatedShape
-    //         ? { ...prevShape, x: updatedShape.x, y: updatedShape.y }
-    //         : prevShape;
-    //     })
-    //   );
-
-    //   setLines((prevLines) =>
-    //     prevLines.map((prevLine) => {
-    //       const updatedLine = receivedData.lines.find(
-    //         (line) => line.id === prevLine.id
-    //       );
-    //       return updatedLine
-    //         ? { ...prevLine, x: updatedLine.x, y: updatedLine.y }
-    //         : prevLine;
-    //     })
-    //   );
-
-    //   setTexts((prevTexts) =>
-    //   prevTexts.map((prevTexts) => {
-    //     const updatedText = receivedData.texts.find(
-    //       (text) => text.id === prevTexts.id
-    //     );
-    //     return updatedText
-    //       ? { ...prevTexts, updatedText}
-    //       : prevTexts;
-    //   })
-    // );
-
-      // setShapes((prevShapes) => {
-      //   const updatedShapes = newShapes.filter(
-      //     (shape) => !prevShapes.some((prev) => prev.id === shape.id)
-      //   );
-      //   return [...prevShapes, ...updatedShapes];
-      // });
-      // setShapes((prevShapes) => {
-      //   // 새로운 도형 데이터를 기존 상태에 병합
-      //   const updatedShapes = newShapes.map((newShape) => {
-      //     const existingShape = prevShapes.find((s) => s.id === newShape.id);
-      //     return existingShape ? { ...existingShape, ...newShape } : newShape;
-      //   });
-
-      //   return updatedShapes;
-      // });
-
-      // setDrawingList((setDrawingList) => {
-      //   const newDrawingList = drawingList.filter(
-      //     (drawingList) =>
-      //       !setDrawingList.some((prev) => prev.id === drawingList.id)
-      //   );
-      //   return [...setDrawingList, ...newDrawingList];
-      // });
-
-      // setLines((prevLines) => {
-      //   // 새로운 선 데이터를 기존 상태에 병합
-      //   const updatedLines = newLines.map((newLine) => {
-      //     const existingLine = prevLines.find((l) => l.id === newLine.id);
-      //     return existingLine ? { ...existingLine, ...newLine } : newLine;
-      //   });
-
-      //   return updatedLines;
-      // });
-
-      // setShapes((prevShapes) => {
-      //   // 새로운 도형과 기존 도형 병합
-      //   const updatedShapes = newShapes.map(newShape => {
-      //     const existingShape = prevShapes.find(shape => shape.id === newShape.id);
-      //     return existingShape ? { ...existingShape, ...newShape } : newShape;
-      //   });
-
-      //   // 기존에 없는 새 도형 추가
-      //   return updatedShapes;
-      // });
-
-      // // 선 상태 업데이트
-      // setLines((prevLines) => {
-      //   // 새로운 선과 기존 선 병합
-      //   const updatedLines = newLines.map(newLine => {
-      //     const existingLine = prevLines.find(line => line.id === newLine.id);
-      //     return existingLine ? { ...existingLine, ...newLine } : newLine;
-      //   });
-
-      //   // 기존에 없는 새 선 추가
-      //   return updatedLines;
-      // });
-
-      // const newChatsArray = Array.isArray(newChat) ? newChat : [newChat];
-
-      // chatLog에 newChat 추가
     }
 
-    // setTexts((prevTexts) => [...prevTexts, ...texts]);
+    // console.log("shape" + JSON.stringify(shapes));
+    // console.log("line" + JSON.stringify(lines));
+    // console.log("text" + JSON.stringify(texts));
 
-    console.log("TE@" + JSON.stringify(shapes));
-    console.log("TE!" + JSON.stringify(lines));
-    console.log("TEST" + JSON.stringify(texts));
-
-    // console.log("GET" + JSON.stringify(setShapes));
-    // console.log("GET" + JSON.stringify(setLines));
-    console.log(JSON.stringify("TE#" + newChat));
+    // console.log(JSON.stringify("TE#" + newChat));
   };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setChatInput((prev) => ({ ...prev, [name]: value }));
   };
+
+  const handleTextSelect = (e) => {
+    console.log(e.target);
+    console.log(e);
+    const selectedTextId = e;
+    setSelectedId(selectedTextId);
+    console.log(selectedId);
+    console.log(selectedTextId);
+    // console.log(selectedId)
+  };
+
+  useEffect(() => {
+    if (layerRef.current) {
+      layerRef.current.batchDraw();
+    }
+  }, [texts]);
 
   const handleMouseDown = (e) => {
     // if (!startWrite) return; // startWrite가 false이면 기능 비활성화
@@ -450,29 +449,30 @@ const MyDrawing = () => {
     const y = (pointer.y - stage.y()) / stage.scaleY();
 
     setCurrentLine([x, y]);
+    // sendInfoToServer();
   };
 
   const handleMouseMove = (e) => {
     // if (!drawing || !startWrite) return; // startWrite가 false이면 기능 비활성화
     if (!drawing || !startWrite || selectedId) {
-      // if (!selectionRect.x) return; // 선택 영역이 없으면 종료
+      if (!selectionRect.x) return; // 선택 영역이 없으면 종료
 
-      // const { x, y } = e.target.getStage().getPointerPosition();
-      // const newSelectionRect = {
-      //   ...selectionRect,
-      //   width: x - selectionRect.x,
-      //   height: y - selectionRect.y,
-      // };
-      // setSelectionRect(newSelectionRect);
-      // const selected = shapes.filter((rect) => {
-      //   return (
-      //     rect.x > selectionRect.x &&
-      //     rect.y > selectionRect.y &&
-      //     rect.x + rect.width < x &&
-      //     rect.y + rect.height < y
-      //   );
-      // });
-      // setSelectedIds(selected.map((s) => s.id));
+      const { x, y } = e.target.getStage().getPointerPosition();
+      const newSelectionRect = {
+        ...selectionRect,
+        width: x - selectionRect.x,
+        height: y - selectionRect.y,
+      };
+      setSelectionRect(newSelectionRect);
+      const selected = shapes.filter((rect) => {
+        return (
+          rect.x > selectionRect.x &&
+          rect.y > selectionRect.y &&
+          rect.x + rect.width < x &&
+          rect.y + rect.height < y
+        );
+      });
+      setSelectedIds(selected.map((s) => s.id));
       return;
     } // startWrite가 false이면 기능 비활성화
     const stage = e.target.getStage();
@@ -483,66 +483,157 @@ const MyDrawing = () => {
 
     setCurrentLine(currentLine.concat([x, y]));
 
-    // setCurrentLine(currentLine.concat([point.x, point.y]));
-    // console.log(pointer.x + "    " + pointer.y);
-    // sendInfoToServer();
+    // if (selectedId) {
+    //   // 객체가 드래그되고 있을 때
+    //   const newPos = { x: e.target.x(), y: e.target.y() };
+    // }
   };
 
   const handleMouseUp = (shapes) => {
     // if (!startWrite) return; // startWrite가 false이면 기능 비활성화
     if (!startWrite) {
-      // setSelectionRect({});
+      setSelectionRect({});
       return;
     } // startWrite가 false이면 기능 비활성화
     setDrawing(false);
     setDrawingList([
       ...drawingList,
-      { points: currentLine, stroke: fillColor, strokeWidth: 5 },
+      { points: currentLine, stroke: currentColor, strokeWidth: 5 },
     ]);
-    // sendInfoToServer.bind(this);
-    sendInfoToServer();
-    // shapes.getLayer().batchDraw();
 
     // console.log(shapes);
+    sendInfoToServer();
   };
 
-  const handleDragEnd = (e) => {
-    // 사용자가 드래그를 마치면 호출되는 콜백 함수
+  const handleDragEnd = async (e) => {
+    if (!e || !e.target) {
+      // e 또는 e.target이 undefined인 경우
+      console.error("이벤트 또는 대상 요소가 정의되지 않았습니다.");
+      return;
+    }
+
+    // console.log(e.target); // e.target 객체 확인
+    // console.log(typeof e.target); // e.target의 타입 확인
+    // console.log(e.target.id); // e.target의 id 속성 값 확인
+    // console.log(e.target.constructor.name);
+
     const id = e.target.id();
+    const id2 = e.target.attrs.id;
+    const ty = e.target.attrs.ty;
+    const type = e.target.attrs.type;
 
     // 새로운 위치 정보를 가져옵니다.
     const newPos = { x: e.target.x(), y: e.target.y() };
+    const newData = e.target.attrs;
+    const newRotate = e.target.rotation();
 
-    // 도형의 배열을 업데이트합니다.
-    setShapes((prevShapes) =>
-      prevShapes.map((shapes) => {
-        if (shapes.id === id) {
-          // 드래그된 도형의 위치를 업데이트합니다.
-          return { ...shapes, x: newPos.x, y : newPos.y };
-        }
-        return shapes;
-      })
-    );
+    if (!id) {
+      console.log("id 확인 " + "혹시 null인가?");
+    } else {
+      console.log("오예 성공! " + id);
+    }
+    // console.log(id + "  id");
+    // console.log(id2 + "  id2");
+    // console.log(JSON.stringify(newData));
+    // console.log(ty + "  ty확인용");
+    // console.log(id2 + "체크해보자");
+    // console.log(newRotate);
+    console.log(type);
 
-    setLines((prevLines) =>
-      prevLines.map((line) => {
-        if (line.id === id) {
-          return { ...line,  x: newPos.x, y: newPos.y  };
-        }
-        return line;
-      })
-    );
+    // console.log("newpos 확인 용" + newPos.x + "  " + newPos.y);
 
-    setTexts((prevTexts) =>
-    prevTexts.map((text) => {
-      if (text.id === id) {
-        return { ...text, x: newPos.x, y: newPos.y  };
-      }
-      return text;
-    })
-  );
-    sendInfoToServer.bind(this);
-    sendInfoToServer();
+    console.log(newData);
+    if (ty === "Line" && type === "Dot") {
+      setLines((prevLines) =>
+        prevLines.map((lines) => {
+          if (lines.id === id) {
+            const updatedLine = { ...lines, ...newData };
+            // PostDot({ target: { attrs: updatedLine } }); // 필요한 데이터만 전송
+            return updatedLine;
+          }
+          return lines;
+        })
+      );
+    } else if (ty === "Line" && type === "Arrow") {
+      setLines((prevLines) =>
+        prevLines.map((lines) => {
+          if (lines.id === id) {
+            const updatedLine = { ...lines, ...newData };
+            // PostArrow({ target: { attrs: updatedLine } }); // 필요한 데이터만 전송
+            return updatedLine;
+          }
+          return lines;
+        })
+      );
+    } else if (ty === "Line" && type === "Line") {
+      setLines((prevLines) =>
+        prevLines.map((lines) => {
+          if (lines.id === id) {
+            const updatedLine = { ...lines, ...newData };
+            // PostLine({ target: { attrs: updatedLine } }); // 필요한 데이터만 전송
+            return updatedLine;
+          }
+          return lines;
+        })
+      );
+    } else if (ty === "Shape" && type === "Rect") {
+      setShapes((prevShapes) =>
+        prevShapes.map((shapes) => {
+          if (shapes.id === id) {
+            // 드래그된 도형의 위치를 업데이트합니다.
+            const updatedShape = { ...shapes, ...newData };
+            // PostRect({ target: { attrs: updatedShape } }); // 필요한 데이터만 전송
+            return updatedShape;
+          }
+          return shapes;
+        })
+      );
+    } else if (ty === "Shape" && type === "RegularPolygon") {
+      setShapes((prevShapes) =>
+        prevShapes.map((shapes) => {
+          if (shapes.id === id) {
+            // 드래그된 도형의 위치를 업데이트합니다.
+            const updatedShape = { ...shapes, ...newData };
+            // PostTriangle({ target: { attrs: updatedShape } }); // 필요한 데이터만 전송
+            return updatedShape;
+          }
+          return shapes;
+        })
+      );
+    } else if (ty === "Shape" && type === "Circle") {
+      setShapes((prevShapes) =>
+        prevShapes.map((shapes) => {
+          if (shapes.id === id) {
+            // 드래그된 도형의 위치를 업데이트합니다.
+            const updatedShape = { ...shapes, ...newData };
+            // PostCircle({ target: { attrs: updatedShape } }); // 필요한 데이터만 전송
+            return updatedShape;
+          }
+          return shapes;
+        })
+      );
+    } else if (ty === "Text" && ty === "Text") {
+      setTexts((prevTexts) =>
+        prevTexts.map((texts) => {
+          if (texts.id === id) {
+            const updatedText = { ...texts, ...newData };
+            // PostText({ target: { attrs: updatedText } }); // 필요한 데이터만 전송
+            return updatedText;
+          }
+          return texts;
+        })
+      );
+    }
+
+    setDragEnded(true);
+  };
+
+  const handleTransformEnd = (e) => {
+    const node = e.target;
+
+    const rotationAngle = node.rotation();
+
+    console.log(`Rotation angle: ${rotationAngle}`);
   };
 
   const zoomOnWheel = useCallback((e) => {
@@ -595,29 +686,75 @@ const MyDrawing = () => {
     setStageScale({ x: 1, y: 1 });
   }, []);
 
-  const changeSelectedShapePosition = (RectPosition) => {
-    if (!selectedId) return; // 선택된 도형이 없으면 함수 종료
-
-    // 선택된 도형 찾기
-    const updatedShapes = shapes.map((shape) => {
-      if (shape.id === selectedId) {
-        return { ...shape, x: RectPosition.x, y: RectPosition.y }; // 색상 변경
-      }
-      return shape;
-    });
-
-    setShapes(updatedShapes);
-  };
+  useEffect(() => {
+    // 드래그 작업이 완료되었고, 상태가 변경되었다면 서버에 전송
+    if (dragEnded) {
+      sendInfoToServer();
+      // 다음 상태 변경을 위해 dragEnded를 다시 false로 설정
+      setDragEnded(false);
+    }
+  }, [dragEnded]);
 
   const checkObject = (shapeId, newX, newY) => {
     console.log(shapes);
     console.log(lines);
+    console.log(texts);
+  };
 
-    setShapes((prevShapes) =>
-      prevShapes.map((shape) =>
-        shape.id === shapeId ? { ...shape, x: newX, y: newY } : shape
+  const checkObject2 = (shapeId, newX, newY) => {
+    // texts 배열을 복사하여 새로운 배열을 생성
+    const newTexts = texts.map((text) => {
+      // 특정 ID를 가진 객체를 찾아서 해당 객체의 x, y 값을 업데이트
+      if (text.id === shapeId) {
+        console.log("성공");
+        return { ...text, x: newX, y: newY };
+      }
+      // 다른 객체들은 그대로 유지
+      console.log("그런거 없는디");
+      return text;
+    });
+
+    // 업데이트된 배열로 상태를 설정
+    setTexts(newTexts);
+  };
+
+  const handleColorChange = (e) => {
+    setCurrentColor(e.target.value);
+    setShapes(
+      shapes.map((shape) =>
+        shape.id === selectedId ? { ...shape, fill: e.target.value } : shape
       )
     );
+    setLines(
+      lines.map((line) =>
+        line.id === selectedId ? { ...line, stroke: e.target.value } : line
+      )
+    );
+  };
+
+  const handleFontSize = (e) => {
+    const newFontSize = parseInt(e.target.value, 10);
+    if (!isNaN(newFontSize)) {
+      setFontSize(newFontSize);
+      if (selectedId) {
+        setTexts(
+          texts.map((text) =>
+            text.id === selectedId ? { ...text, fontSize: newFontSize } : text
+          )
+        );
+      }
+    }
+    console.log(selectedId);
+  };
+
+  const handleShapeClick = (id, e) => {
+    e.cancelBubble = true; // 이벤트 버블링 방지
+    setSelectedId(id);
+    console.log(id);
+  };
+
+  const handleLayerClick = () => {
+    setSelectedId(null);
   };
 
   const { redo, undo } = redoUndoFunction(
@@ -630,8 +767,8 @@ const MyDrawing = () => {
 
   //Layer 변경 건(이건 색 변경 확인 후에 다시 가는 걸로)
   const { moveDown, moveUp, moveToBottom, moveToTop } = LayerFunction(
-    layerRef,
-    selectedId
+    selectedId,
+    layerRef
   );
 
   useEffect(() => {
@@ -675,21 +812,43 @@ const MyDrawing = () => {
     setEraserToggle(!eraserToggle);
   };
 
-  const addTextBox = () => {
-    const newText = {
-      id: texts.length + 1,
-      text: "텍스트입니다",
-      x: 100,
-      y: 100,
-    };
-    setTexts([...texts, newText]);
-  };
-
   const handleTextChange = (id, newText) => {
     const updatedTexts = texts.map((t) =>
       t.id === id ? { ...t, text: newText } : t
     );
     setTexts(updatedTexts);
+  };
+
+  const ImageList = ({ onImageSelect, isSelected }) => {
+    const images = [
+      "/img/강아지.jpg",
+      "/img/고양이.jpg",
+      "/img/아기사슴.jpg",
+      "/img/햄스터.jpg",
+    ]; // 이미지 경로 목록
+    const imageRef = useRef();
+    const transformerRef = useRef();
+
+    useEffect(() => {
+      if (isSelected) {
+        transformerRef.current.nodes([imageRef.current]);
+        transformerRef.current.getLayer().batchDraw();
+      }
+    }, [isSelected]);
+
+    return (
+      <div>
+        {images.map((src, index) => (
+          <img
+            key={index}
+            src={src}
+            alt={`image-${index}`}
+            onClick={() => onImageSelect(src)}
+            style={{ width: "100px", cursor: "pointer" }}
+          />
+        ))}
+      </div>
+    );
   };
 
   return (
@@ -724,7 +883,7 @@ const MyDrawing = () => {
 
         {/* 프로젝트 이름 */}
         <div className=" ml-3 font-Nanum font-medium text-base rotate-[-0.03deg]">
-          새 프로젝트
+          {projectName}
         </div>
       </div>
 
@@ -740,7 +899,7 @@ const MyDrawing = () => {
         {/* 펜 툴 */}
         <svg
           className="w-6 h-6 mt-7 cursor-pointer"
-          fill={!writeToggle ? "black" : "#0064FF"}
+          fill={!writeToggle ? "#000000" : "#0064FF"}
           onClick={() => writeSetToggle()}
           viewBox="0 0 128 128"
           xmlns="http://www.w3.org/2000/svg"
@@ -757,7 +916,7 @@ const MyDrawing = () => {
             fill="none"
             height="24"
             onClick={shapeToggle}
-            stroke={!shapeMenuToggle ? "black" : "#0064FF"}
+            stroke={!shapeMenuToggle ? "#000000" : "#0064FF"}
             stroke-linecap="round"
             stroke-linejoin="round"
             stroke-width="2"
@@ -770,7 +929,7 @@ const MyDrawing = () => {
             <circle cx="17" cy="17" r="3" />
             <rect height="6" rx="1" width="6" x="4" y="14" />
           </svg>
-          {/* <img src="/shape.svg" alt="" className={`'w-7 h-7 mt-7 cursor-pointer ' stroke-current ${shapeMenuToggle ? 'text-black' : 'text-blue'}`}  onClick={shapeToggle}/> */}
+          {/* <img src="/shape.svg" alt="" className={`'w-7 h-7 mt-7 cursor-pointer ' stroke-current ${shapeMenuToggle ? 'text-black0' : 'text-blue'}`}  onClick={shapeToggle}/> */}
           {shapeMenuToggle && (
             <div className="absolute top-[120px] left-[55px]  bg-white rounded-md w-[50px] h-[140px] flex items-center flex-col shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]">
               <svg
@@ -820,8 +979,8 @@ const MyDrawing = () => {
         <div>
           <svg
             className="w-7 h-7 mt-7 cursor-pointer"
-            stroke={!lineMenuToggle ? "black" : "#0064FF"}
-            fill={!lineMenuToggle ? "black" : "#0064FF"}
+            stroke={!lineMenuToggle ? "#000000" : "#0064FF"}
+            fill={!lineMenuToggle ? "#000000" : "#0064FF"}
             viewBox="0 0 32 32"
             onClick={lineToggle}
             xmlns="http://www.w3.org/2000/svg"
@@ -869,7 +1028,7 @@ const MyDrawing = () => {
                 id="right-arrow"
                 data-name="Flat Color"
                 xmlns="http://www.w3.org/2000/svg"
-                className="hover:stroke-blue mt-1 mb-2 w-15  hover:fill-blue stroke-black cursor-pointer"
+                className="hover:stroke-blue mt-1 mb-2 w-15  hover:fill-blue stroke-black0 cursor-pointer"
               >
                 <path
                   id="primary"
@@ -937,7 +1096,7 @@ const MyDrawing = () => {
       {/* 복구 버튼 */}
       <div
         className="cursor-pointer absolute top-[670px] left-6  hover:stroke-blue bg-white rounded-md w-[50px] h-[50px] flex justify-center items-center shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]"
-        onClick={() => undo()}
+        onClick={() => redo()}
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -997,57 +1156,65 @@ const MyDrawing = () => {
 
       {/* 오른쪽 윗 블록 */}
       <div className="absolute top-6 right-32 justify-center bg-white rounded-md w-16 h-[50px] flex  items-center flex-row shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]">
-        <svg
-          className="hover:stroke-blue w-7 h-7 cursor-pointer"
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          strokeWidth={1.5}
-          stroke="currentColor"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M8.625 9.75a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375m-13.5 3.01c0 1.6 1.123 2.994 2.707 3.227 1.087.16 2.185.283 3.293.369V21l4.184-4.183a1.14 1.14 0 0 1 .778-.332 48.294 48.294 0 0 0 5.83-.498c1.585-.233 2.708-1.626 2.708-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z"
-          />
-        </svg>
+        <button onClick={() => checkObject()}>Check</button>
       </div>
 
       {/* 오른쪽 윗 블록 */}
       <div className="absolute top-6 right-12 justify-center bg-white rounded-md w-16 h-[50px] flex  items-center flex-row shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]">
-        <svg
-          className="hover:stroke-blue w-7 h-7 cursor-pointer"
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          strokeWidth={1.5}
-          stroke="currentColor"
-          onClick={() => addTextBox()}
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M8.625 9.75a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375m-13.5 3.01c0 1.6 1.123 2.994 2.707 3.227 1.087.16 2.185.283 3.293.369V21l4.184-4.183a1.14 1.14 0 0 1 .778-.332 48.294 48.294 0 0 0 5.83-.498c1.585-.233 2.708-1.626 2.708-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z"
-          />
-        </svg>
+        <input type="color" value={currentColor} onChange={handleColorChange} />
+      </div>
+
+      {/* 오른쪽 윗 블록 */}
+      <div className="absolute top-6 right-52 justify-center bg-white rounded-md w-16 h-[50px] flex  items-center flex-row shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]">
+        <button onClick={() => GetData()}>Get</button>
+      </div>
+
+      {/* 오른쪽 윗 블록 */}
+      <div className="absolute top-6 right-72 justify-center bg-white rounded-md w-16 h-[50px] flex  items-center flex-row shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]"></div>
+
+      {/* 오른쪽 윗 블록 */}
+      <div className="absolute bottom-6 right-32 z-50 justify-center bg-white rounded-md w-16 h-[50px] flex  items-center flex-row shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]">
+        <button onClick={moveUp}>한칸 위</button>
+      </div>
+
+      {/* 오른쪽 윗 블록 */}
+      <div className="absolute bottom-6 right-12 z-50 justify-center bg-white rounded-md w-16 h-[50px] flex  items-center flex-row shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]">
+        <button onClick={moveDown}>한칸 아래</button>
+      </div>
+
+      {/* 오른쪽 윗 블록 */}
+      <div className="absolute bottom-6 right-52 z-50  justify-center bg-white rounded-md w-16 h-[50px] flex  items-center flex-row shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]">
+        <button onClick={moveToTop}>제일 위</button>
+      </div>
+
+      {/* 오른쪽 윗 블록 */}
+      <div className="absolute bottom-6 right-72 z-50 justify-center bg-white rounded-md w-16 h-[50px] flex  items-center flex-row shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]">
+        {/* <button onClick={moveToBottom}>제일 아래</button> */}
+        {selectedImage && <URLImage src={selectedImage} />}
+        <></>
       </div>
 
       {/* 그리는 구역 */}
       <div className="ml-36 mt-24 h-full w-full">
         <Stage
           ref={stageRef}
-          width={window.innerWidth * 1}
-          height={window.innerHeight * 1}
+          width={window.innerWidth}
+          height={window.innerHeight}
           draggable={!draggable}
           onWheel={zoomOnWheel}
           onMouseDown={handleMouseDown}
           onMousemove={handleMouseMove}
           onMouseup={handleMouseUp}
           onDragEnd={handleDragEnd}
+          onClick={handleLayerClick}
         >
-          <Layer>
+          <Layer ref={layerRef}>
             {drawing && (
-              <Line points={currentLine} stroke={fillColor} strokeWidth={5} />
+              <Line
+                points={currentLine}
+                stroke={currentColor}
+                strokeWidth={5}
+              />
             )}
             {drawingList.map((drawing, id) => (
               <Line key={id} {...drawing} />
@@ -1056,9 +1223,11 @@ const MyDrawing = () => {
               <ShapeComponent
                 key={shape.id}
                 shapeProps={shape}
+                ref={shapeRef}
                 isSelected={shape.id === selectedId}
-                onSelect={() => {
-                  setSelectedId(shape.id);
+                onTransformEnd={handleTransformEnd}
+                onSelect={(e) => {
+                  handleShapeClick(shape.id, e);
                 }}
                 onChange={(newAttrs) => {
                   const newShapes = shapes.map((s) =>
@@ -1068,15 +1237,16 @@ const MyDrawing = () => {
                 }}
               />
             ))}
-            {lines.map((line, id) => {
+            {lines.map((line) => {
               if (line.type === "Arrow") {
                 return (
                   <ArrowComponent
-                    key={id}
+                    key={line.id}
+                    ref={lineRef}
                     lineProps={line}
                     isSelected={line.id === selectedId}
-                    onSelect={() => {
-                      setSelectedId(line.id);
+                    onSelect={(e) => {
+                      handleShapeClick(line.id, e);
                     }}
                     onChange={(newAttrs) => {
                       const newLines = lines.map((l) =>
@@ -1089,11 +1259,12 @@ const MyDrawing = () => {
               } else {
                 return (
                   <LineComponent
-                    key={id}
+                    key={line.id}
                     lineProps={line}
+                    ref={lineRef}
                     isSelected={line.id === selectedId}
-                    onSelect={() => {
-                      setSelectedId(line.id);
+                    onSelect={(e) => {
+                      handleShapeClick(line.id, e);
                     }}
                     onChange={(newAttrs) => {
                       const newLines = lines.map((l) =>
@@ -1105,34 +1276,33 @@ const MyDrawing = () => {
                 );
               }
             })}
-            {texts.map((text) => (
-              <TextBox
-                key={text.id}
-                text={text.text}
-                x={text.x}
-                y={text.y}
+            {texts.map((text, i) => (
+              <TextComponent
+                key={i}
+                textProps={text}
                 isSelected={text.id === selectedId}
                 onSelect={() => {
                   setSelectedId(text.id);
                 }}
-                onTextChange={(newText) => handleTextChange(text.id, newText)}
+                onChange={(newAttrs) => {
+                  const newTexts = texts.map((t) =>
+                    t.id === text.id ? { ...t, ...newAttrs } : t
+                  );
+                  setTexts(newTexts);
+                }}
               />
             ))}
 
-            {images.map((imageObj, index) => (
-              <Image
-                key={index}
-                id={`image-${imageObj.id}`} // 고유 ID 설정
-                image={imageObj.img}
-                x={20}
-                y={20}
-                width={100}
-                height={100}
-                draggable
-                onClick={() => setSelectedId(`image-${imageObj.id}`)} // onClick에서 ID 설정
-                // onClick={() => handleImageClick}
+            {images.map((img) => (
+              <ImgComponent
+                key={img.id}
+                id={img.id}
+                image={img}
+                x={img.x}
+                y={img.y}
               />
             ))}
+
 
             {selectedId && (
               <Transformer
