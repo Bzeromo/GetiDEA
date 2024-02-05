@@ -32,6 +32,7 @@ const MyDrawing = () => {
   const textRef = useRef();
   const lineRef = useRef();
   const shapeRef = useRef();
+  const ImageRef = useRef();
 
   const [selectedImage, setSelectedImage] = useState(null);
 
@@ -132,6 +133,7 @@ const MyDrawing = () => {
     PostLine,
     PostDot,
     PostArrow,
+    PostSave,
   } = postData(axios);
 
   const {
@@ -202,39 +204,6 @@ const MyDrawing = () => {
     console.log("업데이트됨" + selectedId);
   }, [selectedId]);
 
-  const GetData = () => {
-    axios
-      .get("http://192.168.31.172:8080/data/test/1")
-      .then((response) => {
-        if (response.data && response.data.data) {
-          const dataItems = response.data.data;
-
-          Object.keys(dataItems).forEach((key) => {
-            const item = dataItems[key];
-
-            switch (item.ty) {
-              case "Text":
-                setTexts((prevTexts) => updateArray(prevTexts, item, key));
-                break;
-              case "Shape":
-                console.log(JSON.stringify(item) + "짜잔?");
-                setShapes((prevShapes) => updateArray(prevShapes, item, key));
-                break;
-              case "Line":
-                setLines((prevLines) => updateArray(prevLines, item, key));
-                break;
-              default:
-                // 기타 타입 처리
-                break;
-            }
-          });
-        }
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-  };
-
   function updateArray(array, item, key) {
     const index = array.findIndex((element) => element.id === key);
 
@@ -249,6 +218,51 @@ const MyDrawing = () => {
     }
   }
 
+  const GetData = () => {
+    axios
+      .get("http://192.168.31.172:8080/api/project/data/1/1")
+      .then((response) => {
+        if (response.data && response.data.data) {
+          const dataItems = response.data.data;
+
+          console.log(response);
+
+          Object.keys(dataItems).forEach((key) => {
+            const item = dataItems[key];
+            const itemWithDefaults = {
+              ...item,
+              x: item.x ?? 0, // 기본값 0으로 설정
+              y: item.y ?? 0, // 기본값 0으로 설정
+              // 필요한 다른 속성에 대해서도 기본값을 설정할 수 있습니다.
+            };
+            switch (item.ty) {
+              case "Text":
+                setTexts((prevTexts) => updateArray(prevTexts, key));
+                break;
+              case "Shape":
+                console.log(JSON.stringify(item) + "짜잔?");
+                setShapes((prevShapes) => updateArray(prevShapes, itemWithDefaults, key));
+                break;
+              case "Line":
+                setLines((prevLines) => updateArray(prevLines, item, key));
+                break;
+              case "img":
+                setImages((prevImage) => updateArray(prevImage, item, key));
+                break;
+              default:
+                // 기타 타입 처리
+                break;
+            }
+          });
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  };
+
+
+
   const [socket, setSocket] = useState(null);
 
   useEffect(() => {
@@ -260,7 +274,7 @@ const MyDrawing = () => {
     };
 
     socket.onmessage = (event) => {
-      console.log("서버로부터 메시지를 받았습니다:", event.data);
+      // console.log("서버로부터 메시지를 받았습니다:", event.data);
 
       if (event.data instanceof Blob) {
         const textDataPromise = new Response(event.data).text();
@@ -309,6 +323,7 @@ const MyDrawing = () => {
         shapes: shapes, // 항상 도형 데이터를 포함합니다.
         lines: lines,
         texts: texts,
+        images: images,
         newChat:
           chatInput.nickname.trim() !== "" && chatInput.message.trim() !== ""
             ? { ...chatInput, id: new Date().getTime() }
@@ -336,14 +351,18 @@ const MyDrawing = () => {
     }
   }, [lines]); // texts 상태가 변경될 때마다 실행
 
+  useEffect(() => {
+    if (ImageRef.current) {
+      ImageRef.current.getLayer().batchDraw();
+    }
+  }, [images]);
+
   const applyDataToStage = (receivedData) => {
     // const newReceivedData = JSON.stringify(receivedData);
     console.log("receiveData" + receivedData);
-    const { shapes, lines, texts, newChat } = receivedData;
+    const { shapes, lines, texts, images, newChat } = receivedData;
 
-    // console.log(JSON.stringify(receivedData) + "fdsfds");
-    // console.log(JSON.stringify(receivedData.lines) + "fdsfds");
-    // console.log(JSON.stringify(texts) + "fdsfds");
+    console.log(JSON.stringify(receivedData) + "fdsfds");
 
     setShapes((prevShapes) => {
       return shapes.map((newShape) => {
@@ -388,6 +407,19 @@ const MyDrawing = () => {
       });
     });
 
+    setImages((prevImage) => {
+      return images.map((newImage) => {
+        const existingImage = prevImage.find(
+          (image) => image.id === newImage.id
+        );
+        if (existingImage) {
+          return { ...existingImage, ...newImage };
+        } else {
+          return newImage;
+        }
+      });
+    });
+
     if (
       newChat &&
       newChat.nickname.trim() !== "" &&
@@ -409,6 +441,7 @@ const MyDrawing = () => {
     // console.log("shape" + JSON.stringify(shapes));
     // console.log("line" + JSON.stringify(lines));
     // console.log("text" + JSON.stringify(texts));
+    console.log("text" + JSON.stringify(images));
 
     // console.log(JSON.stringify("TE#" + newChat));
   };
@@ -519,15 +552,20 @@ const MyDrawing = () => {
     // console.log(e.target.id); // e.target의 id 속성 값 확인
     // console.log(e.target.constructor.name);
 
-    const id = e.target.id();
-    const id2 = e.target.attrs.id;
+    // const id = e.target.id();
+    const id = e.target.attrs.id;
     const ty = e.target.attrs.ty;
+
+    console.log(id + "id를 확ㅇ닣래보자");
+    console.log(ty + " tetstsetawetfdgdfffsdfsdfsdfsdds");
     const type = e.target.attrs.type;
 
     // 새로운 위치 정보를 가져옵니다.
     const newPos = { x: e.target.x(), y: e.target.y() };
     const newData = e.target.attrs;
     const newRotate = e.target.rotation();
+
+    // console.log(JSON.stringify(e.target.attrs) + "확인돼라 제발!!");
 
     if (!id) {
       console.log("id 확인 " + "혹시 null인가?");
@@ -540,17 +578,14 @@ const MyDrawing = () => {
     // console.log(ty + "  ty확인용");
     // console.log(id2 + "체크해보자");
     // console.log(newRotate);
-    console.log(type);
-
     // console.log("newpos 확인 용" + newPos.x + "  " + newPos.y);
 
-    console.log(newData);
     if (ty === "Line" && type === "Dot") {
       setLines((prevLines) =>
         prevLines.map((lines) => {
           if (lines.id === id) {
             const updatedLine = { ...lines, ...newData };
-            // PostDot({ target: { attrs: updatedLine } }); // 필요한 데이터만 전송
+            PostDot({ target: { attrs: updatedLine } }); // 필요한 데이터만 전송
             return updatedLine;
           }
           return lines;
@@ -561,7 +596,7 @@ const MyDrawing = () => {
         prevLines.map((lines) => {
           if (lines.id === id) {
             const updatedLine = { ...lines, ...newData };
-            // PostArrow({ target: { attrs: updatedLine } }); // 필요한 데이터만 전송
+            PostArrow({ target: { attrs: updatedLine } }); // 필요한 데이터만 전송
             return updatedLine;
           }
           return lines;
@@ -572,7 +607,7 @@ const MyDrawing = () => {
         prevLines.map((lines) => {
           if (lines.id === id) {
             const updatedLine = { ...lines, ...newData };
-            // PostLine({ target: { attrs: updatedLine } }); // 필요한 데이터만 전송
+            PostLine({ target: { attrs: updatedLine } }); // 필요한 데이터만 전송
             return updatedLine;
           }
           return lines;
@@ -584,7 +619,7 @@ const MyDrawing = () => {
           if (shapes.id === id) {
             // 드래그된 도형의 위치를 업데이트합니다.
             const updatedShape = { ...shapes, ...newData };
-            // PostRect({ target: { attrs: updatedShape } }); // 필요한 데이터만 전송
+            PostRect({ target: { attrs: updatedShape } }); // 필요한 데이터만 전송
             return updatedShape;
           }
           return shapes;
@@ -596,7 +631,7 @@ const MyDrawing = () => {
           if (shapes.id === id) {
             // 드래그된 도형의 위치를 업데이트합니다.
             const updatedShape = { ...shapes, ...newData };
-            // PostTriangle({ target: { attrs: updatedShape } }); // 필요한 데이터만 전송
+            PostTriangle({ target: { attrs: updatedShape } }); // 필요한 데이터만 전송
             return updatedShape;
           }
           return shapes;
@@ -608,21 +643,31 @@ const MyDrawing = () => {
           if (shapes.id === id) {
             // 드래그된 도형의 위치를 업데이트합니다.
             const updatedShape = { ...shapes, ...newData };
-            // PostCircle({ target: { attrs: updatedShape } }); // 필요한 데이터만 전송
+            PostCircle({ target: { attrs: updatedShape } }); // 필요한 데이터만 전송
             return updatedShape;
           }
           return shapes;
         })
       );
-    } else if (ty === "Text" && ty === "Text") {
+    } else if (ty === "Text") {
       setTexts((prevTexts) =>
         prevTexts.map((texts) => {
           if (texts.id === id) {
             const updatedText = { ...texts, ...newData };
-            // PostText({ target: { attrs: updatedText } }); // 필요한 데이터만 전송
+            PostText({ target: { attrs: updatedText } }); // 필요한 데이터만 전송
             return updatedText;
           }
           return texts;
+        })
+      );
+    } else if (ty === "img") {
+      setImages((prevImage) =>
+        prevImage.map((images) => {
+          if (images.id === id) {
+            const updatedImage = { ...images, ...newData };
+            return updatedImage;
+          }
+          return images;
         })
       );
     }
@@ -735,23 +780,8 @@ const MyDrawing = () => {
     console.log(shapes);
     console.log(lines);
     console.log(texts);
-  };
-
-  const checkObject2 = (shapeId, newX, newY) => {
-    // texts 배열을 복사하여 새로운 배열을 생성
-    const newTexts = texts.map((text) => {
-      // 특정 ID를 가진 객체를 찾아서 해당 객체의 x, y 값을 업데이트
-      if (text.id === shapeId) {
-        console.log("성공");
-        return { ...text, x: newX, y: newY };
-      }
-      // 다른 객체들은 그대로 유지
-      console.log("그런거 없는디");
-      return text;
-    });
-
-    // 업데이트된 배열로 상태를 설정
-    setTexts(newTexts);
+    console.log(images);
+    console.log(drawingList);
   };
 
   const handleColorChange = (e) => {
@@ -853,38 +883,6 @@ const MyDrawing = () => {
       t.id === id ? { ...t, text: newText } : t
     );
     setTexts(updatedTexts);
-  };
-
-  const ImageList = ({ onImageSelect, isSelected }) => {
-    const images = [
-      "/img/강아지.jpg",
-      "/img/고양이.jpg",
-      "/img/아기사슴.jpg",
-      "/img/햄스터.jpg",
-    ]; // 이미지 경로 목록
-    const imageRef = useRef();
-    const transformerRef = useRef();
-
-    useEffect(() => {
-      if (isSelected) {
-        transformerRef.current.nodes([imageRef.current]);
-        transformerRef.current.getLayer().batchDraw();
-      }
-    }, [isSelected]);
-
-    return (
-      <div>
-        {images.map((src, index) => (
-          <img
-            key={index}
-            src={src}
-            alt={`image-${index}`}
-            onClick={() => onImageSelect(src)}
-            style={{ width: "100px", cursor: "pointer" }}
-          />
-        ))}
-      </div>
-    );
   };
 
   return (
@@ -1206,6 +1204,11 @@ const MyDrawing = () => {
       </div>
 
       {/* 오른쪽 윗 블록 */}
+      <div className="absolute top-6 right-94 justify-center bg-white rounded-md w-16 h-[50px] z-50 flex  items-center flex-row shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]">
+        <button onClick={() => GetData()}>Get</button>
+      </div>
+
+      {/* 오른쪽 윗 블록 */}
       <div className="absolute top-6 right-72 justify-center bg-white rounded-md w-12 h-10 flex items-center shadow">
         <input
           type="text"
@@ -1274,7 +1277,6 @@ const MyDrawing = () => {
               <ShapeComponent
                 key={shape.id}
                 shapeProps={shape}
-                ref={shapeRef}
                 isSelected={shape.id === selectedId}
                 onTransformEnd={handleTransformEnd}
                 onSelect={(e) => {
@@ -1329,7 +1331,7 @@ const MyDrawing = () => {
             })}
             {texts.map((text, id) => (
               <TextComponent
-                key={id}
+                key={text.id}
                 textProps={text}
                 fontSize={fontSize}
                 isSelected={text.id === selectedId}
@@ -1351,6 +1353,8 @@ const MyDrawing = () => {
               <ImgComponent
                 key={img.id}
                 id={img.id}
+                ty={img.ty}
+                ref={ImageRef}
                 imageSrc={img.src}
                 x={img.x}
                 y={img.y}
