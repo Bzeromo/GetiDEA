@@ -15,7 +15,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 
 @Configuration
 @EnableJpaRepositories(
-    basePackages = "com.gi.giback.mysql",
+    basePackages = {"com.gi.giback.mysql", "com.gi.giback.login"},
     entityManagerFactoryRef = "mysqlEntityManager",
     transactionManagerRef = "mysqlTransactionManager"
 )
@@ -33,7 +33,7 @@ public class MySqlConfig {
     public LocalContainerEntityManagerFactoryBean mysqlEntityManager() {
         LocalContainerEntityManagerFactoryBean em = new LocalContainerEntityManagerFactoryBean();
         em.setDataSource(mysqlDataSource());
-        em.setPackagesToScan(new String[] {"com.gi.giback.mysql"});
+        em.setPackagesToScan(new String[] {"com.gi.giback.mysql", "com.gi.giback.login"});
 
         HibernateJpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
         vendorAdapter.setShowSql(true);

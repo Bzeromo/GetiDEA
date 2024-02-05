@@ -1,7 +1,6 @@
 package com.gi.giback.mongo.entity;
 
 import com.gi.giback.mongo.dto.ChatMessage;
-import java.time.LocalDateTime;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
