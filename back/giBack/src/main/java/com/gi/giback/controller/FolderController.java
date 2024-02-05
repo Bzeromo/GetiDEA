@@ -55,7 +55,7 @@ public class FolderController {
         List<LocationEntity> locationEntityList = locationService.getLocationsByUserEmailAndFolderName(userEmail, folderName);
 
         for (LocationEntity location : locationEntityList) {
-            String pid = location.getProjectId();
+            Long pid = location.getProjectId();
 
             locationService.deleteLocationByUserEmailAndProjectId(userEmail, pid);
             long count = locationService.countLocationsByProjectId(pid);

@@ -27,7 +27,7 @@ public class LocationEntity {
 
     private String userEmail;
 
-    private String projectId;
+    private Long projectId;
 
     @Builder.Default
     private Boolean authority = false; // 기본값 false

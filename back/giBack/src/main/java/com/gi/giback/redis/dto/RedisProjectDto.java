@@ -7,8 +7,8 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 public class RedisProjectDto {
-    private String projectId;
-    private String userId;
+    private Long projectId;
+    private String userEmail;
     private String propId;
     private Map<String, Object> preData;
     private Map<String, Object> newData;

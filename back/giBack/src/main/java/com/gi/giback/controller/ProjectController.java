@@ -50,10 +50,9 @@ public class ProjectController {
     private LocationService locationService;
 
     // 새 프로젝트 생성시 호출 코드
-    @PostMapping("/{projectId}/{projectName}/{templateId}/{userEmail}")
+    @PostMapping("/new/{projectName}/{templateId}/{userEmail}")
     @Operation(summary = "새 프로젝트 생성 (Mongo)", description = "몽고 DB에 새 프로젝트 데이터 저장 후 프로젝트 정보 반환")
     public ResponseEntity<?> makeProject(
-            @PathVariable("projectId") @Parameter(description = "생성 프로젝트 ID") String projectId,
             @PathVariable("projectName") @Parameter(description = "생성 프로젝트 Name") String projectName,
             @PathVariable("templateId") @Parameter(description = "참조 템플릿 ID") String templateId,
             @PathVariable("userEmail") @Parameter(description = "생성한 사용자 email") String userEmail) {
@@ -63,6 +62,10 @@ public class ProjectController {
 
         if (templateTmp.isPresent()) { //template 객체 확인
             TemplateEntity template = templateTmp.get();
+
+            // 전체 프로젝트 확인 리스트 사이즈가 0이면 projectId = 1;
+            // 아니면 가장 큰 projectId + 1;
+            Long projectId = projectService.getNextProjectId();
 
             project.setProjectId(projectId);
             project.setProjectName(projectName);
@@ -85,7 +88,7 @@ public class ProjectController {
     // 기존 프로젝트 실행시 호출
     @GetMapping("/data/{projectId}/{userCount}")
     @Operation(summary = "기존 프로젝트 열기 (Mongo)", description = "Redis에 임시 저장된 데이터 와 MongoDB 병합 후 MongoDB에 있는 Project 데이터 반환")
-    public ResponseEntity<ProjectEntity> getProject(@PathVariable("projectId") @Parameter(description ="참여 프로젝트 ID") String projectId,
+    public ResponseEntity<ProjectEntity> getProject(@PathVariable("projectId") @Parameter(description ="참여 프로젝트 ID") Long projectId,
                                                     @PathVariable("userCount") @Parameter(description = "프로젝트 현재 인원") int userCount) {
 
         ProjectEntity project = new ProjectEntity();
@@ -129,7 +132,7 @@ public class ProjectController {
     // redis에서 project 데이터 받아와서 mongo에 넣어줌
     @PatchMapping("/{projectId}")
     @Operation(summary = "프로젝트 병합 - 사용자의 프로젝트 저장, 퇴장, 참여 => 호출", description = "Redis에 저장되어있는 임시 데이터와 MongoDB의 프로젝트 데이터를 병합 작업 수행")
-    public ResponseEntity<?> saveProject(@PathVariable("projectId") @Parameter(description = "병합 작업 진행할 프로젝트 ID") String projectId)
+    public ResponseEntity<?> saveProject(@PathVariable("projectId") @Parameter(description = "병합 작업 진행할 프로젝트 ID") Long projectId)
             throws JsonProcessingException {
         // projectId 기준으로 모든 데이터 가져옴
         List<ProjectData> redisData = redisService.getAllDataProject(projectId);
@@ -140,10 +143,10 @@ public class ProjectController {
             return ResponseEntity.badRequest().build();
     }
 
-    @DeleteMapping("/close/{projectId}/{userId}")
+    @DeleteMapping("/close/{projectId}/{userEmail}")
     @Operation(summary = "프로젝트 나가기", description = "작업중인 프로젝트에서 나갈 경우 남은 인원에 따라 Redis와 Mongo 데이터 저장, 삭제")
-    public ResponseEntity<?> closeProject(@PathVariable("projectId") @Parameter(description = "퇴장 프로젝트 ID") String projectId,
-                                          @PathVariable("userId") @Parameter(description = "퇴장 사용자 ID") String userId) {
+    public ResponseEntity<?> closeProject(@PathVariable("projectId") @Parameter(description = "퇴장 프로젝트 ID") Long projectId,
+                                          @PathVariable("userEmail") @Parameter(description = "퇴장 사용자 ID") String userEmail) {
 
         try { // 종료시 병합 먼저 실행 => 병합코드를 front에서 호출해야함
             List<ProjectData> redisData = redisService.getAllDataProject(projectId);
@@ -154,7 +157,7 @@ public class ProjectController {
             return ResponseEntity.badRequest().build();
         }
 
-        if(redisService.deleteData(projectId, userId))
+        if(redisService.deleteData(projectId, userEmail))
             return ResponseEntity.ok().build();
         else
             return ResponseEntity.badRequest().build();
@@ -165,7 +168,7 @@ public class ProjectController {
     @Operation(summary = "프로젝트 삭제", description = "프로젝트 1개만 삭제")
     public ResponseEntity<?> deleteProject(
             @PathVariable("userEmail") @Parameter(description = "사용자 이메일") String userEmail,
-            @PathVariable("projectId") @Parameter(description = "삭제 프로젝트 ID") String projectId) {
+            @PathVariable("projectId") @Parameter(description = "삭제 프로젝트 ID") Long projectId) {
 
         Optional<LocationEntity> entity = locationService.getLocationByProjectIdAndUserEmail(projectId, userEmail);
         if(entity.isPresent()) {
@@ -191,7 +194,7 @@ public class ProjectController {
             int size = locationEntityList.size();
 
             for (int i=0; i<size; i++) {
-                String projectId = locationEntityList.get(i).getProjectId();
+                Long projectId = locationEntityList.get(i).getProjectId();
                 Optional<ProjectEntity> entity = projectService.getProject(projectId);
                 if(entity.isPresent()){
                     projectEntityList.add(entity.get());
@@ -209,7 +212,7 @@ public class ProjectController {
         List<ProjectEntity> projectEntityList = new ArrayList<>();
 
         for (LocationEntity locationEntity : locationEntityList) {
-            String projectId = locationEntity.getProjectId();
+            Long projectId = locationEntity.getProjectId();
             projectService.getProjectByIdWithDay(projectId).ifPresent(projectEntityList::add);
         }
 
@@ -228,7 +231,7 @@ public class ProjectController {
 
         // 위치 정보를 바탕으로 프로젝트 조회
         for (LocationEntity locationEntity : locationEntityList) {
-            String projectId = locationEntity.getProjectId();
+            Long projectId = locationEntity.getProjectId();
             projectService.getProjectByIdWithDay(projectId).ifPresent(projectEntityList::add);
         }
 
@@ -252,7 +255,7 @@ public class ProjectController {
         List<ProjectEntity> projectEntityList = new ArrayList<>();
 
         for (LocationEntity locationEntity : bookmarkedLocations) {
-            String projectId = locationEntity.getProjectId();
+            Long projectId = locationEntity.getProjectId();
             projectService.getProjectByIdWithDay(projectId).ifPresent(projectEntityList::add);
         }
 
@@ -270,7 +273,7 @@ public class ProjectController {
         List<ProjectEntity> projectEntityList = new ArrayList<>();
 
         for (LocationEntity locationEntity : locations) {
-            String projectId = locationEntity.getProjectId();
+            Long projectId = locationEntity.getProjectId();
             projectService.getProjectByIdWithDay(projectId).ifPresent(projectEntityList::add);
         }
 
@@ -285,7 +288,7 @@ public class ProjectController {
     @Operation(summary = "프로젝트 이름 변경 - 프로젝트 ID 정보 어떻게할지 구상 필요", description = "프로젝트 이름 변경")
     public ResponseEntity<?> updateProjectName(
         @RequestParam @Parameter(description = "사용자 ID") String userEmail,
-        @RequestParam @Parameter(description = "프로젝트 ID") String projectId,
+        @RequestParam @Parameter(description = "프로젝트 ID") Long projectId,
         @RequestParam @Parameter(description = "새로운 프로젝트 이름") String newProjectName) {
         Optional<LocationEntity> location = locationService.getLocationByProjectIdAndUserEmail(projectId, userEmail);
 
@@ -300,7 +303,7 @@ public class ProjectController {
 
     @GetMapping("/rollback/{projectId}/{userEmail}") // 되돌리기 기능을 위한 User별 변동사항 호출
     @Operation(summary = "이전 변경사항 불러오기 - 되돌리기 기능(Ctrl + z)", description = "userEmail과 projectId를 받아서 레디스의 임시데이터에서 최근 변경한 내용을 호출")
-    public ResponseEntity<Object> getUserData(@PathVariable("projectId") String projectId, @PathVariable("userEmail") String userEmail) {
+    public ResponseEntity<Object> getUserData(@PathVariable("projectId") Long projectId, @PathVariable("userEmail") String userEmail) {
         Object data = redisService.getLastProjectData(projectId, userEmail);
         return ResponseEntity.ok(data);
     }

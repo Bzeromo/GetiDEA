@@ -31,8 +31,8 @@ public class RedisService {
 
     public void saveData(RedisProjectDto data) throws JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
-        String projectId = data.getProjectId();
-        String key= data.getProjectId() + ":" + data.getUserId();
+        Long projectId = data.getProjectId();
+        String key= data.getProjectId() + ":" + data.getUserEmail();
         ListOperations<String, Object> listOps = redisTemplate.opsForList();
 
         Map<String,Object> combinedData = new HashMap<>();
@@ -54,8 +54,8 @@ public class RedisService {
         
     }
 
-    public Object getLastProjectData(String projectId, String userId) { // 되돌리기에서 사용
-        String key = projectId + ":" + userId;
+    public Object getLastProjectData(Long projectId, String userEmail) { // 되돌리기에서 사용
+        String key = projectId + ":" + userEmail;
         if(Boolean.TRUE.equals(redisTemplate.hasKey(key))){
             return redisTemplate.opsForList().rightPop(key);
             // 마지막 값 pop 작업 수행 후 반환
@@ -65,7 +65,7 @@ public class RedisService {
     }
 
     // projectId가 일치하는 곳의 모든 사용자의 변경사항 시간 순서로 정렬후 리턴
-    public List<ProjectData> getAllDataProject(String projectId) throws JsonProcessingException {
+    public List<ProjectData> getAllDataProject(Long projectId) throws JsonProcessingException {
         List<ProjectData> results = new ArrayList<>();
         ObjectMapper objectMapper = new ObjectMapper();
 
@@ -118,15 +118,15 @@ public class RedisService {
 
     // projectId + UserId 기준으로 어떤 사용자가 프로젝트를 종료했을때 호출하여
     // 해당 사용자의 기록을 지움
-    public boolean deleteData(String projectId, String userId) {
-        String key = projectId + ":" + userId;
+    public boolean deleteData(Long projectId, String userEmail) {
+        String key = projectId + ":" + userEmail;
         redisTemplate.delete(key);
         return true;
     }
 
     // projectId에 해당하는 프로젝트에 사용자가 하나도 남지 않았을때
     // 저장을 하고 호출하여 프로젝트 정보를 삭제
-    public boolean deleteAllDataByProjectId(String projectId) {
+    public boolean deleteAllDataByProjectId(Long projectId) {
         Set<String> keysToDelete = redisTemplate.keys(projectId + ":*");
         redisTemplate.delete(keysToDelete);
         return true;

@@ -81,4 +81,10 @@ public class UserService {
         Optional<UserEntity> userOptional = userRepository.findByRefreshToken(refreshToken);
         return userOptional.orElse(null);
     }
+
+    @Transactional
+    public boolean updateUserProfileImage(String userEmail, String imageUrl) {
+        int updatedRows = userRepository.updateProfileImage(userEmail, imageUrl);
+        return updatedRows > 0;
+    }
 }

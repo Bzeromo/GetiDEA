@@ -10,6 +10,7 @@ import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -27,20 +28,21 @@ public class ImageController {
     private final UserService userService;
     private final ProjectService projectService;
 
-    @PostMapping("/thumbnailImage")
+    @PostMapping("/thumbnailImage/{projectId}")
     @Operation(summary = "썸네일 이미지 저장", description = "썸네일 이미지 저장")
-    public ResponseEntity<String> uploadThumbnailImage(@RequestParam("thumbnailImage") @Parameter(description = "저장할 이미지") MultipartFile multipartFile) {
+    public ResponseEntity<String> uploadThumbnailImage(@RequestParam("thumbnailImage") @Parameter(description = "저장할 이미지") MultipartFile multipartFile,
+        @PathVariable("projectId") Long projectId) {
         String result;
         try {
             result = s3UploadService.saveThumbnailImage(multipartFile);
-            // 여기에 Project에 썸네일 이미지 result 값으로 변경해주는 작업 필요
+            projectService.updateProjectThumbnail(projectId, result);
         } catch (IOException e) {
             return ResponseEntity.badRequest().build();
         }
         return ResponseEntity.ok(result);
     }
 
-    @PostMapping("/userId/profileImage")
+    @PostMapping("/userEmail/profileImage")
     @Operation(summary = "프로필 이미지 변경", description = "프로필 이미지 변경")
     public ResponseEntity<String> updateProfileImage(
             @RequestParam("userEmail") @Parameter(description = "사용자 이메일") String userEmail,
@@ -50,9 +52,12 @@ public class ImageController {
         try {
             result = s3UploadService.saveProfileImage(multipartFile, userEmail);
             // 여기에 MySQL에 프로필 이미지 result 값으로 변경해주는 작업 필요
+            if(userService.updateUserProfileImage(userEmail, result)){
+                return ResponseEntity.ok(result);
+            }
         } catch (IOException e) {
             return ResponseEntity.badRequest().build();
         }
-        return ResponseEntity.ok(result);
+        return ResponseEntity.badRequest().build();
     }
 }

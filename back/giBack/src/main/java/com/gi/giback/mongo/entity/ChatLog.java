@@ -14,6 +14,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @AllArgsConstructor
 public class ChatLog {
     @Id
-    private String projectId;
+    private Long projectId;
     private List<ChatMessage> chats;
 }

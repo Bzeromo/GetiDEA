@@ -53,8 +53,8 @@ public class S3UploadService {
         amazonS3Client.deleteObject(bucket, originalFilename);
     }
 
-    public String saveProfileImage(MultipartFile multipartFile, String userId) throws IOException {
-        String filenameWithPath = "profileImage/" + userId;
+    public String saveProfileImage(MultipartFile multipartFile, String userEmail) throws IOException {
+        String filenameWithPath = "profileImage/" + userEmail;
 
         ByteArrayInputStream resizedImageStream = resizeImage(multipartFile, 200, 200);
 

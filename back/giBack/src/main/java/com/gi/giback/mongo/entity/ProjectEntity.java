@@ -12,7 +12,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class ProjectEntity {
 
     @Id
-    private String projectId;
+    private Long projectId;
 
     private String templateId;
     private String projectName;

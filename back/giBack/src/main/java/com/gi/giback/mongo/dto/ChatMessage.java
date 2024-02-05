@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 public class
 
 ChatMessage {
-    private String userId;
+    private String userEmail;
     private String profileImg;
     private String message;
     private LocalDateTime timestamp;

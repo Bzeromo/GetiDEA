@@ -16,7 +16,7 @@ public class LocationService {
         this.locationRepository = locationRepository;
     }
 
-    public LocationEntity createLocation(String userEmail, String projectId) {
+    public LocationEntity createLocation(String userEmail, Long projectId) {
         LocationEntity locationEntity = LocationEntity.builder()
                 .userEmail(userEmail)
                 .projectId(projectId)
@@ -28,7 +28,7 @@ public class LocationService {
         return locationRepository.findByUserEmail(userEmail);
     }
 
-    public LocationEntity updateFolderName(String userEmail, String projectId, String newFolderName) {
+    public LocationEntity updateFolderName(String userEmail, Long projectId, String newFolderName) {
         List<LocationEntity> entities = locationRepository.findByUserEmail(userEmail);
         for (LocationEntity entity : entities) {
             if (entity.getProjectId().equals(projectId)) {
@@ -39,7 +39,7 @@ public class LocationService {
         return null;
     }
 
-    public LocationEntity toggleBookmark(String userEmail, String projectId) {
+    public LocationEntity toggleBookmark(String userEmail, Long projectId) {
         List<LocationEntity> entities = locationRepository.findByUserEmail(userEmail);
         for (LocationEntity entity : entities) {
             if (entity.getProjectId().equals(projectId)) {
@@ -58,15 +58,15 @@ public class LocationService {
         return locationRepository.findByUserEmailAndFolderName(userEmail, folderName);
     }
 
-    public Optional<LocationEntity> getLocationByProjectIdAndUserEmail(String projectId, String userEmail) {
+    public Optional<LocationEntity> getLocationByProjectIdAndUserEmail(Long projectId, String userEmail) {
         return locationRepository.findByProjectIdAndUserEmail(projectId, userEmail);
     }
 
-    public void deleteLocationByUserEmailAndProjectId(String userEmail, String projectId) {
+    public void deleteLocationByUserEmailAndProjectId(String userEmail, Long projectId) {
         locationRepository.deleteByUserEmailAndProjectId(userEmail, projectId);
     }
 
-    public long countLocationsByProjectId(String projectId) {
+    public long countLocationsByProjectId(Long projectId) {
         return locationRepository.countByProjectId(projectId);
     }
 }

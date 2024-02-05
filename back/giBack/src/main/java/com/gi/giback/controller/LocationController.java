@@ -35,7 +35,7 @@ public class LocationController {
     @Operation(summary = "프로젝트에 유저 초대", description = "프로젝트에 유저 초대 -> 초대받은 유저 정보를 기반으로 location 엔티티 생성")
     public ResponseEntity<LocationEntity> createLocation(
             @RequestParam @Parameter(description = "초대할 userEmail") String userEmail,
-            @RequestParam @Parameter(description = "초대 프로젝트 ID") String projectId) {
+            @RequestParam @Parameter(description = "초대 프로젝트 ID") Long projectId) {
         String userName = null;
         userName = userService.getUserNameByEmail(userEmail);
         if (userName != null) { // 사용자가 없으면 실행하지 않음
@@ -49,7 +49,7 @@ public class LocationController {
     @Operation(summary = "프로젝트 위치 이동", description = "프로젝트 위치 이동 : 로케이션에 있는 folderName 변경")
     public ResponseEntity<LocationEntity> updateFolderName(
             @RequestParam @Parameter(description = "사용자 이메일") String userEmail,
-            @RequestParam @Parameter(description = "이동시킬 프로젝트") String projectId,
+            @RequestParam @Parameter(description = "이동시킬 프로젝트") Long projectId,
             @RequestParam @Parameter(description = "이동할 폴더 이름") String newFolderName) {
         // 폴더 존재 검증 필요
         Optional<FolderEntity> folder = folderService.getFolderByFolderName(newFolderName);
@@ -64,7 +64,7 @@ public class LocationController {
     @Operation(summary = "북마크", description = "북마크 해제, 등록 기능 구현")
     public ResponseEntity<LocationEntity> toggleBookmark(
             @RequestParam @Parameter(description = "사용자 이메일") String userEmail,
-            @RequestParam @Parameter(description = "북마크 기능 사용할 프로젝트id") String projectId) {
+            @RequestParam @Parameter(description = "북마크 기능 사용할 프로젝트id") Long projectId) {
         LocationEntity updatedEntity = locationService.toggleBookmark(userEmail, projectId);
         return ResponseEntity.ok(updatedEntity);
     }

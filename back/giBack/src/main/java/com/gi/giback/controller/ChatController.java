@@ -26,7 +26,7 @@ public class ChatController {
     @PostMapping("/send/{projectId}")
     @Operation(summary = "채팅 전송", description = "채팅 사용시 계속 호출해야함 / Mongo의 projectId가 일치하는 곳에 채팅 로그 저장")
     public ResponseEntity<Void> addChatMessage(
-            @PathVariable("projectId") @Parameter(description = "채팅 저장할 프로젝트 ID") String projectId,
+            @PathVariable("projectId") @Parameter(description = "채팅 저장할 프로젝트 ID") Long projectId,
             @RequestBody @Parameter(description = "채팅 저장할 프로젝트 ID") ChatMessage chatMessage) {
         chatService.addChatLog(projectId, chatMessage);
         return ResponseEntity.ok().build();
@@ -34,7 +34,7 @@ public class ChatController {
 
     @GetMapping("/load/{projectId}")
     @Operation(summary = "채팅 내역 불러오기", description = "프로젝트 실행시 프로젝트와 함께 채팅도 불러와야함")
-    public ResponseEntity<List<ChatMessage>> getChatLogs(@PathVariable("projectId") @Parameter(description = "채팅 로그 불러올 프로젝트 ID") String projectId) {
+    public ResponseEntity<List<ChatMessage>> getChatLogs(@PathVariable("projectId") @Parameter(description = "채팅 로그 불러올 프로젝트 ID") Long projectId) {
         List<ChatMessage> chatLogs = chatService.getChatLogsByProjectId(projectId);
         return ResponseEntity.ok(chatLogs);
     }

@@ -9,7 +9,7 @@ import org.springframework.data.annotation.Id;
 @NoArgsConstructor
 public class ProjectDto {
     @Id
-    private String projectId;
+    private Long projectId;
     private String templateId;
     private String projectName;
     private String thumbnail;

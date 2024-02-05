@@ -4,10 +4,12 @@ import com.gi.giback.mongo.entity.ProjectEntity;
 import com.gi.giback.mongo.repository.ProjectRepository;
 import com.gi.giback.redis.dto.ProjectData;
 import com.mongodb.bulk.BulkWriteResult;
+import com.mongodb.client.result.UpdateResult;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.BulkOperations;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -29,11 +31,11 @@ public class ProjectService {
     }
 
     // Project 오픈시 호출
-    public Optional<ProjectEntity> getProject(String projectId) {
+    public Optional<ProjectEntity> getProject(Long projectId) {
         return repository.findById(projectId);
     }
 
-    public Optional<ProjectEntity> getProjectByIdWithDay(String projectId) {
+    public Optional<ProjectEntity> getProjectByIdWithDay(Long projectId) {
         LocalDateTime sevenDaysAgo = LocalDateTime.now().minusDays(7);
 
         Query query = new Query(Criteria.where("projectId").is(projectId)
@@ -44,7 +46,7 @@ public class ProjectService {
     }
 
     // bulk operation으로 업데이트 성능 최적화 코드 아직 사용x
-    public boolean updateData(String projectId, List<ProjectData> datas) {
+    public boolean updateData(Long projectId, List<ProjectData> datas) {
         Query query = new Query(Criteria.where("projectId").is(projectId));
         BulkOperations bulkOps = mongoTemplate.bulkOps(BulkOperations.BulkMode.UNORDERED, ProjectEntity.class);
 
@@ -58,14 +60,34 @@ public class ProjectService {
         return result.wasAcknowledged();
     }
 
-    public void deleteProjectByProjectId(String projectId) {
+    public void deleteProjectByProjectId(Long projectId) {
         repository.deleteByProjectId(projectId);
     }
 
-    public Optional<ProjectEntity> updateProjectName(String projectId, String newProjectName) {
+    public Optional<ProjectEntity> updateProjectName(Long projectId, String newProjectName) {
         Query query = new Query(Criteria.where("projectId").is(projectId));
         Update update = new Update().set("projectName", newProjectName);
         mongoTemplate.findAndModify(query, update, ProjectEntity.class);
         return Optional.ofNullable(mongoTemplate.findOne(query, ProjectEntity.class));
+    }
+
+    public Long getNextProjectId() {
+        ProjectEntity highestProject = mongoTemplate.find(
+            Query.query(new Criteria()).with(Sort.by(Sort.Direction.DESC, "projectId")).limit(1),
+            ProjectEntity.class).stream().findFirst().orElse(null);
+        if (highestProject == null) {
+            return 1L; // 프로젝트가 없으면 1 반환
+        } else {
+            return highestProject.getProjectId() + 1; // 가장 큰 projectId 찾아 +1
+        }
+    }
+
+    public boolean updateProjectThumbnail(Long projectId, String imageUrl) {
+        Query query = new Query(Criteria.where("projectId").is(projectId));
+        Update update = new Update().set("thumbnail", imageUrl);
+        // 업데이트 실행 및 결과 반환
+        UpdateResult result = mongoTemplate.updateFirst(query, update, ProjectEntity.class);
+        // 업데이트 성공 여부 확인 (수정된 문서 수가 0보다 크면 true 반환)
+        return result.getModifiedCount() > 0;
     }
 }
