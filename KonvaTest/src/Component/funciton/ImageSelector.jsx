@@ -82,9 +82,11 @@ const ImageSelector = ({ onImageSelect }) => {
       gap: '10px', // 그리드 간격
       padding: '10px', // 내부 여백
       maxWidth: '300px', // 최대 너비, 필요에 따라 조절
+      maxHeight: '600px',
       backgroundColor: '#fff', // 배경색
       boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)', // 그림자 효과
       borderRadius: '8px', // 테두리 둥글게
+      overflowY: 'auto' // 세로 스크롤 활성화
     }}>
       {imageOptions.map((src, index) => (
         <img
