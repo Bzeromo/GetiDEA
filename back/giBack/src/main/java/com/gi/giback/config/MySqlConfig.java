@@ -41,7 +41,6 @@ public class MySqlConfig {
         em.setJpaVendorAdapter(vendorAdapter);
 
         HashMap<String, Object> prop = new HashMap<>();
-        prop.put("hibernate.dialect", "org.hibernate.dialect.MySQL8Dialect");
         prop.put("hibernate.hbm2ddl.auto", "update");
         prop.put("hibernate.format_sql", true);
         em.setJpaPropertyMap(prop);
