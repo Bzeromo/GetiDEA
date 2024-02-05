@@ -86,27 +86,22 @@ public class ProjectController {
     }
 
     // 기존 프로젝트 실행시 호출
-    @GetMapping("/data/{projectId}/{userCount}")
+    @GetMapping("/data/{projectName}/{userEmail}")
     @Operation(summary = "기존 프로젝트 열기 (Mongo)", description = "Redis에 임시 저장된 데이터 와 MongoDB 병합 후 MongoDB에 있는 Project 데이터 반환")
-    public ResponseEntity<ProjectEntity> getProject(@PathVariable("projectId") @Parameter(description ="참여 프로젝트 ID") Long projectId,
-                                                    @PathVariable("userCount") @Parameter(description = "프로젝트 현재 인원") int userCount) {
+    public ResponseEntity<ProjectEntity> getProject(
+        @PathVariable("projectName") @Parameter(description ="참여 프로젝트 ID") String projectName,
+        @PathVariable("userEmail") @Parameter(description ="참여 프로젝트 ID") String  userEmail) {
 
-        ProjectEntity project = new ProjectEntity();
+        Optional<LocationEntity> location = locationService.getLocationByUserEmailAndFolderName(userEmail, projectName);
+        if(location.isPresent()){
+            Long pid = location.get().getProjectId();
+            ProjectEntity project = new ProjectEntity();
 
-        if (userCount == 1) // 최초 1인이 들어왔을 경우
-        {
-            Optional<ProjectEntity> projectTmp = projectService.getProject(projectId);
-            if (projectTmp.isPresent()) { //project 객체 확인
-                project = projectTmp.get();
-            }
-            return ResponseEntity.ok(project);
-        } else {
-            // 2인 이상일 경우 merge -> send
+            List<ProjectData> redisData = null;
             try {
-                List<ProjectData> redisData = redisService.getAllDataProject(projectId);
-
-                if (projectService.updateData(projectId, redisData)) {
-                    Optional<ProjectEntity> projectTmp = projectService.getProject(projectId);
+                redisData = redisService.getAllDataProject(pid);
+                if (projectService.updateData(pid, redisData)) {
+                    Optional<ProjectEntity> projectTmp = projectService.getProject(pid);
                     if (projectTmp.isPresent()) { //project 객체 확인
                         project = projectTmp.get();
                     }
@@ -114,11 +109,11 @@ public class ProjectController {
                 } else {
                     return ResponseEntity.badRequest().build();
                 }
-
             } catch (JsonProcessingException e) {
                 return ResponseEntity.badRequest().build();
             }
         }
+        return ResponseEntity.badRequest().build();
     }
 
     @PostMapping("/changes")// Redis에 변경사항 저장

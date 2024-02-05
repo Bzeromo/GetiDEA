@@ -11,6 +11,7 @@ import org.springframework.stereotype.Repository;
 public interface LocationRepository extends JpaRepository<LocationEntity, String> {
     List<LocationEntity> findByUserEmailAndBookmarkTrue(String userEmail);
     List<LocationEntity> findByUserEmail(String userEmail);
+    Optional<LocationEntity> findFirstByUserEmailAndFolderName(String userEmail, String folderName);
     List<LocationEntity> findByUserEmailAndFolderName(String userEmail, String folderName);
     Optional<LocationEntity> findByProjectIdAndUserEmail(Long projectId, String userEmail);
 

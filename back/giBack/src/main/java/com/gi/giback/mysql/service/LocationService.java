@@ -54,6 +54,10 @@ public class LocationService {
         return locationRepository.findByUserEmailAndBookmarkTrue(userEmail);
     }
 
+    public Optional<LocationEntity> getLocationByUserEmailAndFolderName(String userEmail, String folderName) {
+        return locationRepository.findFirstByUserEmailAndFolderName(userEmail, folderName);
+    }
+
     public List<LocationEntity> getLocationsByUserEmailAndFolderName(String userEmail, String folderName) {
         return locationRepository.findByUserEmailAndFolderName(userEmail, folderName);
     }
