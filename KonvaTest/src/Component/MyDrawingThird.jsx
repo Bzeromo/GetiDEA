@@ -16,6 +16,7 @@ import LayerFunction from "./funciton/LayerFunction";
 import postData from "./axios/postData";
 import TextComponent from "./Add/TextComponent";
 import useEventHandler from "./funciton/useEventHandler";
+import ImageSelector from "./funciton/ImageSelector";
 
 const MyDrawing = () => {
   const [imageIdCounter, setImageIdCounter] = useState(0);
@@ -164,7 +165,8 @@ const MyDrawing = () => {
     selectedId,
     setTexts,
     fontSize,
-    setFontSize
+    setFontSize,
+    setSelectedId
   );
 
   const {
@@ -189,8 +191,8 @@ const MyDrawing = () => {
     setImages
   );
 
-  const [selectedImageUrl, setSelectedImageUrl] = useState(null); // 선택된 이미지 URL을 저장하는 상태
-  const [selectedImageUrls, setSelectedImageUrls] = useState([]);
+  // const [selectedImageUrl, setSelectedImageUrl] = useState(null); // 선택된 이미지 URL을 저장하는 상태
+  // const [selectedImageUrls, setSelectedImageUrls] = useState([]);
 
   const handleImageSelect = (src) => {
     setSelectedImage(src);
@@ -686,6 +688,40 @@ const MyDrawing = () => {
     setStageScale({ x: 1, y: 1 });
   }, []);
 
+  // const {
+  //   handleMouseDown,
+  //   handleMouseMove,
+  //   handleMouseUp,
+  //   handleDragEnd,
+  //   handleTransformEnd,
+  //   zoomOnWheel,
+  //   resetZoom,
+  // } = useEventHandler({
+  //   // 필요한 모든 props와 상태를 여기에 전달합니다.
+  //   startWrite,
+  //   selectedId,
+  //   setSelectionRect,
+  //   setSelectedIds,
+  //   setDrawing,
+  //   setCurrentLine,
+  //   drawingList,
+  //   setDrawingList,
+  //   currentColor,
+  //   shapes,
+  //   setLines,
+  //   setShapes,
+  //   setTexts,
+  //   setDragEnded,
+  //   stageRef,
+  //   setStageScale,
+  //   setStagePosition,
+  //   drawing,
+  //   selectionRect,
+  //   currentLine,
+  //   sendInfoToServer,
+  //   stagePosition,
+  // });
+
   useEffect(() => {
     // 드래그 작업이 완료되었고, 상태가 변경되었다면 서버에 전송
     if (dragEnded) {
@@ -748,7 +784,7 @@ const MyDrawing = () => {
   };
 
   const handleShapeClick = (id, e) => {
-    e.cancelBubble = true; // 이벤트 버블링 방지
+    e.cancelBubble = true;
     setSelectedId(id);
     console.log(id);
   };
@@ -1170,7 +1206,14 @@ const MyDrawing = () => {
       </div>
 
       {/* 오른쪽 윗 블록 */}
-      <div className="absolute top-6 right-72 justify-center bg-white rounded-md w-16 h-[50px] flex  items-center flex-row shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]"></div>
+      <div className="absolute top-6 right-72 justify-center bg-white rounded-md w-12 h-10 flex items-center shadow">
+        <input
+          type="text"
+          value={fontSize}
+          onChange={handleFontSize}
+          className="w-full h-full text-center text-sm border-none rounded-md"
+        />
+      </div>
 
       {/* 오른쪽 윗 블록 */}
       <div className="absolute bottom-6 right-32 z-50 justify-center bg-white rounded-md w-16 h-[50px] flex  items-center flex-row shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]">
@@ -1188,11 +1231,19 @@ const MyDrawing = () => {
       </div>
 
       {/* 오른쪽 윗 블록 */}
-      <div className="absolute bottom-6 right-72 z-50 justify-center bg-white rounded-md w-16 h-[50px] flex  items-center flex-row shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]">
-        {/* <button onClick={moveToBottom}>제일 아래</button> */}
-        {selectedImage && <URLImage src={selectedImage} />}
-        <></>
-      </div>
+      <button
+        onClick={imgToggle}
+        className="absolute bottom-6 right-72 z-50 justify-center bg-white rounded-md w-16 h-[50px] flex items-center flex-row shadow-[rgba(0,0,0,0.25)]"
+      >
+        img
+      </button>
+      {imgMenuToggle && (
+        <div className="absolute bottom-[56px] right-72">
+          {" "}
+          {/* 위치 조정 필요에 따라 조절 */}
+          <ImageSelector onImageSelect={addImage} />
+        </div>
+      )}
 
       {/* 그리는 구역 */}
       <div className="ml-36 mt-24 h-full w-full">
@@ -1276,13 +1327,14 @@ const MyDrawing = () => {
                 );
               }
             })}
-            {texts.map((text, i) => (
+            {texts.map((text, id) => (
               <TextComponent
-                key={i}
+                key={id}
                 textProps={text}
+                fontSize={fontSize}
                 isSelected={text.id === selectedId}
-                onSelect={() => {
-                  setSelectedId(text.id);
+                onSelect={(e) => {
+                  handleShapeClick(text.id, e);
                 }}
                 onChange={(newAttrs) => {
                   const newTexts = texts.map((t) =>
@@ -1290,6 +1342,8 @@ const MyDrawing = () => {
                   );
                   setTexts(newTexts);
                 }}
+                setSelectedId={setSelectedId}
+                onTextChange={(newText) => handleTextChange(text.id, newText)}
               />
             ))}
 
@@ -1297,12 +1351,15 @@ const MyDrawing = () => {
               <ImgComponent
                 key={img.id}
                 id={img.id}
-                image={img}
+                imageSrc={img.src}
                 x={img.x}
                 y={img.y}
+                isSelected={img.id === selectedId}
+                onSelect={(e) => {
+                  handleShapeClick(img.id, e);
+                }}
               />
             ))}
-
 
             {selectedId && (
               <Transformer

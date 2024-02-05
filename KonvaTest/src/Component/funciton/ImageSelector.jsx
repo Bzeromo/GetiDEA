@@ -3,12 +3,13 @@ import React from "react";
 
 const ImageSelector = ({ onImageSelect }) => {
   const imageOptions = [
-    "/img/강아지.jpg",
-    "/img/고양이.jpg",
-    "/img/아기사슴.jpg",
-    "/img/햄스터.jpg",
-    "/img/card1.png",
-    //Template 1번 : bubble chat 관련 이미지
+    // test 코드
+    // "/img/강아지.jpg",
+    // "/img/고양이.jpg",
+    // "/img/아기사슴.jpg",
+    // "/img/햄스터.jpg",
+
+    // template 1 : bubble chat 관련 이미지
     "/img/template1_bubble_chat/bubble_chat1.svg",
     "/img/template1_bubble_chat/bubble_chat2.svg",
     "/img/template1_bubble_chat/bubble_chat3.svg",
@@ -44,7 +45,7 @@ const ImageSelector = ({ onImageSelect }) => {
     "/img/template1_bubble_chat/bubble_chat33.svg",
     "/img/template1_bubble_chat/bubble_chat34.svg",
     
-    //템블릿 2번 : 6hat
+    // template 2 : six hats 관련 이미지
     "/img/template2_6hat/1_white_hat.svg",
     "/img/template2_6hat/2_red_hat.svg",
     "/img/template2_6hat/3_yellow_hat.svg",
@@ -52,9 +53,25 @@ const ImageSelector = ({ onImageSelect }) => {
     "/img/template2_6hat/5_green_hat.svg",
     "/img/template2_6hat/6_blue_hat.svg",
 
+    // template 3 : check 7 관련 이미지
+    "/img/template3_check7/bulb.svg",   
+    "/img/template3_check7/card1.png",
+    "/img/template3_check7/card2.png",
+    "/img/template3_check7/card3.png",
+    "/img/template3_check7/card4.png",
+    "/img/template3_check7/card5.png",
+    "/img/template3_check7/card6.png",
+    "/img/template3_check7/card7.png",
+    "/img/template3_check7/writing_area.png",
+    // "/img/template3_check7/card1.svg",
+    // "/img/template3_check7/card2.svg",
+    // "/img/template3_check7/card3.svg",
+    // "/img/template3_check7/card4.svg",
+    // "/img/template3_check7/card5.svg",
+    // "/img/template3_check7/card6.svg",
+    // "/img/template3_check7/card7.svg",
+    "/img/template3_check7/template3.png",
 
-
-    // "/img/새 폴더/bubble_chat - 복사본 (1).svg",
     // 여기에 더 많은 이미지 경로를 추가할 수 있습니다.
   ];
 
