@@ -1,19 +1,29 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Image, Transformer } from 'react-konva';
-import useImage from 'use-image';
+import React, { useState, useEffect, useRef } from "react";
+import { Image, Transformer } from "react-konva";
+import useImage from "use-image";
 
-const ImgComponent = ({ imageSrc, x, y, isSelected, onSelect, maxWidth = 200, maxHeight = 200 }) => {
+const ImgComponent = ({
+  imageSrc,
+  x,
+  y,
+  ty,
+  isSelected,
+  onSelect,
+  maxWidth = 200,
+  maxHeight = 200,
+  id,
+}) => {
   const [img, status] = useImage(imageSrc);
   const [size, setSize] = useState({ width: 0, height: 0 });
   const imgRef = useRef(null);
   const transformerRef = useRef(null);
 
   useEffect(() => {
-    if (img && status === 'loaded') {
+    if (img && status === "loaded") {
       // 이미지 로딩 완료 시 크기 조정 로직 실행
       const aspectRatio = img.width / img.height;
       let newWidth, newHeight;
-      
+
       if (img.width > img.height || img.width > maxWidth) {
         newWidth = maxWidth;
         newHeight = maxWidth / aspectRatio;
@@ -51,8 +61,10 @@ const ImgComponent = ({ imageSrc, x, y, isSelected, onSelect, maxWidth = 200, ma
       {img && (
         <Image
           image={img}
+          id={id}
           x={x}
           y={y}
+          ty={ty}
           width={size.width}
           height={size.height}
           ref={imgRef}

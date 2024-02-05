@@ -1,14 +1,26 @@
 import axios from "axios";
 
 const postData = () => {
+  const PostSave = () => {
+    axios
+      .post("http://192.168.31.172:8080/api/project/1")
+      .then((response) => {
+        // console.log(response);
+        console.log(response.data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }
+
   const PostText = (e) => {
     if (!e || !e.target) {
       console.error("이벤트 또는 대상 요소가 정의되지 않았습니다.");
       return;
     }
     const postData = {
-      projectId: "test",
-      userId: "강준규",
+      projectId: 1,
+      userEmail: "강준규",
       propId: e.target.attrs.id,
       preData: {},
       newData: {
@@ -30,7 +42,7 @@ const postData = () => {
       },
     };
     axios
-      .post("http://192.168.31.172:8080/changes", postData)
+      .post("http://192.168.31.172:8080/api/project/changes", postData)
       .then((response) => {
         // console.log(response);
         console.log(response.data);
@@ -46,8 +58,8 @@ const postData = () => {
       return;
     }
     const postData = {
-      projectId: "test",
-      userId: "강준규",
+      projectId: 1,
+      userEmail: "강준규",
       propId: e.target.attrs.id,
       preData: {},
       newData: {
@@ -71,7 +83,8 @@ const postData = () => {
       },
     };
     axios
-      .post("http://192.168.31.172:8080/changes", postData)
+      .post("http://192.168.31.172:8080/api/project/changes", postData)
+
       .then((response) => {
         // console.log(response);
         console.log(response.data);
@@ -87,8 +100,8 @@ const postData = () => {
       return;
     }
     const postData = {
-      projectId: "test",
-      userId: "강준규",
+      projectId: 1,
+      userEmail: "강준규",
       propId: e.target.attrs.id,
       preData: {},
       newData: {
@@ -111,7 +124,8 @@ const postData = () => {
       },
     };
     axios
-      .post("http://192.168.31.172:8080/changes", postData)
+      .post("http://192.168.31.172:8080/api/project/changes", postData)
+
       .then((response) => {
         // console.log(response);
         console.log(response.data);
@@ -127,16 +141,16 @@ const postData = () => {
       return;
     }
     const postData = {
-      projectId: "test",
-      userId: "강준규",
+      projectId: 1,
+      userEmail: "강준규",
       propId: e.target.attrs.id,
       preData: {},
       newData: {
         id: e.target.attrs.id,
-        type: e.target.attrs.type,
-        stroke: e.target.attrs.stroke,
         x: e.target.attrs.x,
         y: e.target.attrs.y,
+        type: e.target.attrs.type,
+        stroke: e.target.attrs.stroke,
         side: e.target.attrs.side,
         fill: e.target.attrs.fill,
         ty: e.target.attrs.ty,
@@ -151,7 +165,8 @@ const postData = () => {
       },
     };
     axios
-      .post("http://192.168.31.172:8080/changes", postData)
+      .post("http://192.168.31.172:8080/api/project/changes", postData)
+
       .then((response) => {
         // console.log(response);
         console.log(response.data);
@@ -167,8 +182,8 @@ const postData = () => {
       return;
     }
     const postData = {
-      projectId: "test",
-      userId: "강준규",
+      projectId: 1,
+      userEmail: "강준규",
       propId: e.target.attrs.id,
       preData: {},
       newData: {
@@ -193,7 +208,8 @@ const postData = () => {
       },
     };
     axios
-      .post("http://192.168.31.172:8080/changes", postData)
+      .post("http://192.168.31.172:8080/api/project/changes", postData)
+
       .then((response) => {
         // console.log(response);
         console.log(response.data);
@@ -208,8 +224,8 @@ const postData = () => {
       return;
     }
     const postData = {
-      projectId: "test",
-      userId: "강준규",
+      projectId: 1,
+      userEmail: "강준규",
       propId: e.target.attrs.id,
       preData: {},
       newData: {
@@ -235,7 +251,8 @@ const postData = () => {
       },
     };
     axios
-      .post("http://192.168.31.172:8080/changes", postData)
+      .post("http://192.168.31.172:8080/api/project/changes", postData)
+
       .then((response) => {
         // console.log(response);
         console.log(response.data);
@@ -250,8 +267,8 @@ const postData = () => {
       return;
     }
     const postData = {
-      projectId: "test",
-      userId: "강준규",
+      projectId: 1,
+      userEmail: "강준규",
       propId: e.target.attrs.id,
       preData: {},
       newData: {
@@ -277,7 +294,8 @@ const postData = () => {
       },
     };
     axios
-      .post("http://192.168.31.172:8080/changes", postData)
+      .post("http://192.168.31.172:8080/api/project/changes", postData)
+
       .then((response) => {
         // console.log(response);
         console.log(response.data);
@@ -295,6 +313,7 @@ const postData = () => {
     PostDot,
     PostArrow,
     PostText,
+    PostSave,
   };
 };
 

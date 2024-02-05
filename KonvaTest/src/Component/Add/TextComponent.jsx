@@ -87,6 +87,8 @@ const TextComponent = ({
       <Text
         ref={textRef}
         {...textProps}
+        x={textProps.x}
+        y={textProps.y}
         text={textProps.text}
         fontSize={textProps.fontSize}
         draggable
