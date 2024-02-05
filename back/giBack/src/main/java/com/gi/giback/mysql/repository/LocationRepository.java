@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface LocationRepository extends JpaRepository<LocationEntity, String> {
+    Optional<LocationEntity> findByProjectId(Long projectId);
     List<LocationEntity> findByUserEmailAndBookmarkTrue(String userEmail);
     List<LocationEntity> findByUserEmail(String userEmail);
     Optional<LocationEntity> findFirstByUserEmailAndFolderName(String userEmail, String folderName);
@@ -19,4 +20,6 @@ public interface LocationRepository extends JpaRepository<LocationEntity, String
     void deleteByUserEmailAndProjectId(String userEmail, Long projectId);
 
     long countByProjectId(Long projectId);
+
+    Optional<LocationEntity> findByProjectNameAndUserEmail(String projectName, String userEmail);
 }

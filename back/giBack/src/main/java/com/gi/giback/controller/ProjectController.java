@@ -40,14 +40,19 @@ import org.springframework.web.bind.annotation.RestController;
 @CrossOrigin
 public class ProjectController {
 
+    private final RedisService redisService;
+    private final ProjectService projectService;
+    private final TemplateService templateService;
+    private final LocationService locationService;
+
     @Autowired
-    private RedisService redisService;
-    @Autowired
-    private ProjectService projectService;
-    @Autowired
-    private TemplateService templateService;
-    @Autowired
-    private LocationService locationService;
+    public ProjectController(RedisService redisService, ProjectService projectService,
+        TemplateService templateService, LocationService locationService) {
+        this.redisService = redisService;
+        this.projectService = projectService;
+        this.templateService = templateService;
+        this.locationService = locationService;
+    }
 
     // 새 프로젝트 생성시 호출 코드
     @PostMapping("/new/{projectName}/{templateId}/{userEmail}")
@@ -63,8 +68,6 @@ public class ProjectController {
         if (templateTmp.isPresent()) { //template 객체 확인
             TemplateEntity template = templateTmp.get();
 
-            // 전체 프로젝트 확인 리스트 사이즈가 0이면 projectId = 1;
-            // 아니면 가장 큰 projectId + 1;
             Long projectId = projectService.getNextProjectId();
 
             project.setProjectId(projectId);
@@ -74,7 +77,7 @@ public class ProjectController {
             project.setLastUpdateTime(LocalDateTime.now(ZoneId.of("Asia/Seoul")));
             project.setData(template.getData());
 
-            locationService.createLocation(userEmail, projectId); // 로케이션에도 넣어줌
+            locationService.createLocation(userEmail, projectId, projectName); // 로케이션에도 넣어줌
 
             if (projectService.addProject(project))
                 return ResponseEntity.ok().build();
@@ -89,15 +92,15 @@ public class ProjectController {
     @GetMapping("/data/{projectName}/{userEmail}")
     @Operation(summary = "기존 프로젝트 열기 (Mongo)", description = "Redis에 임시 저장된 데이터 와 MongoDB 병합 후 MongoDB에 있는 Project 데이터 반환")
     public ResponseEntity<ProjectEntity> getProject(
-        @PathVariable("projectName") @Parameter(description ="참여 프로젝트 ID") String projectName,
-        @PathVariable("userEmail") @Parameter(description ="참여 프로젝트 ID") String  userEmail) {
+        @PathVariable("projectName") @Parameter(description ="참여 프로젝트 Name") String projectName,
+        @PathVariable("userEmail") @Parameter(description ="사용자 Email") String  userEmail) {
 
-        Optional<LocationEntity> location = locationService.getLocationByUserEmailAndFolderName(userEmail, projectName);
+        Optional<LocationEntity> location = locationService.getLocationByProjectNameAndUserEmail(projectName, userEmail);
         if(location.isPresent()){
             Long pid = location.get().getProjectId();
             ProjectEntity project = new ProjectEntity();
 
-            List<ProjectData> redisData = null;
+            List<ProjectData> redisData = null; // 병합 작업부터 수행
             try {
                 redisData = redisService.getAllDataProject(pid);
                 if (projectService.updateData(pid, redisData)) {
@@ -106,6 +109,7 @@ public class ProjectController {
                         project = projectTmp.get();
                     }
                     return ResponseEntity.ok(project);
+                    // 여기에서 사용자한테 projectId 값도 같이 보내줌 -> 프로젝트 내부에서는 사용자가 projectId 값을 보유
                 } else {
                     return ResponseEntity.badRequest().build();
                 }
@@ -159,14 +163,15 @@ public class ProjectController {
 
     }
 
-    @DeleteMapping("/{userEmail}/{projectId}")
+    @DeleteMapping("/{userEmail}/{projectName}")
     @Operation(summary = "프로젝트 삭제", description = "프로젝트 1개만 삭제")
     public ResponseEntity<?> deleteProject(
             @PathVariable("userEmail") @Parameter(description = "사용자 이메일") String userEmail,
-            @PathVariable("projectId") @Parameter(description = "삭제 프로젝트 ID") Long projectId) {
+            @PathVariable("projectName") @Parameter(description = "삭제 프로젝트 Name") String projectName) {
 
-        Optional<LocationEntity> entity = locationService.getLocationByProjectIdAndUserEmail(projectId, userEmail);
+        Optional<LocationEntity> entity = locationService.getLocationByProjectNameAndUserEmail(projectName, userEmail);
         if(entity.isPresent()) {
+            long projectId = entity.get().getProjectId();
 
             locationService.deleteLocationByUserEmailAndProjectId(userEmail, projectId);
             long count = locationService.countLocationsByProjectId(projectId);
@@ -191,9 +196,7 @@ public class ProjectController {
             for (int i=0; i<size; i++) {
                 Long projectId = locationEntityList.get(i).getProjectId();
                 Optional<ProjectEntity> entity = projectService.getProject(projectId);
-                if(entity.isPresent()){
-                    projectEntityList.add(entity.get());
-                }
+                entity.ifPresent(projectEntityList::add);
             }
             return ResponseEntity.ok(projectEntityList);
         }
@@ -280,18 +283,22 @@ public class ProjectController {
     }
 
     @PutMapping("/updateName") // 로케이션에서 사용자 확인 후 프로젝트id 기준으로 프로젝트 이름 변경
-    @Operation(summary = "프로젝트 이름 변경 - 프로젝트 ID 정보 어떻게할지 구상 필요", description = "프로젝트 이름 변경")
-    public ResponseEntity<?> updateProjectName(
+    @Operation(summary = "프로젝트 이름 변경", description = "프로젝트 이름 변경")
+    public ResponseEntity<ProjectEntity> updateProjectName(
         @RequestParam @Parameter(description = "사용자 ID") String userEmail,
         @RequestParam @Parameter(description = "프로젝트 ID") Long projectId,
         @RequestParam @Parameter(description = "새로운 프로젝트 이름") String newProjectName) {
         Optional<LocationEntity> location = locationService.getLocationByProjectIdAndUserEmail(projectId, userEmail);
 
         if (location.isPresent()) {
-            Optional<ProjectEntity> updatedProject = projectService.updateProjectName(projectId, newProjectName);
-            return updatedProject
-                .map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
+            LocationEntity entity = locationService.updateProjectName(projectId, newProjectName); // 로케이션에 저장된 이름
+            if(entity != null) {
+                Optional<ProjectEntity> updatedProject = projectService.updateProjectName(projectId,
+                    newProjectName); // 몽고DB에 저장된 이름
+                return updatedProject
+                    .map(ResponseEntity::ok)
+                    .orElseGet(() -> ResponseEntity.notFound().build());
+            }
         }
         return ResponseEntity.notFound().build();
     }

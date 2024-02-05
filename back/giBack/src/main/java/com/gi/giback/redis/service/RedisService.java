@@ -21,13 +21,14 @@ import org.springframework.stereotype.Service;
 @Service
 public class RedisService {
 
-    private final int remainData = 5;
+    private final RedisTemplate<String,Object> redisTemplate;
+    private final ProjectService projectService;
 
     @Autowired
-    private RedisTemplate<String,Object> redisTemplate;
-
-    @Autowired
-    private ProjectService projectService;
+    public RedisService(RedisTemplate<String, Object> redisTemplate, ProjectService projectService) {
+        this.redisTemplate = redisTemplate;
+        this.projectService = projectService;
+    }
 
     public void saveData(RedisProjectDto data) throws JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
@@ -51,7 +52,6 @@ public class RedisService {
             List<ProjectData> redisData = getAllDataProject(projectId);
             projectService.updateData(projectId, redisData);
         }
-        
     }
 
     public Object getLastProjectData(Long projectId, String userEmail) { // 되돌리기에서 사용
@@ -84,32 +84,14 @@ public class RedisService {
             if(!data.isEmpty())
                 currentSize = data.size();
 
-            int maxDataSize = 5; // 최대로 남길 데이터 개수
-            if (currentSize > maxDataSize) {
-                int excessData = currentSize - maxDataSize;
+            int remainSize = 5;
+            if (currentSize > remainSize) {
+                int excessData = currentSize - remainSize;
                 // 초과하는 데이터를 삭제
                 for (int i = 0; i < excessData; i++) {
                     redisTemplate.opsForList().rightPop(key);
                 }
             }
-
-            // 되돌리기에 사용될 최대 5개 데이터만 남기고 삭제하는 방식
-//            List<Object> tempData = new ArrayList<>();
-//            int dataSize = redisTemplate.opsForList().size(key).intValue(); // 현재 데이터 개수
-//            for (int i = 0; i < Math.min(dataSize, remainData); i++) {
-//                Object tmp = redisTemplate.opsForList().rightPop(key);
-//                if (tmp != null) {
-//                    tempData.add(tmp);
-//                }
-//            }
-//            redisTemplate.delete(key);
-//
-//            for (Object tmp : tempData) {
-//                // saveDto 에 맞춰줘야함
-//                ProjectData projectData = objectMapper.readValue((String) tmp, ProjectData.class);
-//
-//                redisTemplate.opsForList().leftPush(key, data);
-//            }
         }
 
         results.sort(Comparator.comparing(ProjectData::getUpdateTime));
@@ -123,13 +105,4 @@ public class RedisService {
         redisTemplate.delete(key);
         return true;
     }
-
-    // projectId에 해당하는 프로젝트에 사용자가 하나도 남지 않았을때
-    // 저장을 하고 호출하여 프로젝트 정보를 삭제
-    public boolean deleteAllDataByProjectId(Long projectId) {
-        Set<String> keysToDelete = redisTemplate.keys(projectId + ":*");
-        redisTemplate.delete(keysToDelete);
-        return true;
-    }
-
 }

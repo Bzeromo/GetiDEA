@@ -87,4 +87,12 @@ public class UserService {
         int updatedRows = userRepository.updateProfileImage(userEmail, imageUrl);
         return updatedRows > 0;
     }
+
+    public UserDto updateUserName(String userEmail, String newName) {
+        return userRepository.findByUserEmail(userEmail).map(user -> {
+            user.setUserName(newName);
+            userRepository.save(user);
+            return new UserDto(user.getUserEmail(), user.getUserName(), user.getProfileImage());
+        }).orElseThrow(() -> new RuntimeException("User not found with email: " + userEmail));
+    }
 }

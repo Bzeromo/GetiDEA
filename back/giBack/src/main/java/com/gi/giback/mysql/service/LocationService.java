@@ -16,10 +16,11 @@ public class LocationService {
         this.locationRepository = locationRepository;
     }
 
-    public LocationEntity createLocation(String userEmail, Long projectId) {
+    public LocationEntity createLocation(String userEmail, Long projectId, String projectName) {
         LocationEntity locationEntity = LocationEntity.builder()
                 .userEmail(userEmail)
                 .projectId(projectId)
+                .projectName(projectName)
                 .build();
         return locationRepository.save(locationEntity);
     }
@@ -28,10 +29,10 @@ public class LocationService {
         return locationRepository.findByUserEmail(userEmail);
     }
 
-    public LocationEntity updateFolderName(String userEmail, Long projectId, String newFolderName) {
+    public LocationEntity updateFolderName(String userEmail, String  projectName, String newFolderName) {
         List<LocationEntity> entities = locationRepository.findByUserEmail(userEmail);
         for (LocationEntity entity : entities) {
-            if (entity.getProjectId().equals(projectId)) {
+            if (entity.getProjectName().equals(projectName)) {
                 entity.setFolderName(newFolderName);
                 return locationRepository.save(entity);
             }
@@ -66,11 +67,23 @@ public class LocationService {
         return locationRepository.findByProjectIdAndUserEmail(projectId, userEmail);
     }
 
+    public Optional<LocationEntity> getLocationByProjectNameAndUserEmail(String projectName, String userEmail) {
+        return locationRepository.findByProjectNameAndUserEmail(projectName, userEmail);
+    }
+
     public void deleteLocationByUserEmailAndProjectId(String userEmail, Long projectId) {
         locationRepository.deleteByUserEmailAndProjectId(userEmail, projectId);
     }
 
     public long countLocationsByProjectId(Long projectId) {
         return locationRepository.countByProjectId(projectId);
+    }
+
+    public LocationEntity updateProjectName(Long projectId, String newProjectName) {
+        LocationEntity location = locationRepository.findByProjectId(projectId)
+            .orElseThrow(() -> new RuntimeException("Project not found with id: " + projectId));
+
+        location.setProjectName(newProjectName);
+        return locationRepository.save(location);
     }
 }

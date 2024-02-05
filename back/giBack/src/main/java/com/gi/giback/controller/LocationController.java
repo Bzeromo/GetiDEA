@@ -1,5 +1,7 @@
 package com.gi.giback.controller;
 
+import com.gi.giback.mongo.entity.ProjectEntity;
+import com.gi.giback.mongo.service.ProjectService;
 import com.gi.giback.mysql.entity.FolderEntity;
 import com.gi.giback.mysql.entity.LocationEntity;
 import com.gi.giback.mysql.service.FolderService;
@@ -30,17 +32,24 @@ public class LocationController {
     private UserService userService;
     @Autowired
     private FolderService folderService;
+    @Autowired
+    private ProjectService projectService;
 
     @PostMapping("/invite") // 유저 초대시 로케이션 생성
     @Operation(summary = "프로젝트에 유저 초대", description = "프로젝트에 유저 초대 -> 초대받은 유저 정보를 기반으로 location 엔티티 생성")
     public ResponseEntity<LocationEntity> createLocation(
             @RequestParam @Parameter(description = "초대할 userEmail") String userEmail,
             @RequestParam @Parameter(description = "초대 프로젝트 ID") Long projectId) {
-        String userName = null;
-        userName = userService.getUserNameByEmail(userEmail);
-        if (userName != null) { // 사용자가 없으면 실행하지 않음
-            LocationEntity createdEntity = locationService.createLocation(userEmail, projectId);
-            return ResponseEntity.ok(createdEntity);
+        // 이 작업은 프로젝트 내부에서 실행되므로 projectId 정보가 클라이언트에 있다는 것을 가정
+
+        Optional<ProjectEntity> project = projectService.getProject(projectId);
+        if (project.isPresent()){
+            String userName = null;
+            userName = userService.getUserNameByEmail(userEmail);
+            if (userName != null) { // 사용자가 없으면 실행하지 않음
+                LocationEntity createdEntity = locationService.createLocation(userEmail, projectId, project.get().getProjectName());
+                return ResponseEntity.ok(createdEntity);
+            }
         }
         return ResponseEntity.notFound().build();
     }
@@ -49,12 +58,12 @@ public class LocationController {
     @Operation(summary = "프로젝트 위치 이동", description = "프로젝트 위치 이동 : 로케이션에 있는 folderName 변경")
     public ResponseEntity<LocationEntity> updateFolderName(
             @RequestParam @Parameter(description = "사용자 이메일") String userEmail,
-            @RequestParam @Parameter(description = "이동시킬 프로젝트") Long projectId,
+            @RequestParam @Parameter(description = "이동시킬 프로젝트") String projectName,
             @RequestParam @Parameter(description = "이동할 폴더 이름") String newFolderName) {
-        // 폴더 존재 검증 필요
+
         Optional<FolderEntity> folder = folderService.getFolderByFolderName(newFolderName);
         if(folder.isPresent()){
-            LocationEntity updatedEntity = locationService.updateFolderName(userEmail, projectId, newFolderName);
+            LocationEntity updatedEntity = locationService.updateFolderName(userEmail, projectName, newFolderName);
             return ResponseEntity.ok(updatedEntity);
         }
         return ResponseEntity.badRequest().build();

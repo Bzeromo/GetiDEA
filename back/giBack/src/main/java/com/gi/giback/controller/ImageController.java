@@ -51,7 +51,6 @@ public class ImageController {
         String result;
         try {
             result = s3UploadService.saveProfileImage(multipartFile, userEmail);
-            // 여기에 MySQL에 프로필 이미지 result 값으로 변경해주는 작업 필요
             if(userService.updateUserProfileImage(userEmail, result)){
                 return ResponseEntity.ok(result);
             }
