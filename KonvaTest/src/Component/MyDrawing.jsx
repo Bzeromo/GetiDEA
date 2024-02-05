@@ -17,7 +17,7 @@ import postData from "./axios/postData";
 import TextComponent from "./Add/TextComponent";
 import useEventHandler from "./funciton/useEventHandler";
 import ImageSelector from "./funciton/ImageSelector";
-import undoData from "./axios/undoData"
+import undoData from "./axios/undoData";
 
 const MyDrawing = () => {
   const [imageIdCounter, setImageIdCounter] = useState(0);
@@ -138,7 +138,7 @@ const MyDrawing = () => {
     PostDot,
     PostArrow,
     PostSave,
-  } = postData( projectId, userEmail);
+  } = postData(projectId, userEmail);
 
   const { undoEvent } = undoData(axios, projectId, userEmail);
 
@@ -180,9 +180,9 @@ const MyDrawing = () => {
   const {
     deleteSelectedShape,
     deleteSelectedLine,
-    deleteSelectedDrawing,
     deleteSelectedText,
     deleteSelectedImage,
+    deleteSelectedDrawing,
     deleteSelected,
   } = deleteFunction(
     shapes,
@@ -191,8 +191,8 @@ const MyDrawing = () => {
     setSelectedId,
     lines,
     setLines,
-    setDrawingList,
-    drawingList,
+    drawingList, // 이 위치가 맞아야 합니다.
+    setDrawingList, // 이 위치가 맞아야 합니다.
     texts,
     setTexts,
     images,
@@ -243,7 +243,9 @@ const MyDrawing = () => {
             };
             switch (item.ty) {
               case "Text":
-                setTexts((prevTexts) => updateArray(prevTexts, key));
+                setTexts((prevTexts) =>
+                  updateArray(prevTexts, itemWithDefaults, key)
+                );
                 break;
               case "Shape":
                 console.log(JSON.stringify(item) + "짜잔?");
@@ -252,10 +254,14 @@ const MyDrawing = () => {
                 );
                 break;
               case "Line":
-                setLines((prevLines) => updateArray(prevLines, item, key));
+                setLines((prevLines) =>
+                  updateArray(prevLines, itemWithDefaults, key)
+                );
                 break;
               case "img":
-                setImages((prevImage) => updateArray(prevImage, item, key));
+                setImages((prevImage) =>
+                  updateArray(prevImage, itemWithDefaults, key)
+                );
                 break;
               default:
                 // 기타 타입 처리
