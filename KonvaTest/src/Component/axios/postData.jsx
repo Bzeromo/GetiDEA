@@ -1,17 +1,18 @@
 import axios from "axios";
 
-const postData = () => {
+const postData = (projectId, userEmail) => {
   const PostSave = () => {
+    console.log(projectId)
     axios
-      .post("http://192.168.31.172:8080/api/project/1")
+      .post(`http://192.168.31.172:8080/api/project/${projectId}`)
       .then((response) => {
-        // console.log(response);
-        console.log(response.data);
+        console.log(response);
+        // console.log(response.data);
       })
       .catch((error) => {
         console.log(error);
       });
-  }
+  };
 
   const PostText = (e) => {
     if (!e || !e.target) {
@@ -19,8 +20,8 @@ const postData = () => {
       return;
     }
     const postData = {
-      projectId: 1,
-      userEmail: "강준규",
+      projectId: projectId,
+      userEmail: userEmail,
       propId: e.target.attrs.id,
       preData: {},
       newData: {
@@ -58,8 +59,8 @@ const postData = () => {
       return;
     }
     const postData = {
-      projectId: 1,
-      userEmail: "강준규",
+      projectId: projectId,
+      userEmail: userEmail,
       propId: e.target.attrs.id,
       preData: {},
       newData: {
@@ -100,8 +101,8 @@ const postData = () => {
       return;
     }
     const postData = {
-      projectId: 1,
-      userEmail: "강준규",
+      projectId: projectId,
+      userEmail: userEmail,
       propId: e.target.attrs.id,
       preData: {},
       newData: {
@@ -141,8 +142,8 @@ const postData = () => {
       return;
     }
     const postData = {
-      projectId: 1,
-      userEmail: "강준규",
+      projectId: projectId,
+      userEmail: userEmail,
       propId: e.target.attrs.id,
       preData: {},
       newData: {
@@ -182,8 +183,8 @@ const postData = () => {
       return;
     }
     const postData = {
-      projectId: 1,
-      userEmail: "강준규",
+      projectId: projectId,
+      userEmail: userEmail,
       propId: e.target.attrs.id,
       preData: {},
       newData: {
@@ -224,8 +225,8 @@ const postData = () => {
       return;
     }
     const postData = {
-      projectId: 1,
-      userEmail: "강준규",
+      projectId: projectId,
+      userEmail: userEmail,
       propId: e.target.attrs.id,
       preData: {},
       newData: {
@@ -267,8 +268,8 @@ const postData = () => {
       return;
     }
     const postData = {
-      projectId: 1,
-      userEmail: "강준규",
+      projectId: projectId,
+      userEmail: userEmail,
       propId: e.target.attrs.id,
       preData: {},
       newData: {

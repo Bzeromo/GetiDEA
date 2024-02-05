@@ -17,6 +17,7 @@ import postData from "./axios/postData";
 import TextComponent from "./Add/TextComponent";
 import useEventHandler from "./funciton/useEventHandler";
 import ImageSelector from "./funciton/ImageSelector";
+import undoData from "./axios/undoData"
 
 const MyDrawing = () => {
   const [imageIdCounter, setImageIdCounter] = useState(0);
@@ -104,6 +105,9 @@ const MyDrawing = () => {
     useState(false);
   const [imgMenuToggle, setImgMenuToggle] = useState(false);
 
+  const projectId = "test1";
+  const userEmail = "wnsrb933@naver.com";
+
   const {
     changeSelectedShapeColor,
     changeSelectedStrokeColor,
@@ -134,7 +138,9 @@ const MyDrawing = () => {
     PostDot,
     PostArrow,
     PostSave,
-  } = postData(axios);
+  } = postData( projectId, userEmail);
+
+  const { undoEvent } = undoData(axios, projectId, userEmail);
 
   const {
     addText,
@@ -220,7 +226,7 @@ const MyDrawing = () => {
 
   const GetData = () => {
     axios
-      .get("http://192.168.31.172:8080/api/project/data/1/1")
+      .get("http://192.168.31.172:8080/api/project/test1/1")
       .then((response) => {
         if (response.data && response.data.data) {
           const dataItems = response.data.data;
@@ -241,7 +247,9 @@ const MyDrawing = () => {
                 break;
               case "Shape":
                 console.log(JSON.stringify(item) + "짜잔?");
-                setShapes((prevShapes) => updateArray(prevShapes, itemWithDefaults, key));
+                setShapes((prevShapes) =>
+                  updateArray(prevShapes, itemWithDefaults, key)
+                );
                 break;
               case "Line":
                 setLines((prevLines) => updateArray(prevLines, item, key));
@@ -260,8 +268,6 @@ const MyDrawing = () => {
         console.error(error);
       });
   };
-
-
 
   const [socket, setSocket] = useState(null);
 
@@ -1205,7 +1211,7 @@ const MyDrawing = () => {
 
       {/* 오른쪽 윗 블록 */}
       <div className="absolute top-6 right-94 justify-center bg-white rounded-md w-16 h-[50px] z-50 flex  items-center flex-row shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]">
-        <button onClick={() => GetData()}>Get</button>
+        <button onClick={() => PostSave()}>Save</button>
       </div>
 
       {/* 오른쪽 윗 블록 */}
