@@ -9,30 +9,18 @@ const TextComponent = ({
   onTextChange,
   onDragEnd,
   isSelected,
+  // setIsSelected,
   textProps,
   onSelect,
   selectedId,
   setSelectedId,
-  isEditing,
-  setIsEditing,
-  transformerRef,
+  // transformerRef,
 }) => {
   const [textBox, setTextBox] = useState(text);
   const [position, setPosition] = useState({ x, y });
-  // const transformerRef = useRef();
-  const textRef = useRef();
-
-  // const handleTextSelect = () => {
-  //   setSelectedId(textProps.id);
-  // }
-
-  useEffect(() => {
-    if (isSelected) {
-      // 현재 도형에 Transformer 연결
-      transformerRef.current.nodes([textRef.current]);
-      transformerRef.current.getLayer().batchDraw();
-    }
-  }, [isSelected]);
+  const [isEditing, setIsEditing] = useState(false);
+  const textRef = useRef(null);
+  const transformerRef = useRef(null);
 
   useEffect(() => {
     setTextBox(textRef.current);
@@ -41,6 +29,21 @@ const TextComponent = ({
   useEffect(() => {
     console.log(selectedId + " selected id 테스트용");
   }, [selectedId]);
+
+  const handleTextSelect = (id) => {
+    setSelectedId(id);
+    console.log(id);
+  };
+
+  useEffect(() => {
+    if (isSelected) {
+      // 현재 도형에 Transformer 연결
+      console.log(isSelected);
+      transformerRef.current.nodes([textRef.current]);
+      transformerRef.current.getLayer().batchDraw();
+    }
+  }, [isSelected]);
+
 
   const handleDblClick = () => {
     if (!textBox) {
@@ -52,7 +55,7 @@ const TextComponent = ({
 
     // 텍스트 입력을 위한 HTML 텍스트 입력 필드 생성
     const input = document.createElement("input");
-    input.value = text;
+    input.value = textProps.text;
     input.style.position = "absolute";
     input.style.top = textBox.absolutePosition().y + 90 + "px";
     input.style.left = textBox.absolutePosition().x + 140 + "px";
@@ -84,15 +87,13 @@ const TextComponent = ({
       <Text
         ref={textRef}
         {...textProps}
-        text={text}
-        fontSize={fontSize}
+        text={textProps.text}
+        fontSize={textProps.fontSize}
         draggable
-        x={position.x}
-        y={position.y}
         ty="Text"
-        style={{ zIndex: 10 }} // z-index 설정
-        onClick={() => handleSelectedId(textProps.id)}
-        // onDblClick={isEditing ? null : handleDblClick}
+        style={{ zIndex: 100 }} // z-index 설정
+        onClick={onSelect}
+        onDblClick={isEditing ? null : handleDblClick}
       />
       {isSelected && (
         <Transformer

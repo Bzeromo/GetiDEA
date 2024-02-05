@@ -37,25 +37,6 @@ const MyDrawing = () => {
 
   const [selectedImageSrc, setSelectedImageSrc] = useState(""); // 선택된 이미지 경로 상태
 
-  // const handleImageSelect = (src) => {
-  //   const img = new window.Image();
-  //   img.src = src;
-  //   img.onload = () => {
-  //     // 이미지 객체에 ID 추가
-  //     setImages([...images, { id: imageIdCounter, img }]);
-  //     // ID 카운터 증가
-  //     setImageIdCounter(imageIdCounter + 1);
-  //   };
-  // };
-
-  // useEffect(() => {
-  //   // transformerRef.current가 정의되었는지 확인하고, 정의되었다면 nodes() 메서드를 호출
-  //   if (transformerRef.current && imageRef.current) {
-  //     transformerRef.current.nodes([imageRef.current]);
-  //     transformerRef.current.getLayer().batchDraw();
-  //   }
-  // }, [isSelected]);
-
   //프로젝트 이름
   const [projectName, setProjectName] = useState("초기 프로젝트");
 
@@ -185,7 +166,7 @@ const MyDrawing = () => {
     setTexts,
     fontSize,
     setFontSize,
-    setSelectedId,
+    setSelectedId
   );
 
   const {
@@ -210,45 +191,12 @@ const MyDrawing = () => {
     setImages
   );
 
-  // const handleImageSelect = (src) => {
-  //   const img = new window.Image();
-  //   img.src = src;
-  //   img.onload = () => {
-  //     // 이미지 객체에 ID 추가
-  //     setImages([...images, { id: imageIdCounter, img }]);
-  //     // ID 카운터 증가
-  //     setImageIdCounter(imageIdCounter + 1);
-  //   };
-  // };
-
-  const [selectedImageUrl, setSelectedImageUrl] = useState(null); // 선택된 이미지 URL을 저장하는 상태
-  const [selectedImageUrls, setSelectedImageUrls] = useState([]);
+  // const [selectedImageUrl, setSelectedImageUrl] = useState(null); // 선택된 이미지 URL을 저장하는 상태
+  // const [selectedImageUrls, setSelectedImageUrls] = useState([]);
 
   const handleImageSelect = (src) => {
     setSelectedImage(src);
   };
-
-  // const handleImageSelect = (imageUrl) => {
-  //   const newImage = {
-  //     src: imageUrl,
-  //     x: 20,
-  //     y: 20,
-  //     id: images.length, // 간단한 ID 할당, 실제 앱에서는 더 견고한 ID 생성 방식 사용
-  //   };
-  //   setImages(images.concat(newImage));
-  // };
-
-  // const URLImage = ({ image, id, ...props }) => {
-  //   const [img] = useImage(image.src);
-  //   return (
-  //     <Image
-  //       image={img}
-  //       {...props}
-  //       draggable
-  //       onDragEnd={(e) => handleDragEnd(e, id)}
-  //     />
-  //   );
-  // };
 
   useEffect(() => {
     console.log("업데이트됨" + selectedId);
@@ -836,7 +784,7 @@ const MyDrawing = () => {
   };
 
   const handleShapeClick = (id, e) => {
-    e.cancelBubble = true; // 이벤트 버블링 방지
+    e.cancelBubble = true;
     setSelectedId(id);
     console.log(id);
   };
@@ -1258,8 +1206,13 @@ const MyDrawing = () => {
       </div>
 
       {/* 오른쪽 윗 블록 */}
-      <div className="absolute top-6 right-72 justify-center bg-white rounded-md w-16 h-[50px] flex  items-center flex-row shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]">
-        <input type="text" value={fontSize} onChange={handleFontSize} ></input>
+      <div className="absolute top-6 right-72 justify-center bg-white rounded-md w-12 h-10 flex items-center shadow">
+        <input
+          type="text"
+          value={fontSize}
+          onChange={handleFontSize}
+          className="w-full h-full text-center text-sm border-none rounded-md"
+        />
       </div>
 
       {/* 오른쪽 윗 블록 */}
@@ -1278,11 +1231,16 @@ const MyDrawing = () => {
       </div>
 
       {/* 오른쪽 윗 블록 */}
-      <button onClick={imgToggle} className="absolute bottom-6 right-72 z-50 justify-center bg-white rounded-md w-16 h-[50px] flex items-center flex-row shadow-[rgba(0,0,0,0.25)]">
+      <button
+        onClick={imgToggle}
+        className="absolute bottom-6 right-72 z-50 justify-center bg-white rounded-md w-16 h-[50px] flex items-center flex-row shadow-[rgba(0,0,0,0.25)]"
+      >
         img
       </button>
       {imgMenuToggle && (
-        <div className="absolute bottom-[56px] right-72"> {/* 위치 조정 필요에 따라 조절 */}
+        <div className="absolute bottom-[56px] right-72">
+          {" "}
+          {/* 위치 조정 필요에 따라 조절 */}
           <ImageSelector onImageSelect={addImage} />
         </div>
       )}
@@ -1369,14 +1327,14 @@ const MyDrawing = () => {
                 );
               }
             })}
-            {texts.map((text, i) => (
+            {texts.map((text, id) => (
               <TextComponent
-                key={i}
+                key={id}
                 textProps={text}
                 fontSize={fontSize}
                 isSelected={text.id === selectedId}
-                onSelect={() => {
-                  setSelectedId(text.id);
+                onSelect={(e) => {
+                  handleShapeClick(text.id, e);
                 }}
                 onChange={(newAttrs) => {
                   const newTexts = texts.map((t) =>
@@ -1385,6 +1343,7 @@ const MyDrawing = () => {
                   setTexts(newTexts);
                 }}
                 setSelectedId={setSelectedId}
+                onTextChange={(newText) => handleTextChange(text.id, newText)}
               />
             ))}
 
