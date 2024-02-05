@@ -46,9 +46,9 @@ const ImageSelector = ({ onImageSelect }) => {
     
     //템블릿 2번 : 6hat
     "/img/template2_6hat/1_white_hat.svg",
-    "/img/template2_6hat/2_white_hat.svg",
-    "/img/template2_6hat/3_white_hat.svg",
-    "/img/template2_6hat/4_white_hat.svg",
+    "/img/template2_6hat/2_red_hat.svg",
+    "/img/template2_6hat/3_yellow_hat.svg",
+    "/img/template2_6hat/4_black_hat.svg",
     "/img/template2_6hat/5_green_hat.svg",
     "/img/template2_6hat/6_blue_hat.svg",
 
