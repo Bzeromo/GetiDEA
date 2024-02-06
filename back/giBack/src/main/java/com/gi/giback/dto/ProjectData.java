@@ -1,4 +1,4 @@
-package com.gi.giback.redis.dto;
+package com.gi.giback.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;

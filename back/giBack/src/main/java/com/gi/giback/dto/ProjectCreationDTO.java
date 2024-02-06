@@ -1,11 +1,11 @@
-package com.gi.giback.mongo.dto;
+package com.gi.giback.dto;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-public class ProjectCreationDto {
+public class ProjectCreationDTO {
     private String projectName;
     private String templateId;
     private String userEmail;

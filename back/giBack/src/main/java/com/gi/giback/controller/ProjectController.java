@@ -1,16 +1,16 @@
 package com.gi.giback.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.gi.giback.mongo.dto.ProjectCreationDto;
+import com.gi.giback.dto.ProjectCreationDTO;
 import com.gi.giback.mongo.entity.ProjectEntity;
 import com.gi.giback.mongo.entity.TemplateEntity;
 import com.gi.giback.mongo.service.ProjectService;
 import com.gi.giback.mongo.service.TemplateService;
 import com.gi.giback.mysql.entity.LocationEntity;
 import com.gi.giback.mysql.service.LocationService;
-import com.gi.giback.redis.dto.ProjectData;
-import com.gi.giback.redis.dto.RedisProjectDto;
-import com.gi.giback.redis.service.RedisService;
+import com.gi.giback.dto.ProjectData;
+import com.gi.giback.dto.RedisProjectDTO;
+import com.gi.giback.redis.RedisService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -57,7 +57,7 @@ public class ProjectController {
     // 새 프로젝트 생성시 호출 코드
     @PostMapping("/make")
     @Operation(summary = "새 프로젝트 생성 - 테스트 완료", description = "프로젝트 이름, 사용자 이메일, 참조 템플릿, 생성 위치(폴더 - 필수x) 를 받아 프로젝트 생성")
-    public ResponseEntity<?> makeProject(@RequestBody ProjectCreationDto projectCreationDto) {
+    public ResponseEntity<?> makeProject(@RequestBody ProjectCreationDTO projectCreationDto) {
         // DTO에서 데이터 추출
         String projectName = projectCreationDto.getProjectName();
         String templateId = projectCreationDto.getTemplateId();
@@ -115,7 +115,7 @@ public class ProjectController {
 
     @PostMapping("/changes")// Redis에 변경사항 저장
     @Operation(summary = "변경사항 저장 (Redis) - 테스트 완료", description = "작업 진행중 변경사항 Redis에 임시 저장")
-    public ResponseEntity<?> saveData(@RequestBody @Parameter(description = "프로젝트 변경 데이터(작업 전, 후) JSON") RedisProjectDto data)
+    public ResponseEntity<?> saveData(@RequestBody @Parameter(description = "프로젝트 변경 데이터(작업 전, 후) JSON") RedisProjectDTO data)
             throws JsonProcessingException {
         redisService.saveData(data);
         return ResponseEntity.ok().build();

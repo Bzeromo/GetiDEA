@@ -2,7 +2,7 @@ package com.gi.giback.mongo.service;
 
 import com.gi.giback.mongo.entity.ProjectEntity;
 import com.gi.giback.mongo.repository.ProjectRepository;
-import com.gi.giback.redis.dto.ProjectData;
+import com.gi.giback.dto.ProjectData;
 import com.mongodb.bulk.BulkWriteResult;
 import com.mongodb.client.result.UpdateResult;
 import java.time.LocalDateTime;

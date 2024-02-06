@@ -1,9 +1,9 @@
-package com.gi.giback.redis.service;
+package com.gi.giback.redis;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gi.giback.mongo.service.ProjectService;
-import com.gi.giback.redis.dto.ProjectData;
-import com.gi.giback.redis.dto.RedisProjectDto;
+import com.gi.giback.dto.ProjectData;
+import com.gi.giback.dto.RedisProjectDTO;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -30,7 +30,7 @@ public class RedisService {
         this.projectService = projectService;
     }
 
-    public void saveData(RedisProjectDto data) throws JsonProcessingException {
+    public void saveData(RedisProjectDTO data) throws JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
         Long projectId = data.getProjectId();
         String key= data.getProjectId() + ":" + data.getUserEmail();

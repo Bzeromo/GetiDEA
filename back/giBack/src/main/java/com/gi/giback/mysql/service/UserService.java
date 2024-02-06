@@ -1,6 +1,6 @@
 package com.gi.giback.mysql.service;
 
-import com.gi.giback.mysql.dto.UserDto;
+import com.gi.giback.dto.UserDTO;
 import com.gi.giback.mysql.entity.UserEntity;
 import com.gi.giback.mysql.repository.UserRepository;
 import com.gi.giback.oauth2.user.OAuth2UserInfo;
@@ -36,7 +36,7 @@ public class UserService {
     }
 
     // 사용자 초대시 검색을 통해 이메일 리스트를 반환
-    public List<UserDto> searchUsersByEmail(String email) {
+    public List<UserDTO> searchUsersByEmail(String email) {
         return userRepository.findByEmailContaining(email);
     }
 
@@ -89,11 +89,11 @@ public class UserService {
     }
 
     @Transactional
-    public UserDto updateUserName(String userEmail, String newName) {
+    public UserDTO updateUserName(String userEmail, String newName) {
         return userRepository.findByUserEmail(userEmail).map(user -> {
             user.setUserName(newName);
             userRepository.save(user);
-            return new UserDto(user.getUserEmail(), user.getUserName(), user.getProfileImage());
+            return new UserDTO(user.getUserEmail(), user.getUserName(), user.getProfileImage());
         }).orElseThrow(() -> new RuntimeException("User not found with email: " + userEmail));
     }
 }
