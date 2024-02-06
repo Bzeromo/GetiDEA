@@ -17,6 +17,7 @@ import postData from "./axios/postData";
 import TextComponent from "./Add/TextComponent";
 import useEventHandler from "./funciton/useEventHandler";
 import ImageSelector from "./funciton/ImageSelector";
+import undoData from "./axios/undoData";
 
 const MyDrawing = () => {
   const [imageIdCounter, setImageIdCounter] = useState(0);
@@ -204,6 +205,25 @@ const MyDrawing = () => {
     console.log("업데이트됨" + selectedId);
   }, [selectedId]);
 
+  useEffect(() => {
+    const newImage = {
+      id: 1, // 이미지의 고유한 식별자
+      scaleX: 7,
+      scaleY: 5,
+      x: 50, // 이미지의 x 좌표
+      y: 50, // 이미지의 y 좌표
+      src: '/img/template3_check7/template3.png',
+      type: "Image",
+      ty: "Image" // 이미지 경로
+    }
+
+    setImages([newImage])
+  }, [])
+
+  useEffect(() =>{
+
+  }, [images])
+
   function updateArray(array, item, key) {
     const index = array.findIndex((element) => element.id === key);
 
@@ -218,6 +238,7 @@ const MyDrawing = () => {
     }
   }
 
+  //이게 mongDB로부터 템플릿 받아오는건가???
   const GetData = () => {
     axios
       .get("http://192.168.31.172:8080/api/project/data/1/1")
@@ -407,6 +428,7 @@ const MyDrawing = () => {
       });
     });
 
+    //이건 뭘까?
     setImages((prevImage) => {
       return images.map((newImage) => {
         const existingImage = prevImage.find(
@@ -885,6 +907,7 @@ const MyDrawing = () => {
     setTexts(updatedTexts);
   };
 
+
   return (
     <div className="absolute  inset-0 h-full w-full bg-[#EFEFEF] bg-opacity-50 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px]">
       {/* 왼쪽 윗 블록 */}
@@ -1248,8 +1271,11 @@ const MyDrawing = () => {
         </div>
       )}
 
-      {/* 그리는 구역 */}
-      <div className="ml-36 mt-24 h-full w-full">
+      {/*여기에 이미지 넣으면 되겠네!*/}
+      {/* /////////////////////////////////////////////그리는 구역///////////////////////////////////////////// */}
+      <div className="ml-36 mt-24 h-full w-full" >
+        {/* <img src={process.env.PUBLIC_URL + '/img/template3_check7/template3.png'} alt= "Template3_Check" /> */}
+
         <Stage
           ref={stageRef}
           width={window.innerWidth}
