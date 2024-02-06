@@ -205,24 +205,72 @@ const MyDrawing = () => {
     console.log("업데이트됨" + selectedId);
   }, [selectedId]);
 
+  // useEffect(() => {
+  //   const newImage = {
+  //     id: 1, // 이미지의 고유한 식별자
+  //     scaleX: 7,
+  //     scaleY: 5,
+  //     x: 50, // 이미지의 x 좌표
+  //     y: 50, // 이미지의 y 좌표
+  //     src: '/img/template3_check7/template3.png',
+  //     type: "Image",
+  //     ty: "img" // 이미지 경로
+  //   }
+
+  //   setImages([newImage])
+  // }, [])
+
+  // useEffect(() =>{
+
+  // }, [images])
+
   useEffect(() => {
-    const newImage = {
-      id: 1, // 이미지의 고유한 식별자
-      scaleX: 7,
-      scaleY: 5,
-      x: 50, // 이미지의 x 좌표
-      y: 50, // 이미지의 y 좌표
-      src: '/img/template3_check7/template3.png',
-      type: "Image",
-      ty: "Image" // 이미지 경로
-    }
+    // JSON 파일에서 이미지 데이터를 가져오는 비동기 함수
+    const fetchImageData = async () => {
+      try {
+        // axios를 사용하여 JSON 파일에서 이미지 데이터를 가져옵니다.
+        const response = await axios.get('/public/img/template1_bubble_chat/template1-position.json');
+        const imageData = response.data.properties;
 
-    setImages([newImage])
-  }, [])
+        // 이미지 데이터를 이용하여 newImage 배열 생성
+        const newImage = Object.keys(imageData).map((key) => ({
+          id: key,
+          ...imageData[key],
+        }));
 
-  useEffect(() =>{
+        // 새 이미지 데이터를 상태로 설정합니다.
+        setImages(newImage);
+      } catch (error) {
+        console.error('Error fetching image data:', error);
+      }
+    };
 
-  }, [images])
+    // fetchImageData 함수를 호출하여 이미지 데이터를 가져옵니다.
+    fetchImageData();
+  }, []);
+
+  useEffect(() => {
+    // images 상태가 변경될 때 수행할 작업을 여기에 추가합니다.
+  }, [images]);
+
+  return (
+    <div>
+      {/* images 상태에 있는 이미지를 렌더링합니다. */}
+      {images.map((image) => (
+        <img
+          key={image.id}
+          src={image.src}
+          alt={`Image ${image.id}`}
+          style={{
+            transform: `scale(${image.scaleX}, ${image.scaleY})`,
+            position: 'absolute',
+            top: image.y,
+            left: image.x,
+          }}
+        />
+      ))}
+    </div>
+  );
 
   function updateArray(array, item, key) {
     const index = array.findIndex((element) => element.id === key);

@@ -143,7 +143,6 @@ const MyDrawing = () => {
   } = postData(projectId, userEmail);
 
   const { undoEvent } = undoData(axios, projectId, userEmail);
-  console.log("아아아아 이게 나타난다ㅏㅏㅏㅏㅏㅏㅏㅏㅏㅏㅏㅏㅏㅏ");
   const {
     addText,
     addRectangle,
