@@ -46,31 +46,25 @@ const ImageSelector = ({ onImageSelect }) => {
     "/img/template1_bubble_chat/bubble_chat34.svg",
     
     // template 2 : six hats 관련 이미지
-    "/img/template2_6hat/1_white_hat.svg",
-    "/img/template2_6hat/2_red_hat.svg",
-    "/img/template2_6hat/3_yellow_hat.svg",
-    "/img/template2_6hat/4_black_hat.svg",
-    "/img/template2_6hat/5_green_hat.svg",
-    "/img/template2_6hat/6_blue_hat.svg",
+    "/img/template2_6hats/template2.png",
+    "/img/template2_6hats/hat1_white.svg",
+    "/img/template2_6hats/hat2_red.svg",
+    "/img/template2_6hats/hat3_yellow.svg",
+    "/img/template2_6hats/hat4_black.svg",
+    "/img/template2_6hats/hat5_green.svg",
+    "/img/template2_6hats/hat6_blue.svg",
 
-    // template 3 : check 7 관련 이미지
-    "/img/template3_check7/bulb.svg",   
-    "/img/template3_check7/card1.png",
-    "/img/template3_check7/card2.png",
-    "/img/template3_check7/card3.png",
-    "/img/template3_check7/card4.png",
-    "/img/template3_check7/card5.png",
-    "/img/template3_check7/card6.png",
-    "/img/template3_check7/card7.png",
-    "/img/template3_check7/writing_area.png",
-    // "/img/template3_check7/card1.svg",
-    // "/img/template3_check7/card2.svg",
-    // "/img/template3_check7/card3.svg",
-    // "/img/template3_check7/card4.svg",
-    // "/img/template3_check7/card5.svg",
-    // "/img/template3_check7/card6.svg",
-    // "/img/template3_check7/card7.svg",
+    // template 3 : check7 관련 이미지
     "/img/template3_check7/template3.png",
+    "/img/template3_check7/bulb.svg",   
+    // "/img/template3_check7/card1.png",
+    // "/img/template3_check7/card2.png",
+    // "/img/template3_check7/card3.png",
+    // "/img/template3_check7/card4.png",
+    // "/img/template3_check7/card5.png",
+    // "/img/template3_check7/card6.png",
+    // "/img/template3_check7/card7.png",
+    // "/img/template3_check7/writing_area.png",
 
     // 여기에 더 많은 이미지 경로를 추가할 수 있습니다.
   ];
