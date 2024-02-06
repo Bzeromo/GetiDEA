@@ -28,10 +28,11 @@ public class ImageController {
     private final UserService userService;
     private final ProjectService projectService;
 
-    @PostMapping("/thumbnailImage/{projectId}")
+    @PostMapping("/thumbnailImage")
     @Operation(summary = "썸네일 이미지 저장", description = "썸네일 이미지 저장")
-    public ResponseEntity<String> uploadThumbnailImage(@RequestParam("thumbnailImage") @Parameter(description = "저장할 이미지") MultipartFile multipartFile,
-        @PathVariable("projectId") Long projectId) {
+    public ResponseEntity<String> uploadThumbnailImage(
+        @RequestParam("Image") @Parameter(description = "저장할 이미지") MultipartFile multipartFile,
+        @RequestParam("projectId") Long projectId) {
         String result;
         try {
             result = s3UploadService.saveThumbnailImage(multipartFile);
@@ -42,11 +43,11 @@ public class ImageController {
         return ResponseEntity.ok(result);
     }
 
-    @PostMapping("/userEmail/profileImage")
+    @PostMapping("/profileImage")
     @Operation(summary = "프로필 이미지 변경", description = "프로필 이미지 변경")
     public ResponseEntity<String> updateProfileImage(
-            @RequestParam("userEmail") @Parameter(description = "사용자 이메일") String userEmail,
-            @RequestParam("profileImage") @Parameter(description = "저장할 이미지") MultipartFile multipartFile) {
+        @RequestParam("Image") @Parameter(description = "저장할 이미지") MultipartFile multipartFile,
+        @RequestParam("userEmail") @Parameter(description = "사용자 이메일") String userEmail) {
 
         String result;
         try {

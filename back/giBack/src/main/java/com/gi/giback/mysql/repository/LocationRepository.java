@@ -22,4 +22,6 @@ public interface LocationRepository extends JpaRepository<LocationEntity, String
     long countByProjectId(Long projectId);
 
     Optional<LocationEntity> findByProjectNameAndUserEmail(String projectName, String userEmail);
+
+    Optional<LocationEntity> findFirstByUserEmailAndProjectName(String userEmail, String projectName);
 }

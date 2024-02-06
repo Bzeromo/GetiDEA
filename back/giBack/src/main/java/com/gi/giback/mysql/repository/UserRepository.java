@@ -19,8 +19,6 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
     // 이메일에 특정 문자열이 포함된 사용자를 검색하는 쿼리
     @Query("SELECT new com.gi.giback.mysql.dto.UserDto(u.userEmail, u.userName, u.profileImage) FROM UserEntity u WHERE u.userEmail LIKE %?1%")
     List<UserDto> findByEmailContaining(String email);
-
-    @Modifying
     @Transactional
     @Query("UPDATE UserEntity u SET u.profileImage = :imageUrl WHERE u.userEmail = :userEmail")
     int updateProfileImage(String userEmail, String imageUrl);

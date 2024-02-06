@@ -6,13 +6,13 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 public class UserDto {
-    private String uesrEmail;
-    private String uesrName;
+    private String userEmail;
+    private String userName;
     private String profileImage;
 
-    public UserDto(String uesrEmail, String uesrName, String profileImage) {
-        this.uesrEmail = uesrEmail;
-        this.uesrName = uesrName;
+    public UserDto(String userEmail, String userName, String profileImage) {
+        this.userEmail = userEmail;
+        this.userName = userName;
         this.profileImage = profileImage;
     }
 }

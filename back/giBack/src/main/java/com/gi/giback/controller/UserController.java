@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -27,18 +28,18 @@ public class UserController {
         this.userService = userService;
     }
 
-    @GetMapping("/{userEmail}") // 이메일 값은 엑세스 토큰 디코딩 하면 페이로드에 있음
-    @Operation(summary = "사용자 검색", description = "유저 초대시 사용자 검색")
+    @GetMapping("/search") // 이메일 값은 엑세스 토큰 디코딩 하면 페이로드에 있음
+    @Operation(summary = "사용자 검색 - 테스트 완료", description = "유저 초대시 사용자 검색")
     public List<UserDto> searchUsers(
-            @PathVariable("userEmail") @Parameter(description = "검색할 사용자 id") String userEmail) {
+            @RequestParam @Parameter(description = "검색할 사용자 id") String userEmail) {
         return userService.searchUsersByEmail(userEmail);
     }
 
-    @PatchMapping("/rename/{userEmail}/{newName}")
-    @Operation(summary = "사용자 이름 변경", description = "사용자 이름 변경")
+    @PatchMapping("/rename")
+    @Operation(summary = "사용자 이름 변경 - 테스트 완료", description = "사용자 이름 변경")
     public ResponseEntity<UserDto> renameUser(
-        @PathVariable("userEmail") @Parameter(description = "사용자 이메일") String userEmail,
-        @PathVariable("newName") @Parameter(description = "새로운 이름") String newName) {
+        @RequestParam @Parameter(description = "사용자 이메일") String userEmail,
+        @RequestParam @Parameter(description = "새로운 이름") String newName) {
         UserDto user = userService.updateUserName(userEmail, newName);
         return ResponseEntity.ok(user);
     }

@@ -16,11 +16,12 @@ public class LocationService {
         this.locationRepository = locationRepository;
     }
 
-    public LocationEntity createLocation(String userEmail, Long projectId, String projectName) {
+    public LocationEntity createLocation(String userEmail, Long projectId, String projectName, String FolderName) {
         LocationEntity locationEntity = LocationEntity.builder()
                 .userEmail(userEmail)
                 .projectId(projectId)
                 .projectName(projectName)
+                .folderName(FolderName)
                 .build();
         return locationRepository.save(locationEntity);
     }
@@ -30,11 +31,12 @@ public class LocationService {
     }
 
     public LocationEntity updateFolderName(String userEmail, String  projectName, String newFolderName) {
-        List<LocationEntity> entities = locationRepository.findByUserEmail(userEmail);
-        for (LocationEntity entity : entities) {
-            if (entity.getProjectName().equals(projectName)) {
-                entity.setFolderName(newFolderName);
-                return locationRepository.save(entity);
+        Optional<LocationEntity> entity = locationRepository.findFirstByUserEmailAndProjectName(userEmail, projectName);
+        if (entity.isPresent()) {
+            LocationEntity location = entity.get();
+            if (location.getProjectName().equals(projectName)) {
+                location.setFolderName(newFolderName);
+                return locationRepository.save(location);
             }
         }
         return null;

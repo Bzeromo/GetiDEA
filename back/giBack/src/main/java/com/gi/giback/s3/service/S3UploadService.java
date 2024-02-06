@@ -6,6 +6,7 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import javax.imageio.ImageIO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,29 +25,18 @@ public class S3UploadService {
     @Value("${spring.cloud.aws.s3.bucket}")
     private String bucket;
 
-    // 이미지 압축 메서드
-    private ByteArrayInputStream resizeImage(MultipartFile multipartFile, int width, int height) throws IOException {
-        BufferedImage originalImage = ImageIO.read(multipartFile.getInputStream());
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        Thumbnails.of(originalImage)
-            .size(width, height)
-            .outputFormat("JPEG") // 또는 원본 이미지의 포맷에 맞게 조정
-            .toOutputStream(outputStream);
-        return new ByteArrayInputStream(outputStream.toByteArray());
-    }
-
     public String saveThumbnailImage(MultipartFile multipartFile) throws IOException {
         String originalFilename = multipartFile.getOriginalFilename();
         String filenameWithPath = "thumbnailImage/" + originalFilename;
 
-        ByteArrayInputStream resizedImageStream = resizeImage(multipartFile, 400, 300);
+        try (InputStream inputStream = multipartFile.getInputStream()) {
+            ObjectMetadata metadata = new ObjectMetadata();
+            metadata.setContentLength(multipartFile.getSize());
+            metadata.setContentType(multipartFile.getContentType());
 
-        ObjectMetadata metadata = new ObjectMetadata();
-        metadata.setContentLength(multipartFile.getSize());
-        metadata.setContentType(multipartFile.getContentType());
-
-        amazonS3Client.putObject(bucket, filenameWithPath, resizedImageStream, metadata);
-        return amazonS3Client.getUrl(bucket, filenameWithPath).toString();
+            amazonS3Client.putObject(bucket, filenameWithPath, inputStream, metadata);
+            return amazonS3Client.getUrl(bucket, filenameWithPath).toString();
+        }
     }
 
     public void deleteImage(String originalFilename)  {
@@ -56,13 +46,13 @@ public class S3UploadService {
     public String saveProfileImage(MultipartFile multipartFile, String userEmail) throws IOException {
         String filenameWithPath = "profileImage/" + userEmail;
 
-        ByteArrayInputStream resizedImageStream = resizeImage(multipartFile, 200, 200);
+        try (InputStream inputStream = multipartFile.getInputStream()) {
+            ObjectMetadata metadata = new ObjectMetadata();
+            metadata.setContentLength(multipartFile.getSize());
+            metadata.setContentType(multipartFile.getContentType());
 
-        ObjectMetadata metadata = new ObjectMetadata();
-        metadata.setContentLength(multipartFile.getSize());
-        metadata.setContentType(multipartFile.getContentType());
-
-        amazonS3Client.putObject(bucket, filenameWithPath, resizedImageStream, metadata);
-        return amazonS3Client.getUrl(bucket, filenameWithPath).toString();
+            amazonS3Client.putObject(bucket, filenameWithPath, inputStream, metadata);
+            return amazonS3Client.getUrl(bucket, filenameWithPath).toString();
+        }
     }
 }

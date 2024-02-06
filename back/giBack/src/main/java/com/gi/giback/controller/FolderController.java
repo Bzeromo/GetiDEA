@@ -36,22 +36,22 @@ public class FolderController {
     private ProjectService projectService;
 
     @PostMapping("/create")
-    @Operation(summary = "사용자별 폴더 생성", description = "사용자의 폴더 생성")
+    @Operation(summary = "사용자별 폴더 생성 - 테스트 완료", description = "사용자의 폴더 생성")
     public FolderEntity createFolder(@RequestBody FolderEntity folder) {
         return folderService.createFolder(folder);
     }
 
-    @GetMapping("/{userEmail}")
-    @Operation(summary = "사용자별 폴더 검색", description = "사용자의 폴더 검색")
-    public List<FolderEntity> getFoldersByUserEmail(@PathVariable("userEmail") @Parameter(description = "사용자 이메일") String userEmail) {
+    @GetMapping("/search")
+    @Operation(summary = "사용자별 폴더 검색 - 테스트 완료", description = "사용자의 폴더 검색")
+    public List<FolderEntity> getFoldersByUserEmail(@RequestParam @Parameter(description = "사용자 이메일") String userEmail) {
         return folderService.getFoldersByUserEmail(userEmail);
     }
 
-    @DeleteMapping("/{userEmail}/{folderName}")
-    @Operation(summary = "폴더 삭제", description = "폴더 삭제시 내부 프로젝트도 삭제됨")
+    @DeleteMapping("/remove")
+    @Operation(summary = "폴더 삭제 - 테스트 완료", description = "폴더 삭제시 내부 프로젝트도 삭제됨")
     public ResponseEntity<?> deleteFolder(
-            @PathVariable("userEmail") @Parameter(description = "사용자 이메일") String userEmail,
-            @PathVariable("folderName") @Parameter(description = "삭제 폴더 이름") String folderName) {
+            @RequestParam @Parameter(description = "사용자 이메일") String userEmail,
+            @RequestParam @Parameter(description = "삭제 폴더 이름") String folderName) {
         List<LocationEntity> locationEntityList = locationService.getLocationsByUserEmailAndFolderName(userEmail, folderName);
 
         for (LocationEntity location : locationEntityList) {
@@ -70,7 +70,7 @@ public class FolderController {
     }
 
     @PatchMapping("/update")
-    @Operation(summary = "폴더 이름 변경", description = "폴더 이름 변경")
+    @Operation(summary = "폴더 이름 변경 - 테스트 완료", description = "폴더 이름 변경")
     public FolderEntity updateFolderName(
             @RequestParam String userEmail,
             @RequestParam String oldFolderName,

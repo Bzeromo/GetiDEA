@@ -88,6 +88,7 @@ public class UserService {
         return updatedRows > 0;
     }
 
+    @Transactional
     public UserDto updateUserName(String userEmail, String newName) {
         return userRepository.findByUserEmail(userEmail).map(user -> {
             user.setUserName(newName);
