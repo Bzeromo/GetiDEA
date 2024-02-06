@@ -205,24 +205,30 @@ const MyDrawing = () => {
     console.log("업데이트됨" + selectedId);
   }, [selectedId]);
 
+  // 템플릿3 이미지 불러오기
   useEffect(() => {
-    const newImage = {
-      id: 1, // 이미지의 고유한 식별자
-      scaleX: 7,
-      scaleY: 5,
-      x: 50, // 이미지의 x 좌표
-      y: 50, // 이미지의 y 좌표
+    const templateImage = {
+      id: "template3",
       src: '/img/template3_check7/template3.png',
-      type: "Image",
-      ty: "Image" // 이미지 경로
+      x: 31, // 이미지의 x 좌표
+      y: 10, // 이미지의 y 좌표
+
+      // draggable: false,
+      // scaleX: 5.86,
+      // scaleY: 5,
+      // height: 96,
+      // width: 200,
+
+      // type: "Image",
+      // ty: "Image", // 이미지 경로
     }
 
-    setImages([newImage])
+    setImages([templateImage])
+
   }, [])
 
-  useEffect(() =>{
-
-  }, [images])
+  // useEffect(() =>{
+  // }, [images])
 
   function updateArray(array, item, key) {
     const index = array.findIndex((element) => element.id === key);
@@ -238,7 +244,6 @@ const MyDrawing = () => {
     }
   }
 
-  //이게 mongDB로부터 템플릿 받아오는건가???
   const GetData = () => {
     axios
       .get("http://192.168.31.172:8080/api/project/data/1/1")
@@ -428,7 +433,6 @@ const MyDrawing = () => {
       });
     });
 
-    //이건 뭘까?
     setImages((prevImage) => {
       return images.map((newImage) => {
         const existingImage = prevImage.find(
@@ -578,7 +582,7 @@ const MyDrawing = () => {
     const id = e.target.attrs.id;
     const ty = e.target.attrs.ty;
 
-    console.log(id + "id를 확ㅇ닣래보자");
+    console.log(id + "id를 확인해보자");
     console.log(ty + " tetstsetawetfdgdfffsdfsdfsdfsdds");
     const type = e.target.attrs.type;
 
@@ -1275,7 +1279,7 @@ const MyDrawing = () => {
       {/* /////////////////////////////////////////////그리는 구역///////////////////////////////////////////// */}
       <div className="ml-36 mt-24 h-full w-full" >
         {/* <img src={process.env.PUBLIC_URL + '/img/template3_check7/template3.png'} alt= "Template3_Check" /> */}
-
+      
         <Stage
           ref={stageRef}
           width={window.innerWidth}

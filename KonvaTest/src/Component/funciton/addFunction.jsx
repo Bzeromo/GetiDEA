@@ -152,7 +152,6 @@ const addFunction = (
       y: 100,
       z: 200,
       ty: "Text",
-      type: "Text",
       fontSize : 10,
     };
     console.log(newText)
@@ -164,12 +163,10 @@ const addFunction = (
   const addImage = (src) => {
     console.log(`Adding image to layer: ${src}`); // 이미지 추가 로그
     const newImage = {
-      id: `image-${images.length}`,
+      id: `image_${images.length}`,
       src,
       x: 50,
       y: 50,
-      ty: "img",
-      type: "Image"
     };
     setImages([...images, newImage]);
     console.log(images); // 상태 업데이트 후 이미지 목록 로그
