@@ -109,6 +109,34 @@ const MyDrawing = () => {
   const projectId = 3;
   const userEmail = "wnsrb933@naver.com";
 
+  const isEqual = (obj1, obj2) => {
+    return JSON.stringify(obj1) === JSON.stringify(obj2);
+  };
+  
+  useEffect(() => {
+    const getProjectData = () => {
+      axios.get(`http://192.168.31.172:8080/api/project/data?projectId=${projectId}`)
+        .then((response) => {
+          if (response.data && response.data.data) {
+            const dataItems = response.data.data;
+  
+            // 예시: Texts 데이터에 대한 업데이트 최적화
+            const newTexts = dataItems.filter(item => item.ty === "Text");
+            if (!isEqual(newTexts, texts)) {
+              setTexts(newTexts);
+            }
+  
+            // Shapes, Lines, Images 등에 대해서도 비슷한 방식으로 적용
+          }
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    };
+  
+    getProjectData();
+  }, [projectId]); // projectId가 변경될 때만 함수를 다시 실행
+
   const {
     changeSelectedShapeColor,
     changeSelectedStrokeColor,
@@ -203,9 +231,9 @@ const MyDrawing = () => {
   // const [selectedImageUrl, setSelectedImageUrl] = useState(null); // 선택된 이미지 URL을 저장하는 상태
   // const [selectedImageUrls, setSelectedImageUrls] = useState([]);
 
-  const handleImageSelect = (src) => {
-    setSelectedImage(src);
-  };
+  // const handleImageSelect = (src) => {
+  //   setSelectedImage(src);
+  // };
 
   useEffect(() => {
     console.log("업데이트됨" + selectedId);
@@ -225,7 +253,7 @@ const MyDrawing = () => {
   //   }
   // }
 
-  const { getProjectData, updateArray } = getData(
+  const { getProjectData } = getData(
     projectId,
     setTexts,
     setShapes,
@@ -601,7 +629,7 @@ const MyDrawing = () => {
     // console.log(newRotate);
     // console.log("newpos 확인 용" + newPos.x + "  " + newPos.y);
 
-    if (ty === "Line" && type === "Dot") {
+    if (type === "Dot") {
       setLines((prevLines) =>
         prevLines.map((lines) => {
           if (lines.id === id) {
@@ -612,7 +640,7 @@ const MyDrawing = () => {
           return lines;
         })
       );
-    } else if (ty === "Line" && type === "Arrow") {
+    } else if (type === "Arrow") {
       setLines((prevLines) =>
         prevLines.map((lines) => {
           if (lines.id === id) {
@@ -623,7 +651,7 @@ const MyDrawing = () => {
           return lines;
         })
       );
-    } else if (ty === "Line" && type === "Line") {
+    } else if (type === "Line") {
       setLines((prevLines) =>
         prevLines.map((lines) => {
           if (lines.id === id) {
@@ -634,7 +662,7 @@ const MyDrawing = () => {
           return lines;
         })
       );
-    } else if (ty === "Shape" && type === "Rect") {
+    } else if (type === "Rect") {
       setShapes((prevShapes) =>
         prevShapes.map((shapes) => {
           if (shapes.id === id) {
@@ -646,7 +674,7 @@ const MyDrawing = () => {
           return shapes;
         })
       );
-    } else if (ty === "Shape" && type === "RegularPolygon") {
+    } else if (type === "RegularPolygon") {
       setShapes((prevShapes) =>
         prevShapes.map((shapes) => {
           if (shapes.id === id) {
@@ -658,7 +686,7 @@ const MyDrawing = () => {
           return shapes;
         })
       );
-    } else if (ty === "Shape" && type === "Circle") {
+    } else if (type === "Circle") {
       setShapes((prevShapes) =>
         prevShapes.map((shapes) => {
           if (shapes.id === id) {
@@ -1297,6 +1325,8 @@ const MyDrawing = () => {
             {shapes.map((shape) => (
               <ShapeComponent
                 key={shape.id}
+                x={shape.x}
+                y={shape.y}
                 shapeProps={shape}
                 isSelected={shape.id === selectedId}
                 onTransformEnd={handleTransformEnd}

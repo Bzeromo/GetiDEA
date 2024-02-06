@@ -41,16 +41,28 @@ const deleteFunction = (
 
     // type에 따라 적절한 삭제 함수 호출
     switch (selectedType) {
-      case "Shape":
+      case "Rect":
+        deleteSelectedShape();
+        break;
+      case "Circle":
+        deleteSelectedShape();
+        break;
+      case "RegularPolygon ":
         deleteSelectedShape();
         break;
       case "Line":
         deleteSelectedLine();
         break;
+      case "Arrow":
+        deleteSelectedLine();
+        break;
+      case "Dot":
+        deleteSelectedLine();
+        break;
       case "Text":
         deleteSelectedText();
         break;
-      case "img":
+      case "Image":
         deleteSelectedImage();
         break;
       default:
@@ -84,7 +96,7 @@ const deleteFunction = (
     setImages(newImages);
     setSelectedId(null); // 이미지 삭제 후 선택된 이미지 ID 초기화
   };
-  
+
   const deleteSelectedDrawing = () => {
     setDrawingList([]);
     console.log("삭제 완료");

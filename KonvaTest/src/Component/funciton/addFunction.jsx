@@ -30,7 +30,7 @@ const addFunction = (
       width: 100,
       height: 100,
       fill: currentColor,
-      ty: "Shape",
+      ty: "Rect",
       // draagable: true,
       // ondragend: {handleDragEnd},
       
@@ -47,7 +47,7 @@ const addFunction = (
       y: 50,
       radius: 50,
       fill: currentColor,
-      ty: "Shape",
+      ty: "Circle",
     };
     setShapes([...shapes, newShape]);
   };
@@ -62,7 +62,7 @@ const addFunction = (
       sides: 3,
       radius: 50,
       fill: currentColor,
-      ty: "Shape",
+      ty: "RegularPolygon",
     };
     setShapes([...shapes, newShape]);
   };
@@ -97,7 +97,7 @@ const addFunction = (
       lineJoin: "round",
       dash: [33, 10],
       fill: currentColor,
-      ty: "Line",
+      ty: "Dot",
       type : "Dot",
       x: rectPosition.x,
       y: rectPosition.y,
@@ -116,7 +116,7 @@ const addFunction = (
       lineJoin: "round",
       dash: [29, 20, 0.001, 20],
       fill: currentColor,
-      ty: "Line",
+      ty: "Dot",
       type : "Dot",
       x: rectPosition.x,
       y: rectPosition.y,
@@ -135,8 +135,6 @@ const addFunction = (
       rotation : 0,
       strokeWidth: 10,
       fill: currentColor,
-      ty: "Line",
-      type : "Arrow",
       x: rectPosition.x,
       y: rectPosition.y,
     };
@@ -168,8 +166,8 @@ const addFunction = (
       src,
       x: 50,
       y: 50,
-      ty: "img",
-      type: "Image"
+      ty: "image",
+      type: "Image",
     };
     setImages([...images, newImage]);
     console.log(images); // 상태 업데이트 후 이미지 목록 로그

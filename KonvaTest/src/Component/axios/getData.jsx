@@ -3,7 +3,7 @@ import axios from "axios";
 const getData = (projectId, setTexts, setShapes, setLines, setImages) => {
   const getProjectData = () => {
     axios
-      .get(`http://192.168.31.172:8080/api/project/data/${projectId}`)
+      .get(`http://192.168.31.172:8080/api/project/data?projectId=${projectId}`)
       .then((response) => {
         if (response.data && response.data.data) {
           const dataItems = response.data.data;
@@ -13,37 +13,48 @@ const getData = (projectId, setTexts, setShapes, setLines, setImages) => {
           Object.keys(dataItems).forEach((key) => {
             const item = dataItems[key];
 
-            if (item.type === "Shape") {
-              console.log(`Shape item: `, JSON.stringify(item));
-            } else if (item.type === "Line") {
-              console.log(`Line item: `, JSON.stringify(item));
-            } else if (item.type === "Text") {
-              console.log(`Text item: `, JSON.stringify(item));
-            } else if (item.type === "img") {
-              console.log(`img item: `, JSON.stringify(item));
-            }
+            console.log(key)
+            console.log(item.ty + "item 보기")
 
-            console.log(item.type + "item 보기")
-
-            // const itemWithDefaults = {
-            //   ...item,
-            //   x: item.x ?? 0, // 기본값 0으로 설정
-            //   y: item.y ?? 0, // 기본값 0으로 설정
-            //   // 필요한 다른 속성에 대해서도 기본값을 설정할 수 있습니다.
-            // };
-            switch (item.type) {
+            switch (item.ty) {
               case "Text":
+                console.log(`text item: `, JSON.stringify(item, key));
                 setTexts((prevTexts) => updateArray(prevTexts, item, key));
+
                 break;
-              case "Shape":
-                console.log(JSON.stringify(item) + "짜잔?");
+              case "Rect":
+                console.log(JSON.stringify(item, key) + "Rect?");
                 setShapes((prevShapes) => updateArray(prevShapes, item, key));
                 break;
+              case "Circle":
+                console.log(JSON.stringify(item, key) + "Circle?");
+                setShapes((prevShapes) => updateArray(prevShapes, item, key));
+                break;
+              case "RegularPolygon":
+                console.log(
+                  `RegularPolygon item with defaults: `,
+                  JSON.stringify(item)
+                );
+                // setShapes((prevShapes) =>
+                //   updateArray(prevShapes, item, key)
+                // );
+                break;
               case "Line":
+                console.log(`Line item: `, JSON.stringify(item, key));
+                setLines((prevLines) => updateArray(prevLines, item, key));
+                break;
+              case "Dot":
+                console.log(`dot item: `, JSON.stringify(item, key));
+                setLines((prevLines) => updateArray(prevLines, item, key));
+                break;
+              case "Arrow":
+                console.log(`arrow item: `, JSON.stringify(item, key));
                 setLines((prevLines) => updateArray(prevLines, item, key));
                 break;
               case "Image":
                 setImages((prevImage) => updateArray(prevImage, item, key));
+                console.log(`img item: `, JSON.stringify(item, key));
+
                 break;
               default:
                 // 기타 타입 처리

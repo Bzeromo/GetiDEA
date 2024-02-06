@@ -2160,7 +2160,7 @@
 
 "@types/react-reconciler@^0.28.0", "@types/react-reconciler@^0.28.2":
   version "0.28.8"
-  resolved "https://registry.npmjs.org/@types/react-reconciler/-/react-reconciler-0.28.8.tgz"
+  resolved "https://registry.yarnpkg.com/@types/react-reconciler/-/react-reconciler-0.28.8.tgz#e51710572bcccf214306833c2438575d310b3e98"
   integrity sha512-SN9c4kxXZonFhbX4hJrZy37yw9e7EIxcpHCxQv5JUS18wDE5ovkQKlqQEkufdJCCMfuI9BnjUJvhYeJ9x5Ra7g==
   dependencies:
     "@types/react" "*"
@@ -5621,7 +5621,7 @@ iterator.prototype@^1.1.2:
 
 its-fine@^1.1.1:
   version "1.1.1"
-  resolved "https://registry.npmjs.org/its-fine/-/its-fine-1.1.1.tgz"
+  resolved "https://registry.yarnpkg.com/its-fine/-/its-fine-1.1.1.tgz#e74b93fddd487441f978a50f64f0f5af4d2fc38e"
   integrity sha512-v1Ia1xl20KbuSGlwoaGsW0oxsw8Be+TrXweidxD9oT/1lAh6O3K3/GIM95Tt6WCiv6W+h2M7RB1TwdoAjQyyKw==
   dependencies:
     "@types/react-reconciler" "^0.28.0"
@@ -7916,7 +7916,7 @@ react-is@^18.0.0:
 
 react-konva@^18.2.10:
   version "18.2.10"
-  resolved "https://registry.npmjs.org/react-konva/-/react-konva-18.2.10.tgz"
+  resolved "https://registry.yarnpkg.com/react-konva/-/react-konva-18.2.10.tgz#5b5edc5e9ed452755d21babc353747828868decc"
   integrity sha512-ohcX1BJINL43m4ynjZ24MxFI1syjBdrXhqVxYVDw2rKgr3yuS0x/6m1Y2Z4sl4T/gKhfreBx8KHisd0XC6OT1g==
   dependencies:
     "@types/react-reconciler" "^0.28.2"
@@ -7926,7 +7926,7 @@ react-konva@^18.2.10:
 
 react-reconciler@~0.29.0:
   version "0.29.0"
-  resolved "https://registry.npmjs.org/react-reconciler/-/react-reconciler-0.29.0.tgz"
+  resolved "https://registry.yarnpkg.com/react-reconciler/-/react-reconciler-0.29.0.tgz#ee769bd362915076753f3845822f2d1046603de7"
   integrity sha512-wa0fGj7Zht1EYMRhKWwoo1H9GApxYLBuhoAuXN0TlltESAjDssB+Apf0T/DngVqaMyPypDmabL37vw/2aRM98Q==
   dependencies:
     loose-envify "^1.1.0"

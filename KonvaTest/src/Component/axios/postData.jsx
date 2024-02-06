@@ -5,7 +5,7 @@ const postData = (projectId, userEmail) => {
   const PostSave = () => {
     console.log(projectId)
     axios
-      .patch(`http://192.168.31.172:8080/api/project/${projectId}`)
+      .patch(`http://192.168.31.172:8080/api/project/merge?projectId=${projectId}`)
       .then((response) => {
         console.log(response);
         // console.log(response.data);
@@ -68,10 +68,10 @@ const postData = (projectId, userEmail) => {
       preData: {},
       newData: {
         id: e.target.attrs.id,
+        y: e.target.attrs.y,
+        x: e.target.attrs.x,
         type: e.target.attrs.type,
         stroke: e.target.attrs.stroke,
-        x: e.target.attrs.x,
-        y: e.target.attrs.y,
         side: e.target.attrs.side,
         radius: e.target.attrs.radius,
         fill: e.target.attrs.fill,
