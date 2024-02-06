@@ -20,6 +20,7 @@ import ImageSelector from "./funciton/ImageSelector";
 import undoData from "./axios/undoData";
 
 const MyDrawing = () => {
+
   const [imageIdCounter, setImageIdCounter] = useState(0);
 
   const [rectPosition, setRectPosition] = useState({ x: 50, y: 50 });
@@ -141,7 +142,7 @@ const MyDrawing = () => {
   } = postData(projectId, userEmail);
 
   const { undoEvent } = undoData(axios, projectId, userEmail);
-
+  console.log("아아아아 이게 나타난다ㅏㅏㅏㅏㅏㅏㅏㅏㅏㅏㅏㅏㅏㅏ");
   const {
     addText,
     addRectangle,
