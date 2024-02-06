@@ -18,6 +18,7 @@ import TextComponent from "./Add/TextComponent";
 import useEventHandler from "./funciton/useEventHandler";
 import ImageSelector from "./funciton/ImageSelector";
 import undoData from "./axios/undoData";
+import getData from "./axios/getData";
 
 const MyDrawing = () => {
 
@@ -106,7 +107,7 @@ const MyDrawing = () => {
     useState(false);
   const [imgMenuToggle, setImgMenuToggle] = useState(false);
 
-  const projectId = "test1";
+  const projectId = 3;
   const userEmail = "wnsrb933@naver.com";
 
   const {
@@ -211,70 +212,78 @@ const MyDrawing = () => {
     console.log("업데이트됨" + selectedId);
   }, [selectedId]);
 
-  function updateArray(array, item, key) {
-    const index = array.findIndex((element) => element.id === key);
+  // function updateArray(array, item, key) {
+  //   const index = array.findIndex((element) => element.id === key);
 
-    if (index >= 0) {
-      // 기존 항목 업데이트
-      return array.map((element, i) =>
-        i === index ? { ...element, ...item } : element
-      );
-    } else {
-      // 새 항목 추가
-      return [...array, { id: key, ...item }];
-    }
-  }
+  //   if (index >= 0) {
+  //     // 기존 항목 업데이트
+  //     return array.map((element, i) =>
+  //       i === index ? { ...element, ...item } : element
+  //     );
+  //   } else {
+  //     // 새 항목 추가
+  //     return [...array, { id: key, ...item }];
+  //   }
+  // }
 
-  const GetData = () => {
-    axios
-      .get("http://192.168.31.172:8080/api/project/test1/1")
-      .then((response) => {
-        if (response.data && response.data.data) {
-          const dataItems = response.data.data;
+  const { getProjectData, updateArray } = getData(
+    projectId,
+    setTexts,
+    setShapes,
+    setLines,
+    setImages
+  );
 
-          console.log(response);
+  // const GetData = () => {
+  //   axios
+  //     .get("http://192.168.31.172:8080/api/project/test1/1")
+  //     .then((response) => {
+  //       if (response.data && response.data.data) {
+  //         const dataItems = response.data.data;
 
-          Object.keys(dataItems).forEach((key) => {
-            const item = dataItems[key];
-            const itemWithDefaults = {
-              ...item,
-              x: item.x ?? 0, // 기본값 0으로 설정
-              y: item.y ?? 0, // 기본값 0으로 설정
-              // 필요한 다른 속성에 대해서도 기본값을 설정할 수 있습니다.
-            };
-            switch (item.ty) {
-              case "Text":
-                setTexts((prevTexts) =>
-                  updateArray(prevTexts, itemWithDefaults, key)
-                );
-                break;
-              case "Shape":
-                console.log(JSON.stringify(item) + "짜잔?");
-                setShapes((prevShapes) =>
-                  updateArray(prevShapes, itemWithDefaults, key)
-                );
-                break;
-              case "Line":
-                setLines((prevLines) =>
-                  updateArray(prevLines, itemWithDefaults, key)
-                );
-                break;
-              case "img":
-                setImages((prevImage) =>
-                  updateArray(prevImage, itemWithDefaults, key)
-                );
-                break;
-              default:
-                // 기타 타입 처리
-                break;
-            }
-          });
-        }
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-  };
+  //         console.log(response);
+
+  //         Object.keys(dataItems).forEach((key) => {
+  //           const item = dataItems[key];
+  //           const itemWithDefaults = {
+  //             ...item,
+  //             x: item.x ?? 0, // 기본값 0으로 설정
+  //             y: item.y ?? 0, // 기본값 0으로 설정
+  //             // 필요한 다른 속성에 대해서도 기본값을 설정할 수 있습니다.
+  //           };
+  //           switch (item.ty) {
+  //             case "Text":
+  //               setTexts((prevTexts) =>
+  //                 updateArray(prevTexts, itemWithDefaults, key)
+  //               );
+  //               break;
+  //             case "Shape":
+  //               console.log(JSON.stringify(item) + "짜잔?");
+  //               setShapes((prevShapes) =>
+  //                 updateArray(prevShapes, itemWithDefaults, key)
+  //               );
+  //               break;
+  //             case "Line":
+  //               setLines((prevLines) =>
+  //                 updateArray(prevLines, itemWithDefaults, key)
+  //               );
+  //               break;
+  //             case "img":
+  //               setImages((prevImage) =>
+  //                 updateArray(prevImage, itemWithDefaults, key)
+  //               );
+  //               break;
+  //             default:
+  //               // 기타 타입 처리
+  //               break;
+  //           }
+  //         });
+  //       }
+  //     })
+  //     .catch((error) => {
+  //       console.error(error);
+  //     });
+  // };
 
   const [socket, setSocket] = useState(null);
 
@@ -1213,7 +1222,7 @@ const MyDrawing = () => {
 
       {/* 오른쪽 윗 블록 */}
       <div className="absolute top-6 right-52 justify-center bg-white rounded-md w-16 h-[50px] flex  items-center flex-row shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]">
-        <button onClick={() => GetData()}>Get</button>
+        <button onClick={() => getProjectData()}>Get</button>
       </div>
 
       {/* 오른쪽 윗 블록 */}
