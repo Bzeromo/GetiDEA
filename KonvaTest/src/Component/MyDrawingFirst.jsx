@@ -21,7 +21,7 @@ import undoData from "./axios/undoData";
 import getData from "./axios/getData";
 
 const MyDrawing = () => {
-
+  
   const [imageIdCounter, setImageIdCounter] = useState(0);
 
   const [rectPosition, setRectPosition] = useState({ x: 50, y: 50 });
@@ -107,9 +107,6 @@ const MyDrawing = () => {
     useState(false);
   const [imgMenuToggle, setImgMenuToggle] = useState(false);
 
-  const projectId = 3;
-  const userEmail = "wnsrb933@naver.com";
-
   const {
     changeSelectedShapeColor,
     changeSelectedStrokeColor,
@@ -140,9 +137,8 @@ const MyDrawing = () => {
     PostDot,
     PostArrow,
     PostSave,
-  } = postData(projectId, userEmail);
+  } = postData(axios);
 
-  const { undoEvent } = undoData(axios, projectId, userEmail);
   const {
     addText,
     addRectangle,
@@ -181,9 +177,9 @@ const MyDrawing = () => {
   const {
     deleteSelectedShape,
     deleteSelectedLine,
+    deleteSelectedDrawing,
     deleteSelectedText,
     deleteSelectedImage,
-    deleteSelectedDrawing,
     deleteSelected,
   } = deleteFunction(
     shapes,
@@ -192,8 +188,8 @@ const MyDrawing = () => {
     setSelectedId,
     lines,
     setLines,
-    drawingList, // 이 위치가 맞아야 합니다.
-    setDrawingList, // 이 위치가 맞아야 합니다.
+    setDrawingList,
+    drawingList,
     texts,
     setTexts,
     images,
@@ -211,78 +207,132 @@ const MyDrawing = () => {
     console.log("업데이트됨" + selectedId);
   }, [selectedId]);
 
-  // function updateArray(array, item, key) {
-  //   const index = array.findIndex((element) => element.id === key);
-
-  //   if (index >= 0) {
-  //     // 기존 항목 업데이트
-  //     return array.map((element, i) =>
-  //       i === index ? { ...element, ...item } : element
-  //     );
-  //   } else {
-  //     // 새 항목 추가
-  //     return [...array, { id: key, ...item }];
+  // useEffect(() => {
+  //   const newImage = {
+  //     id: 1, // 이미지의 고유한 식별자
+  //     scaleX: 7,
+  //     scaleY: 5,
+  //     x: 50, // 이미지의 x 좌표
+  //     y: 50, // 이미지의 y 좌표
+  //     src: '/img/template3_check7/template3.png',
+  //     type: "Image",
+  //     ty: "img" // 이미지 경로
   //   }
-  // }
 
-  const { getProjectData, updateArray } = getData(
-    projectId,
-    setTexts,
-    setShapes,
-    setLines,
-    setImages
+  //   setImages([newImage])
+  // }, [])
+
+  // useEffect(() =>{
+
+  // }, [images])
+
+  useEffect(() => {
+    // JSON 파일에서 이미지 데이터를 가져오는 비동기 함수
+    const fetchImageData = async () => {
+      try {
+        // axios를 사용하여 JSON 파일에서 이미지 데이터를 가져옵니다.
+        const response = await axios.get('/public/img/template1_bubble_chat/template1-position.json');
+        const imageData = response.data.properties;
+
+        // 이미지 데이터를 이용하여 newImage 배열 생성
+        const newImage = Object.keys(imageData).map((key) => ({
+          id: key,
+          ...imageData[key],
+        }));
+
+        // 새 이미지 데이터를 상태로 설정합니다.
+        setImages(newImage);
+      } catch (error) {
+        console.error('Error fetching image data:', error);
+      }
+    };
+
+    // fetchImageData 함수를 호출하여 이미지 데이터를 가져옵니다.
+    fetchImageData();
+  }, []);
+
+  useEffect(() => {
+    // images 상태가 변경될 때 수행할 작업을 여기에 추가합니다.
+  }, [images]);
+
+  return (
+    <div>
+      {/* images 상태에 있는 이미지를 렌더링합니다. */}
+      {images.map((image) => (
+        <img
+          key={image.id}
+          src={image.src}
+          alt={`Image ${image.id}`}
+          style={{
+            transform: `scale(${image.scaleX}, ${image.scaleY})`,
+            position: 'absolute',
+            top: image.y,
+            left: image.x,
+          }}
+        />
+      ))}
+    </div>
   );
 
-  // const GetData = () => {
-  //   axios
-  //     .get("http://192.168.31.172:8080/api/project/test1/1")
-  //     .then((response) => {
-  //       if (response.data && response.data.data) {
-  //         const dataItems = response.data.data;
+  function updateArray(array, item, key) {
+    const index = array.findIndex((element) => element.id === key);
 
-  //         console.log(response);
+    if (index >= 0) {
+      // 기존 항목 업데이트
+      return array.map((element, i) =>
+        i === index ? { ...element, ...item } : element
+      );
+    } else {
+      // 새 항목 추가
+      return [...array, { id: key, ...item }];
+    }
+  }
 
-  //         Object.keys(dataItems).forEach((key) => {
-  //           const item = dataItems[key];
-  //           const itemWithDefaults = {
-  //             ...item,
-  //             x: item.x ?? 0, // 기본값 0으로 설정
-  //             y: item.y ?? 0, // 기본값 0으로 설정
-  //             // 필요한 다른 속성에 대해서도 기본값을 설정할 수 있습니다.
-  //           };
-  //           switch (item.ty) {
-  //             case "Text":
-  //               setTexts((prevTexts) =>
-  //                 updateArray(prevTexts, itemWithDefaults, key)
-  //               );
-  //               break;
-  //             case "Shape":
-  //               console.log(JSON.stringify(item) + "짜잔?");
-  //               setShapes((prevShapes) =>
-  //                 updateArray(prevShapes, itemWithDefaults, key)
-  //               );
-  //               break;
-  //             case "Line":
-  //               setLines((prevLines) =>
-  //                 updateArray(prevLines, itemWithDefaults, key)
-  //               );
-  //               break;
-  //             case "img":
-  //               setImages((prevImage) =>
-  //                 updateArray(prevImage, itemWithDefaults, key)
-  //               );
-  //               break;
-  //             default:
-  //               // 기타 타입 처리
-  //               break;
-  //           }
-  //         });
-  //       }
-  //     })
-  //     .catch((error) => {
-  //       console.error(error);
-  //     });
-  // };
+  //이게 mongDB로부터 템플릿 받아오는건가???
+  const GetData = () => {
+    axios
+      .get("http://192.168.31.172:8080/api/project/data/1/1")
+      .then((response) => {
+        if (response.data && response.data.data) {
+          const dataItems = response.data.data;
+
+          console.log(response);
+
+          Object.keys(dataItems).forEach((key) => {
+            const item = dataItems[key];
+            const itemWithDefaults = {
+              ...item,
+              x: item.x ?? 0, // 기본값 0으로 설정
+              y: item.y ?? 0, // 기본값 0으로 설정
+              // 필요한 다른 속성에 대해서도 기본값을 설정할 수 있습니다.
+            };
+            switch (item.ty) {
+              case "Text":
+                setTexts((prevTexts) => updateArray(prevTexts, key));
+                break;
+              case "Shape":
+                console.log(JSON.stringify(item) + "짜잔?");
+                setShapes((prevShapes) => updateArray(prevShapes, itemWithDefaults, key));
+                break;
+              case "Line":
+                setLines((prevLines) => updateArray(prevLines, item, key));
+                break;
+              case "img":
+                setImages((prevImage) => updateArray(prevImage, item, key));
+                break;
+              default:
+                // 기타 타입 처리
+                break;
+            }
+          });
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  };
+
+
 
   const [socket, setSocket] = useState(null);
 
@@ -428,6 +478,7 @@ const MyDrawing = () => {
       });
     });
 
+    //이건 뭘까?
     setImages((prevImage) => {
       return images.map((newImage) => {
         const existingImage = prevImage.find(
@@ -906,6 +957,7 @@ const MyDrawing = () => {
     setTexts(updatedTexts);
   };
 
+
   return (
     <div className="absolute  inset-0 h-full w-full bg-[#EFEFEF] bg-opacity-50 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px]">
       {/* 왼쪽 윗 블록 */}
@@ -1221,12 +1273,12 @@ const MyDrawing = () => {
 
       {/* 오른쪽 윗 블록 */}
       <div className="absolute top-6 right-52 justify-center bg-white rounded-md w-16 h-[50px] flex  items-center flex-row shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]">
-        <button onClick={() => getProjectData()}>Get</button>
+        <button onClick={() => GetData()}>Get</button>
       </div>
 
       {/* 오른쪽 윗 블록 */}
       <div className="absolute top-6 right-94 justify-center bg-white rounded-md w-16 h-[50px] z-50 flex  items-center flex-row shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]">
-        <button onClick={() => PostSave()}>Save</button>
+        <button onClick={() => GetData()}>Get</button>
       </div>
 
       {/* 오른쪽 윗 블록 */}
@@ -1269,8 +1321,11 @@ const MyDrawing = () => {
         </div>
       )}
 
-      {/* 그리는 구역 */}
-      <div className="ml-36 mt-24 h-full w-full">
+      {/*여기에 이미지 넣으면 되겠네!*/}
+      {/* /////////////////////////////////////////////그리는 구역///////////////////////////////////////////// */}
+      <div className="ml-36 mt-24 h-full w-full" >
+        {/* <img src={process.env.PUBLIC_URL + '/img/template3_check7/template3.png'} alt= "Template3_Check" /> */}
+
         <Stage
           ref={stageRef}
           width={window.innerWidth}
