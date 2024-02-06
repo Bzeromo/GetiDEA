@@ -56,9 +56,6 @@ const ShapeComponent = ({ shapeProps, isSelected, onSelect, onChange }) => {
           return <Circle {...commonProps} ref={shapeRef}/>;
         case "RegularPolygon":
           return <RegularPolygon {...commonProps} ref={shapeRef}/>;
-          // {shapeProps.x !== undefined && shapeProps.y !== undefined && (
-          //   <RegularPolygon {...shapeProps} />
-          // )}
         default:
           return null;
       }

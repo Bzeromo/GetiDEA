@@ -21,7 +21,6 @@ import undoData from "./axios/undoData";
 import getData from "./axios/getData";
 
 const MyDrawing = () => {
-
   const [imageIdCounter, setImageIdCounter] = useState(0);
 
   const [rectPosition, setRectPosition] = useState({ x: 50, y: 50 });
@@ -110,33 +109,9 @@ const MyDrawing = () => {
   const projectId = 3;
   const userEmail = "wnsrb933@naver.com";
 
-  const isEqual = (obj1, obj2) => {
-    return JSON.stringify(obj1) === JSON.stringify(obj2);
-  };
-  
   useEffect(() => {
-    const getProjectData = () => {
-      axios.get(`http://192.168.31.172:8080/api/project/data?projectId=${projectId}`)
-        .then((response) => {
-          if (response.data && response.data.data) {
-            const dataItems = response.data.data;
-  
-            // 예시: Texts 데이터에 대한 업데이트 최적화
-            const newTexts = dataItems.filter(item => item.ty === "Text");
-            if (!isEqual(newTexts, texts)) {
-              setTexts(newTexts);
-            }
-  
-            // Shapes, Lines, Images 등에 대해서도 비슷한 방식으로 적용
-          }
-        })
-        .catch((error) => {
-          console.error(error);
-        });
-    };
-  
     getProjectData();
-  }, [projectId]); // projectId가 변경될 때만 함수를 다시 실행
+  }, []);
 
   const {
     changeSelectedShapeColor,
@@ -171,6 +146,7 @@ const MyDrawing = () => {
   } = postData(projectId, userEmail);
 
   const { undoEvent } = undoData(axios, projectId, userEmail);
+
   const {
     addText,
     addRectangle,
