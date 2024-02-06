@@ -21,6 +21,7 @@ import undoData from "./axios/undoData";
 import getData from "./axios/getData";
 
 const MyDrawing = () => {
+
   const [imageIdCounter, setImageIdCounter] = useState(0);
 
   const [rectPosition, setRectPosition] = useState({ x: 50, y: 50 });
@@ -170,7 +171,6 @@ const MyDrawing = () => {
   } = postData(projectId, userEmail);
 
   const { undoEvent } = undoData(axios, projectId, userEmail);
-
   const {
     addText,
     addRectangle,

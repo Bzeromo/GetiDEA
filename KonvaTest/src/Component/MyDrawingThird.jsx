@@ -17,6 +17,7 @@ import postData from "./axios/postData";
 import TextComponent from "./Add/TextComponent";
 import useEventHandler from "./funciton/useEventHandler";
 import ImageSelector from "./funciton/ImageSelector";
+import undoData from "./axios/undoData";
 
 const MyDrawing = () => {
   const [imageIdCounter, setImageIdCounter] = useState(0);
@@ -203,6 +204,31 @@ const MyDrawing = () => {
   useEffect(() => {
     console.log("업데이트됨" + selectedId);
   }, [selectedId]);
+
+  // 템플릿3 이미지 불러오기
+  useEffect(() => {
+    const templateImage = {
+      id: "template3",
+      src: '/img/template3_check7/template3.png',
+      x: 31, // 이미지의 x 좌표
+      y: 10, // 이미지의 y 좌표
+
+      // draggable: false,
+      // scaleX: 5.86,
+      // scaleY: 5,
+      // height: 96,
+      // width: 200,
+
+      // type: "Image",
+      // ty: "Image", // 이미지 경로
+    }
+
+    setImages([templateImage])
+
+  }, [])
+
+  // useEffect(() =>{
+  // }, [images])
 
   function updateArray(array, item, key) {
     const index = array.findIndex((element) => element.id === key);
@@ -556,7 +582,7 @@ const MyDrawing = () => {
     const id = e.target.attrs.id;
     const ty = e.target.attrs.ty;
 
-    console.log(id + "id를 확ㅇ닣래보자");
+    console.log(id + "id를 확인해보자");
     console.log(ty + " tetstsetawetfdgdfffsdfsdfsdfsdds");
     const type = e.target.attrs.type;
 
@@ -884,6 +910,7 @@ const MyDrawing = () => {
     );
     setTexts(updatedTexts);
   };
+
 
   return (
     <div className="absolute  inset-0 h-full w-full bg-[#EFEFEF] bg-opacity-50 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px]">
@@ -1248,8 +1275,11 @@ const MyDrawing = () => {
         </div>
       )}
 
-      {/* 그리는 구역 */}
-      <div className="ml-36 mt-24 h-full w-full">
+      {/*여기에 이미지 넣으면 되겠네!*/}
+      {/* /////////////////////////////////////////////그리는 구역///////////////////////////////////////////// */}
+      <div className="ml-36 mt-24 h-full w-full" >
+        {/* <img src={process.env.PUBLIC_URL + '/img/template3_check7/template3.png'} alt= "Template3_Check" /> */}
+      
         <Stage
           ref={stageRef}
           width={window.innerWidth}
