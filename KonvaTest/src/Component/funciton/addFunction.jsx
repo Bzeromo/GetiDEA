@@ -151,6 +151,7 @@ const addFunction = (
       y: 100,
       z: 200,
       ty: "Text",
+      type: "Text",
       fontSize : 10,
     };
     console.log(newText)

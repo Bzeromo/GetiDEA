@@ -65,6 +65,8 @@ const deleteFunction = (
       case "Image":
         deleteSelectedImage();
         break;
+      case null:
+        deleteSelectedDrawing();
       default:
         deleteSelectedDrawing();
         break;

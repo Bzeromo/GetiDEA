@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const postData = (projectId, userEmail) => {
+const postData = (projectId, userEmail, setPreData, preData) => {
   const PostSave = () => {
     console.log(projectId);
     axios
@@ -16,16 +16,20 @@ const postData = (projectId, userEmail) => {
       });
   };
 
-    const PostData = (e) => {
+  const PostData = (e) => {
     if (!e || !e.target) {
       console.error("이벤트 또는 대상 요소가 정의되지 않았습니다.");
       return;
     }
+    const filteredPreData = preData.filter(
+      (item) => item.propId === e.target.attrs.id
+    );
+
     const postData = {
       projectId: projectId,
       userEmail: userEmail,
       propId: e.target.attrs.id,
-      preData: {},
+      preData: filteredPreData,
       newData: e.target.attrs,
     };
     axios
