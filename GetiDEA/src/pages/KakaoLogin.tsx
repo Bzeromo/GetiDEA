@@ -11,7 +11,7 @@ const KakaoLogin: React.FC = () => {
   useEffect(() => {
     localStorage.setItem('accessToken',accessToken ?? "" )
     localStorage.setItem('refreshToken',refreshToken ?? "" )
-    if(!!accessToken){
+    if(accessToken){
       navigate("/home");
     }
   

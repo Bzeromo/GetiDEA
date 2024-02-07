@@ -45,6 +45,19 @@ const Recent: React.FC = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [isOpen,dropdownsOpen]); // 종속성 배열에 isOpen 추가
 
+    // useEffect(() => {
+  //   const fetchData = async () => {
+  //     try {
+  //       const response = await axios.get<UserResponse>('http://localhost:8080/user/userid=1');
+  //       setUserName(response.data.userName); // userName 필드만 추출
+  //     } catch (error) {
+  //       console.error('Error fetching data: ', error);
+  //     }
+  //   };
+
+  //   fetchData();
+  // }, []);
+
   return (
     <div className="flex  min-h-screen  flex-col bg-gray-100">
 
@@ -108,7 +121,7 @@ const Recent: React.FC = () => {
                  )}
               </div>
 
-              <img src="/project_image1.png" alt="" className='w-44 h-44 self-center' />
+              <img src="/projectImage1.png" alt="" className='w-44 h-44 self-center' />
               <span className='self-center mt-5 font-Nanum text-xl font-semibold rotate-[-0.03deg]'>프로젝트 1</span>
               <span className='self-center mt-1 font-Nanum text-sm font-regular text-gray invisible group-hover:visible rotate-[-0.03deg]'>2024-01-30 수정</span>
             </div>
@@ -138,7 +151,7 @@ const Recent: React.FC = () => {
                  )}
               </div>
 
-              <img src="/project_image2.png" alt="" className='w-full h-44 self-center group-hover:text-gray' />
+              <img src="/projectImage2.png" alt="" className='w-full h-44 self-center group-hover:text-gray' />
               <span className='self-center mt-5 font-Nanum text-xl font-semibold rotate-[-0.03deg]'>프로젝트 2</span>
               <span className='self-center mt-1 font-Nanum text-sm font-regular text-gray invisible group-hover:visible rotate-[-0.03deg]'>2024-01-29 수정</span>
           </div>
@@ -168,7 +181,7 @@ const Recent: React.FC = () => {
                  )}
             </div>
 
-            <img src="/project_image3.png" alt="" className='w-full h-44 self-center' />
+            <img src="/projectImage3.png" alt="" className='w-full h-44 self-center' />
             <span className='self-center mt-5 font-Nanum text-xl font-semibold rotate-[-0.03deg]'>프로젝트 3</span>
             <span className='self-center mt-1 font-Nanum text-sm font-regular text-gray invisible group-hover:visible rotate-[-0.03deg]'>2024-01-29 수정</span>
           </div>

@@ -1753,9 +1753,11 @@ const ImageComponent = ({ src, x, y, width, height, rotation, scaleX, scaleY }) 
           onClick={handleLayerClick}
         >
           <Layer ref={layerRef}>
+
           {imagesProperties.map((imgInfo) => (
           <ImageComponent key={imgInfo.id} {...imgInfo} />
           ))}
+          
             {drawing && (
               <Line
                 points={currentLine}

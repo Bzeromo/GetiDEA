@@ -11,6 +11,8 @@ const NaverLogin: React.FC = () => {
   useEffect(() => {
     localStorage.setItem('accessToken',accessToken ?? "" )
     localStorage.setItem('refreshToken',refreshToken ?? "" )
+    console.log(localStorage.getItem('accessToken'));
+  
     if(!!accessToken){
       navigate("/home");
     }
@@ -19,7 +21,7 @@ const NaverLogin: React.FC = () => {
 
   useEffect(() => {
     // 목표 URL로 리다이렉션
-    window.location.href='http://localhost:8080/oauth2/authorization/naver?redirect_uri=http://localhost:3004&mode=login';
+    window.location.href='http://192.168.31.172:8080/oauth2/authorization/naver?redirect_uri=http://localhost:3004&mode=login';
   }, []);
 
   return null; // 리다이렉션 중에는 아무것도 렌더링하지 않습니다.

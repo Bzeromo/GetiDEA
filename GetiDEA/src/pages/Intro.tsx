@@ -1,7 +1,8 @@
 // App.tsx
 import React from 'react';
-import { useState } from 'react';
+import { useState,useEffect } from 'react';
 import LoginModal from '../components/LoginModal';
+import { useSearchParams ,useNavigate} from 'react-router-dom';
 
 interface CarouselImageProps {
   url: string;
@@ -11,6 +12,7 @@ interface CarouselImageProps {
 }
 
 const Intro: React.FC = () => {
+  
 
     const explanation: CarouselImageProps[] = [
       { url: '/intro1.png', alt: 'Image 1', 
@@ -23,7 +25,7 @@ const Intro: React.FC = () => {
       
       { url: '/intro31.png', alt: 'Image 4', 
       title: '유용한 아이디어\n템플릿 제공', 
-      content: '• 창의력을 자극하는 다양한 아이디어 템플릿들을 제공합니다.\n • 6개의 생각하는 모자, SCAMPER 기법 등을 경험해보세요.' },
+      content: '• 창의력을 자극하는 다양한 아이디어 템플릿들을 제공합니다.\n • 6개의 생각하는 모자, 7 CHECK 기법 등을 경험해보세요.' },
 
       { url: '/intro4.png', alt: 'Image 1', 
         title: '실시간 온라인\n화상 회의 ', 
@@ -75,15 +77,14 @@ const Intro: React.FC = () => {
            
 
             {/* 기능 제목 */}
-            <div style={{ whiteSpace: 'pre-line' }} className='text-7xl rotate-[-0.03deg] text-main mt-24 font-SCoreDream  font-extrabold animate-slide-down duration-300' key={explanation[activeIndex].title}>{explanation[activeIndex].title}</div>
+            <div style={{ whiteSpace: 'pre-line' }} className='text-7xl rotate-[-0.03deg] text-main mt-24  font-black animate-slide-down duration-300' key={explanation[activeIndex].title}>{explanation[activeIndex].title}</div>
 
             {/* 기능 설명 */}
-            <div style={{ whiteSpace: 'pre-line' }} className='text-lg rotate-[-0.03deg] text-main font-regular mt-16 font-SCoreDream  animate-slide-down duration-300' key={explanation[activeIndex].content}>{explanation[activeIndex].content}</div>
+            <div style={{ whiteSpace: 'pre-line' }} className='text-lg rotate-[-0.03deg] text-main font-regular mt-16 font-Nanum  animate-slide-down duration-300' key={explanation[activeIndex].content}>{explanation[activeIndex].content}</div>
             
 
              {/* 시작하기 */}
             <div className='absolute w-36 h-12 top-[550px] cursor-pointer rotate-[-0.03deg] bg-main rounded-lg justify-center flex items-center font-SCoreDream font-medium text-xl text-white' onClick={openModal}>시작하기</div>
-
 
             </div>
 

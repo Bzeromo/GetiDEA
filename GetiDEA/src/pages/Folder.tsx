@@ -1,17 +1,38 @@
 // App.tsx
 import React from 'react';
 import { useState ,useEffect, useRef,ChangeEvent, KeyboardEvent} from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation  } from 'react-router-dom';
 import Topbar from '../components/TopBar';
-
+import axios from 'axios';
+import FolderNameChange from '../components/FolderNameChange';
+import Swal from 'sweetalert2';
 const Folder: React.FC = () => {
-
+    
     const [isSelected, setIsSelected] = useState<boolean[]>( Array(4).fill(false));
     const [isOpen, setIsOpen] = useState(false);
     const [dropdownsOpen, setDropdownsOpen] = useState<boolean[]>(new Array(5).fill(false));
-    const [isEditing, setIsEditing] = useState<boolean>(false);
-    const [text, setText] = useState<string>('선보고 후조치');
+    const [name, setName] = useState<string|null>('');
+    const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
+    const openModal = () => setIsModalOpen(true);
+    const closeModal = () => setIsModalOpen(false);
+
+    const location = useLocation();
+
+    useEffect(()=>{
+      const queryParams = new URLSearchParams(location.search);
+      setName(queryParams.get('name')); 
+    })
+    
+    const showAlert = async() => {
+      await Swal.fire({
+           text: '폴더가 삭제되었습니다.',
+         icon: 'success',
+         confirmButtonText: '확인'
+       });
+     };
+
+    
 
     // 북마크 관련 함수
     const select = (idx: number): void => {
@@ -44,57 +65,59 @@ const Folder: React.FC = () => {
       return () => document.removeEventListener('mousedown', handleClickOutside);
     }, [isOpen,dropdownsOpen]); // 종속성 배열에 isOpen 추가
     
+  //   useEffect(() => {
+  //     const fetchData = async () => {
+  //     try {
+  //       const response = await axios.get<UserResponse>(`http://192.168.31.172:8080/api/user/search?userEmail=${localStorage.getItem('userEmail')}`);
+  //       setUserName(response.data[0].userName);
+  //       setUserEmail(response.data[0].userEmail); // userEmail 필드만 추출
+  //       setprofileImage(response.data[0].profileImage); // userEmail 필드만 추출
+  //     } catch (error) {
+  //         console.error('Error fetching data: ', error);
+  //     }
+  //     };
+  //     fetchData();
+  // }, []);
+
     const inputRef = useRef<HTMLInputElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
 
-    const handleEdit = () => {
-      setIsEditing(true);
-    };
-  
-     const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    //폴더 삭제 함수
+    const deleteFolder =async() => {
 
-        const inputText = e.target.value;
-        const length = Array.from(inputText).length;
+      try {
+        const response = await axios.delete(`http://192.168.31.172:8080/api/folder/remove?userEmail=jungyoanwoo@naver.com&folderName=${name}`);
 
-         if (length <= 10) {
-          setText(inputText);
-        } 
-
-    };
-  
-    const handleKeyPress = (e: KeyboardEvent<HTMLInputElement>) => {
-      if (e.key === 'Enter') {
-        setIsEditing(false);
-      }
-    };
-
-      useEffect(() => {
-        if (isEditing) {
-          window.addEventListener('mousedown', handleClickOutside);
-        } else {
-          window.removeEventListener('mousedown', handleClickOutside);
+        showAlert();
+        } catch (error) {
+            console.error('업로드 실패:', error);
+            alert('폴더 생성 실패.');
         }
-    
-        return () => {
-          window.removeEventListener('mousedown', handleClickOutside);
-        };
-      }, [isEditing]);
+    };
+
+     
+
+        // useEffect(() => {
+  //   const fetchData = async () => {
+  //     try {
+  //       const response = await axios.get<UserResponse>('http://localhost:8080/user/userid=1');
+  //       setUserName(response.data.userName); // userName 필드만 추출
+  //     } catch (error) {
+  //       console.error('Error fetching data: ', error);
+  //     }
+  //   };
+
+  //   fetchData();
+  // }, []);
 
   return (
     <div className="flex  min-h-screen  flex-col bg-gray-100">
-
       <Topbar/>
       <div className="flex  relative  ml-28">
 
         {/* 검색바 */}
         <div className="flex relative">
-          <input
-            className="rotate-[-0.03deg] font-NanumGothic appearance-none border-[1px] pl-12  border-line_gray hover:border-light_gray transition-colors rounded-3xl w-full  py-3 px-4 text-black leading-tight focus:outline-none focus:ring-purple-600 focus:border-main focus:shadow-outline"
-            id="username"
-            type="text"
-            placeholder="검색"
-            
-          />
+          <button onClick={deleteFolder}>삭제</button>
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 absolute left-4 top-3 text-gray">
             <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
           </svg>
@@ -105,23 +128,8 @@ const Folder: React.FC = () => {
 
         <div ref={containerRef} className='flex flex-row mt-10 ml-28 font-Nanum rotate-[-0.03deg] font-semibold text-xl'>
             {/* 폴더 이름 */}
-            {isEditing ? (
-                <input 
-                spellCheck={false}
-                ref={inputRef}
-                type="text" 
-                value={text} 
-                onChange={handleChange} 
-                onKeyPress={handleKeyPress}
-                autoFocus
-                />
-            ) : (
-                <span onClick={handleEdit}>{text}</span>
-            )}
-            {/* 수정 버튼 */}
-            <svg xmlns="http://www.w3.org/2000/svg" onClick={handleEdit} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 ml-2 mt-[5px] cursor-pointer">
-            <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
-            </svg>
+          {name}
+           
 
         </div>
 
@@ -164,7 +172,7 @@ const Folder: React.FC = () => {
                  )}
               </div>
 
-              <img src="/project_image1.png" alt="" className='w-44 h-44 self-center' />
+              <img src="/projectImage1.png" alt="" className='w-44 h-44 self-center' />
               <span className='self-center mt-5 font-Nanum text-xl font-semibold rotate-[-0.03deg]'>프로젝트 1</span>
               <span className='self-center mt-1 font-Nanum text-sm font-regular text-gray invisible group-hover:visible rotate-[-0.03deg]'>2024-01-30 수정</span>
             </div>
@@ -195,7 +203,7 @@ const Folder: React.FC = () => {
                  )}
               </div>
 
-              <img src="/project_image2.png" alt="" className='w-full h-44 self-center group-hover:text-gray' />
+              <img src="/projectImage2.png" alt="" className='w-full h-44 self-center group-hover:text-gray' />
               <span className='self-center mt-5 font-Nanum text-xl font-semibold rotate-[-0.03deg]'>프로젝트 2</span>
               <span className='self-center mt-1 font-Nanum text-sm font-regular text-gray invisible group-hover:visible rotate-[-0.03deg]'>2024-01-29 수정</span>
           </div>
