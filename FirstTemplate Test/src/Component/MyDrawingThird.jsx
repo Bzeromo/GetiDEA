@@ -931,8 +931,28 @@ const MyDrawing = () => {
 
 
   // 템플릿3 이미지 생성 코드
-  const templateImage3 = [
-    {
+  // const templateImage3 = [
+  //   {
+  //     "id": "template3",
+  //     "src": "/img/template3_check7/template3.png",
+  //     "x": 31,  // x좌표
+  //     "y": 10,  // y좌표
+  //     "ty": "img",
+  //     "type": "Image",
+  //     "width": 200,
+  //     "height": 96,
+  //     "draggable": false,
+  //     "rotation": 0,
+  //     "scaleX": 5.86,
+  //     "scaleY": 5.86,
+  //   }
+  // ]
+
+  
+  useEffect(() => {
+    const templateId = 3
+
+    const templateImage3 = {
       "id": "template3",
       "src": "/img/template3_check7/template3.png",
       "x": 31,  // x좌표
@@ -946,28 +966,25 @@ const MyDrawing = () => {
       "scaleX": 5.86,
       "scaleY": 5.86,
     }
-  ]
 
-  const templateId = 3
 
-  // useEffect(() => {
-  //   if (templateId == 1) {
+    if (templateId == 1) {
     
-  //   } else if (templateId == 2) {
+    } else if (templateId == 2) {
 
-  //   } else if (templateId == 3) {
-  //     // setImages([templateImage3])
-  //   } else {
+    } else if (templateId == 3) {
+      setImages([templateImage3])
+    } else {
 
-  //   }
+    }
     
-  // }, [])
+  }, [])
 
   // useEffect(() =>{
   // }, [images])
 
 
-  const ImageComponent = ({ src, x, y, width, height, rotation, scaleX, scaleY }) => {
+  const ImageComponent = ({ src, x, y, width, height, draggable,rotation, scaleX, scaleY }) => {
     const [image] = useImage(src);
 
     return (
@@ -1372,10 +1389,13 @@ const MyDrawing = () => {
 
 
           {/* 템플릿3 적용 */}
+          {/* 
           {templateId === 3 && templateImage3.map((imgInfo) => (
           <ImageComponent key={imgInfo.id} {...imgInfo} />
           ))}
+           */}
 
+          
 
 
 

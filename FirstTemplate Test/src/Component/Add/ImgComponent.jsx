@@ -45,10 +45,10 @@ const ImgComponent = ({
       }
        
       // 템플릿 이미지 크기 조절 관련 코드 (삭제)
-      // if (id == "template2" || id == "template3") {
-      //   newWidth = maxWidth * 5.85;
-      //   newHeight = newWidth / aspectRatio;
-      // }
+      if (id == "template2" || id == "template3") {
+        newWidth = maxWidth * 5.85;
+        newHeight = newWidth / aspectRatio;
+      }
         
       setSize({ width: newWidth, height: newHeight });
     }
