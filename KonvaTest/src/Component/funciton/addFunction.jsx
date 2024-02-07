@@ -127,6 +127,7 @@ const addFunction = (
   const addArrowLine = (type) => {
     const newLine = {
       id: `${type}${lines.length + 1}`,
+      ty: "Arrow",
       type: "Arrow",
       points: [linePosition.startX, linePosition.startY, linePosition.endX, linePosition.endY],
       pointerLength: 20,
@@ -165,7 +166,7 @@ const addFunction = (
       src,
       x: 50,
       y: 50,
-      ty: "image",
+      ty: "Image",
       type: "Image",
     };
     setImages([...images, newImage]);

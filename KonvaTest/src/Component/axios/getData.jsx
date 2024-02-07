@@ -35,9 +35,9 @@ const getData = (projectId, setTexts, setShapes, setLines, setImages) => {
                   `RegularPolygon item with defaults: `,
                   JSON.stringify(item)
                 );
-                // setShapes((prevShapes) =>
-                //   updateArray(prevShapes, item, key)
-                // );
+                setShapes((prevShapes) =>
+                  updateArray(prevShapes, item, key)
+                );
                 break;
               case "Line":
                 console.log(`Line item: `, JSON.stringify(item, key));

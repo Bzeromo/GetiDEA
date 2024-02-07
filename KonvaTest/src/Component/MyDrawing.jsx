@@ -106,7 +106,7 @@ const MyDrawing = () => {
     useState(false);
   const [imgMenuToggle, setImgMenuToggle] = useState(false);
 
-  const projectId = 3;
+  const projectId = 1;
   const userEmail = "wnsrb933@naver.com";
 
   useEffect(() => {
@@ -135,13 +135,7 @@ const MyDrawing = () => {
   );
 
   const {
-    PostRect,
-    PostCircle,
-    PostTriangle,
-    PostText,
-    PostLine,
-    PostDot,
-    PostArrow,
+    PostData,
     PostSave,
   } = postData(projectId, userEmail);
 
@@ -549,7 +543,7 @@ const MyDrawing = () => {
     // }
   };
 
-  const handleMouseUp = (shapes) => {
+  const handleMouseUp = () => {
     // if (!startWrite) return; // startWrite가 false이면 기능 비활성화
     if (!startWrite) {
       setSelectionRect({});
@@ -581,9 +575,8 @@ const MyDrawing = () => {
     const id = e.target.attrs.id;
     const ty = e.target.attrs.ty;
 
-    console.log(id + "id를 확ㅇ닣래보자");
-    console.log(ty + " tetstsetawetfdgdfffsdfsdfsdfsdds");
     const type = e.target.attrs.type;
+    console.log(type)
 
     // 새로운 위치 정보를 가져옵니다.
     const newPos = { x: e.target.x(), y: e.target.y() };
@@ -597,78 +590,25 @@ const MyDrawing = () => {
     } else {
       console.log("오예 성공! " + id);
     }
-    // console.log(id + "  id");
-    // console.log(id2 + "  id2");
-    // console.log(JSON.stringify(newData));
-    // console.log(ty + "  ty확인용");
-    // console.log(id2 + "체크해보자");
-    // console.log(newRotate);
-    // console.log("newpos 확인 용" + newPos.x + "  " + newPos.y);
 
-    if (type === "Dot") {
+    if (type === "Dot" || type === "Arrow" || type === "Line") {
       setLines((prevLines) =>
         prevLines.map((lines) => {
           if (lines.id === id) {
             const updatedLine = { ...lines, ...newData };
-            PostDot({ target: { attrs: updatedLine } }); // 필요한 데이터만 전송
+            PostData({ target: { attrs: updatedLine } }); // 필요한 데이터만 전송
             return updatedLine;
           }
           return lines;
         })
       );
-    } else if (type === "Arrow") {
-      setLines((prevLines) =>
-        prevLines.map((lines) => {
-          if (lines.id === id) {
-            const updatedLine = { ...lines, ...newData };
-            PostArrow({ target: { attrs: updatedLine } }); // 필요한 데이터만 전송
-            return updatedLine;
-          }
-          return lines;
-        })
-      );
-    } else if (type === "Line") {
-      setLines((prevLines) =>
-        prevLines.map((lines) => {
-          if (lines.id === id) {
-            const updatedLine = { ...lines, ...newData };
-            PostLine({ target: { attrs: updatedLine } }); // 필요한 데이터만 전송
-            return updatedLine;
-          }
-          return lines;
-        })
-      );
-    } else if (type === "Rect") {
+    } else if (type === "Rect" || type === "RegularPolygon" || type === "Circle" ) {
       setShapes((prevShapes) =>
         prevShapes.map((shapes) => {
           if (shapes.id === id) {
             // 드래그된 도형의 위치를 업데이트합니다.
             const updatedShape = { ...shapes, ...newData };
-            PostRect({ target: { attrs: updatedShape } }); // 필요한 데이터만 전송
-            return updatedShape;
-          }
-          return shapes;
-        })
-      );
-    } else if (type === "RegularPolygon") {
-      setShapes((prevShapes) =>
-        prevShapes.map((shapes) => {
-          if (shapes.id === id) {
-            // 드래그된 도형의 위치를 업데이트합니다.
-            const updatedShape = { ...shapes, ...newData };
-            PostTriangle({ target: { attrs: updatedShape } }); // 필요한 데이터만 전송
-            return updatedShape;
-          }
-          return shapes;
-        })
-      );
-    } else if (type === "Circle") {
-      setShapes((prevShapes) =>
-        prevShapes.map((shapes) => {
-          if (shapes.id === id) {
-            // 드래그된 도형의 위치를 업데이트합니다.
-            const updatedShape = { ...shapes, ...newData };
-            PostCircle({ target: { attrs: updatedShape } }); // 필요한 데이터만 전송
+            PostData({ target: { attrs: updatedShape } }); // 필요한 데이터만 전송
             return updatedShape;
           }
           return shapes;
@@ -679,24 +619,24 @@ const MyDrawing = () => {
         prevTexts.map((texts) => {
           if (texts.id === id) {
             const updatedText = { ...texts, ...newData };
-            PostText({ target: { attrs: updatedText } }); // 필요한 데이터만 전송
+            PostData({ target: { attrs: updatedText } }); // 필요한 데이터만 전송
             return updatedText;
           }
           return texts;
         })
       );
-    } else if (ty === "img") {
+    } else if (ty === "Image") {
       setImages((prevImage) =>
         prevImage.map((images) => {
           if (images.id === id) {
             const updatedImage = { ...images, ...newData };
+            PostData({ target: { attrs: updatedImage } }); // 필요한 데이터만 전송
             return updatedImage;
           }
           return images;
         })
       );
     }
-
     setDragEnded(true);
   };
 
