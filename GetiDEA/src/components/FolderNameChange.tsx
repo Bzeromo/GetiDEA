@@ -3,27 +3,26 @@ import { useState,useEffect,useRef,ChangeEvent, } from 'react';
 import axios from 'axios';
 import Swal from 'sweetalert2';
 
-interface Folder {
-  folderId: number;
-  userEmail: string;
-  folderName: string;
-}
-
 interface ProfileModalProps {
   isOpen: boolean;
   closeModal: () => void;
+  index : number,
   folders: string[];
   setFolders : React.Dispatch<React.SetStateAction<string[]>>;
 }
 
 
-const FolderModal: React.FC<ProfileModalProps> = ({ isOpen, closeModal ,folders ,setFolders}) => {
+const FolderNameChange: React.FC<ProfileModalProps> = ({ isOpen, closeModal ,index,folders,setFolders }) => {
 
     const [folderName, setFolderName] = useState<string>('');
     
+    useEffect(() => {
+       setFolderName(folders[index]);
+      },[index]); 
+
     const showAlert = async() => {
       await Swal.fire({
-           text: '폴더가 생성되었습니다.',
+           text: '폴더 이름이 수정되었습니다.',
          icon: 'success',
          confirmButtonText: '확인'
        });
@@ -38,26 +37,27 @@ const FolderModal: React.FC<ProfileModalProps> = ({ isOpen, closeModal ,folders 
         if (length <= 8) {
             setFolderName(inputText);
         } 
+
     };
 
     const folderCreate = async() => {
       
       try {
-        const response = await axios.post('http://192.168.31.172:8080/api/folder/create', 
-        {
-          "userEmail" : localStorage.getItem('userEmail'),
-          "folderName" : folderName
-        }
-        );
+        const response = await axios.patch(`http://192.168.31.172:8080/api/folder/rename?userEmail=jungyoanwoo@naver.com&oldFolderName=${folders[index]}&newFolderName=${folderName}`);
         
-        setFolders([...folders,folderName]);
         console.log('서버 응답:', response.data);
            showAlert();
         } catch (error) {
             console.error('업로드 실패:', error);
             alert('폴더 생성 실패.');
         }
-        setFolderName('');
+        const updatedFolders = [
+            ...folders.slice(0, index), // 첫 번째 부분
+            folderName,                 // 삽입할 요소
+            ...folders.slice(index+1)     // 두 번째 부분
+          ];
+        
+        setFolders(updatedFolders);
         closeModal();
   };
     const close =()=> {
@@ -93,8 +93,8 @@ const FolderModal: React.FC<ProfileModalProps> = ({ isOpen, closeModal ,folders 
                         <div className="px-8 py-4">
                             
 
-                            <div className=" mt-3 flex flex-row gap-72 items-center justify-center ">
-                                <h2 className="text-2xl mt-2 text-center font-Nanum  dark:text-white font-bold rotate-[-0.03deg]">폴더 생성
+                            <div className=" mt-3 flex flex-row gap-56 items-center justify-center ">
+                                <h2 className="text-2xl mt-2 text-center font-Nanum  dark:text-white font-bold rotate-[-0.03deg]">폴더 이름 수정
                                 </h2>
                                 <svg  onClick={close} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-7 h-7 ml-6  text-light_gray cursor-pointer">
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
@@ -102,13 +102,13 @@ const FolderModal: React.FC<ProfileModalProps> = ({ isOpen, closeModal ,folders 
                             </div>
                             <div className="flex flex-row mt-5 h-32">
                               
-                                <div className='flex flex-col text-base font-Inter ml-10 py-5 h-full w-[70%] rotate-[-0.03deg]'>
-                                    <input className={`w-full h-12 rounded-md border-2 px-3 bg-white border-line_gray`} type="text" placeholder='폴더 명을 입력해주세요(최대 10자)' value={folderName} onChange={nameChange} spellCheck={false}/>
+                                <div className='flex flex-col text-base font-Inter ml-10 py-8 h-full w-[70%] rotate-[-0.03deg]'>
+                                    <input className={`w-full h-12 rounded-md border-2 px-3 bg-white border-line_gray`} type="text" value={folderName} onChange={nameChange} spellCheck={false}/>
                                 </div>
                             </div>
                             <div className='flex flex-row justify-end gap-2 h-10 font-Nanum'>
                                 <button className='bg-white rounded-md border-[1.5px] text-opacity-80 text-black text-sm font-regular border-line_gray w-16 h-8' onClick={close}>취소</button>       
-                                <button className='bg-blue bg-opacity-80 rounded-md  text-opacity-80 text-white text-sm w-16 h-8' onClick={folderCreate} >생성</button>
+                                <button className='bg-blue bg-opacity-80 rounded-md  text-opacity-80 text-white text-sm w-16 h-8' onClick={folderCreate} >수정</button>
                             </div>
                       
                     </div>
@@ -121,4 +121,4 @@ const FolderModal: React.FC<ProfileModalProps> = ({ isOpen, closeModal ,folders 
   );
 };
 
-export default FolderModal;
+export default FolderNameChange;

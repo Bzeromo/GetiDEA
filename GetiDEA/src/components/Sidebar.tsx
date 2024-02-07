@@ -1,19 +1,28 @@
 import React from 'react';
-import { useState } from 'react';
+import { useState,useEffect } from 'react';
+import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import FolderModal from './FolderModal';
+import FolderNameChange from './FolderNameChange';
+
+interface Folder {
+  folderId: number;
+  userEmail: string;
+  folderName: string;
+}
 
 const Sidebar = () => {
 
   const navigate = useNavigate();
-
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [isNameChangeModalOpen, setIsNameChangeModalOpen] = useState<boolean>(false);
   // 폴더 늘어나면 수정해야되는 부분
-  const [isSelected, setIsSelected] = useState<boolean[]>( [true,false,false,false,false]);
-  //폴더 생성 10자 제한 초과 여부
-  const [isExceeded, setIsExceeded] = useState(false);
-  
+  const [isSelected, setIsSelected] = useState<boolean[]>([]);
+
+  //폴더 배열 || 배열 추가 x 배열 새로 넣기 
+  const [folders, setFolders] = useState<string[]>([]);
+  const [index, setIndex] = useState<number>();
   const select = (idx: number): void => {
       const arr: boolean[] = Array(5).fill(false);
       arr[idx] = true;
@@ -26,14 +35,43 @@ const Sidebar = () => {
     select(3);
   }
 
+  const folderSetting = (event: React.MouseEvent<SVGElement>) => {
+    event.preventDefault(); // 기본 동작 취소
+    alert("dfdf");
+  };
+
+
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
+  const closeNameChangeModal = () => setIsNameChangeModalOpen(false);
 
+  useEffect(() => {
+    const fetchDFolders = async () => {
+      try {
+        const response = await axios.get<Folder[]>(`http://192.168.31.172:8080/api/folder/search?userEmail=jungyoanwoo@naver.com`);
+       
+        setFolders(response.data.map((folder: Folder) => folder.folderName));
+       
+        const dataLength = response.data.length;
+        const initialSelectedState = Array(dataLength).fill(false).map((_, index) => index === 0);
+        setIsSelected(initialSelectedState);
+      } catch (error) {
+        console.error('Error fetching data: ', error);
+      }
+    };
+
+    fetchDFolders();
+  }, []);
+
+  const nameChange = (index:number) =>{
+    setIndex(index); // 선택된 폴더 이름을 상태에 저장
+    setIsNameChangeModalOpen(true);
+  }
   return (
     <div className="flex-shrink-0 min-h-svh w-80 bg-side scrollbar  scrollbar-thumb-red ">
 
-      <FolderModal isOpen={isModalOpen} closeModal={closeModal}></FolderModal>
-
+      <FolderModal isOpen={isModalOpen} closeModal={closeModal} folders={folders} setFolders={setFolders}></FolderModal>
+      <FolderNameChange isOpen={isNameChangeModalOpen} closeModal={closeNameChangeModal} index={index??0} folders={folders} setFolders={setFolders}></FolderNameChange>
       <Link to="/home"  className='flex flex-row mt-16 mb-10 p-4 justify-center items-center' onClick={()=>{select(0)}}>
          {/* 로고 이미지*/}
         <div className=" flex justify-center items-center">
@@ -75,7 +113,7 @@ const Sidebar = () => {
 
         {/* 북마크 버튼 */}
         <li className="flex justify-center mb-3">
-          <Link to="/bookmark" className={!isSelected[2]? "flex flex-row text-center    rounded py-4 px-4 bg-blue-500  hover:text-blue hover:opacity-80 text-black": 
+          <Link to="/bookmark" state={{ folders: folders }} className={!isSelected[2]? "flex flex-row text-center    rounded py-4 px-4 bg-blue-500  hover:text-blue hover:opacity-80 text-black": 
             "flex flex-row text-center    rounded py-4 px-4 bg-blue-500  text-blue"}  onClick={() => select(2)}>
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 mr-5">
               <path strokeLinecap="round" strokeLinejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z" />
@@ -104,27 +142,25 @@ const Sidebar = () => {
 				  </summary>
 
 				  <ul className='p-4'>
-              
-              <li className="flex justify-center mb-3  ">
-                <Link to="folder" onClick={()=>{select(4)}} className={!isSelected[4]?"w-56 flex flex-row text-center    rounded py-4 px-4 text-black hover:text-blue hover:opacity-80 " 
+            <>{
+               folders.map((folder,index)=>(
+                <li key={index} className="flex justify-center mb-3  ">
+                <Link to={`folder/${folders[index]}?name=${folders[index]}`} onClick={()=>{select(4+index)}} className={!isSelected[4+index]?"w-56 flex flex-row text-center   rounded py-4 px-4 text-black hover:text-blue hover:opacity-80 " 
                 :"w-56 flex flex-row text-center    rounded py-4 px-4 text-blue  " } >
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 mr-5">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12.75V12A2.25 2.25 0 0 1 4.5 9.75h15A2.25 2.25 0 0 1 21.75 12v.75m-8.69-6.44-2.12-2.12a1.5 1.5 0 0 0-1.061-.44H4.5A2.25 2.25 0 0 0 2.25 6v12a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9a2.25 2.25 0 0 0-2.25-2.25h-5.379a1.5 1.5 0 0 1-1.06-.44Z" />
+                
                 </svg>
+                  <span className='inline-block font-Nanum font-medium text-base rotate-[-0.03deg]'>{folders[index]}</span>
+                  <svg onClick={()=>nameChange(index)} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={!isSelected[4+index]?"w-5 h-5 absolute left-[240px] invisible":"w-5 h-5 absolute left-[240px] text-light_gray hover:text-blue"}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
+                  </svg>
 
-                  <span className='inline-block font-Nanum font-medium text-base rotate-[-0.03deg]'>선보고 후조치</span>
                 </Link>
               </li>
-
-                
-                <li className="flex justify-center mb-3 ">
-                  <Link to="folder" className="w-56 flex flex-row text-center    rounded py-4 px-4 bg-blue-500  hover:text-blue hover:opacity-80 text-black" >
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 mr-5">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12.75V12A2.25 2.25 0 0 1 4.5 9.75h15A2.25 2.25 0 0 1 21.75 12v.75m-8.69-6.44-2.12-2.12a1.5 1.5 0 0 0-1.061-.44H4.5A2.25 2.25 0 0 0 2.25 6v12a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9a2.25 2.25 0 0 0-2.25-2.25h-5.379a1.5 1.5 0 0 1-1.06-.44Z" />
-                  </svg>
-                    <span className='inline-block font-Nanum font-medium text-base rotate-[-0.03deg]'>B104</span>
-                  </Link>
-                </li>
+               ))
+            }
+            </>
 
                 {/* 새로운 폴더 만들기 */}
                 <li className="flex justify-center mb-3 ">

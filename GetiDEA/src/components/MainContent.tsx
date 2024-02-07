@@ -2,14 +2,13 @@ import React from 'react';
 import axios from 'axios';
 import { useState,useEffect } from 'react';
 
-interface UserResponse {
-  userId: number;
+interface User {
   userName: string;
-  userEmail: string;
+  userEmail: string; // API 응답의 오타가 의도된 것이라면 여기도 같게 유지
   profileImage: string;
-  provider: string;
-  accessToken: string | null;
 }
+
+type UserResponse = User[];
 
 const MainContent: React.FC = () => {
 
@@ -20,16 +19,13 @@ const MainContent: React.FC = () => {
 
   
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axios.get<UserResponse>('http://localhost:8080/user/userid=1');
-        setUserName(response.data.userName); // userName 필드만 추출
-      } catch (error) {
-        console.error('Error fetching data: ', error);
-      }
-    };
 
-    fetchData();
+    const storedUserName = localStorage.getItem('userName');
+    if (storedUserName) {
+      setUserName(storedUserName);
+    }
+    
+
   }, []);
 
 

@@ -1,45 +1,53 @@
 import React from 'react';
 import { useState,useEffect,useRef,ChangeEvent, } from 'react';
 import axios from 'axios';
+import Swal from 'sweetalert2';
+
 
 interface ProfileModalProps {
   isOpen: boolean;
   closeModal: () => void;
+  profileImage : string;
+  setProfileImage : React.Dispatch<React.SetStateAction<string>>;
 }
 
-interface UserProfile {
-    userName: string;
-    userEmail: string;
-    profileImage: string;
-  }
+interface User {
+  userName: string;
+  userEmail: string; // API 응답의 오타가 의도된 것이라면 여기도 같게 유지
+  profileImage: string;
+}
 
-interface UserResponse {
-    userId: number;
-    userName: string;
-    userEmail: string;
-    profileImage: string;
-    provider: string;
-    accessToken: string | null;
-  }
+interface ProfileJson {
+  profileImage: string;
+}
 
-const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, closeModal }) => {
+interface userNameJson {
+  userName: string;
+}
+
+
+type UserResponse = User[];
+
+const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, closeModal, profileImage, setProfileImage }) => {
+
     const [userName, setUserName] = useState<string>('');
-    const [userEmail, setuserEmail] = useState<string>('');
-    const [profileImage, setprofileImage] = useState("")
-
-    const userProfileData: UserProfile = {
-        userName, // 변수 이름만 사용
-        userEmail,
-        profileImage
-      };
-
+    const [userEmail, setUserEmail] = useState<string>('');
+    const [profile, setProfile] = useState<string>('');
+    const showAlert = async() => {
+     await Swal.fire({
+          text: '프로필이 수정되었습니다.',
+        icon: 'success',
+        confirmButtonText: '확인'
+      });
+    };
+  
     useEffect(() => {
         const fetchData = async () => {
         try {
-            const response = await axios.get<UserResponse>('http://localhost:8080/user/userid=1');
-            setUserName(response.data.userName); // userName 필드만 추출
-            setuserEmail(response.data.userEmail); // userEmail 필드만 추출
-            setprofileImage(response.data.profileImage); // userEmail 필드만 추출
+          const response = await axios.get<UserResponse>(`http://192.168.31.172:8080/api/user/search?userEmail=jungyoanwoo@naver.com`);
+          setUserName(response.data[0].userName);
+          setUserEmail(response.data[0].userEmail); // userEmail 필드만 추출
+          setProfile(response.data[0].profileImage); // userEmail 필드만 추출
         } catch (error) {
             console.error('Error fetching data: ', error);
         }
@@ -47,46 +55,72 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, closeModal }) => {
         fetchData();
     }, []);
 
-    // 프로필 수정 PATCH 요청
-    const updateUserProfile = async (userInfo: UserProfile) => {
+    // 프로필 수정 POST 요청
+    const updateUserProfile = async (userInfo: ProfileJson) => {
         try {
             console.log(userInfo);
-            const response = await axios.patch('http://localhost:8080/user/update/userinfo', userInfo);
+            const response = await axios.post('http://192.168.31.172:8080/api/image/userEmail/profileImage?userEmail=yoanwoo%40naver.com', userInfo);
             console.log('Update success:', response.data);
         } catch (error) {
             console.error('Update failed:', error);
         }
     };
 
-    const nameChange = (e: ChangeEvent<HTMLInputElement>) => {
-
+    //유저 이름 변경 관련
+    const nameChange = async (e: ChangeEvent<HTMLInputElement>) => {
         setUserName(e.target.value);
-
     };
 
-    const changeUserProfile =()=> {
-        closeModal();
-        updateUserProfile(userProfileData);
+    const nameChangeSave = async () =>{ 
+      try {
+        const response = await axios.patch(`http://192.168.31.172:8080/api/user/rename?userEmail=${userEmail}&newName=${userName}`, {
+         
+            });
+            console.log('서버 응답:', response.data);
+            showAlert();  
+            localStorage.setItem('userName',userName);
+            closeModal();
+         
+        } catch (error) {
+            console.error('업로드 실패:', error);
+            alert('파일 업로드 실패.');
+        }
         
     }
 
     // 프로필 이미지 변경 관련
     const selectFile = useRef<HTMLInputElement>(null);
     
-    const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const handleImageChange = async (e: ChangeEvent<HTMLInputElement>) => {
         
         if (e.target.files && e.target.files[0]) {
           const file = e.target.files[0];
-    
           const reader = new FileReader();
-          reader.onloadend = () => {
-            setprofileImage(reader.result as string);
-            console.log(reader.result as string);
+          
+          reader.onloadend = async () => {
+            setProfile(reader.result as string);
+            setProfileImage(reader.result as string);
           };
           reader.readAsDataURL(file);
-         
-        }
+
+          const formData = new FormData();
+          console.log(file)
+          formData.append('Image', file); // 프로필 이미지 파일
+          formData.append('userEmail', "jungyoanwoo@naver.com");
+          try {
+            await axios.post('http://192.168.31.172:8080/api/image/profile',formData);
+            
+            } catch (error) {
+                alert('파일 업로드 실패.');
+            }
+          }
       };
+
+      // 저장 버튼 클릭 시 유저 정보 변경
+      const changeUserProfile =()=> {
+        closeModal();
+        
+    }
 
   if (!isOpen) return null;
 
@@ -124,8 +158,8 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, closeModal }) => {
                             </div>
                             <div className="flex flex-row mt-5 h-60">
                                 <div className='flex flex-col items-center  h-full w-[30%]'>
-                                    <div className='rounded-full w-32 h-32 mt-3'>
-                                        <img src={profileImage} alt="" className='rounded-full w-32 h-32 object-cover' />
+                                    <div className={profile?`rounded-full w-32 h-32 mt-3 ` :`rounded-full w-32 h-32 mt-3 bg-main`}>
+                                        <img src={profile} alt="" className='rounded-full w-32 h-32 object-cover' />
                                     </div>
                                     <div className='mt-3 cursor-pointer text-sm font-Nanum font-regular text-opacity-80 text-black bg-white drop-shadow-md rounded-lg p-2 rotate-[-0.03deg]' onClick={() => {
                                         if (selectFile.current) {
@@ -153,7 +187,7 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, closeModal }) => {
                             </div>
                             <div className='flex flex-row justify-end gap-2 h-10 font-Nanum'>
                                 <button className='bg-white rounded-md border-[1.5px] text-opacity-80 text-black text-sm font-regular border-line_gray w-16 h-8' onClick={closeModal}>취소</button>       
-                                <button className='bg-blue bg-opacity-80 rounded-md  text-opacity-80 text-white text-sm w-16 h-8' onClick={changeUserProfile}>저장</button>
+                                <button className='bg-blue bg-opacity-80 rounded-md  text-opacity-80 text-white text-sm w-16 h-8' onClick={nameChangeSave}>저장</button>
                             </div>
                       
                     </div>

@@ -1,4 +1,8 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useSearchParams } from "react-router-dom";
+import { useAuth } from '../AuthContext';
+import { useNavigate,Link } from 'react-router-dom';
+import GoogleLogin from '../pages/GoogleLogin';
 
 interface LoginModalProps {
   isOpen: boolean;
@@ -6,6 +10,42 @@ interface LoginModalProps {
 }
 
 const LoginModal: React.FC<LoginModalProps> = ({ isOpen, closeModal }) => {
+
+  const navigate = useNavigate();
+  const auth = useAuth();
+  const redirectUri = encodeURIComponent("http://localhost:3004&mode=login");
+  const authLink = `http://localhost:8080/oauth2/authorization/google?redirect_uri=${redirectUri}`;
+  
+
+  const [searchParams] = useSearchParams();
+  const accessToken = searchParams.get("access_token");
+  console.log(`토큰? : ${searchParams.get("access_token")}`)
+  const refreshToken = searchParams.get("refresh_token");
+
+  useEffect(() => {
+    // 페이지 로드 시 토큰 확인 로직
+    console.log(accessToken);
+    localStorage.setItem('accessToken',accessToken ?? "" )
+    localStorage.setItem('refreshToken',refreshToken ?? "" )
+    if(!!accessToken){
+      navigate("/home");
+    }
+    
+  
+  }, []);
+ 
+  
+  const setToken = ()=>{
+    auth?.login("eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJqdW5neW9hbndvb0BuYXZlci5jb20iLCJpYXQiOjE3MDcxMDkxMjEsInVzZXJOYW1lIjoi7KCV7Jew7JqwIiwicHJvdmlkZXIiOiJLQUtBTyIsImV4cCI6MTcwNzExMjcyMX0.6Sbb6dXDnIzENV1AQjoInitBgE6Dbawt-g67OIfWZ3-QMRjeHUqr_37ZlOiOkjqT3uEpEb-jZXgqwzJzsYyVsw",
+    "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJqdW5neW9hbndvb0BuYXZlci5jb20iLCJpYXQiOjE3MDcxMDkxMjEsInByb3ZpZGVyIjoiS0FLQU8iLCJleHAiOjE3MDcxOTU1MjF9.RizvhwfS9rhwfl8sKPIJWkcMOfEbaPZyERhhsAan7S09BkSCerIAu4EI9chkCxYWu-Q5ckP0Ss_8BrwSYgdiRw");
+  }
+  // useEffect(() => {
+  //   // accessToken 또는 refreshToken 값이 있을 때만 로그인 함수 호출
+  //   if (accessToken && refreshToken) {
+  //     auth?.login(accessToken, refreshToken);
+  //   }
+  // }, [accessToken, refreshToken,auth]);
+
   if (!isOpen) return null;
 
   return (
@@ -29,7 +69,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, closeModal }) => {
         <div className="fixed grid place-items-center backdrop-blur-sm top-0 right-0 left-0 z-50 w-full inset-0 h-modal h-full justify-center items-center">
             <div className="relative container m-auto px-6">
                 <div className="w-[400px] ">
-                    <div className="rounded-xl h-80 bg-white dark:bg-gray-800 shadow-xl">
+                    <div className="rounded-xl h-96 bg-white dark:bg-gray-800 shadow-xl">
                         <div className="px-8 py-4">
                             <svg  onClick={closeModal} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-7 h-7 ml-80 text-light_gray cursor-pointer">
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
@@ -42,23 +82,33 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, closeModal }) => {
                             <div className="mt-12 grid space-y-4">
 
                                 {/* 구글 로그인 버튼 */}
-                                <button className="group h-12 px-7  rounded-full transition bg-white border-[1px] border-light_gray">
-                                    <div className="relative flex items-center font-regular font-Nanum tracking-wide rotate-[-0.03deg] text-black text-base ">
+                                <Link to="/googlelogin" className="group h-12 px-7  rounded-full transition bg-white border-[1px] border-light_gray" 
+                                    >
+                                    <div className="relative flex mt-2 items-center font-regular font-Nanum tracking-wide rotate-[-0.03deg] text-black text-base ">
                                     <img src="/google.svg" alt="" className='w-7 h-7'/>
                                         <span className="ml-16">
                                             구글로 시작하기
                                         </span>
                                     </div>
-                                </button>
+                                </Link>
 
                                 {/* 네이버 로그인 버튼 */}
-                                <button
-                                    className="group h-12 px-6 rounded-full bg-[#03c75a]  ">
-                                    <div className="relative items-center flex font-regular font-Nanum tracking-wide rotate-[-0.03deg] text-white text-base ">
+                                <Link to="/naverlogin"
+                                    className="group h-12 px-6 pt-1 rounded-full bg-[#03c75a]  " onClick={setToken}>
+                                    <div className="relative  items-center flex font-regular font-Nanum tracking-wide rotate-[-0.03deg] text-white text-base ">
                                        <img src="/naver.png" alt="" className='w-10 h-10'/>
                                             <span className='ml-12'>네이버로 시작하기</span>
                                     </div>
-                                </button>
+                                </Link>
+
+                                {/* 카카오 로그인 */}
+                                <Link to="/kakaologin"
+                                    className="group h-12 px-6 rounded-full bg-[#FEE500]  " onClick={setToken}>
+                                    <div className="relative items-center flex font-regular font-Nanum tracking-wide rotate-[-0.03deg] text-black text-base ">
+                                       <img src="/kakao.svg" alt="" className='w-7 h-7 mt-2 ml-1'/>
+                                            <span className='ml-14 mt-3'>카카오로 시작하기</span>
+                                    </div>
+                                </Link>
                         </div>
                       
                     </div>
