@@ -18,10 +18,8 @@ import TextComponent from "./Add/TextComponent";
 import useEventHandler from "./funciton/useEventHandler";
 import ImageSelector from "./funciton/ImageSelector";
 import undoData from "./axios/undoData";
-import getData from "./axios/getData";
 
 const MyDrawing = () => {
-
   const [imageIdCounter, setImageIdCounter] = useState(0);
 
   const [rectPosition, setRectPosition] = useState({ x: 50, y: 50 });
@@ -107,9 +105,6 @@ const MyDrawing = () => {
     useState(false);
   const [imgMenuToggle, setImgMenuToggle] = useState(false);
 
-  const projectId = 3;
-  const userEmail = "wnsrb933@naver.com";
-
   const {
     changeSelectedShapeColor,
     changeSelectedStrokeColor,
@@ -140,9 +135,8 @@ const MyDrawing = () => {
     PostDot,
     PostArrow,
     PostSave,
-  } = postData(projectId, userEmail);
+  } = postData(axios);
 
-  const { undoEvent } = undoData(axios, projectId, userEmail);
   const {
     addText,
     addRectangle,
@@ -181,9 +175,9 @@ const MyDrawing = () => {
   const {
     deleteSelectedShape,
     deleteSelectedLine,
+    deleteSelectedDrawing,
     deleteSelectedText,
     deleteSelectedImage,
-    deleteSelectedDrawing,
     deleteSelected,
   } = deleteFunction(
     shapes,
@@ -192,8 +186,8 @@ const MyDrawing = () => {
     setSelectedId,
     lines,
     setLines,
-    drawingList, // 이 위치가 맞아야 합니다.
-    setDrawingList, // 이 위치가 맞아야 합니다.
+    setDrawingList,
+    drawingList,
     texts,
     setTexts,
     images,
@@ -211,78 +205,89 @@ const MyDrawing = () => {
     console.log("업데이트됨" + selectedId);
   }, [selectedId]);
 
-  // function updateArray(array, item, key) {
-  //   const index = array.findIndex((element) => element.id === key);
+  // 템플릿3 이미지 불러오기
+  useEffect(() => {
+    const templateImage = {
+      id: "template3",
+      src: '/img/template3_check7/template3.png',
+      x: 31, // 이미지의 x 좌표
+      y: 10, // 이미지의 y 좌표
 
-  //   if (index >= 0) {
-  //     // 기존 항목 업데이트
-  //     return array.map((element, i) =>
-  //       i === index ? { ...element, ...item } : element
-  //     );
-  //   } else {
-  //     // 새 항목 추가
-  //     return [...array, { id: key, ...item }];
-  //   }
-  // }
+      // draggable: false,
+      scaleX: 5.86,
+      scaleY: 5,
+      height: 96,
+      width: 200,
 
-  const { getProjectData, updateArray } = getData(
-    projectId,
-    setTexts,
-    setShapes,
-    setLines,
-    setImages
-  );
+      type: "Image",
+      ty: "Image", // 이미지 경로
+    }
 
-  // const GetData = () => {
-  //   axios
-  //     .get("http://192.168.31.172:8080/api/project/test1/1")
-  //     .then((response) => {
-  //       if (response.data && response.data.data) {
-  //         const dataItems = response.data.data;
+    setImages([templateImage])
 
-  //         console.log(response);
+  }, [])
 
-  //         Object.keys(dataItems).forEach((key) => {
-  //           const item = dataItems[key];
-  //           const itemWithDefaults = {
-  //             ...item,
-  //             x: item.x ?? 0, // 기본값 0으로 설정
-  //             y: item.y ?? 0, // 기본값 0으로 설정
-  //             // 필요한 다른 속성에 대해서도 기본값을 설정할 수 있습니다.
-  //           };
-  //           switch (item.ty) {
-  //             case "Text":
-  //               setTexts((prevTexts) =>
-  //                 updateArray(prevTexts, itemWithDefaults, key)
-  //               );
-  //               break;
-  //             case "Shape":
-  //               console.log(JSON.stringify(item) + "짜잔?");
-  //               setShapes((prevShapes) =>
-  //                 updateArray(prevShapes, itemWithDefaults, key)
-  //               );
-  //               break;
-  //             case "Line":
-  //               setLines((prevLines) =>
-  //                 updateArray(prevLines, itemWithDefaults, key)
-  //               );
-  //               break;
-  //             case "img":
-  //               setImages((prevImage) =>
-  //                 updateArray(prevImage, itemWithDefaults, key)
-  //               );
-  //               break;
-  //             default:
-  //               // 기타 타입 처리
-  //               break;
-  //           }
-  //         });
-  //       }
-  //     })
-  //     .catch((error) => {
-  //       console.error(error);
-  //     });
-  // };
+  // useEffect(() =>{
+  // }, [images])
+
+  function updateArray(array, item, key) {
+    const index = array.findIndex((element) => element.id === key);
+
+    if (index >= 0) {
+      // 기존 항목 업데이트
+      return array.map((element, i) =>
+        i === index ? { ...element, ...item } : element
+      );
+    } else {
+      // 새 항목 추가
+      return [...array, { id: key, ...item }];
+    }
+  }
+
+  const GetData = () => {
+    axios
+      .get("http://192.168.31.172:8080/api/project/data/1/1")
+      .then((response) => {
+        if (response.data && response.data.data) {
+          const dataItems = response.data.data;
+
+          console.log(response);
+
+          Object.keys(dataItems).forEach((key) => {
+            const item = dataItems[key];
+            const itemWithDefaults = {
+              ...item,
+              x: item.x ?? 0, // 기본값 0으로 설정
+              y: item.y ?? 0, // 기본값 0으로 설정
+              // 필요한 다른 속성에 대해서도 기본값을 설정할 수 있습니다.
+            };
+            switch (item.ty) {
+              case "Text":
+                setTexts((prevTexts) => updateArray(prevTexts, key));
+                break;
+              case "Shape":
+                console.log(JSON.stringify(item) + "짜잔?");
+                setShapes((prevShapes) => updateArray(prevShapes, itemWithDefaults, key));
+                break;
+              case "Line":
+                setLines((prevLines) => updateArray(prevLines, item, key));
+                break;
+              case "img":
+                setImages((prevImage) => updateArray(prevImage, item, key));
+                break;
+              default:
+                // 기타 타입 처리
+                break;
+            }
+          });
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  };
+
+
 
   const [socket, setSocket] = useState(null);
 
@@ -577,7 +582,7 @@ const MyDrawing = () => {
     const id = e.target.attrs.id;
     const ty = e.target.attrs.ty;
 
-    console.log(id + "id를 확ㅇ닣래보자");
+    console.log(id + "id를 확인해보자");
     console.log(ty + " tetstsetawetfdgdfffsdfsdfsdfsdds");
     const type = e.target.attrs.type;
 
@@ -906,6 +911,7 @@ const MyDrawing = () => {
     setTexts(updatedTexts);
   };
 
+
   return (
     <div className="absolute  inset-0 h-full w-full bg-[#EFEFEF] bg-opacity-50 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px]">
       {/* 왼쪽 윗 블록 */}
@@ -1221,12 +1227,12 @@ const MyDrawing = () => {
 
       {/* 오른쪽 윗 블록 */}
       <div className="absolute top-6 right-52 justify-center bg-white rounded-md w-16 h-[50px] flex  items-center flex-row shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]">
-        <button onClick={() => getProjectData()}>Get</button>
+        <button onClick={() => GetData()}>Get</button>
       </div>
 
       {/* 오른쪽 윗 블록 */}
       <div className="absolute top-6 right-94 justify-center bg-white rounded-md w-16 h-[50px] z-50 flex  items-center flex-row shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]">
-        <button onClick={() => PostSave()}>Save</button>
+        <button onClick={() => GetData()}>Get</button>
       </div>
 
       {/* 오른쪽 윗 블록 */}
@@ -1269,8 +1275,11 @@ const MyDrawing = () => {
         </div>
       )}
 
-      {/* 그리는 구역 */}
-      <div className="ml-36 mt-24 h-full w-full">
+      {/*여기에 이미지 넣으면 되겠네!*/}
+      {/* /////////////////////////////////////////////그리는 구역///////////////////////////////////////////// */}
+      <div className="ml-36 mt-24 h-full w-full" >
+        {/* <img src={process.env.PUBLIC_URL + '/img/template3_check7/template3.png'} alt= "Template3_Check" /> */}
+      
         <Stage
           ref={stageRef}
           width={window.innerWidth}

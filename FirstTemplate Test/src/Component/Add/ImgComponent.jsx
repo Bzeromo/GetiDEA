@@ -24,26 +24,33 @@ const ImgComponent = ({
       const aspectRatio = img.width / img.height;
       let newWidth, newHeight;
 
-      if (img.width > img.height || img.width > maxWidth) {
-        newWidth = maxWidth;
-        newHeight = maxWidth / aspectRatio;
-      } else if (img.height > maxHeight) {
-        newHeight = maxHeight;
-        newWidth = maxHeight * aspectRatio;
-      } else {
-        newWidth = img.width;
-        newHeight = img.height;
-      }
-
-      if (newWidth > maxWidth) {
-        newWidth = maxWidth;
+      if (id == "template2" || id == "template3") {
+        newWidth = maxWidth * 5.85;
         newHeight = newWidth / aspectRatio;
-      }
-      if (newHeight > maxHeight) {
-        newHeight = maxHeight;
-        newWidth = newHeight * aspectRatio;
-      }
+      } else {
 
+        if (img.width > img.height || img.width > maxWidth) {
+          newWidth = maxWidth;
+          newHeight = maxWidth / aspectRatio;
+        } else if (img.height > maxHeight) {
+          newHeight = maxHeight;
+          newWidth = maxHeight * aspectRatio;
+        } else {
+          newWidth = img.width;
+          newHeight = img.height;
+        }
+        
+        if (newWidth > maxWidth) {
+          newWidth = maxWidth;
+          newHeight = newWidth / aspectRatio;
+        }
+        if (newHeight > maxHeight) {
+          newHeight = maxHeight;
+          newWidth = newHeight * aspectRatio;
+        }
+
+      }
+        
       setSize({ width: newWidth, height: newHeight });
     }
   }, [img, status, maxWidth, maxHeight]);
