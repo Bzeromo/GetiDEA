@@ -43,6 +43,8 @@ public class TokenController {
             }
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid refresh token");
-        // 이거 받으면 모달로 세션 만료 띄워주고 다시 로그인 하도록 유도 필요
+        // 이거 받으면 모달로 세션 만료 띄워주고 다시 로그인 하도록 유도
     }
+    
+    // 토큰 GET 요청 생성 필요
 }

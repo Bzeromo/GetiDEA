@@ -1,4 +1,4 @@
-package com.gi.giback.redis.dto;
+package com.gi.giback.dto;
 
 import java.util.Map;
 import lombok.Data;
@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-public class RedisProjectDto {
+public class RedisProjectDTO {
     private Long projectId;
     private String userEmail;
     private String propId;

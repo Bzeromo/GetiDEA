@@ -1,4 +1,4 @@
-package com.gi.giback.redis.dto;
+package com.gi.giback.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -23,9 +23,9 @@ public class ProjectData { // 데이터 역직렬화를 위한 객체
     private Map<String, Object> newData;
     private Map<String, Object> preData;
 
-    // updateTime을 파싱하는 메서드 (LocalDateTime 형식으로)
-    public static LocalDateTime parseUpdateTime(String updateTime) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        return LocalDateTime.parse(updateTime, formatter);
-    }
+//    updateTime을 파싱하는 메서드 (LocalDateTime 형식으로)
+//    public static LocalDateTime parseUpdateTime(String updateTime) {
+//        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+//        return LocalDateTime.parse(updateTime, formatter);
+//    }
 }

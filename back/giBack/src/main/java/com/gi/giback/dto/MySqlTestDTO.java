@@ -1,9 +1,9 @@
-package com.gi.giback.mysql.dto;
+package com.gi.giback.dto;
 
 import lombok.Data;
 
 @Data
-public class MySqlTestDto {
+public class MySqlTestDTO {
     private String id;
     private String name;
 }

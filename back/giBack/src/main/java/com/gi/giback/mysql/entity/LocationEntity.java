@@ -26,6 +26,7 @@ public class LocationEntity {
     private String folderName = ""; // 기본값 ""
 
     private String userEmail;
+    private String projectName;
 
     private Long projectId;
 

@@ -1,9 +1,9 @@
-package com.gi.giback.mysql.dto;
+package com.gi.giback.dto;
 
 import lombok.Data;
 
 @Data
-public class FolderDto {
+public class FolderDTO {
     private String userEmail;
     private String folerName;
 }

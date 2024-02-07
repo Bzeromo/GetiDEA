@@ -1,6 +1,6 @@
 package com.gi.giback.mongo.entity;
 
-import com.gi.giback.mongo.dto.ChatMessage;
+import com.gi.giback.dto.ChatDTO;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -15,5 +15,5 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class ChatLog {
     @Id
     private Long projectId;
-    private List<ChatMessage> chats;
+    private List<ChatDTO> chats;
 }

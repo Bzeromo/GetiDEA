@@ -1,4 +1,4 @@
-package com.gi.giback.mongo.dto;
+package com.gi.giback.dto;
 
 import java.time.LocalDateTime;
 import lombok.Data;
@@ -7,7 +7,7 @@ import org.springframework.data.annotation.Id;
 
 @Data
 @NoArgsConstructor
-public class ProjectDto {
+public class ProjectDTO {
     @Id
     private Long projectId;
     private String templateId;

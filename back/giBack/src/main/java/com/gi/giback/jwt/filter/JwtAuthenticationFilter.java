@@ -40,7 +40,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             SecurityContextHolder.getContext().setAuthentication(authentication);
             filterChain.doFilter(request, response);
 
-        } else { // 액세스 토큰 만료되어서 리프레시 확인 필요
+        } else { // 액세스 토큰 만료되어서 리프레시 확인
             System.out.println("액세스 토큰이 없습니다.");
             String refreshToken = getRefreshTokenFromRequest(request);
             if (refreshToken != null && jwtService.validateToken(refreshToken)) {
