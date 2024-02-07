@@ -205,31 +205,6 @@ const MyDrawing = () => {
     console.log("업데이트됨" + selectedId);
   }, [selectedId]);
 
-  // 템플릿3 이미지 불러오기
-  useEffect(() => {
-    const templateImage = {
-      id: "template3",
-      src: '/img/template3_check7/template3.png',
-      x: 31, // 이미지의 x 좌표
-      y: 10, // 이미지의 y 좌표
-
-      draggable: false,
-      scaleX: 5.86,
-      scaleY: 5.86,
-      height: 96,
-      width: 200,
-
-      type: "Image",
-      ty: "Image", // 이미지 경로
-    }
-
-    setImages([templateImage])
-
-  }, [])
-
-  // useEffect(() =>{
-  // }, [images])
-
   function updateArray(array, item, key) {
     const index = array.findIndex((element) => element.id === key);
 

@@ -5,6 +5,7 @@ import MyDrawing from "./Component/MyDrawing";
 import MyDrawingFirst from "./Component/MyDrawingFirst";
 import MyDrawingFirstTest from "./Component/MyDrawingFirstTest";
 // import MyDrawingSecond from "./Component/MyDrawingSecond";
+import MyDrawingThird from "./Component/MyDrawingThird";
 
 
 function App() {
@@ -14,8 +15,10 @@ function App() {
         <Route path="/"  element={<Home />} />
         <Route path="/board"  element={<MyDrawing />} />
         <Route path="/board/1"  element={<MyDrawingFirst />} />
-        <Route path="/board/1test"  element={<MyDrawingFirstTest />} />
+        <Route path="/board/1/test"  element={<MyDrawingFirstTest />} />
         {/* <Route path="/board/2"  element={<MyDrawingSecond />} /> */}
+        <Route path="/board/3"  element={<MyDrawingThird />} />
+        
       </Routes>
     </BrowserRouter>
    
