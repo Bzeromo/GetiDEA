@@ -1,9 +1,10 @@
 package com.gi.giback.redis;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.gi.giback.dto.ProjectInputDTO;
+import com.gi.giback.dto.ProjectProcessDTO;
 import com.gi.giback.mongo.service.ProjectService;
-import com.gi.giback.dto.ProjectData;
-import com.gi.giback.dto.RedisProjectDTO;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -30,7 +31,7 @@ public class RedisService {
         this.projectService = projectService;
     }
 
-    public void saveData(RedisProjectDTO data) throws JsonProcessingException {
+    public void saveData(ProjectInputDTO data) throws JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
         Long projectId = data.getProjectId();
         String key= data.getProjectId() + ":" + data.getUserEmail();
@@ -47,9 +48,9 @@ public class RedisService {
 
         listOps.rightPush(key, jsonData);
         Long size = listOps.size(key);
-        if (size != null && size > 10) { // 만약 크기가 30이 넘어가면 merge 작업 수행
+        if (size != null && size > 30) { // 만약 크기가 30이 넘어가면 merge 작업 수행
             // 병합 작업 수행
-            List<ProjectData> redisData = getAllDataProject(projectId);
+            List<ProjectProcessDTO> redisData = getAllDataProject(projectId);
             projectService.updateData(projectId, redisData);
         }
     }
@@ -65,8 +66,9 @@ public class RedisService {
     }
 
     // projectId가 일치하는 곳의 모든 사용자의 변경사항 시간 순서로 정렬후 리턴
-    public List<ProjectData> getAllDataProject(Long projectId) throws JsonProcessingException {
-        List<ProjectData> results = new ArrayList<>();
+    public List<ProjectProcessDTO> getAllDataProject(Long projectId)
+        throws JsonProcessingException {
+        List<ProjectProcessDTO> results = new ArrayList<>();
         ObjectMapper objectMapper = new ObjectMapper();
 
         Set<String> keys = redisTemplate.keys(projectId + ":*");
@@ -76,25 +78,24 @@ public class RedisService {
             List<Object> data = redisTemplate.opsForList().range(key, 0, -1);
             assert data != null;
             for (Object o : data) {
-                ProjectData projectData = objectMapper.readValue((String) o, ProjectData.class);
-                results.add(projectData);
+                ProjectProcessDTO projectProcessDTO = objectMapper.readValue((String) o,
+                    ProjectProcessDTO.class);
+                results.add(projectProcessDTO);
             }
 
-            int currentSize = 0;
-            if(!data.isEmpty())
-                currentSize = data.size();
+            int currentSize = data.size();
 
             int remainSize = 5;
             if (currentSize > remainSize) {
                 int excessData = currentSize - remainSize;
                 // 초과하는 데이터를 삭제
                 for (int i = 0; i < excessData; i++) {
-                    redisTemplate.opsForList().rightPop(key);
+                    redisTemplate.opsForList().leftPop(key);
                 }
             }
         }
 
-        results.sort(Comparator.comparing(ProjectData::getUpdateTime));
+        results.sort(Comparator.comparing(ProjectProcessDTO::getUpdateTime));
         return results;
     }
 

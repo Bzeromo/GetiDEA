@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/locations")
+@RequestMapping("/api/location")
 @CrossOrigin
 @Tag(name = "로케이션 컨트롤러", description = "로케이션 관련 컨트롤러 (북마크 포함)")
 public class LocationController {
@@ -59,7 +59,7 @@ public class LocationController {
         return ResponseEntity.notFound().build();
     }
 
-    @PutMapping("/updateFolderName") // 프로젝트를 디폴트에서 폴더로 지정시키면 폴더 이름을 바꿔줌
+    @PutMapping("/move") // 프로젝트를 디폴트에서 폴더로 지정시키면 폴더 이름을 바꿔줌
     @Operation(summary = "프로젝트 위치 이동 - 테스트 완료", description = "프로젝트 위치 이동 : 로케이션에 있는 folderName 변경")
     public ResponseEntity<LocationEntity> updateFolderName(
             @RequestParam @Parameter(description = "사용자 이메일") String userEmail,
@@ -68,14 +68,13 @@ public class LocationController {
 
         Optional<FolderEntity> folder = folderService.getFolderByFolderName(newFolderName);
         if(folder.isPresent()){
-            System.out.println(folder.get().getFolderName());
             LocationEntity updatedEntity = locationService.updateFolderName(userEmail, projectName, newFolderName);
             return ResponseEntity.ok(updatedEntity);
         }
         return ResponseEntity.badRequest().build();
     }
 
-    @PutMapping("/toggleBookmark") // 북마크 해제, 등록
+    @PutMapping("/bookmark") // 북마크 해제, 등록
     @Operation(summary = "북마크 - 테스트 완료", description = "북마크 해제, 등록 기능 구현")
     public ResponseEntity<LocationEntity> toggleBookmark(
             @RequestParam @Parameter(description = "사용자 이메일") String userEmail,

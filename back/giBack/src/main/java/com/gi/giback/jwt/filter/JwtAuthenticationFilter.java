@@ -10,12 +10,14 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+@Slf4j
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
@@ -30,18 +32,25 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
 
+        String requestURI = request.getRequestURI();
+
+        if (requestURI.startsWith("/swagger-ui") || requestURI.startsWith("/v3/api-docs") || requestURI.startsWith("/swagger-resources") || requestURI.startsWith("/webjars")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         String token = getTokenFromRequest(request);
         if (token != null && jwtService.validateToken(token)) {
 
             String userEmail = jwtService.getUserEmailFromToken(token);
-            System.out.println(userEmail);
+            log.info("USER : {}", userEmail);
             List<GrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"));
             UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userEmail, null, authorities); // 권한 정보 등을 추가할 수 있음
             SecurityContextHolder.getContext().setAuthentication(authentication);
             filterChain.doFilter(request, response);
 
         } else { // 액세스 토큰 만료되어서 리프레시 확인
-            System.out.println("액세스 토큰이 없습니다.");
+            log.info("AccessToken is not valid");
             String refreshToken = getRefreshTokenFromRequest(request);
             if (refreshToken != null && jwtService.validateToken(refreshToken)) {
                 // 리프레시 토큰이 존재하면, 새로운 액세스 토큰 발급
@@ -55,7 +64,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
                 } else {
 
-                    System.out.println("리프레시 토큰이 없습니다.");
+                    log.info("RefershToken is not valid");
                     // 리프레시 토큰에 해당하는 사용자가 없을 때
                     response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401 Unauthorized
                     SecurityContextHolder.clearContext(); // 사용자 로그아웃

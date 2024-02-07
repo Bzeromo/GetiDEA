@@ -1,8 +1,9 @@
 package com.gi.giback.mongo.service;
 
+import com.gi.giback.dto.ProjectInfoDTO;
 import com.gi.giback.mongo.entity.ProjectEntity;
 import com.gi.giback.mongo.repository.ProjectRepository;
-import com.gi.giback.dto.ProjectData;
+import com.gi.giback.dto.ProjectProcessDTO;
 import com.mongodb.bulk.BulkWriteResult;
 import com.mongodb.client.result.UpdateResult;
 import java.time.LocalDateTime;
@@ -45,12 +46,59 @@ public class ProjectService {
         return Optional.ofNullable(project);
     }
 
+    // data 내용을 제외한 프로젝트 Info만 가져오는 서비스
+    public Optional<ProjectInfoDTO> getProjectInfoByIdWithDay(Long projectId) {
+        LocalDateTime sevenDaysAgo = LocalDateTime.now().minusDays(7);
+        Query query = new Query(Criteria.where("projectId").is(projectId)
+            .andOperator(Criteria.where("lastUpdateTime").gte(sevenDaysAgo)));
+
+        // 필요한 필드만 포함하도록 프로젝션 설정
+        query.fields().include("projectId").include("templateId").include("projectName")
+            .include("thumbnail").include("lastUpdateTime");
+
+        ProjectEntity project = mongoTemplate.findOne(query, ProjectEntity.class);
+
+        if (project != null) {
+            ProjectInfoDTO projectInfoDTO = new ProjectInfoDTO();
+            projectInfoDTO.setProjectId(project.getProjectId());
+            projectInfoDTO.setTemplateId(project.getTemplateId());
+            projectInfoDTO.setProjectName(project.getProjectName());
+            projectInfoDTO.setThumbnail(project.getThumbnail());
+            projectInfoDTO.setLastUpdateTime(project.getLastUpdateTime());
+            return Optional.of(projectInfoDTO);
+        } else {
+            return Optional.empty();
+        }
+    }
+
+    public Optional<ProjectInfoDTO> getProjectInfo(Long projectId) {
+        Query query = new Query(Criteria.where("projectId").is(projectId));
+
+        // 필요한 필드만 포함하도록 프로젝션 설정
+        query.fields().include("projectId").include("templateId").include("projectName")
+            .include("thumbnail").include("lastUpdateTime");
+
+        ProjectEntity project = mongoTemplate.findOne(query, ProjectEntity.class);
+
+        if (project != null) {
+            ProjectInfoDTO projectInfoDTO = new ProjectInfoDTO();
+            projectInfoDTO.setProjectId(project.getProjectId());
+            projectInfoDTO.setTemplateId(project.getTemplateId());
+            projectInfoDTO.setProjectName(project.getProjectName());
+            projectInfoDTO.setThumbnail(project.getThumbnail());
+            projectInfoDTO.setLastUpdateTime(project.getLastUpdateTime());
+            return Optional.of(projectInfoDTO);
+        } else {
+            return Optional.empty();
+        }
+    }
+
     // bulk operation으로 업데이트 성능 최적화 코드 아직 사용x
-    public boolean updateData(Long projectId, List<ProjectData> datas) {
+    public boolean updateData(Long projectId, List<ProjectProcessDTO> datas) {
         Query query = new Query(Criteria.where("projectId").is(projectId));
         BulkOperations bulkOps = mongoTemplate.bulkOps(BulkOperations.BulkMode.UNORDERED, ProjectEntity.class);
 
-        for (ProjectData data : datas) {
+        for (ProjectProcessDTO data : datas) {
             String propId = data.getPropId();
             Update update = new Update().set("data." + propId, data.getNewData());
             bulkOps.updateOne(query, update);
