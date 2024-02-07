@@ -37,10 +37,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const logout = () => {
     localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
     localStorage.removeItem('userEmail');
     localStorage.removeItem('userName');
     localStorage.removeItem('profileImage');
-    setAccessToken(null);
+    console.log("dfdfdf");
+    
     navigate('/');
   };
 
