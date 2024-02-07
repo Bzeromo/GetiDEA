@@ -74,7 +74,7 @@ const ImgComponent = ({
           width={size.width}
           height={size.height}
           ref={imgRef}
-          draggable
+          // draggable
           onClick={onSelect}
         />
       )}

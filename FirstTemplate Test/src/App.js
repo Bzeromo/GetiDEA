@@ -5,7 +5,7 @@ import MyDrawing from "./Component/MyDrawing";
 import MyDrawingFirst from "./Component/MyDrawingFirst";
 import MyDrawingFirstTest from "./Component/MyDrawingFirstTest";
 // import MyDrawingSecond from "./Component/MyDrawingSecond";
-import MyDrawingThird from "./Component/MyDrawingThird";
+import MyDrawingThird from "./Component/MyDrawingThird copy";
 
 
 function App() {

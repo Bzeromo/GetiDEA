@@ -51,6 +51,27 @@ const LayerFunction = (selectedId, layerRef) => {
     }
   };
 
-  return { moveDown, moveToBottom, moveUp, moveToTop };
+  // const moveToTemplate = (layerRef, id) => {
+  //   if (layerRef.current) {
+  //     const shapes = layerRef.current.find(node => node.id() === id);
+  //     if (shapes.length > 0) {
+  //       shapes.forEach(shape => {
+  //         shape.moveToBottom();
+  //       });
+  //       layerRef.current.batchDraw();
+  //       console.log("살려주세용");
+  //     } else {
+  //       console.log("해당 id에 해당하는 도형을 찾을 수 없습니다.");
+  //     }
+  //   } else {
+  //     console.log("layerRef가 null입니다.");
+  //   }
+  // };
+  
+  
+  
+
+
+  return { moveDown, moveToBottom, moveUp, moveToTop, };
 };
 export default LayerFunction;
