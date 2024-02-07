@@ -39,6 +39,11 @@ public class UserController {
     public ResponseEntity<UserDTO> renameUser(
         @RequestParam @Parameter(description = "사용자 이메일") String userEmail,
         @RequestParam @Parameter(description = "새로운 이름") String newName) {
+
+        // 사용자 검증
+        List<UserDTO> userCheck = userService.searchUsersByEmail(userEmail);
+        if(userCheck.isEmpty()) return ResponseEntity.badRequest().build();
+
         UserDTO user = userService.updateUserName(userEmail, newName);
         return ResponseEntity.ok(user);
     }

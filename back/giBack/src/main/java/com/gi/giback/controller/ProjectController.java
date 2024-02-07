@@ -2,14 +2,15 @@ package com.gi.giback.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.gi.giback.dto.ProjectCreationDTO;
+import com.gi.giback.dto.ProjectInfoDTO;
 import com.gi.giback.mongo.entity.ProjectEntity;
 import com.gi.giback.mongo.entity.TemplateEntity;
 import com.gi.giback.mongo.service.ProjectService;
 import com.gi.giback.mongo.service.TemplateService;
 import com.gi.giback.mysql.entity.LocationEntity;
 import com.gi.giback.mysql.service.LocationService;
-import com.gi.giback.dto.ProjectData;
-import com.gi.giback.dto.RedisProjectDTO;
+import com.gi.giback.dto.ProjectProcessDTO;
+import com.gi.giback.dto.ProjectInputDTO;
 import com.gi.giback.redis.RedisService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -89,7 +90,7 @@ public class ProjectController {
     }
 
     // 기존 프로젝트 실행시 호출
-    @GetMapping("/data")
+    @GetMapping("/open")
     @Operation(summary = "기존 프로젝트 열기 (Mongo) - 테스트 완료", description = "Redis에 임시 저장된 데이터 와 MongoDB 병합 후 MongoDB에 있는 Project 데이터 반환")
     public ResponseEntity<ProjectEntity> getProject(
         @RequestParam @Parameter(description = "참여 프로젝트 Id") Long projectId)
@@ -97,7 +98,7 @@ public class ProjectController {
 
         ProjectEntity project = new ProjectEntity();
 
-        List<ProjectData> redisData = null; // 병합 작업부터 수행
+        List<ProjectProcessDTO> redisData = null; // 병합 작업부터 수행
 
         redisData = redisService.getAllDataProject(projectId);
         if (!redisData.isEmpty()) { // 레디스에 데이터가 있을경우 병합
@@ -113,9 +114,9 @@ public class ProjectController {
         // 여기에서 사용자한테 projectId 값도 같이 보내줌 -> 프로젝트 내부에서는 사용자가 projectId 값을 보유
     }
 
-    @PostMapping("/changes")// Redis에 변경사항 저장
+    @PostMapping("/change")// Redis에 변경사항 저장
     @Operation(summary = "변경사항 저장 (Redis) - 테스트 완료", description = "작업 진행중 변경사항 Redis에 임시 저장")
-    public ResponseEntity<?> saveData(@RequestBody @Parameter(description = "프로젝트 변경 데이터(작업 전, 후) JSON") RedisProjectDTO data)
+    public ResponseEntity<?> saveData(@RequestBody @Parameter(description = "프로젝트 변경 데이터(작업 전, 후) JSON") ProjectInputDTO data)
             throws JsonProcessingException {
         redisService.saveData(data);
         return ResponseEntity.ok().build();
@@ -128,7 +129,7 @@ public class ProjectController {
         @RequestParam @Parameter(description = "병합 작업 진행할 프로젝트 ID") Long projectId)
             throws JsonProcessingException {
         // projectId 기준으로 모든 데이터 가져옴
-        List<ProjectData> redisData = redisService.getAllDataProject(projectId);
+        List<ProjectProcessDTO> redisData = redisService.getAllDataProject(projectId);
 
         if(projectService.updateData(projectId, redisData))
             return ResponseEntity.ok().build();
@@ -143,7 +144,7 @@ public class ProjectController {
         @RequestParam @Parameter(description = "퇴장 사용자 ID") String userEmail) {
 
         try { // 종료시 병합 먼저 실행 => 병합코드를 front에서 호출해야함
-            List<ProjectData> redisData;
+            List<ProjectProcessDTO> redisData;
             redisData = redisService.getAllDataProject(projectId);
             if (!redisData.isEmpty()) {
                 projectService.updateData(projectId, redisData);
@@ -176,41 +177,41 @@ public class ProjectController {
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/loadAll") // 유저 이메일 기반으로 모든 참여되어있는 모든 프로젝트 가져오기
+    @GetMapping("/all") // 유저 이메일 기반으로 모든 참여되어있는 모든 프로젝트 가져오기
     @Operation(summary = "전체 프로젝트 불러오기 - 테스트 완료", description = "사용자의 모든 프로젝트 불러오기")
-    public ResponseEntity<List<ProjectEntity>> getProjectListByEmail(
+    public ResponseEntity<List<ProjectInfoDTO>> getProjectListByEmail(
         @RequestParam @Parameter(description = "사용자 Email") String userEmail) {
 
         List<LocationEntity> locationEntityList = locationService.getLocationEntityByUserEmail(userEmail);
-        List<ProjectEntity> projectEntityList = new ArrayList<>();
+        List<ProjectInfoDTO> projectInfoList = new ArrayList<>();
         if(!locationEntityList.isEmpty()) {
             int size = locationEntityList.size();
 
             for (int i=0; i<size; i++) {
                 Long projectId = locationEntityList.get(i).getProjectId();
-                Optional<ProjectEntity> entity = projectService.getProject(projectId);
-                entity.ifPresent(projectEntityList::add);
+                Optional<ProjectInfoDTO> entity = projectService.getProjectInfo(projectId);
+                entity.ifPresent(projectInfoList::add);
             }
-            return ResponseEntity.ok(projectEntityList);
+            return ResponseEntity.ok(projectInfoList);
         }
         return ResponseEntity.badRequest().build();
     }
 
     @GetMapping("/recent") // 유저 이메일 기반으로 모든 참여되어있는 모든 프로젝트 중 최근 7일
     @Operation(summary = "최근 프로젝트 불러오기 (7일) - 테스트 완료", description = "사용자의 모든 프로젝트 중 최근 7일 불러오기")
-    public ResponseEntity<List<ProjectEntity>> getRecentProjectListByEmail(
+    public ResponseEntity<List<ProjectInfoDTO>> getRecentProjectListByEmail(
         @RequestParam String userEmail) {
 
         List<LocationEntity> locationEntityList = locationService.getLocationEntityByUserEmail(userEmail);
-        List<ProjectEntity> projectEntityList = new ArrayList<>();
+        List<ProjectInfoDTO> projectInfoList = new ArrayList<>();
 
         for (LocationEntity locationEntity : locationEntityList) {
             Long projectId = locationEntity.getProjectId();
-            projectService.getProjectByIdWithDay(projectId).ifPresent(projectEntityList::add);
+            projectService.getProjectInfoByIdWithDay(projectId).ifPresent(projectInfoList::add);
         }
 
-        if (!projectEntityList.isEmpty()) {
-            return ResponseEntity.ok(projectEntityList);
+        if (!projectInfoList.isEmpty()) {
+            return ResponseEntity.ok(projectInfoList);
         } else {
             return ResponseEntity.noContent().build(); // 프로젝트가 없을 경우 No Content 상태 코드 반환
         }
@@ -218,26 +219,26 @@ public class ProjectController {
 
     @GetMapping("/recent2")
     @Operation(summary = "최근 프로젝트 불러오기 (2개) - 테스트 완료", description = "사용자의 모든 프로젝트 중 최근 2개 불러오기")
-    public ResponseEntity<List<ProjectEntity>> getMostRecentProjectListByEmail(
+    public ResponseEntity<List<ProjectInfoDTO>> getMostRecentProjectListByEmail(
         @RequestParam String userEmail) {
 
         List<LocationEntity> locationEntityList = locationService.getLocationEntityByUserEmail(userEmail);
-        List<ProjectEntity> projectEntityList = new ArrayList<>();
+        List<ProjectInfoDTO> ProjectInfoList = new ArrayList<>();
 
         // 위치 정보를 바탕으로 프로젝트 조회
         for (LocationEntity locationEntity : locationEntityList) {
             Long projectId = locationEntity.getProjectId();
-            projectService.getProjectByIdWithDay(projectId).ifPresent(projectEntityList::add);
+            projectService.getProjectInfo(projectId).ifPresent(ProjectInfoList::add);
         }
 
         // 프로젝트를 lastUpdateTime 기준으로 내림차순 정렬
-        List<ProjectEntity> sortedProjectEntityList = projectEntityList.stream()
-            .sorted(Comparator.comparing(ProjectEntity::getLastUpdateTime).reversed())
+        List<ProjectInfoDTO> sortedProjectEntityList = ProjectInfoList.stream()
+            .sorted(Comparator.comparing(ProjectInfoDTO::getLastUpdateTime).reversed())
             .limit(2) // 최근 업데이트된 상위 2개 프로젝트만 선택
-            .collect(Collectors.toList());
+            .toList();
 
         if (!sortedProjectEntityList.isEmpty()) {
-            return ResponseEntity.ok(sortedProjectEntityList);
+            return ResponseEntity.ok(ProjectInfoList);
         } else {
             return ResponseEntity.noContent().build(); // 프로젝트가 없을 경우 No Content 상태 코드 반환
         }
@@ -245,19 +246,19 @@ public class ProjectController {
 
     @GetMapping("/bookmarked") // 북마크된 프로젝트 전체
     @Operation(summary = "북마크 된 프로젝트 전체 불러오기 - 테스트 완료", description = "사용자의 모든 프로젝트 중 북마크 되어있는 프로젝트")
-    public ResponseEntity<List<ProjectEntity>> getBookmarkedLocations(
+    public ResponseEntity<List<ProjectInfoDTO>> getBookmarkedLocations(
         @RequestParam String userEmail) {
 
         List<LocationEntity> bookmarkedLocations = locationService.getBookmarkedLocations(userEmail);
-        List<ProjectEntity> projectEntityList = new ArrayList<>();
+        List<ProjectInfoDTO> projectInfoList = new ArrayList<>();
 
         for (LocationEntity locationEntity : bookmarkedLocations) {
             Long projectId = locationEntity.getProjectId();
-            projectService.getProjectByIdWithDay(projectId).ifPresent(projectEntityList::add);
+            projectService.getProjectInfo(projectId).ifPresent(projectInfoList::add);
         }
 
-        if (!projectEntityList.isEmpty()) {
-            return ResponseEntity.ok(projectEntityList);
+        if (!projectInfoList.isEmpty()) {
+            return ResponseEntity.ok(projectInfoList);
         } else {
             return ResponseEntity.noContent().build(); // 프로젝트가 없을 경우 No Content 상태 코드 반환
         }
@@ -265,26 +266,26 @@ public class ProjectController {
 
     @GetMapping("/folder") // 유저이메일 + 폴더네임으로 가져온 프로젝트 데이터
     @Operation(summary = "폴더에 있는 프로젝트 전체 불러오기 - 테스트 완료", description = "사용자의 특정 폴더 내부에 있는 프로젝트 전달")
-    public ResponseEntity<List<ProjectEntity>> getBookmarkedLocations(
+    public ResponseEntity<List<ProjectInfoDTO>> getBookmarkedLocations(
         @RequestParam String userEmail,
         @RequestParam String folderName) {
 
         List<LocationEntity> locations = locationService.getLocationsByUserEmailAndFolderName(userEmail, folderName);
-        List<ProjectEntity> projectEntityList = new ArrayList<>();
+        List<ProjectInfoDTO> projectInfoList = new ArrayList<>();
 
         for (LocationEntity locationEntity : locations) {
             Long projectId = locationEntity.getProjectId();
-            projectService.getProjectByIdWithDay(projectId).ifPresent(projectEntityList::add);
+            projectService.getProjectInfo(projectId).ifPresent(projectInfoList::add);
         }
 
-        if (!projectEntityList.isEmpty()) {
-            return ResponseEntity.ok(projectEntityList);
+        if (!projectInfoList.isEmpty()) {
+            return ResponseEntity.ok(projectInfoList);
         } else {
             return ResponseEntity.noContent().build(); // 프로젝트가 없을 경우 No Content 상태 코드 반환
         }
     }
 
-    @PutMapping("/updateName") // 로케이션에서 사용자 확인 후 프로젝트id 기준으로 프로젝트 이름 변경
+    @PutMapping("/rename") // 로케이션에서 사용자 확인 후 프로젝트id 기준으로 프로젝트 이름 변경
     @Operation(summary = "프로젝트 이름 변경 - 테스트 완료", description = "프로젝트 이름 변경")
     public ResponseEntity<ProjectEntity> updateProjectName(
         @RequestParam @Parameter(description = "사용자 ID") String userEmail,

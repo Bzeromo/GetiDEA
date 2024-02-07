@@ -8,9 +8,11 @@ import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
 import java.util.Date;
 import javax.crypto.SecretKey;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 public class JwtService {
     private SecretKey key = Keys.secretKeyFor(SignatureAlgorithm.HS512); // 안전한 키 생성;
@@ -48,7 +50,7 @@ public class JwtService {
                     .setSigningKey(key) // 검증에 사용할 서명 키 설정
                     .build()
                     .parseClaimsJws(token);
-            System.out.println("토큰 검증 완료");
+            log.info("토큰 검증 완료");
             return !claims.getBody().getExpiration().before(new Date()); // 토큰 만료 날짜가 현재 날짜보다 이후인지 확인
         } catch (SignatureException ex) {
             // 로그인 실패 처리 (예: 로그 기록)

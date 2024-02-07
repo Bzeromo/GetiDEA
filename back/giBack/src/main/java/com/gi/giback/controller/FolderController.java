@@ -69,7 +69,7 @@ public class FolderController {
         return ResponseEntity.ok().build();
     }
 
-    @PatchMapping("/update")
+    @PatchMapping("/rename")
     @Operation(summary = "폴더 이름 변경 - 테스트 완료", description = "폴더 이름 변경")
     public FolderEntity updateFolderName(
             @RequestParam String userEmail,

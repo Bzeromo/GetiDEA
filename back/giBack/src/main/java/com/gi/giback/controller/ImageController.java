@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.io.IOException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,6 +23,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping("/api/image")
 @RequiredArgsConstructor
 @CrossOrigin
+@Slf4j
 @Tag(name = "이미지 컨트롤러 - 테스트 완료", description = "S3 이미지 저장 컨트롤러")
 public class ImageController {
 
@@ -29,7 +31,7 @@ public class ImageController {
     private final UserService userService;
     private final ProjectService projectService;
 
-    @PostMapping("/thumbnailImage")
+    @PostMapping("/thumbnail")
     @Operation(summary = "썸네일 이미지 저장", description = "썸네일 이미지 저장")
     public ResponseEntity<String> uploadThumbnailImage(
         @RequestPart("Image")  MultipartFile multipartFile,
@@ -37,6 +39,7 @@ public class ImageController {
         String result;
         try {
             result = s3UploadService.saveThumbnailImage(multipartFile);
+            log.info("result ={}", result);
             projectService.updateProjectThumbnail(projectId, result);
         } catch (IOException e) {
             return ResponseEntity.badRequest().build();
@@ -44,15 +47,19 @@ public class ImageController {
         return ResponseEntity.ok(result);
     }
 
-    @PostMapping("/profileImage")
+    @PostMapping("/profile")
     @Operation(summary = "프로필 이미지 변경", description = "프로필 이미지 변경")
     public ResponseEntity<String> updateProfileImage(
         @RequestPart("Image") MultipartFile multipartFile,
         @RequestPart("userEmail") @Parameter(description = "사용자 이메일") String userEmail) {
 
+
+        log.info("start // email ={}", userEmail);
+
         String result;
         try {
             result = s3UploadService.saveProfileImage(multipartFile, userEmail);
+            log.info("result ={}", result);
             if(userService.updateUserProfileImage(userEmail, result)){
                 return ResponseEntity.ok(result);
             }
@@ -62,8 +69,8 @@ public class ImageController {
         return ResponseEntity.badRequest().build();
     }
 
-    @PostMapping("/upload")
-    @Operation(summary = "프로필/썸네일 이미지 변경", description = "프로필/썸네일 이미지 변경")
+    @PostMapping("/project")
+    @Operation(summary = "프로젝트 이미지 추가", description = "프로필/썸네일 이미지 변경")
     public ResponseEntity<String> updateProfileImage(
         @RequestParam @Parameter(description = "type : thumbnailImage or profileImage"
             + ", imageName : ProjectId or UserEmail, imageBase64 : 인코딩된 이미지 ")FileUploadDTO fileUploadDTO) {

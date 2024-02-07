@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-public class RedisProjectDTO {
+public class ProjectInputDTO {
     private Long projectId;
     private String userEmail;
     private String propId;
