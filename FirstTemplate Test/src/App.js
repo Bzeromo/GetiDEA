@@ -15,7 +15,7 @@ function App() {
         <Route path="/board"  element={<MyDrawing />} />
         <Route path="/board/1"  element={<MyDrawingFirst />} />
         {/* <Route path="/board/2"  element={<MyDrawingSecond />} /> */}
-        {/* <Route path="/board/3"  element={<MyDrawingThird />} /> */}
+        <Route path="/board/3"  element={<MyDrawingThird />} />
       </Routes>
     </BrowserRouter>
    

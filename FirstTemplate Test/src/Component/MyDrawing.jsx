@@ -213,9 +213,9 @@ const MyDrawing = () => {
       x: 31, // 이미지의 x 좌표
       y: 10, // 이미지의 y 좌표
 
-      // draggable: false,
+      draggable: false,
       scaleX: 5.86,
-      scaleY: 5,
+      scaleY: 5.86,
       height: 96,
       width: 200,
 

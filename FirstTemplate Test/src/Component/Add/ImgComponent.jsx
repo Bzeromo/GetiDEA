@@ -23,33 +23,58 @@ const ImgComponent = ({
       // 이미지 로딩 완료 시 크기 조정 로직 실행
       const aspectRatio = img.width / img.height;
       let newWidth, newHeight;
-
+      
+      if (img.width > img.height || img.width > maxWidth) {
+        newWidth = maxWidth;
+        newHeight = maxWidth / aspectRatio;
+      } else if (img.height > maxHeight) {
+        newHeight = maxHeight;
+        newWidth = maxHeight * aspectRatio;
+      } else {
+        newWidth = img.width;
+        newHeight = img.height;
+      }
+      
+      if (newWidth > maxWidth) {
+        newWidth = maxWidth;
+        newHeight = newWidth / aspectRatio;
+      }
+      if (newHeight > maxHeight) {
+        newHeight = maxHeight;
+        newWidth = newHeight * aspectRatio;
+      }
+        
       if (id == "template2" || id == "template3") {
         newWidth = maxWidth * 5.85;
         newHeight = newWidth / aspectRatio;
-      } else {
-
-        if (img.width > img.height || img.width > maxWidth) {
-          newWidth = maxWidth;
-          newHeight = maxWidth / aspectRatio;
-        } else if (img.height > maxHeight) {
-          newHeight = maxHeight;
-          newWidth = maxHeight * aspectRatio;
-        } else {
-          newWidth = img.width;
-          newHeight = img.height;
-        }
-        
-        if (newWidth > maxWidth) {
-          newWidth = maxWidth;
-          newHeight = newWidth / aspectRatio;
-        }
-        if (newHeight > maxHeight) {
-          newHeight = maxHeight;
-          newWidth = newHeight * aspectRatio;
-        }
-
       }
+
+      // if (id == "template2" || id == "template3") {
+      //   newWidth = maxWidth * 5.85;
+      //   newHeight = newWidth / aspectRatio;
+      // } else {
+
+      //   if (img.width > img.height || img.width > maxWidth) {
+      //     newWidth = maxWidth;
+      //     newHeight = maxWidth / aspectRatio;
+      //   } else if (img.height > maxHeight) {
+      //     newHeight = maxHeight;
+      //     newWidth = maxHeight * aspectRatio;
+      //   } else {
+      //     newWidth = img.width;
+      //     newHeight = img.height;
+      //   }
+        
+      //   if (newWidth > maxWidth) {
+      //     newWidth = maxWidth;
+      //     newHeight = newWidth / aspectRatio;
+      //   }
+      //   if (newHeight > maxHeight) {
+      //     newHeight = maxHeight;
+      //     newWidth = newHeight * aspectRatio;
+      //   }
+
+      // }
         
       setSize({ width: newWidth, height: newHeight });
     }
