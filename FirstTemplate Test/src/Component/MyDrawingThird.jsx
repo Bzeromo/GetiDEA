@@ -205,31 +205,6 @@ const MyDrawing = () => {
     console.log("업데이트됨" + selectedId);
   }, [selectedId]);
 
-  // 템플릿3 이미지 불러오기
-  useEffect(() => {
-    const templateImage = {
-      id: "template3",
-      src: '/img/template3_check7/template3.png',
-      x: 31, // 이미지의 x 좌표
-      y: 10, // 이미지의 y 좌표
-
-      draggable: false,
-      scaleX: 5.86,
-      scaleY: 5.86,
-      height: 96,
-      width: 200,
-
-      type: "Image",
-      ty: "Image", // 이미지 경로
-    }
-
-    setImages([templateImage])
-
-  }, [])
-
-  // useEffect(() =>{
-  // }, [images])
-
   function updateArray(array, item, key) {
     const index = array.findIndex((element) => element.id === key);
 
@@ -912,6 +887,108 @@ const MyDrawing = () => {
   };
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  // 템플릿3 이미지 생성 코드
+  const templateImage3 = [
+    {
+      "id": "template3",
+      "src": "/img/template3_check7/template3.png",
+      "x": 31,  // x좌표
+      "y": 10,  // y좌표
+      "ty": "img",
+      "type": "Image",
+      "width": 200,
+      "height": 96,
+      "draggable": false,
+      "rotation": 0,
+      "scaleX": 5.86,
+      "scaleY": 5.86,
+    }
+  ]
+
+  const templateId = 3
+
+  // useEffect(() => {
+  //   if (templateId == 1) {
+    
+  //   } else if (templateId == 2) {
+
+  //   } else if (templateId == 3) {
+  //     // setImages([templateImage3])
+  //   } else {
+
+  //   }
+    
+  // }, [])
+
+  // useEffect(() =>{
+  // }, [images])
+
+
+  const ImageComponent = ({ src, x, y, width, height, rotation, scaleX, scaleY }) => {
+    const [image] = useImage(src);
+
+    return (
+      <Image
+        image={image}
+        x={x}
+        y={y}
+        width={width}
+        height={height}
+        rotation={rotation}
+        scaleX={scaleX}
+        scaleY={scaleY}
+        draggable={draggable}
+      />
+    );
+  };
+
+
+
+
+
   return (
     <div className="absolute  inset-0 h-full w-full bg-[#EFEFEF] bg-opacity-50 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px]">
       {/* 왼쪽 윗 블록 */}
@@ -1275,10 +1352,9 @@ const MyDrawing = () => {
         </div>
       )}
 
-      {/*여기에 이미지 넣으면 되겠네!*/}
-      {/* /////////////////////////////////////////////그리는 구역///////////////////////////////////////////// */}
+
+      {/* 그리는 구역 */}
       <div className="ml-36 mt-24 h-full w-full" >
-        {/* <img src={process.env.PUBLIC_URL + '/img/template3_check7/template3.png'} alt= "Template3_Check" /> */}
       
         <Stage
           ref={stageRef}
@@ -1293,6 +1369,42 @@ const MyDrawing = () => {
           onClick={handleLayerClick}
         >
           <Layer ref={layerRef}>
+
+
+          {/* 템플릿3 적용 */}
+          {templateId === 3 && templateImage3.map((imgInfo) => (
+          <ImageComponent key={imgInfo.id} {...imgInfo} />
+          ))}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
             {drawing && (
               <Line
                 points={currentLine}

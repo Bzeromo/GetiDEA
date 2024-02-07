@@ -43,37 +43,11 @@ const ImgComponent = ({
         newHeight = maxHeight;
         newWidth = newHeight * aspectRatio;
       }
-        
-      if (id == "template2" || id == "template3") {
-        newWidth = maxWidth * 5.85;
-        newHeight = newWidth / aspectRatio;
-      }
-
+       
+      // 템플릿 이미지 크기 조절 관련 코드 (삭제)
       // if (id == "template2" || id == "template3") {
       //   newWidth = maxWidth * 5.85;
       //   newHeight = newWidth / aspectRatio;
-      // } else {
-
-      //   if (img.width > img.height || img.width > maxWidth) {
-      //     newWidth = maxWidth;
-      //     newHeight = maxWidth / aspectRatio;
-      //   } else if (img.height > maxHeight) {
-      //     newHeight = maxHeight;
-      //     newWidth = maxHeight * aspectRatio;
-      //   } else {
-      //     newWidth = img.width;
-      //     newHeight = img.height;
-      //   }
-        
-      //   if (newWidth > maxWidth) {
-      //     newWidth = maxWidth;
-      //     newHeight = newWidth / aspectRatio;
-      //   }
-      //   if (newHeight > maxHeight) {
-      //     newHeight = maxHeight;
-      //     newWidth = newHeight * aspectRatio;
-      //   }
-
       // }
         
       setSize({ width: newWidth, height: newHeight });
