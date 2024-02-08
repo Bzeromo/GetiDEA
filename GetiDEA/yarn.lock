@@ -2175,6 +2175,13 @@
   dependencies:
     "@types/react" "*"
 
+"@types/react-reconciler@^0.28.0", "@types/react-reconciler@^0.28.2":
+  version "0.28.8"
+  resolved "https://registry.yarnpkg.com/@types/react-reconciler/-/react-reconciler-0.28.8.tgz#e51710572bcccf214306833c2438575d310b3e98"
+  integrity sha512-SN9c4kxXZonFhbX4hJrZy37yw9e7EIxcpHCxQv5JUS18wDE5ovkQKlqQEkufdJCCMfuI9BnjUJvhYeJ9x5Ra7g==
+  dependencies:
+    "@types/react" "*"
+
 "@types/react-router-dom@^5.3.3":
   version "5.3.3"
   resolved "https://registry.yarnpkg.com/@types/react-router-dom/-/react-router-dom-5.3.3.tgz#e9d6b4a66fcdbd651a5f106c2656a30088cc1e83"
@@ -3511,7 +3518,14 @@ cosmiconfig@^7.0.0:
     path-type "^4.0.0"
     yaml "^1.10.0"
 
-cross-spawn@^7.0.0, cross-spawn@^7.0.2, cross-spawn@^7.0.3:
+cross-env@^7.0.3:
+  version "7.0.3"
+  resolved "https://registry.yarnpkg.com/cross-env/-/cross-env-7.0.3.tgz#865264b29677dc015ba8418918965dd232fc54cf"
+  integrity sha512-+/HKd6EgcQCJGh2PSjZuUitQBQynKor4wrFbRg4DtAgS1aWO+gU52xpH7M9ScGgXSYmAVS9bIJ8EzuaGw0oNAw==
+  dependencies:
+    cross-spawn "^7.0.1"
+
+cross-spawn@^7.0.0, cross-spawn@^7.0.1, cross-spawn@^7.0.2, cross-spawn@^7.0.3:
   version "7.0.3"
   resolved "https://registry.yarnpkg.com/cross-spawn/-/cross-spawn-7.0.3.tgz#f73a85b9d5d41d045551c177e2882d4ac85728a6"
   integrity sha512-iRDPJKUPVEND7dHPO8rkbOnPpyDygcDFtWjpeWNCgy8WP2rXcxXL8TskReQl6OrB2G7+UJrags1q15Fudc7G6w==
@@ -5662,6 +5676,13 @@ iterator.prototype@^1.1.2:
     reflect.getprototypeof "^1.0.4"
     set-function-name "^2.0.1"
 
+its-fine@^1.1.1:
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/its-fine/-/its-fine-1.1.1.tgz#e74b93fddd487441f978a50f64f0f5af4d2fc38e"
+  integrity sha512-v1Ia1xl20KbuSGlwoaGsW0oxsw8Be+TrXweidxD9oT/1lAh6O3K3/GIM95Tt6WCiv6W+h2M7RB1TwdoAjQyyKw==
+  dependencies:
+    "@types/react-reconciler" "^0.28.0"
+
 jackspeak@^2.3.5:
   version "2.3.6"
   resolved "https://registry.yarnpkg.com/jackspeak/-/jackspeak-2.3.6.tgz#647ecc472238aee4b06ac0e461acc21a8c505ca8"
@@ -6379,6 +6400,11 @@ klona@^2.0.4, klona@^2.0.5:
   version "2.0.6"
   resolved "https://registry.yarnpkg.com/klona/-/klona-2.0.6.tgz#85bffbf819c03b2f53270412420a4555ef882e22"
   integrity sha512-dhG34DXATL5hSxJbIexCft8FChFXtmskoZYnoPWjXQuebWYCNkVeV3KkGegCK9CP1oswI/vQibS2GY7Em/sJJA==
+
+konva@^9.3.1:
+  version "9.3.2"
+  resolved "https://registry.yarnpkg.com/konva/-/konva-9.3.2.tgz#92533dacf3e0373f7cd8138a7c3e1ecb70603d1c"
+  integrity sha512-I4CFGVbWKpzgYi1I0pmoHz8iYfmGc/A61yfltzcuBHMFuBwDsR2VnQo4+eFQ1dGyEAmHcdvTumJ871KqkhuGng==
 
 language-subtag-registry@^0.3.20:
   version "0.3.22"
@@ -7935,6 +7961,24 @@ react-is@^18.0.0:
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-18.2.0.tgz#199431eeaaa2e09f86427efbb4f1473edb47609b"
   integrity sha512-xWGDIW6x921xtzPkhiULtthJHoJvBbF3q26fzloPCK0hsvxtPVelvftw3zjbHWSkR2km9Z+4uxbDDK/6Zw9B8w==
 
+react-konva@^18.2.10:
+  version "18.2.10"
+  resolved "https://registry.yarnpkg.com/react-konva/-/react-konva-18.2.10.tgz#5b5edc5e9ed452755d21babc353747828868decc"
+  integrity sha512-ohcX1BJINL43m4ynjZ24MxFI1syjBdrXhqVxYVDw2rKgr3yuS0x/6m1Y2Z4sl4T/gKhfreBx8KHisd0XC6OT1g==
+  dependencies:
+    "@types/react-reconciler" "^0.28.2"
+    its-fine "^1.1.1"
+    react-reconciler "~0.29.0"
+    scheduler "^0.23.0"
+
+react-reconciler@~0.29.0:
+  version "0.29.0"
+  resolved "https://registry.yarnpkg.com/react-reconciler/-/react-reconciler-0.29.0.tgz#ee769bd362915076753f3845822f2d1046603de7"
+  integrity sha512-wa0fGj7Zht1EYMRhKWwoo1H9GApxYLBuhoAuXN0TlltESAjDssB+Apf0T/DngVqaMyPypDmabL37vw/2aRM98Q==
+  dependencies:
+    loose-envify "^1.1.0"
+    scheduler "^0.23.0"
+
 react-refresh@^0.11.0:
   version "0.11.0"
   resolved "https://registry.yarnpkg.com/react-refresh/-/react-refresh-0.11.0.tgz#77198b944733f0f1f1a90e791de4541f9f074046"
@@ -8904,6 +8948,11 @@ svgo@^2.7.0:
     csso "^4.2.0"
     picocolors "^1.0.0"
     stable "^0.1.8"
+
+sweetalert2@^11.10.5:
+  version "11.10.5"
+  resolved "https://registry.yarnpkg.com/sweetalert2/-/sweetalert2-11.10.5.tgz#ff01f45b40ad678ca1f0c2e6c98800d79a74c49f"
+  integrity sha512-q9eE3EKhMcpIDU/Xcz7z5lk8axCGkgxwK47gXGrrfncnBJWxHPPHnBVAjfsVXcTt8Yi8U6HNEcBRSu+qGeyFdA==
 
 symbol-tree@^3.2.4:
   version "3.2.4"
