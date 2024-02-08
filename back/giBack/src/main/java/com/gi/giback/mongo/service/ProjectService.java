@@ -138,4 +138,9 @@ public class ProjectService {
         // 업데이트 성공 여부 확인 (수정된 문서 수가 0보다 크면 true 반환)
         return result.getModifiedCount() > 0;
     }
+
+    public boolean checkProjectId(Long projectId) {
+        Optional<ProjectEntity> project = repository.findById(projectId);
+        return project.isPresent();
+    }
 }

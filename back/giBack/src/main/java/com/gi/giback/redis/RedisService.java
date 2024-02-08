@@ -14,12 +14,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.ListOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 @Service
+@Slf4j
 public class RedisService {
 
     private final RedisTemplate<String,Object> redisTemplate;
@@ -46,9 +48,10 @@ public class RedisService {
         combinedData.put("newData", data.getNewData());
         String jsonData = objectMapper.writeValueAsString(combinedData);
 
-        listOps.rightPush(key, jsonData);
+        listOps.rightPush(key, jsonData); // 2개씩 보내지는 버그(프론트) 고쳐지면 pop 기능 제거
+        log.info("Save data - Redis");
         Long size = listOps.size(key);
-        if (size != null && size > 30) { // 만약 크기가 30이 넘어가면 merge 작업 수행
+        if (size != null && size > 60) { // 만약 크기가 30이 넘어가면 merge 작업 수행
             // 병합 작업 수행
             List<ProjectProcessDTO> redisData = getAllDataProject(projectId);
             projectService.updateData(projectId, redisData);
@@ -58,9 +61,12 @@ public class RedisService {
     public Object getLastProjectData(Long projectId, String userEmail) { // 되돌리기에서 사용
         String key = projectId + ":" + userEmail;
         if(Boolean.TRUE.equals(redisTemplate.hasKey(key))){
+            log.info("Get last data - Redis");
+            redisTemplate.opsForList().rightPop(key);
             return redisTemplate.opsForList().rightPop(key);
             // 마지막 값 pop 작업 수행 후 반환
             // if 앞으로 돌리기 작업 추가시 꺼내온 값을 다른 곳에 임시 저장 필요
+
         }
         return null;
     }
@@ -94,7 +100,7 @@ public class RedisService {
                 }
             }
         }
-
+        log.info("Get all data - Redis");
         results.sort(Comparator.comparing(ProjectProcessDTO::getUpdateTime));
         return results;
     }
