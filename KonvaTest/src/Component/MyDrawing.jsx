@@ -73,6 +73,13 @@ const MyDrawing = () => {
   const [texts, setTexts] = useState([]);
   const [images, setImages] = useState([]);
   const [currentLine, setCurrentLine] = useState([]);
+  const [wholeData, setWholeData] = useState([]);
+  const [checkDelete, setCheckDelete] = useState(false);
+
+  function checkPost() {
+    setCheckDelete(!checkDelete);
+  }
+  
 
   //전체 드래그 기능 구현
   const [selectedIds, setSelectedIds] = useState([]);
@@ -154,12 +161,27 @@ const MyDrawing = () => {
   }, [texts]);
 
   useEffect(() => {
+    if (layerRef.current) {
+      layerRef.current.batchDraw();
+    }
+  });
+
+  useEffect(() => {
     setHistory([...history, shapes]);
   }, [shapes]);
 
   useEffect(() => {
     console.log("업데이트됨" + selectedId);
+    // if(layerRef.current){
+    //   layerRef.current.batchDraw();
+    //   console.log(":teststsetst")
+    // }
   }, [selectedId]);
+
+  useEffect(() => {
+    // console.log(JSON.stringify(preData) + "preData 확인용");
+    console.log("checkdata");
+  }, [preData]);
 
   const {
     changeSelectedShapeColor,
@@ -181,10 +203,6 @@ const MyDrawing = () => {
     setCurrentColor,
     setSelectedId
   );
-
-  const { PostData, PostSave } = postData(projectId, userEmail, setPreData, preData);
-
-  const { undoEvent } = undoData(axios, projectId, userEmail);
 
   const {
     addText,
@@ -248,7 +266,8 @@ const MyDrawing = () => {
     setTexts,
     setShapes,
     setLines,
-    setImages
+    setImages,
+    setWholeData
   );
 
   const [socket, setSocket] = useState(null);
@@ -375,7 +394,7 @@ const MyDrawing = () => {
   const handleMouseDown = (e) => {
     if (e) {
       const newData = e.target.attrs;
-      // console.log(JSON.stringify(newData), "확인해볼래용");  
+      // console.log(JSON.stringify(newData), "확인해볼래용");
 
       setPreData((prevData) => {
         const index = prevData.findIndex((data) => data.id === newData.id);
@@ -459,6 +478,28 @@ const MyDrawing = () => {
 
     sendInfoToServer();
   };
+
+  const { PostData, PostSave, PostDelete } = postData(
+    projectId,
+    userEmail,
+    preData,
+    selectedId,
+    sendInfoToServer,
+    wholeData,
+    setWholeData,
+    checkDelete, setCheckDelete,checkPost
+  );
+
+  const { undoEvent, updateArray } = undoData(
+    projectId,
+    userEmail,
+    setTexts,
+    setShapes,
+    setLines,
+    setImages,
+    dragEnded,
+    sendInfoToServer
+  );
 
   const handleDragEnd = async (e) => {
     if (!e || !e.target) {
@@ -605,6 +646,10 @@ const MyDrawing = () => {
       setDragEnded(false);
     }
   }, [dragEnded]);
+
+  useEffect(() => {
+
+  },[checkDelete])
 
   const checkObject = (shapeId, newX, newY) => {
     console.log(shapes);
@@ -913,7 +958,7 @@ const MyDrawing = () => {
       {/* 삭제 버튼 */}
       <div
         className="cursor-pointer absolute top-[540px] left-6  bg-white rounded-md w-[50px] h-[50px] flex justify-center items-center shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]"
-        onClick={() => deleteSelected()}
+        onClick={() => PostDelete()}
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -934,7 +979,7 @@ const MyDrawing = () => {
       {/* 실행취소 버튼 */}
       <div
         className="cursor-pointer absolute top-[610px]  hover:stroke-blue left-6  bg-white rounded-md w-[50px] h-[50px] flex justify-center items-center shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]"
-        onClick={() => undo()}
+        onClick={() => undoEvent()}
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
