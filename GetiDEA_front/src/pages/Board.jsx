@@ -119,7 +119,8 @@ const MyDrawing = () => {
 
   useEffect(() => {
     getProjectData();
-    console.log(`|\\_/|
+    console.log(
+    `|\\_/|
     |q p|   /}
     ( 0 )"""\\
     |"^"\`    |
@@ -266,7 +267,7 @@ const MyDrawing = () => {
     };
 
     socket.onmessage = (event) => {
-      // console.log("서버로부터 메시지를 받았습니다:", event.data);
+      console.log("서버로부터 메시지를 받았습니다:", event.data);
 
       if (event.data instanceof Blob) {
         const textDataPromise = new Response(event.data).text();
@@ -481,9 +482,9 @@ const MyDrawing = () => {
     // console.log(JSON.stringify(newData))
 
     if (!id) {
-      console.log("id 확인 " + "혹시 null인가?");
+      // console.log("id 확인 " + "혹시 null인가?");
     } else {
-      console.log("오예 성공! " + id);
+      // console.log("오예 성공! " + id);
     }
 
     if (type === "Dot" || type === "Arrow" || type === "Line") {
@@ -548,7 +549,7 @@ const MyDrawing = () => {
 
     const rotationAngle = node.rotation();
 
-    console.log(`Rotation angle: ${rotationAngle}`);
+    // console.log(`Rotation angle: ${rotationAngle}`);
   };
 
   const zoomOnWheel = useCallback((e) => {
@@ -611,11 +612,11 @@ const MyDrawing = () => {
   }, [dragEnded]);
 
   const checkObject = (shapeId, newX, newY) => {
-    console.log(shapes);
-    console.log(lines);
-    console.log(texts);
-    console.log(images);
-    console.log(drawingList);
+    // console.log(shapes);
+    // console.log(lines);
+    // console.log(texts);
+    // console.log(images);
+    // console.log(drawingList);
   };
 
   const handleColorChange = (e) => {

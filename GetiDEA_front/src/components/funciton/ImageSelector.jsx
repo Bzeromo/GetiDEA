@@ -44,19 +44,16 @@ const ImageSelector = ({ onImageSelect }) => {
     "/img/template1_bubble_chat/bubble_chat32.svg",
     "/img/template1_bubble_chat/bubble_chat33.svg",
     "/img/template1_bubble_chat/bubble_chat34.svg",
-    "/img/template1_bubble_chat/bubble_chat_set_removebg.png",
     
     // template 2 : six hats 관련 이미지
-    "/img/template2_6hats/template2.png",
     "/img/template2_6hats/hat1_white.svg",
     "/img/template2_6hats/hat2_red.svg",
     "/img/template2_6hats/hat3_yellow.svg",
     "/img/template2_6hats/hat4_black.svg",
     "/img/template2_6hats/hat5_green.svg",
     "/img/template2_6hats/hat6_blue.svg",
-
+    
     // template 3 : check7 관련 이미지
-    "/img/template3_check7/template3.png",
     "/img/template3_check7/bulb.svg",   
     // "/img/template3_check7/card1.png",
     // "/img/template3_check7/card2.png",
@@ -66,6 +63,10 @@ const ImageSelector = ({ onImageSelect }) => {
     // "/img/template3_check7/card6.png",
     // "/img/template3_check7/card7.png",
     // "/img/template3_check7/writing_area.png",
+    
+    // template 이미지 최종
+    "/img/template2_6hats/template2.png",
+    "/img/template3_check7/template3.png",
 
     // 여기에 더 많은 이미지 경로를 추가할 수 있습니다.
   ];
