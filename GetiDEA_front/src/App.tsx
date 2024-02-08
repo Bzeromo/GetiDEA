@@ -47,7 +47,10 @@ const App: React.FC = () => {
 
           <Route path="/templateSelect" element={<ProtectedRoute><TemplateSelect /></ProtectedRoute>} />
           <Route path="/projectnameinput" element={<ProtectedRoute><ProjectNameInput /></ProtectedRoute>} />
-          <Route path="/board" element={<ProtectedRoute><Board /></ProtectedRoute>} />
+          {/* <Route path="/board" element={<ProtectedRoute><Board /></ProtectedRoute>} /> */}
+
+          {/* Board에 로그인 없이 접근하기 위함 */}
+          <Route path="/board" element={<Board />} />
         
          
       </Routes>
