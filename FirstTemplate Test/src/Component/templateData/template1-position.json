@@ -9,7 +9,8 @@
             "height": 200,
             "draggable": false,
             "scaleX": 1,
-            "scaleY": 1
+            "scaleY": 1,
+            "color": "rgb(173, 255, 47)"
         },
         "2": {
             "src": "/img/template1_bubble_chat/bubble_chat2.svg",
@@ -290,7 +291,7 @@
         "25": {
             "src": "/img/template1_bubble_chat/bubble_chat25.svg",
             "x": 81.17947359999947,
-            "y": -155.19429442057532,
+            "y": -175.19429442057532,
             "ty": "img",
             "type": "Image",
             "width": 192.30769230769232,

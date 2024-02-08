@@ -1,10 +1,8 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
-import { Stage, Layer, Transformer, Line, Image, Text } from "react-konva";
+import { Stage, Layer, Transformer, Line, Image } from "react-konva";
 import axios from "axios";
-import useImage from 'use-image';
+import useImage from "use-image";
 import URLImage from "./Add/URLImage";
-import bubbleChatProperties from "./templateData/template1-position.json";
-import randaomWords from "./templateData/randomWords.json";
 
 import ImgComponent from "./Add/ImgComponent";
 import ShapeComponent from "./Add/ShapeComponent";
@@ -20,11 +18,8 @@ import TextComponent from "./Add/TextComponent";
 import useEventHandler from "./funciton/useEventHandler";
 import ImageSelector from "./funciton/ImageSelector";
 import undoData from "./axios/undoData";
-import getData from "./axios/getData";
-import ImageGallery from "./ImageGallery";
 
 const MyDrawing = () => {
-
   const [imageIdCounter, setImageIdCounter] = useState(0);
 
   const [rectPosition, setRectPosition] = useState({ x: 50, y: 50 });
@@ -110,9 +105,6 @@ const MyDrawing = () => {
     useState(false);
   const [imgMenuToggle, setImgMenuToggle] = useState(false);
 
-  const projectId = 3;
-  const userEmail = "wnsrb933@naver.com";
-
   const {
     changeSelectedShapeColor,
     changeSelectedStrokeColor,
@@ -143,9 +135,8 @@ const MyDrawing = () => {
     PostDot,
     PostArrow,
     PostSave,
-  } = postData(projectId, userEmail);
+  } = postData(axios);
 
-  const { undoEvent } = undoData(axios, projectId, userEmail);
   const {
     addText,
     addRectangle,
@@ -184,9 +175,9 @@ const MyDrawing = () => {
   const {
     deleteSelectedShape,
     deleteSelectedLine,
+    deleteSelectedDrawing,
     deleteSelectedText,
     deleteSelectedImage,
-    deleteSelectedDrawing,
     deleteSelected,
   } = deleteFunction(
     shapes,
@@ -195,8 +186,8 @@ const MyDrawing = () => {
     setSelectedId,
     lines,
     setLines,
-    drawingList, // 이 위치가 맞아야 합니다.
-    setDrawingList, // 이 위치가 맞아야 합니다.
+    setDrawingList,
+    drawingList,
     texts,
     setTexts,
     images,
@@ -214,78 +205,64 @@ const MyDrawing = () => {
     console.log("업데이트됨" + selectedId);
   }, [selectedId]);
 
-  // function updateArray(array, item, key) {
-  //   const index = array.findIndex((element) => element.id === key);
+  function updateArray(array, item, key) {
+    const index = array.findIndex((element) => element.id === key);
 
-  //   if (index >= 0) {
-  //     // 기존 항목 업데이트
-  //     return array.map((element, i) =>
-  //       i === index ? { ...element, ...item } : element
-  //     );
-  //   } else {
-  //     // 새 항목 추가
-  //     return [...array, { id: key, ...item }];
-  //   }
-  // }
+    if (index >= 0) {
+      // 기존 항목 업데이트
+      return array.map((element, i) =>
+        i === index ? { ...element, ...item } : element
+      );
+    } else {
+      // 새 항목 추가
+      return [...array, { id: key, ...item }];
+    }
+  }
 
-  const { getProjectData, updateArray } = getData(
-    projectId,
-    setTexts,
-    setShapes,
-    setLines,
-    setImages
-  );
+  const GetData = () => {
+    axios
+      .get("http://192.168.31.172:8080/api/project/data/1/1")
+      .then((response) => {
+        if (response.data && response.data.data) {
+          const dataItems = response.data.data;
 
-  // const GetData = () => {
-  //   axios
-  //     .get("http://192.168.31.172:8080/api/project/test1/1")
-  //     .then((response) => {
-  //       if (response.data && response.data.data) {
-  //         const dataItems = response.data.data;
+          console.log(response);
 
-  //         console.log(response);
+          Object.keys(dataItems).forEach((key) => {
+            const item = dataItems[key];
+            const itemWithDefaults = {
+              ...item,
+              x: item.x ?? 0, // 기본값 0으로 설정
+              y: item.y ?? 0, // 기본값 0으로 설정
+              // 필요한 다른 속성에 대해서도 기본값을 설정할 수 있습니다.
+            };
+            switch (item.ty) {
+              case "Text":
+                setTexts((prevTexts) => updateArray(prevTexts, key));
+                break;
+              case "Shape":
+                console.log(JSON.stringify(item) + "짜잔?");
+                setShapes((prevShapes) => updateArray(prevShapes, itemWithDefaults, key));
+                break;
+              case "Line":
+                setLines((prevLines) => updateArray(prevLines, item, key));
+                break;
+              case "img":
+                setImages((prevImage) => updateArray(prevImage, item, key));
+                break;
+              default:
+                // 기타 타입 처리
+                break;
+            }
+          });
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  };
 
-  //         Object.keys(dataItems).forEach((key) => {
-  //           const item = dataItems[key];
-  //           const itemWithDefaults = {
-  //             ...item,
-  //             x: item.x ?? 0, // 기본값 0으로 설정
-  //             y: item.y ?? 0, // 기본값 0으로 설정
-  //             // 필요한 다른 속성에 대해서도 기본값을 설정할 수 있습니다.
-  //           };
-  //           switch (item.ty) {
-  //             case "Text":
-  //               setTexts((prevTexts) =>
-  //                 updateArray(prevTexts, itemWithDefaults, key)
-  //               );
-  //               break;
-  //             case "Shape":
-  //               console.log(JSON.stringify(item) + "짜잔?");
-  //               setShapes((prevShapes) =>
-  //                 updateArray(prevShapes, itemWithDefaults, key)
-  //               );
-  //               break;
-  //             case "Line":
-  //               setLines((prevLines) =>
-  //                 updateArray(prevLines, itemWithDefaults, key)
-  //               );
-  //               break;
-  //             case "img":
-  //               setImages((prevImage) =>
-  //                 updateArray(prevImage, itemWithDefaults, key)
-  //               );
-  //               break;
-  //             default:
-  //               // 기타 타입 처리
-  //               break;
-  //           }
-  //         });
-  //       }
-  //     })
-  //     .catch((error) => {
-  //       console.error(error);
-  //     });
-  // };
+
 
   const [socket, setSocket] = useState(null);
 
@@ -325,8 +302,6 @@ const MyDrawing = () => {
     socket.onclose = () => {
       console.log("WebSocket 연결이 닫혔습니다.");
     };
-
-
 
     // 컴포넌트 언마운트 시 WebSocket 연결 해제
     return () => {
@@ -582,7 +557,7 @@ const MyDrawing = () => {
     const id = e.target.attrs.id;
     const ty = e.target.attrs.ty;
 
-    console.log(id + "id를 확ㅇ닣래보자");
+    console.log(id + "id를 확인해보자");
     console.log(ty + " tetstsetawetfdgdfffsdfsdfsdfsdds");
     const type = e.target.attrs.type;
 
@@ -925,8 +900,91 @@ const MyDrawing = () => {
 
 
 
-  //Template의 정보 받아오기.,,
-  const ImageComponent = ({ src, x, y, width, height, rotation, scaleX, scaleY, color }) => {
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  // 템플릿3 이미지 생성 코드
+  const templateImage3 = [
+    {
+      "id": "template3",
+      "src": "/img/template3_check7/template3.png",
+      "x": 31,  // x좌표
+      "y": 10,  // y좌표
+      "ty": "img",
+      "type": "Image",
+      "width": 200,
+      "height": 96,
+      "draggable": false,
+      "rotation": 0,
+      "scaleX": 5.86,
+      "scaleY": 5.86,
+    }
+  ]
+
+  
+    const templateId = 3
+  // useEffect(() => {
+
+  //   const templateImage3 = {
+  //     "id": "template3",
+  //     "src": "/img/template3_check7/template3.png",
+  //     "x": 31,  // x좌표
+  //     "y": 10,  // y좌표
+  //     "ty": "img",
+  //     "type": "Image",
+  //     "width": 200,
+  //     "height": 96,
+  //     "draggable": false,
+  //     "rotation": 0,
+  //     "scaleX": 5.86,
+  //     "scaleY": 5.86,
+  //   }
+
+
+  //   if (templateId == 1) {
+    
+  //   } else if (templateId == 2) {
+
+  //   } else if (templateId == 3) {
+  //     setImages([templateImage3])
+  //   } else {
+
+  //   }
+    
+  // }, [])
+
+  useEffect(() =>{
+  }, [templateId])
+
+
+  const ImageComponent = ({ src, x, y, width, height, draggable,rotation, scaleX, scaleY }) => {
     const [image] = useImage(src);
 
     return (
@@ -939,61 +997,10 @@ const MyDrawing = () => {
         rotation={rotation}
         scaleX={scaleX}
         scaleY={scaleY}
-        color={color}
-        draggable
+        draggable={draggable}
       />
     );
   };
-
-
-  //랜덤한 단어의 속성 설정하기
-  const RandomTextComponent = ({ text, x, y, fontSize, textProps }) => {
-
-    return (
-      <Text
-        text={text}
-        x={x}
-        y={y}
-        fontSize={fontSize}
-        {...textProps}
-      />
-    );
-  };
-
-  // words.json 파일을 불러옵니다.
-  const words = require("./templateData/randomWords.json");
-
-  //랜덤한 단어를 내뱉는 함수.
-  const getRandomWords = () => {
-    const selectedWords = [];
-    const totalWords = words.length;
-    const wordsToSelect = 34;
-
-    // 중복되지 않는 랜덤한 단어를 선택합니다.
-    while (selectedWords.length < wordsToSelect) {
-      const randomIndex = Math.floor(Math.random() * totalWords);
-      const word = words[randomIndex];
-      if (!selectedWords.includes(word)) {
-        selectedWords.push(word);
-      }
-    }
-
-    return selectedWords;
-  };
-
-  const selectedWords = getRandomWords();
-
-
-
-  
-  const firstTemplateProperties = Object.values(bubbleChatProperties);
-
-
-
-
-
-
-
 
 
 
@@ -1314,12 +1321,12 @@ const MyDrawing = () => {
 
       {/* 오른쪽 윗 블록 */}
       <div className="absolute top-6 right-52 justify-center bg-white rounded-md w-16 h-[50px] flex  items-center flex-row shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]">
-        <button onClick={() => getProjectData()}>Get</button>
+        <button onClick={() => GetData()}>Get</button>
       </div>
 
       {/* 오른쪽 윗 블록 */}
       <div className="absolute top-6 right-94 justify-center bg-white rounded-md w-16 h-[50px] z-50 flex  items-center flex-row shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]">
-        <button onClick={() => PostSave()}>Save</button>
+        <button onClick={() => GetData()}>Get</button>
       </div>
 
       {/* 오른쪽 윗 블록 */}
@@ -1362,193 +1369,180 @@ const MyDrawing = () => {
         </div>
       )}
 
+
       {/* 그리는 구역 */}
-      <div className="absolute top-20 left-36">
-        <div className="max-w-[1300px] max-h-[580px] overflow-hidden">
-
-          <Stage
-            ref={stageRef}
-            width={window.innerWidth}
-            height={window.innerHeight}
-            draggable={!draggable}
-            onWheel={zoomOnWheel}
-            onMouseDown={handleMouseDown}
-            onMousemove={handleMouseMove}
-            onMouseup={handleMouseUp}
-            onDragEnd={handleDragEnd}
-            onClick={handleLayerClick}
-          >
-            <Layer ref={layerRef}>
-
+      <div className="ml-36 mt-24 h-full w-full" >
+      
+        <Stage
+          ref={stageRef}
+          width={window.innerWidth}
+          height={window.innerHeight}
+          draggable={!draggable}
+          onWheel={zoomOnWheel}
+          onMouseDown={handleMouseDown}
+          onMousemove={handleMouseMove}
+          onMouseup={handleMouseUp}
+          onDragEnd={handleDragEnd}
+          onClick={handleLayerClick}
+        >
+          <Layer ref={layerRef}>
 
 
+          {/* 템플릿3 적용 */}
+          
+          {templateId === 3 && templateImage3.map((imgInfo) => (
+          <ImageComponent key={imgInfo.id} {...imgInfo} />
+          ))}
+          
+
+          
 
 
 
-              {/**이게 for문와 같은 역할. 여기서 이미지 속성에 맞게 화면에 표시될거임 */}
-              {/* {firstTemplateProperties.map((imgInfo, index) => (
-            console.log(selectedWords),
-          <ImageComponent key={imgInfo.id} {...imgInfo} />,
-           <RandomTextComponent key={`text_${index}`} x={imgInfo.x} y={imgInfo.y} />
-          ))} */}
 
-              {firstTemplateProperties.map((imgInfo, index) => {
-                // 랜덤한 단어를 가져옵니다.
-                const randomWords = getRandomWords();
-                // 랜덤한 단어 중 첫 번째 단어를 선택합니다.
-                const randomWord = randomWords[0];
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            {drawing && (
+              <Line
+                points={currentLine}
+                stroke={currentColor}
+                strokeWidth={5}
+              />
+            )}
+            {drawingList.map((drawing, id) => (
+              <Line key={id} {...drawing} />
+            ))}
+            {shapes.map((shape) => (
+              <ShapeComponent
+                key={shape.id}
+                shapeProps={shape}
+                isSelected={shape.id === selectedId}
+                onTransformEnd={handleTransformEnd}
+                onSelect={(e) => {
+                  handleShapeClick(shape.id, e);
+                }}
+                onChange={(newAttrs) => {
+                  const newShapes = shapes.map((s) =>
+                    s.id === shape.id ? newAttrs : s
+                  );
+                  setShapes(newShapes); // 상태 업데이트
+                }}
+              />
+            ))}
+            {lines.map((line) => {
+              if (line.type === "Arrow") {
                 return (
-                  <React.Fragment key={imgInfo.id}>
-                    {/* 이미지 컴포넌트 렌더링 */}
-                    <ImageComponent key={imgInfo.id} {...imgInfo} />
-
-                    {/* 랜덤한 단어를 표시하는 텍스트 컴포넌트 렌더링 */}
-                    <RandomTextComponent
-                      key={`text_${index}`}
-                      x={imgInfo.x + imgInfo.width*0.2}
-                      y={imgInfo.y + imgInfo.height*0.4}
-                      text={randomWord}
-                      fontSize={11} // 원하는 폰트 크기 설정
-                      textProps={{ fill: "black" }} // 추가적인 텍스트 스타일 설정 가능
-                    />
-                  </React.Fragment>
+                  <ArrowComponent
+                    key={line.id}
+                    ref={lineRef}
+                    lineProps={line}
+                    isSelected={line.id === selectedId}
+                    onSelect={(e) => {
+                      handleShapeClick(line.id, e);
+                    }}
+                    onChange={(newAttrs) => {
+                      const newLines = lines.map((l) =>
+                        l.id === line.id ? newAttrs : l
+                      );
+                      setLines(newLines);
+                    }}
+                  />
                 );
-              })}
-
-              {/* {firstTemplateProperties.map((textInfo) =>(
-          ))} */}
-
-
-
-
-
-
-
-
-
-              {drawing && (
-                <Line
-                  points={currentLine}
-                  stroke={currentColor}
-                  strokeWidth={5}
-                />
-              )}
-              {drawingList.map((drawing, id) => (
-                <Line key={id} {...drawing} />
-              ))}
-              {shapes.map((shape) => (
-                <ShapeComponent
-                  key={shape.id}
-                  shapeProps={shape}
-                  isSelected={shape.id === selectedId}
-                  onTransformEnd={handleTransformEnd}
-                  onSelect={(e) => {
-                    handleShapeClick(shape.id, e);
-                  }}
-                  onChange={(newAttrs) => {
-                    const newShapes = shapes.map((s) =>
-                      s.id === shape.id ? newAttrs : s
-                    );
-                    setShapes(newShapes); // 상태 업데이트
-                  }}
-                />
-              ))}
-              {lines.map((line) => {
-                if (line.type === "Arrow") {
-                  return (
-                    <ArrowComponent
-                      key={line.id}
-                      ref={lineRef}
-                      lineProps={line}
-                      isSelected={line.id === selectedId}
-                      onSelect={(e) => {
-                        handleShapeClick(line.id, e);
-                      }}
-                      onChange={(newAttrs) => {
-                        const newLines = lines.map((l) =>
-                          l.id === line.id ? newAttrs : l
-                        );
-                        setLines(newLines);
-                      }}
-                    />
+              } else {
+                return (
+                  <LineComponent
+                    key={line.id}
+                    lineProps={line}
+                    ref={lineRef}
+                    isSelected={line.id === selectedId}
+                    onSelect={(e) => {
+                      handleShapeClick(line.id, e);
+                    }}
+                    onChange={(newAttrs) => {
+                      const newLines = lines.map((l) =>
+                        l.id === line.id ? newAttrs : l
+                      );
+                      setLines(newLines);
+                    }}
+                  />
+                );
+              }
+            })}
+            {texts.map((text, id) => (
+              <TextComponent
+                key={text.id}
+                textProps={text}
+                fontSize={fontSize}
+                isSelected={text.id === selectedId}
+                onSelect={(e) => {
+                  handleShapeClick(text.id, e);
+                }}
+                onChange={(newAttrs) => {
+                  const newTexts = texts.map((t) =>
+                    t.id === text.id ? { ...t, ...newAttrs } : t
                   );
-                } else {
-                  return (
-                    <LineComponent
-                      key={line.id}
-                      lineProps={line}
-                      ref={lineRef}
-                      isSelected={line.id === selectedId}
-                      onSelect={(e) => {
-                        handleShapeClick(line.id, e);
-                      }}
-                      onChange={(newAttrs) => {
-                        const newLines = lines.map((l) =>
-                          l.id === line.id ? newAttrs : l
-                        );
-                        setLines(newLines);
-                      }}
-                    />
-                  );
-                }
-              })}
-              {texts.map((text, id) => (
-                <TextComponent
-                  key={text.id}
-                  textProps={text}
-                  fontSize={fontSize}
-                  isSelected={text.id === selectedId}
-                  onSelect={(e) => {
-                    handleShapeClick(text.id, e);
-                  }}
-                  onChange={(newAttrs) => {
-                    const newTexts = texts.map((t) =>
-                      t.id === text.id ? { ...t, ...newAttrs } : t
-                    );
-                    setTexts(newTexts);
-                  }}
-                  setSelectedId={setSelectedId}
-                  onTextChange={(newText) => handleTextChange(text.id, newText)}
-                />
-              ))}
+                  setTexts(newTexts);
+                }}
+                setSelectedId={setSelectedId}
+                onTextChange={(newText) => handleTextChange(text.id, newText)}
+              />
+            ))}
 
-              {images.map((img) => (
-                <ImgComponent
-                  key={img.id}
-                  id={img.id}
-                  ty={img.ty}
-                  ref={ImageRef}
-                  imageSrc={img.src}
-                  x={img.x}
-                  y={img.y}
-                  isSelected={img.id === selectedId}
-                  onSelect={(e) => {
-                    handleShapeClick(img.id, e);
-                  }}
-                />
-              ))}
+            {images.map((img) => (
+              <ImgComponent
+                key={img.id}
+                id={img.id}
+                ty={img.ty}
+                ref={ImageRef}
+                imageSrc={img.src}
+                x={img.x}
+                y={img.y}
+                isSelected={img.id === selectedId}
+                onSelect={(e) => {
+                  handleShapeClick(img.id, e);
+                }}
+              />
+            ))}
 
-
-              {selectedId && (
-                <Transformer
-                  ref={(node) => {
-                    if (node) {
-                      const selectedNode = node
-                        .getStage()
-                        .findOne(`#${selectedId}`);
-                      if (selectedNode) {
-                        node.attachTo(selectedNode);
-                      }
+            {selectedId && (
+              <Transformer
+                ref={(node) => {
+                  if (node) {
+                    const selectedNode = node
+                      .getStage()
+                      .findOne(`#${selectedId}`);
+                    if (selectedNode) {
+                      node.attachTo(selectedNode);
                     }
-                  }}
-                />
-              )}
-
-            </Layer>
-
-          </Stage>
-        </div>
+                  }
+                }}
+              />
+            )}
+          </Layer>
+        </Stage>
       </div>
     </div>
   );
