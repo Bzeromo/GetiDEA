@@ -1,4 +1,5 @@
 .env
+.conf
 *.yml
 *.log
 init-mongo.js

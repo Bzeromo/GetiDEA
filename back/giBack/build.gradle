@@ -78,3 +78,8 @@ bootRun {
     // gradle terminal 실행 시 server port 설정 가능
     systemProperty "server.port", findProperty("server.port")
 }
+
+bootJar {
+    baseName = 'getidea'
+    version =  '0.1.0'
+}

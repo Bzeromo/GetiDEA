@@ -32,7 +32,7 @@ FROM azul/zulu-openjdk-alpine:17
 WORKDIR /app
 
 # 1단계에서 빌드된 애플리케이션 파일을 현재 스테이지로 복사
-COPY --from=build /app/build/libs/*.jar app.jar
+COPY --from=build /app/build/libs/getidea-0.1.0.jar app.jar
 
 # entrypoint.sh 스크립트 복사
 COPY entrypoint.sh entrypoint.sh
