@@ -80,6 +80,7 @@ bootRun {
 }
 
 bootJar {
-    baseName = 'getidea'
-    version =  '0.1.0'
+    archiveBaseName = 'myapplication'
+    archiveVersion = '0.1.0'
+    archiveFileName = "${archiveBaseName.get()}-${archiveVersion.get()}.jar"
 }
