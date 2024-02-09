@@ -22,6 +22,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -39,6 +40,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/project")
 @Tag(name = "프로젝트 컨트롤러", description = "프로젝트 관련 컨트롤러")
 @CrossOrigin
+@Slf4j
 public class ProjectController {
 
     private final RedisService redisService;
@@ -100,8 +102,11 @@ public class ProjectController {
 
         List<ProjectProcessDTO> redisData = null; // 병합 작업부터 수행
 
+        log.info("Open Project");
+        log.info("Check Merge");
         redisData = redisService.getAllDataProject(projectId);
         if (!redisData.isEmpty()) { // 레디스에 데이터가 있을경우 병합
+            log.info("Merge Redis-Mongo");
             projectService.updateData(projectId, redisData);
         }
 
@@ -116,8 +121,9 @@ public class ProjectController {
 
     @PostMapping("/change")// Redis에 변경사항 저장
     @Operation(summary = "변경사항 저장 (Redis) - 테스트 완료", description = "작업 진행중 변경사항 Redis에 임시 저장")
-    public ResponseEntity<?> saveData(@RequestBody @Parameter(description = "프로젝트 변경 데이터(작업 전, 후) JSON") ProjectInputDTO data)
+    public ResponseEntity<?> saveToRedis(@RequestBody @Parameter(description = "프로젝트 변경 데이터(작업 전, 후) JSON") ProjectInputDTO data)
             throws JsonProcessingException {
+
         redisService.saveData(data);
         return ResponseEntity.ok().build();
     }
@@ -145,6 +151,7 @@ public class ProjectController {
 
         try { // 종료시 병합 먼저 실행 => 병합코드를 front에서 호출해야함
             List<ProjectProcessDTO> redisData;
+            log.info("Merge Redis-Mongo");
             redisData = redisService.getAllDataProject(projectId);
             if (!redisData.isEmpty()) {
                 projectService.updateData(projectId, redisData);
@@ -192,7 +199,9 @@ public class ProjectController {
                 Optional<ProjectInfoDTO> entity = projectService.getProjectInfo(projectId);
                 entity.ifPresent(projectInfoList::add);
             }
-            return ResponseEntity.ok(projectInfoList);
+            List<ProjectInfoDTO> sortedProjectEntityList = projectInfoList.stream()
+                .sorted(Comparator.comparing(ProjectInfoDTO::getLastUpdateTime).reversed()).toList();
+            return ResponseEntity.ok(sortedProjectEntityList);
         }
         return ResponseEntity.badRequest().build();
     }
@@ -210,8 +219,11 @@ public class ProjectController {
             projectService.getProjectInfoByIdWithDay(projectId).ifPresent(projectInfoList::add);
         }
 
+        List<ProjectInfoDTO> sortedProjectEntityList = projectInfoList.stream()
+            .sorted(Comparator.comparing(ProjectInfoDTO::getLastUpdateTime).reversed()).toList();
+
         if (!projectInfoList.isEmpty()) {
-            return ResponseEntity.ok(projectInfoList);
+            return ResponseEntity.ok(sortedProjectEntityList);
         } else {
             return ResponseEntity.noContent().build(); // 프로젝트가 없을 경우 No Content 상태 코드 반환
         }
@@ -238,7 +250,7 @@ public class ProjectController {
             .toList();
 
         if (!sortedProjectEntityList.isEmpty()) {
-            return ResponseEntity.ok(ProjectInfoList);
+            return ResponseEntity.ok(sortedProjectEntityList);
         } else {
             return ResponseEntity.noContent().build(); // 프로젝트가 없을 경우 No Content 상태 코드 반환
         }
@@ -314,6 +326,7 @@ public class ProjectController {
         @RequestParam String userEmail) {
 
         Object data = redisService.getLastProjectData(projectId, userEmail);
+        log.info("Rollback project");
         return ResponseEntity.ok(data);
     }
 }

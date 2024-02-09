@@ -1,5 +1,6 @@
 package com.gi.giback.controller;
 
+import com.gi.giback.dto.FolderDTO;
 import com.gi.giback.mongo.service.ProjectService;
 import com.gi.giback.mysql.entity.FolderEntity;
 import com.gi.giback.mysql.entity.LocationEntity;
@@ -9,6 +10,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -26,25 +28,38 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/folder")
 @Tag(name = "폴더 컨트롤러 - 테스트 완료", description = "폴더 관련 컨트롤러")
 @CrossOrigin
+@Slf4j
 public class FolderController {
 
+    private final FolderService folderService;
+    private final LocationService locationService;
+    private final ProjectService projectService;
+
     @Autowired
-    private FolderService folderService;
-    @Autowired
-    private LocationService locationService;
-    @Autowired
-    private ProjectService projectService;
+    public FolderController(FolderService folderService, LocationService locationService,
+        ProjectService projectService) {
+        this.folderService = folderService;
+        this.locationService = locationService;
+        this.projectService = projectService;
+    }
 
     @PostMapping("/create")
     @Operation(summary = "사용자별 폴더 생성 - 테스트 완료", description = "사용자의 폴더 생성")
-    public FolderEntity createFolder(@RequestBody FolderEntity folder) {
-        return folderService.createFolder(folder);
+    public ResponseEntity<FolderEntity> createFolder(@RequestBody FolderDTO data) {
+
+        FolderEntity folder = new FolderEntity();
+        folder.setFolderName(data.getFolderName());
+        folder.setUserEmail(data.getUserEmail());
+        FolderEntity result = folderService.createFolder(folder);
+        if (result == null)
+            return ResponseEntity.badRequest().build();
+        return ResponseEntity.ok(result);
     }
 
     @GetMapping("/search")
     @Operation(summary = "사용자별 폴더 검색 - 테스트 완료", description = "사용자의 폴더 검색")
-    public List<FolderEntity> getFoldersByUserEmail(@RequestParam @Parameter(description = "사용자 이메일") String userEmail) {
-        return folderService.getFoldersByUserEmail(userEmail);
+    public ResponseEntity<List<FolderEntity>> getFoldersByUserEmail(@RequestParam @Parameter(description = "사용자 이메일") String userEmail) {
+        return ResponseEntity.ok(folderService.getFoldersByUserEmail(userEmail));
     }
 
     @DeleteMapping("/remove")
@@ -71,10 +86,16 @@ public class FolderController {
 
     @PatchMapping("/rename")
     @Operation(summary = "폴더 이름 변경 - 테스트 완료", description = "폴더 이름 변경")
-    public FolderEntity updateFolderName(
+    public ResponseEntity<FolderEntity> updateFolderName(
             @RequestParam String userEmail,
             @RequestParam String oldFolderName,
             @RequestParam String newFolderName) {
-        return folderService.updateFolderName(userEmail, oldFolderName, newFolderName);
+
+        if(folderService.checkFolder(userEmail, oldFolderName))
+            return ResponseEntity.ok(folderService.updateFolderName(userEmail, oldFolderName, newFolderName));
+        else
+            return ResponseEntity.badRequest().build();
+
+
     }
 }

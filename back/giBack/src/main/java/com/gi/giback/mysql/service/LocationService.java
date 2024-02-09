@@ -4,10 +4,12 @@ import com.gi.giback.mysql.entity.LocationEntity;
 import com.gi.giback.mysql.repository.LocationRepository;
 import java.util.List;
 import java.util.Optional;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
+@Slf4j
 public class LocationService {
     private final LocationRepository locationRepository;
 
@@ -17,6 +19,7 @@ public class LocationService {
     }
 
     public LocationEntity createLocation(String userEmail, Long projectId, String projectName, String FolderName) {
+        log.info("Get folder : {}", userEmail);
         LocationEntity locationEntity = LocationEntity.builder()
                 .userEmail(userEmail)
                 .projectId(projectId)

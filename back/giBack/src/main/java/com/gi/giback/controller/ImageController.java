@@ -70,27 +70,16 @@ public class ImageController {
     }
 
     @PostMapping("/project")
-    @Operation(summary = "프로젝트 이미지 추가", description = "프로필/썸네일 이미지 변경")
+    @Operation(summary = "프로젝트 이미지 추가", description = "프로젝트 내 삽입된 이미지 저장 후, 이미지 url 반환")
     public ResponseEntity<String> updateProfileImage(
-        @RequestParam @Parameter(description = "type : thumbnailImage or profileImage"
-            + ", imageName : ProjectId or UserEmail, imageBase64 : 인코딩된 이미지 ")FileUploadDTO fileUploadDTO) {
-
-        String type = fileUploadDTO.getType();
-        String name = fileUploadDTO.getImageName();
-
+        @RequestParam @Parameter(description = "imageBase64 : 인코딩된 이미지 ")FileUploadDTO fileUploadDTO) {
         String result;
         try {
             result = s3UploadService.saveImage(fileUploadDTO);
-            if(type.equals("thumbnailImage")) {
-                Long pid = Long.parseLong(name);
-                projectService.updateProjectThumbnail(pid, result);
-            }
-            else if(type.equals("profileImage")) {
-                userService.updateUserProfileImage(name, result);
-            }
         } catch (IOException e) {
             return ResponseEntity.badRequest().build();
         }
         return ResponseEntity.ok(result);
     }
+
 }
