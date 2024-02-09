@@ -12,42 +12,84 @@ import {
   Image,
 } from "react-konva";
 
-const TextComponent = (
+const TextComponent = ({
     textProps,
     isSelected,
     onSelect,
     onChange,
     onTextEdit,
-  ) => {
-    const [text, setText] = useState("텍스트상자입니다");
-    const [isEditing, setIsEditing] = useState(false);
-    const [position, setPosition] = useState({ x: 50, y: 50 });
-
+  }) => {
+    const textRef = useRef();
+    const transformerRef = useRef();
+    const [editing, setEditing] = useState(false);
+    const [text, setText] = useState(textProps.text);
+    const [showInput, setShowInput] = useState(true);
+  
+    useEffect(() => {
+      if (isSelected) {
+        transformerRef.current.nodes([textRef.current]);
+        transformerRef.current.getLayer().batchDraw();
+      }
+      // console.log(editing);
+    }, [isSelected]);
+  
+    useEffect(() => {
+      console.log(editing);
+    }, [editing]);
+  
     const handleDoubleClick = () => {
-      setIsEditing(true);
+      console.log("더블 클릭됨"); // 로그 추가
+      setEditing((prevEditing) => !prevEditing);
+      // console.log(editing);
+      // console.log(editing);
     };
   
     const handleChange = (e) => {
+      console.log("change1");
       setText(e.target.value);
     };
   
     const handleBlur = () => {
-      setIsEditing(false);
+      console.log("change2");
+      setEditing(false);
+      if (onTextEdit) {
+        onTextEdit({ ...textProps, text });
+      }
+      onChange({ ...textProps, text }); // 변경된 텍스트를 상위 컴포넌트에 전달
     };
-
-  return (
-    <Text
-    x={position.x}
-    y={position.y}
-    text={text}
-    fontSize={20}
-    draggable
-    onDblClick={handleDoubleClick}
-    onDragEnd={(e) => {
-      setPosition({ x: e.target.x(), y: e.target.y() });
-    }}
-  />
-  );
+  
+    return (
+      <>
+        {showInput && (
+          <input
+            type="text"
+            value={text}
+            onChange={handleChange}
+            onBlur={handleBlur}
+            style={{
+              position: "absolute",
+              top: `${textProps.y}px`, // 확인: 정확한 위치 설정
+              left: `${textProps.x}px`, // 확인: 정확한 위치 설정
+              zIndex: "1000",
+              // 추가 스타일링이 필요한 경우 여기에 추가
+              width: "100px",
+              height: "50px",
+              backgroundColor: "black",
+            }}
+            autoFocus
+          />
+        )}
+        <Text
+          ref={textRef}
+          {...textProps}
+          text={text}
+          draggable
+          onClick={onSelect}
+          onDblClick={handleDoubleClick}
+        />
+        {isSelected && <Transformer ref={transformerRef} />}
+      </>
+    );
   };
 
   export default TextComponent;
