@@ -53,7 +53,7 @@ public class JwtService {
             log.info("토큰 검증 완료");
             return !claims.getBody().getExpiration().before(new Date()); // 토큰 만료 날짜가 현재 날짜보다 이후인지 확인
         } catch (SignatureException ex) {
-            // 로그인 실패 처리 (예: 로그 기록)
+            log.info("토큰 검증 실패");
             return false;
         }
     }
