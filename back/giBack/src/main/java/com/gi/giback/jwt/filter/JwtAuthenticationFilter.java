@@ -60,6 +60,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
                     String newAccessToken = jwtService.createAccessToken(user.getUserEmail(), user.getUserName(), user.getProvider().toString());
                     response.setHeader("Authorization", "Bearer " + newAccessToken);
+                    // 클라이언트한테 다시 액세스 토큰 전송 필요
                     filterChain.doFilter(request, response);
 
                 } else {
@@ -68,7 +69,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     // 리프레시 토큰에 해당하는 사용자가 없을 때
                     response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401 Unauthorized
                     SecurityContextHolder.clearContext(); // 사용자 로그아웃
-
+                    // 리프레시 토큰 만기시 다시 로그인 시켜야함
                 }
             }
         }
