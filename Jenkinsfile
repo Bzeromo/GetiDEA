@@ -2,17 +2,15 @@ pipeline {
     agent any
 
     // 환경 변수 정의, 빌드에 필요한 변수나 API 키 등을 설정
-    environment {
-        def gitlabApiUrl = "https://lab.ssafy.com/s10-webmobile1-sub2/S10P12B104"
-        def gitlabToken = "uFYe7ypyNaGQz3nKxBuY"
-        NEXUS_URL = 'http://43.202.42.142:8081/'
-        NEXUS_REPOSITORY = 'your-repository' // 찾아서 파야됨
-        NEXUS_CREDENTIALS_ID = 'getIdeaNexus'
-    }
+     environment {
+         gitlabApiUrl = "https://lab.ssafy.com/s10-webmobile1-sub2/S10P12B104"
+         gitlabToken = "uFYe7ypyNaGQz3nKxBuY"
+         NEXUS_URL = 'http://43.202.42.142:8081'
+         NEXUS_BACK_REPOSITORY = 'backBuild'
+         NEXUS_CREDENTIALS_ID = 'getIdeaNexus'
+     }
 
     stages {
-
-
         stage('Checkout') {
             steps {
                 // 현재 파이프라인이 실행된 브랜치에 따라 소스 코드를 체크아웃
@@ -25,41 +23,43 @@ pipeline {
             steps {
                 echo 'Downloading build files from Nexus Repository...'
                 script {
-                    // Nexus Repository로부터 필요한 파일들을 다운로드
                     def buildFiles = [
-                        'docker-compose.yml',
+                        'compose.yml',
                         'init-mongo.js',
                         'init-mysql.sql',
-                        // 필요한 다른 파일들을 여기에 추가
+                        '.env',
+                        'redis.conf',
+                        'entrypoint.sh'
                     ]
+
+                    sh 'mkdir -p back/giBack'
 
                     for (file in buildFiles) {
                         withCredentials([usernamePassword(credentialsId: NEXUS_CREDENTIALS_ID, usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
-                            sh "curl -u $USERNAME:$PASSWORD $NEXUS_URL/repository/$NEXUS_REPOSITORY/back/giback/${file} -o back/giback/${file}"
+                            sh "curl -u \$USERNAME:\$PASSWORD \$NEXUS_URL/repository/\$NEXUS_BACK_REPOSITORY/back/giback/$file -o back/giBack/$file"
                         }
+                    }
+
+                    sh 'mkdir -p back/giBack/src/main/resource'
+
+                    withCredentials([usernamePassword(credentialsId: NEXUS_CREDENTIALS_ID, usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+                        sh "curl -u \$USERNAME:\$PASSWORD \$NEXUS_URL/repository/\$NEXUS_BACK_REPOSITORY/back/giback/application.yml -o back/giBack/src/main/resource/application.yml"
                     }
                 }
             }
         }
 
-
-        stage('Build and Test Back') {
-            when {
-                branch 'back'
-            }
+         stage('Build and Test backend') {
             steps {
-                echo 'Building and testing back branch...'
-                // Docker Compose
-                // Jenkins 작업자에게 Docker 명령을 실행할 수 있는 권한 부여
-                sh 'docker-compose -f back/giback/compose.yml up -d --build'
-                // 테스트 스크립트 추가
-                // 예: sh 'docker-compose -f back/giback/compose.yml exec app ./gradlew test'
+                script {
+                    echo 'Building and testing backend branch...'
+                    sh 'docker-compose -f back/giBack/compose.yml up -d --build'
+                }
             }
             post {
                 always {
-                    // Docker Compose를 사용하여 서비스를 종료 (테스트)
                     echo 'Stopping Docker Compose services...'
-                    sh 'docker-compose -f back/giback/compose.yml down'
+                    sh 'docker-compose -f back/giBack/compose.yml down'
                 }
             }
         }
@@ -77,39 +77,40 @@ pipeline {
 //                     }
 //           }
 
-     stage('Upload Artifacts to Nexus') {
-            when {
-                branch 'back'
-            }
-            steps {
-                script {
-                    // 백엔드 아티팩트 업로드
-                    nexusArtifactUploader(
-                        nexusVersion: 'nexus3',
-                        protocol: 'http',
-                        nexusUrl: NEXUS_URL,
-                        groupId: 'your.group',
-                        version: '1.0.0',
-                        repository: NEXUS_REPOSITORY,
-                        credentialsId: NEXUS_CREDENTIALS_ID,
-                        artifacts: [
-                            [artifactId: 'your-artifact-id',
-                             classifier: '',
-                             file: 'path/to/your/artifact/file.jar',
-                             type: 'jar']
-                            // 추가적인 아티팩트를 업로드하려면 여기에 추가
-                        ]
-                    )
-                }
-            }
-        }
+//      stage('Upload Artifacts to Nexus') {
+//             when {
+//                 branch 'back'
+//             }
+//             steps {
+//                 script {
+//                     // 백엔드 아티팩트 업로드
+//                     nexusArtifactUploader(
+//                         nexusVersion: 'nexus3',
+//                         protocol: 'http',
+//                         nexusUrl: NEXUS_URL,
+//                         groupId: 'your.group',
+//                         version: '1.0.0',
+//                         repository: NEXUS_REPOSITORY,
+//                         credentialsId: NEXUS_CREDENTIALS_ID,
+//                         artifacts: [
+//                             [artifactId: 'your-artifact-id',
+//                              classifier: '',
+//                              file: 'path/to/your/artifact/file.jar',
+//                              type: 'jar']
+//                             // 추가적인 아티팩트를 업로드하려면 여기에 추가
+//                         ]
+//                     )
+//                 }
+//             }
+//         }
+//     }
     }
 
     post {
         always {
             // 항상 실행되는 단계, 청소 단계
             echo 'Cleaning up...'
-            sh 'docker-compose -f back/giback/compose.yml down --volumes --remove-orphans'
+            sh 'docker-compose -f back/giBack/compose.yml down --volumes --remove-orphans'
             sh 'docker system prune -af'
         }
 
