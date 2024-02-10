@@ -26,7 +26,7 @@ WORKDIR /app
 
 # 1단계에서 빌드된 애플리케이션 파일 및 entrypoint.sh 스크립트 복사
 COPY --from=build /app/build/libs/getidea-0.1.0.jar /app/app.jar
-COPY entrypoint.sh ./
+COPY entrypoint.sh /app/entrypoint.sh
 
 # entrypoint.sh 실행 권한 부여
 RUN chmod +x entrypoint.sh
@@ -35,4 +35,4 @@ RUN chmod +x entrypoint.sh
 EXPOSE 8080
 
 # 애플리케이션 실행
-ENTRYPOINT ["./entrypoint.sh"]
+ENTRYPOINT ["/app/entrypoint.sh"]
