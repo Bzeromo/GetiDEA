@@ -64,18 +64,12 @@ pipeline {
             }
         }
 
-//           stage('Deploy to Main') {
-//                     when {
-//                         branch 'main'
-//                     }
-//                     steps {
-//                         echo 'Deploying main branch...'
-//                         // 메인 브랜치에 대한 배포 스크립트를 실행
-//                         // 배포 환경에 따라 적절한 배포 명령을 추가
-//                         // sh 'docker-compose -f back/giback/compose.yml up -d --build'
-//                         // sh 'docker-compose -f back/giback/compose.yml run app ./deploy-script.sh'
-//                     }
-//           }
+          stage('Deploy to Main') {
+            steps {
+                echo 'Deploying main branch...'
+                sh 'docker-compose -f back/giBack/compose.yml up -d --build'
+            }
+          }
 
 //      stage('Upload Artifacts to Nexus') {
 //             when {
@@ -110,8 +104,6 @@ pipeline {
         always {
             // 항상 실행되는 단계, 청소 단계
             echo 'Cleaning up...'
-            sh 'docker-compose -f back/giBack/compose.yml down --volumes --remove-orphans'
-            sh 'docker system prune -af'
         }
 
         success {
