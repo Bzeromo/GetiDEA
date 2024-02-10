@@ -925,6 +925,7 @@ const MyDrawing = () => {
 
 
 
+
   //Template의 정보 받아오기.,,
   const ImageComponent = ({ src, x, y, width, height, rotation, scaleX, scaleY, color }) => {
     const [image] = useImage(src);
@@ -946,12 +947,43 @@ const MyDrawing = () => {
   };
 
 
+  const inputWord = "이것은 당신의 아이디어";
+
   //랜덤한 단어의 속성 설정하기
-  const RandomTextComponent = ({ text, x, y, fontSize, textProps }) => {
+  const RandomTextComponent = ({ text, x, y, fontSize, textProps, arrangementType }) => {
+
+    const [textResult, setTextResult] = useState(text);
+
+    const plus = "&";
+    const arrangementType1 = " ";
+    const arrangementType2 = "\n";
+
+    // if(arrangementType === 1){
+    //   setTextResult(text + arrangementType1 + plus + arrangementType1 + inputWord); // setTextResult를 통해 상태 업데이트
+    // }
+    // else if(arrangementType === 2){
+    //   setTextResult(text + arrangementType2 + plus + arrangementType2 + plus); // setTextResult를 통해 상태 업데이트
+    // }
+    // else{
+    //   console.log("Wrong arrangementType!!");
+    // }
+
+    useEffect(() => {
+      if(arrangementType === 1){
+        setTextResult(inputWord + arrangementType1 + plus + arrangementType1 + text);
+      }
+      else if(arrangementType === 2){
+        setTextResult(inputWord + arrangementType2 + plus + arrangementType2 + text);
+      }
+      else{
+        console.log("Wrong arrangementType!!");
+      }
+    }, [text]); // text와 arrangementType이 변경될 때마다 useEffect가 호출되도록 설정
+  
 
     return (
       <Text
-        text={text}
+        text={textResult}
         x={x}
         y={y}
         fontSize={fontSize}
@@ -983,9 +1015,6 @@ const MyDrawing = () => {
 
   const selectedWords = getRandomWords();
 
-
-
-  
   const firstTemplateProperties = Object.values(bubbleChatProperties);
 
 
@@ -1406,11 +1435,12 @@ const MyDrawing = () => {
                     {/* 랜덤한 단어를 표시하는 텍스트 컴포넌트 렌더링 */}
                     <RandomTextComponent
                       key={`text_${index}`}
-                      x={imgInfo.x + imgInfo.width*0.2}
-                      y={imgInfo.y + imgInfo.height*0.4}
+                      x={imgInfo.textPosX}
+                      y={imgInfo.textPosY}
                       text={randomWord}
-                      fontSize={11} // 원하는 폰트 크기 설정
+                      fontSize={7} // 원하는 폰트 크기 설정
                       textProps={{ fill: "black" }} // 추가적인 텍스트 스타일 설정 가능
+                      arrangementType={imgInfo.arrangementType}
                     />
                   </React.Fragment>
                 );

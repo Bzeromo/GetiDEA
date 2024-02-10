@@ -10,7 +10,9 @@
             "draggable": false,
             "scaleX": 1,
             "scaleY": 1,
-            "color": "rgb(173, 255, 47)"
+            "arrangementType": 2,
+            "textPosX": 570,
+            "textPosY": 175
         },
         "2": {
             "src": "/img/template1_bubble_chat/bubble_chat2.svg",
@@ -22,7 +24,10 @@
             "height": 175.5,
             "draggable": false,
             "scaleX": 1,
-            "scaleY": 1
+            "scaleY": 1,
+            "arrangementType": 2,
+            "textPosX": 610,
+            "textPosY": 40
         },
         "3": {
             "src": "/img/template1_bubble_chat/bubble_chat3.svg",
@@ -34,7 +39,10 @@
             "height": 200,
             "draggable": false,
             "scaleX": 0.8557413944778604,
-            "scaleY": 0.85574139447786
+            "scaleY": 0.85574139447786,
+            "arrangementType": 1,
+            "textPosX": 410,
+            "textPosY": 13
         },
         "4": {
             "src": "/img/template1_bubble_chat/bubble_chat4.svg",
@@ -46,7 +54,10 @@
             "height": 165.99999999999997,
             "draggable": false,
             "scaleX": 0.8436266022598501,
-            "scaleY": 0.8436266022598501
+            "scaleY": 0.8436266022598501,
+            "arrangementType": 2,
+            "textPosX": 430,
+            "textPosY": 170
         },
         "5": {
             "src": "/img/template1_bubble_chat/bubble_chat5.svg",
@@ -58,7 +69,10 @@
             "height": 160,
             "draggable": false,
             "scaleX": 0.8806672555544259,
-            "scaleY": 0.8806672555544254
+            "scaleY": 0.8806672555544254,
+            "arrangementType": 2,
+            "textPosX": 440,
+            "textPosY": 300
         },
         "6": {
             "src": "/img/template1_bubble_chat/bubble_chat6.svg",
@@ -70,7 +84,10 @@
             "height": 110,
             "draggable": false,
             "scaleX": 1,
-            "scaleY": 1
+            "scaleY": 1,
+            "arrangementType": 1,
+            "textPosX": 387,
+            "textPosY": 413
         },
         "7": {
             "src": "/img/template1_bubble_chat/bubble_chat7.svg",
@@ -82,7 +99,10 @@
             "height": 156.5,
             "draggable": false,
             "scaleX": 0.8691179176751741,
-            "scaleY": 0.8691179176751737
+            "scaleY": 0.8691179176751737,
+            "arrangementType": 2,
+            "textPosX": 582,
+            "textPosY": 400
         },
         "8": {
             "src": "/img/template1_bubble_chat/bubble_chat8.svg",
@@ -94,7 +114,10 @@
             "height": 200,
             "draggable": false,
             "scaleX": 0.8500093733041931,
-            "scaleY": 0.8500093733041935
+            "scaleY": 0.8500093733041935,
+            "arrangementType": 2,
+            "textPosX": 765,
+            "textPosY": 380
         },
         "9": {
             "src": "/img/template1_bubble_chat/bubble_chat9.svg",
@@ -106,7 +129,10 @@
             "height": 131,
             "draggable": false,
             "scaleX": 1,
-            "scaleY": 1
+            "scaleY": 1,
+            "arrangementType": 2,
+            "textPosX": 720,
+            "textPosY": 263
         },
         "10": {
             "src": "/img/template1_bubble_chat/bubble_chat10.svg",
@@ -118,7 +144,10 @@
             "height": 138.5,
             "draggable": false,
             "scaleX": 1,
-            "scaleY": 1
+            "scaleY": 1,
+            "arrangementType": 2,
+            "textPosX": 738,
+            "textPosY": 140
         },
         "11": {
             "src": "/img/template1_bubble_chat/bubble_chat11.svg",
@@ -130,7 +159,10 @@
             "height": 158,
             "draggable": false,
             "scaleX": 1,
-            "scaleY": 1
+            "scaleY": 1,
+            "arrangementType": 2,
+            "textPosX": 790,
+            "textPosY": 3
         },
         "12": {
             "src": "/img/template1_bubble_chat/bubble_chat12.svg",
@@ -142,7 +174,10 @@
             "height": 140,
             "draggable": false,
             "scaleX": 0.8824204435138535,
-            "scaleY": 0.8824204435138543
+            "scaleY": 0.8824204435138543,
+            "arrangementType": 2,
+            "textPosX": 910,
+            "textPosY": 153
         },
         "13": {
             "src": "/img/template1_bubble_chat/bubble_chat13.svg",
@@ -154,7 +189,10 @@
             "height": 82.99999999999999,
             "draggable": false,
             "scaleX": 1.0874215323666543,
-            "scaleY": 1.087421532366655
+            "scaleY": 1.087421532366655,
+            "arrangementType": 1,
+            "textPosX": 900,
+            "textPosY": 275
         },
         "14": {
             "src": "/img/template1_bubble_chat/bubble_chat14.svg",
@@ -166,7 +204,10 @@
             "height": 146,
             "draggable": false,
             "scaleX": 1,
-            "scaleY": 1
+            "scaleY": 1,
+            "arrangementType": 2,
+            "textPosX": 940,
+            "textPosY": 365
         },
         "15": {
             "src": "/img/template1_bubble_chat/bubble_chat15.svg",
@@ -178,7 +219,10 @@
             "height": 113.5,
             "draggable": false,
             "scaleX": 1,
-            "scaleY": 1
+            "scaleY": 1,
+            "arrangementType": 1,
+            "textPosX": 880,
+            "textPosY": 513
         },
         "16": {
             "src": "/img/template1_bubble_chat/bubble_chat16.svg",
@@ -190,7 +234,10 @@
             "height": 74,
             "draggable": false,
             "scaleX": 1.3086985298498477,
-            "scaleY": 1.3086985298498521
+            "scaleY": 1.3086985298498521,
+            "arrangementType": 1,
+            "textPosX": 625,
+            "textPosY": 530
         },
         "17": {
             "src": "/img/template1_bubble_chat/bubble_chat17.svg",
@@ -202,7 +249,10 @@
             "height": 105.5,
             "draggable": false,
             "scaleX": 1.181473824940491,
-            "scaleY": 1.18147382494049
+            "scaleY": 1.18147382494049,
+            "arrangementType": 1,
+            "textPosX": 380,
+            "textPosY": 515 
         },
         "18": {
             "src": "/img/template1_bubble_chat/bubble_chat18.svg",
@@ -214,7 +264,10 @@
             "height": 175.5,
             "draggable": false,
             "scaleX": 1.392527921374859,
-            "scaleY": 0.8712517701098303
+            "scaleY": 0.8712517701098303,
+            "arrangementType": 2,
+            "textPosX": 190,
+            "textPosY": 510  
         },
         "19": {
             "src": "/img/template1_bubble_chat/bubble_chat19.svg",
@@ -226,7 +279,10 @@
             "height": 87,
             "draggable": false,
             "scaleX": 1.1385085880806978,
-            "scaleY": 1.1385085880806987
+            "scaleY": 1.1385085880806987,
+            "arrangementType": 1,
+            "textPosX": 150,
+            "textPosY": 418 
         },
         "20": {
             "src": "/img/template1_bubble_chat/bubble_chat20.svg",
@@ -238,7 +294,10 @@
             "height": 84.5,
             "draggable": false,
             "scaleX": 1.1305900608137989,
-            "scaleY": 1.130590060813798
+            "scaleY": 1.130590060813798,
+            "arrangementType": 1,
+            "textPosX": 144,
+            "textPosY": 320 
         },
         "21": {
             "src": "/img/template1_bubble_chat/bubble_chat21.svg",
@@ -250,7 +309,10 @@
             "height": 153.5,
             "draggable": false,
             "scaleX": 0.7690710035117189,
-            "scaleY": 0.819071003511719
+            "scaleY": 0.819071003511719,
+            "arrangementType": 2,
+            "textPosX": 142,
+            "textPosY": 213 
         },
         "22": {
             "src": "/img/template1_bubble_chat/bubble_chat22.svg",
@@ -262,7 +324,10 @@
             "height": 191,
             "draggable": false,
             "scaleX": 0.7724471106274919,
-            "scaleY": 0.7724471106274925
+            "scaleY": 0.7724471106274925,
+            "arrangementType": 2,
+            "textPosX": 290,
+            "textPosY": 210 
         },
         "23": {
             "src": "/img/template1_bubble_chat/bubble_chat23.svg",
@@ -274,7 +339,10 @@
             "height": 143.5,
             "draggable": false,
             "scaleX": 0.9337794981547395,
-            "scaleY": 0.9337794981547394
+            "scaleY": 0.9337794981547394,
+            "arrangementType": 2,
+            "textPosX": 280,
+            "textPosY": 65
         },
         "24": {
             "src": "/img/template1_bubble_chat/bubble_chat24.svg",
@@ -286,7 +354,10 @@
             "height": 200,
             "draggable": false,
             "scaleX": 1,
-            "scaleY": 1
+            "scaleY": 1,
+            "arrangementType": 2,
+            "textPosX": 125,
+            "textPosY": 22 
         },
         "25": {
             "src": "/img/template1_bubble_chat/bubble_chat25.svg",
@@ -298,7 +369,10 @@
             "height": 200,
             "draggable": false,
             "scaleX": 0.9054591396028742,
-            "scaleY": 0.9054591396028743
+            "scaleY": 0.9054591396028743,
+            "arrangementType": 2,
+            "textPosX": 120,
+            "textPosY": -145 
         },
         "26": {
             "src": "/img/template1_bubble_chat/bubble_chat26.svg",
@@ -310,7 +384,10 @@
             "height": 161,
             "draggable": false,
             "scaleX": 0.956254846088376,
-            "scaleY": 1.1620200057157035
+            "scaleY": 1.1620200057157035,
+            "arrangementType": 2,
+            "textPosX": 300,
+            "textPosY": -97 
         },
         "27": {
             "src": "/img/template1_bubble_chat/bubble_chat27.svg",
@@ -322,7 +399,10 @@
             "height": 186.5,
             "draggable": false,
             "scaleX": 0.9137811079175155,
-            "scaleY": 0.9137811079175155
+            "scaleY": 0.9137811079175155,
+            "arrangementType": 2,
+            "textPosX": 465,
+            "textPosY": -150 
         },
         "28": {
             "src": "/img/template1_bubble_chat/bubble_chat28.svg",
@@ -334,7 +414,10 @@
             "height": 150.5,
             "draggable": false,
             "scaleX": 1,
-            "scaleY": 1
+            "scaleY": 1,
+            "arrangementType": 2,
+            "textPosX": 620,
+            "textPosY": -97 
         },
         "29": {
             "src": "/img/template1_bubble_chat/bubble_chat29.svg",
@@ -346,7 +429,10 @@
             "height": 192,
             "draggable": false,
             "scaleX": 0.9454603686025753,
-            "scaleY": 0.9454603686025755
+            "scaleY": 0.9454603686025755,
+            "arrangementType": 1,
+            "textPosX": 760,
+            "textPosY": -155 
         },
         "30": {
             "src": "/img/template1_bubble_chat/bubble_chat30.svg",
@@ -359,7 +445,10 @@
             "draggable": true,
             "rotation": 0,
             "scaleX": 0.9086290618645347,
-            "scaleY": 1.221803613609236
+            "scaleY": 1.221803613609236,
+            "arrangementType": 2,
+            "textPosX": 950,
+            "textPosY": -120 
         },
         "31": {
             "src": "/img/template1_bubble_chat/bubble_chat31.svg",
@@ -371,7 +460,10 @@
             "height": 179.5,
             "draggable": false,
             "scaleX": 1.0000000000000007,
-            "scaleY": 1.1845581654596098
+            "scaleY": 1.1845581654596098,
+            "arrangementType": 2,
+            "textPosX": 1120,
+            "textPosY": -165 
         },
         "32": {
             "src": "/img/template1_bubble_chat/bubble_chat32.svg",
@@ -383,7 +475,10 @@
             "height": 200,
             "draggable": false,
             "scaleX": 1.0746881444450387,
-            "scaleY": 1.0746881444450405
+            "scaleY": 1.0746881444450405,
+            "arrangementType": 2,
+            "textPosX": 1115,
+            "textPosY": 20        
         },
         "33": {
             "src": "/img/template1_bubble_chat/bubble_chat33.svg",
@@ -391,11 +486,14 @@
             "y": 184.25763120000008,
             "ty": "img",
             "type": "Image",
-            "width": 160,
+            "width": 190,
             "height": 200,
             "draggable": false,
             "scaleX": 1,
-            "scaleY": 1.116923026
+            "scaleY": 1.116923026,
+            "arrangementType": 2,
+            "textPosX": 1120,
+            "textPosY": 230
         },
         "34": {
             "src": "/img/template1_bubble_chat/bubble_chat34.svg",
@@ -407,6 +505,9 @@
             "height": 200,
             "draggable": false,
             "scaleX": 1,
-            "scaleY": 1
+            "scaleY": 1,
+            "arrangementType": 2,
+            "textPosX": 1105,
+            "textPosY": 430
         }
 }
