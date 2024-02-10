@@ -8,8 +8,12 @@ RUN apk add --no-cache dos2unix
 WORKDIR /app
 
 # Gradle Wrapper 파일 및 빌드 스크립트 파일 복사
-COPY gradlew gradle build.gradle settings.gradle ./
-COPY src src
+COPY gradlew /app/
+COPY gradle/wrapper/gradle-wrapper.jar /app/gradle/wrapper/
+COPY gradle/wrapper/gradle-wrapper.properties /app/gradle/wrapper/
+COPY build.gradle /app/
+COPY settings.gradle /app/
+COPY src /app/src
 
 # 종속성 다운로드 및 애플리케이션 빌드
 RUN dos2unix gradlew && chmod +x gradlew && \
@@ -21,7 +25,7 @@ FROM azul/zulu-openjdk-alpine:17
 WORKDIR /app
 
 # 1단계에서 빌드된 애플리케이션 파일 및 entrypoint.sh 스크립트 복사
-COPY --from=build /app/build/libs/getidea-0.1.0.jar app.jar
+COPY --from=build /app/build/libs/*.jar app.jar
 COPY entrypoint.sh ./
 
 # entrypoint.sh 실행 권한 부여
