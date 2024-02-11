@@ -26,9 +26,7 @@ pipeline {
                 script {
                     def buildFiles = [
                         'compose.yml',
-                        'init-mongo.js',
                         '.env',
-                        'redis.conf',
                     ]
 
                     for (file in buildFiles) {
