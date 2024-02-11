@@ -1,7 +1,9 @@
 package com.gi.giback.mongo.service;
 
 import com.gi.giback.dto.ChatDTO;
+import com.gi.giback.dto.ChatSendDTO;
 import com.gi.giback.mongo.entity.ChatLog;
+import com.mongodb.client.result.UpdateResult;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
@@ -17,11 +19,16 @@ public class ChatService {
     @Autowired
     private MongoTemplate mongoTemplate;
 
-    public void addChatLog(Long projectId, ChatDTO chatMessage) {
-        chatMessage.setTimestamp(LocalDateTime.now(ZoneId.of("Asia/Seoul")));
+    public boolean addChatLog(ChatSendDTO data) {
+        Long projectId = data.getProjectId();
+        ChatDTO chatMessage = new ChatDTO(data.getUserEmail(), data.getProfileImg(),
+            data.getMessage(), LocalDateTime.now(ZoneId.of("Asia/Seoul")));
+
         Query query = new Query(Criteria.where("projectId").is(projectId));
         Update update = new Update().push("chats", chatMessage);
-        mongoTemplate.upsert(query, update, ChatLog.class);
+        UpdateResult result = mongoTemplate.upsert(query, update, ChatLog.class);
+
+        return result.getModifiedCount() > 0 || result.getUpsertedId() != null;
     }
 
     public List<ChatDTO> getChatLogsByProjectId(Long projectId) {

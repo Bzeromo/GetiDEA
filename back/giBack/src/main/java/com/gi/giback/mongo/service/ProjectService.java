@@ -131,6 +131,10 @@ public class ProjectService {
     }
 
     public boolean updateProjectThumbnail(Long projectId, String imageUrl) {
+        // projectId 검증
+        Optional<ProjectEntity> entity = repository.findById(projectId);
+        if(entity.isEmpty()) return false; // 없으면 false 리턴
+
         Query query = new Query(Criteria.where("projectId").is(projectId));
         Update update = new Update().set("thumbnail", imageUrl);
         // 업데이트 실행 및 결과 반환

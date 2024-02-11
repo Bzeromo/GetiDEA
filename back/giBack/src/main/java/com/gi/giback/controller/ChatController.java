@@ -1,6 +1,7 @@
 package com.gi.giback.controller;
 
 import com.gi.giback.dto.ChatDTO;
+import com.gi.giback.dto.ChatSendDTO;
 import com.gi.giback.mongo.service.ChatService;
 import com.gi.giback.mongo.service.ProjectService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -34,15 +35,16 @@ public class ChatController {
 
     @PostMapping("/send")
     @Operation(summary = "채팅 전송", description = "채팅 사용시 계속 호출해야함 / Mongo의 projectId가 일치하는 곳에 채팅 로그 저장")
-    public ResponseEntity<String> addChatMessage(
-            @RequestParam @Parameter(description = "채팅 저장할 프로젝트 ID") Long projectId,
-            @RequestBody @Parameter(description = "채팅 저장할 프로젝트 ID") ChatDTO chatMessage) {
+    public ResponseEntity<String> addChatMessage(@RequestBody @Parameter(description = "채팅 저장할 내용") ChatSendDTO data) {
 
-        if(projectService.checkProjectId(projectId)){
-            chatService.addChatLog(projectId, chatMessage);
+        boolean isProjectValid = projectService.checkProjectId(data.getProjectId());
+        boolean isChatSaved = isProjectValid && chatService.addChatLog(data);
+
+        if (isChatSaved) {
             return ResponseEntity.ok("채팅 저장 완료");
+        } else {
+            return ResponseEntity.badRequest().build();
         }
-        return ResponseEntity.badRequest().build();
     }
 
     @GetMapping("/load")
