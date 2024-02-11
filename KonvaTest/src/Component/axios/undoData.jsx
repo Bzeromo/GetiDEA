@@ -68,9 +68,6 @@ const undoData = (
                 break;
             }
           });
-
-          // dragEnded = true;
-          // sendInfoToServer();
           console.log(dragEnded)
         }
       })

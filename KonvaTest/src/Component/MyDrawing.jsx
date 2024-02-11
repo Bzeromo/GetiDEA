@@ -4,6 +4,7 @@ import axios from "axios";
 import useImage from "use-image";
 import URLImage from "./Add/URLImage";
 import { debounce } from "lodash";
+import { nanoid } from "nanoid";
 
 import ImgComponent from "./Add/ImgComponent";
 import ShapeComponent from "./Add/ShapeComponent";
@@ -83,6 +84,9 @@ const MyDrawing = () => {
   const [imageCounter, setImageCounter] = useState(0);
   const [idCounter, setIdCounter] = useState(0);
 
+  //복사 붙여넣기용
+  const [clipboard, setClipboard] = useState(null);
+
   // function checkPost() {
   //   setCheckDelete(!checkDelete);
   // }
@@ -115,21 +119,113 @@ const MyDrawing = () => {
       .catch((error) => {
         console.log(error);
         // 오류 발생 시 실행할 코드
-      })
+      });
   };
 
   const deleteAll = () => {
     deleteSelected();
     PostDelete2();
-    setCount(prevCount => prevCount + 1); // 이 부분을 수정
+    setCount((prevCount) => prevCount + 1); // 이 부분을 수정
     // window.location.reload();
     console.log(count); // 이 로그는 상태 업데이트가 비동기적으로 이루어지기 때문에 업데이트 이전의 값을 출력할 수 있음
     layerRef.current.batchDraw();
     // shapeRef.current.batchDraw();
     checkPost();
     console.log(checkDelete);
-};
+  };
 
+  const undoEvent2 = () => {
+    axios
+      .get(
+        `http://localhost:8080/api/project/rollback?projectId=${projectId}&userEmail=${userEmail}`
+      )
+      .then((response) => {
+        console.log(response);
+        console.log(response.data);
+        if (response.data) {
+          const dataItems = response.data;
+
+          console.log(response.data);
+
+          Object.keys(dataItems).forEach((key) => {
+            const item = dataItems[key];
+
+            switch (item.ty) {
+              case "Text":
+                setTexts((prevTexts) => updateArray(prevTexts, item));
+                console.log(`text item: `, JSON.stringify2(item, key));
+
+                break;
+              case "Rect":
+                setShapes((prevShapes) => updateArray2(prevShapes, item));
+                console.log(JSON.stringify(item, key) + "Rect?");
+                break;
+              case "Circle":
+                setShapes((prevShapes) => updateArray2(prevShapes, item));
+                console.log(JSON.stringify(item, key) + "Circle?");
+                break;
+              case "RegularPolygon":
+                setShapes((prevShapes) => updateArray2(prevShapes, item));
+                console.log(
+                  `RegularPolygon item with defaults: `,
+                  JSON.stringify(item)
+                );
+                break;
+              case "Line":
+                setLines((prevLines) => updateArray2(prevLines, item));
+                console.log(`Line item: `, JSON.stringify(item, key));
+                break;
+              case "Dot":
+                setLines((prevLines) => updateArray2(prevLines, item));
+                console.log(`dot item: `, JSON.stringify(item, key));
+                break;
+              case "Arrow":
+                setLines((prevLines) => updateArray2(prevLines, item));
+                console.log(`arrow item: `, JSON.stringify(item, key));
+                break;
+              case "Image":
+                setImages((prevImage) => updateArray2(prevImage, item));
+                console.log(`img item: `, JSON.stringify(item, key));
+                break;
+              default:
+                // 기타 타입 처리
+                break;
+            }
+          });
+          console.log(dragEnded)
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+      }, []);
+  };
+
+  function updateArray2(array, item) {
+    const index = array.findIndex((element) => element.id === item.id);
+
+    if (index >= 0) {
+      // 기존 항목 업데이트
+      return array.map((element, i) =>
+        i === index ? { ...element, ...item } : element
+      );
+    } else {
+      // 새 항목 추가
+      return [...array, ...item];
+    }
+  }
+
+  const undoAll = () => {
+    undo();
+    undoEvent2();
+    setCount((prevCount) => prevCount + 1); // 이 부분을 수정
+    // window.location.reload();
+    console.log(count); // 이 로그는 상태 업데이트가 비동기적으로 이루어지기 때문에 업데이트 이전의 값을 출력할 수 있음
+    layerRef.current.batchDraw();
+    // shapeRef.current.batchDraw();
+    checkPost();
+    console.log(checkDelete);
+  }
+  
 
   //전체 드래그 기능 구현
   const [selectedIds, setSelectedIds] = useState([]);
@@ -292,7 +388,7 @@ const MyDrawing = () => {
     imageCounter,
     setImageCounter,
     idCounter,
-    setIdCounter,
+    setIdCounter
   );
 
   const {
@@ -714,7 +810,7 @@ const MyDrawing = () => {
     if (layerRef.current) {
       layerRef.current.batchDraw();
     }
-    console.log("이것도 탐지해봐라")
+    console.log("이것도 탐지해봐라");
   }, [checkDelete]);
 
   const checkObject = (shapeId, newX, newY) => {
@@ -783,6 +879,75 @@ const MyDrawing = () => {
     selectedId,
     layerRef
   );
+
+  // 단축키 이벤트 리스너 설정
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      // Ctrl+C: 복사
+      if (event.ctrlKey && event.key === "c") {
+        // 현재 선택된 요소의 타입에 따라 다른 상태에서 검색
+        const selectedShape = shapes.find((shape) => shape.id === selectedId);
+        const selectedLine = lines.find((line) => line.id === selectedId);
+        const selectedText = texts.find((text) => text.id === selectedId);
+        const selectedImage = images.find((image) => image.id === selectedId);
+
+        const selectedItem =
+          selectedShape || selectedLine || selectedText || selectedImage;
+        if (selectedItem) {
+          setClipboard({ ...selectedItem, id: nanoid(), x: selectedItem.x-20, y : selectedItem.y-20 });
+        }
+        console.log("복사");
+      }
+      // Ctrl+V: 붙여넣기
+      else if (event.ctrlKey && event.key === "v") {
+        if (clipboard) {
+          // 클립보드의 타입에 따라 적절한 상태를 업데이트
+          switch (clipboard.type) {
+            case "Rect":
+              setShapes((shapes) => [...shapes, clipboard]);
+              break;
+            case "Circle":
+              setShapes((shapes) => [...shapes, clipboard]);
+              break;
+            case "RegularPolygon":
+              setShapes((shapes) => [...shapes, clipboard]);
+              break;
+            case "Line":
+              setLines((lines) => [...lines, clipboard]);
+              break;
+            case "Dot":
+              setLines((lines) => [...lines, clipboard]);
+              break;
+            case "Arrow":
+              setLines((lines) => [...lines, clipboard]);
+              break;
+            case "Text":
+              setTexts((texts) => [...texts, clipboard]);
+              break;
+            case "Image":
+              setImages((images) => [...images, clipboard]);
+              break;
+            default:
+              break;
+          }
+          setClipboard(null);
+        }
+        console.log("붙여넣기");
+      }
+      // Delete: 삭제
+      else if (event.key === "Delete" || (event.ctrlKey && event.key === "d")) {
+        deleteAll();
+      }
+      else if(event.ctrlKey && event.key === "z"){
+        undoEvent();
+      } 
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [selectedId, clipboard, shapes, lines, texts, images]); // 의존성 배열 업데이트
 
   //토글 온오프 기능
   const writeSetToggle = () => {
@@ -1045,7 +1210,7 @@ const MyDrawing = () => {
       {/* 실행취소 버튼 */}
       <div
         className="cursor-pointer absolute top-[610px]  hover:stroke-blue left-6  bg-white rounded-md w-[50px] h-[50px] flex justify-center items-center shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]"
-        onClick={() => undoEvent()}
+        onClick={() => undoAll()}
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
