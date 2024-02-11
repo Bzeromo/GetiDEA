@@ -81,7 +81,7 @@ pipeline {
         stage('Build Project') {
             steps {
                 echo 'Building project...'
-                dir('back/giback') {
+                dir('back/giBack') {
                     // 실행 권한 부여
                     sh 'chmod +x gradlew'
                     // 빌드 실행
