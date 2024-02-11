@@ -32,18 +32,16 @@ pipeline {
                         'entrypoint.sh'
                     ]
 
-                    sh 'mkdir -p back/giBack'
-
                     for (file in buildFiles) {
                         withCredentials([usernamePassword(credentialsId: NEXUS_CREDENTIALS_ID, usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
                             sh "curl -u \$USERNAME:\$PASSWORD \$NEXUS_URL/repository/\$NEXUS_BACK_REPOSITORY/back/giback/$file -o back/giBack/$file"
                         }
                     }
 
-                    sh 'mkdir -p back/giBack/src/main/resource'
+                    sh 'mkdir -p back/giBack/src/main/resources'
 
                     withCredentials([usernamePassword(credentialsId: NEXUS_CREDENTIALS_ID, usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
-                        sh "curl -u \$USERNAME:\$PASSWORD \$NEXUS_URL/repository/\$NEXUS_BACK_REPOSITORY/back/giback/application.yml -o back/giBack/src/main/resource/application.yml"
+                        sh "curl -u \$USERNAME:\$PASSWORD \$NEXUS_URL/repository/\$NEXUS_BACK_REPOSITORY/back/giback/application.yml -o back/giBack/src/main/resources/application.yml"
                     }
                 }
             }
