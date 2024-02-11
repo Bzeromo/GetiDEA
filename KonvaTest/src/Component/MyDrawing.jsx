@@ -76,10 +76,60 @@ const MyDrawing = () => {
   const [wholeData, setWholeData] = useState([]);
   const [checkDelete, setCheckDelete] = useState(false);
 
-  function checkPost() {
+  // ID same issue 용
+  const [shapeCounter, setShapeCounter] = useState(0);
+  const [lineCounter, setLineCounter] = useState(0);
+  const [textCounter, setTextCounter] = useState(0);
+  const [imageCounter, setImageCounter] = useState(0);
+  const [idCounter, setIdCounter] = useState(0);
+
+  // function checkPost() {
+  //   setCheckDelete(!checkDelete);
+  // }
+  const checkPost = () => {
     setCheckDelete(!checkDelete);
-  }
-  
+  };
+
+  const PostDelete2 = () => {
+    const filteredPreData = preData.find((item) => item.id === selectedId);
+
+    const postData = {
+      projectId: projectId,
+      userEmail: userEmail,
+      propId: selectedId,
+      preData: filteredPreData,
+      newData: {},
+    };
+
+    axios
+      .post("http://localhost:8080/api/project/change", postData)
+      .then((response) => {
+        // 삭제가 성공적으로 반영되었을 때 상태 업데이트
+        console.log(response);
+        setPreData((prevData) => {
+          const newData = prevData.filter((item) => item.id !== selectedId);
+          console.log("Updated data:", newData);
+          return newData; // 필터링된 새 데이터로 상태를 업데이트
+        });
+      })
+      .catch((error) => {
+        console.log(error);
+        // 오류 발생 시 실행할 코드
+      })
+  };
+
+  const deleteAll = () => {
+    deleteSelected();
+    PostDelete2();
+    setCount(prevCount => prevCount + 1); // 이 부분을 수정
+    // window.location.reload();
+    console.log(count); // 이 로그는 상태 업데이트가 비동기적으로 이루어지기 때문에 업데이트 이전의 값을 출력할 수 있음
+    layerRef.current.batchDraw();
+    // shapeRef.current.batchDraw();
+    checkPost();
+    console.log(checkDelete);
+};
+
 
   //전체 드래그 기능 구현
   const [selectedIds, setSelectedIds] = useState([]);
@@ -94,6 +144,7 @@ const MyDrawing = () => {
   const [selectStroke, setSelectStroke] = useState("");
   const [newTextValue, setNewTextValue] = useState("");
   const [fontSize, setFontSize] = useState(10);
+  const [count, setCount] = useState(0);
 
   //설정 변경
   const [startWrite, setStartWrite] = useState(false);
@@ -119,7 +170,6 @@ const MyDrawing = () => {
   const userEmail = "wnsrb933@naver.com";
 
   const [preData, setPreData] = useState([]);
-
   useEffect(() => {
     getProjectData();
     console.log(`|\\_/|
@@ -129,6 +179,10 @@ const MyDrawing = () => {
 ||_/=\\\\__|
 `);
   }, []);
+
+  useEffect(() => {
+    console.log("탐지 완료");
+  }, [count]);
 
   useEffect(() => {
     if (shapeRef.current) {
@@ -164,7 +218,7 @@ const MyDrawing = () => {
     if (layerRef.current) {
       layerRef.current.batchDraw();
     }
-  });
+  }, []);
 
   useEffect(() => {
     setHistory([...history, shapes]);
@@ -172,6 +226,7 @@ const MyDrawing = () => {
 
   useEffect(() => {
     console.log("업데이트됨" + selectedId);
+    sendInfoToServer();
     // if(layerRef.current){
     //   layerRef.current.batchDraw();
     //   console.log(":teststsetst")
@@ -224,19 +279,20 @@ const MyDrawing = () => {
     setTexts,
     currentColor,
     selectStroke,
-    newTextValue,
-    setNewTextValue,
     images,
     setImages,
-    setImageIdCounter,
-    imageIdCounter,
     rectPosition,
     linePosition,
-    selectedId,
-    setTexts,
-    fontSize,
-    setFontSize,
-    setSelectedId
+    shapeCounter,
+    setShapeCounter,
+    lineCounter,
+    setLineCounter,
+    textCounter,
+    setTextCounter,
+    imageCounter,
+    setImageCounter,
+    idCounter,
+    setIdCounter,
   );
 
   const {
@@ -479,7 +535,7 @@ const MyDrawing = () => {
     sendInfoToServer();
   };
 
-  const { PostData, PostSave, PostDelete } = postData(
+  const { PostData, PostSave, PostDelete, PostDrawing } = postData(
     projectId,
     userEmail,
     preData,
@@ -487,7 +543,14 @@ const MyDrawing = () => {
     sendInfoToServer,
     wholeData,
     setWholeData,
-    checkDelete, setCheckDelete,checkPost
+    checkDelete,
+    setCheckDelete,
+    checkPost,
+    drawingList,
+    deleteSelected,
+    count,
+    setCount,
+    layerRef
   );
 
   const { undoEvent, updateArray } = undoData(
@@ -648,8 +711,11 @@ const MyDrawing = () => {
   }, [dragEnded]);
 
   useEffect(() => {
-
-  },[checkDelete])
+    if (layerRef.current) {
+      layerRef.current.batchDraw();
+    }
+    console.log("이것도 탐지해봐라")
+  }, [checkDelete]);
 
   const checkObject = (shapeId, newX, newY) => {
     console.log(shapes);
@@ -958,7 +1024,7 @@ const MyDrawing = () => {
       {/* 삭제 버튼 */}
       <div
         className="cursor-pointer absolute top-[540px] left-6  bg-white rounded-md w-[50px] h-[50px] flex justify-center items-center shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]"
-        onClick={() => PostDelete()}
+        onClick={() => deleteAll()}
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"

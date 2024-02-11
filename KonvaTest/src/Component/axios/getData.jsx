@@ -10,7 +10,7 @@ const getData = (
 ) => {
   const getProjectData = () => {
     axios
-      .get(`http://192.168.31.172:8080/api/project/open?projectId=${projectId}`)
+      .get(`http://localhost:8080/api/project/open?projectId=${projectId}`)
       .then((response) => {
         if (response.data && response.data.data) {
           const dataItems = response.data.data;

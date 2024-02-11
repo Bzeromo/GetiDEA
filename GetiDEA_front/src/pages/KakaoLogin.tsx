@@ -16,7 +16,7 @@ const KakaoLogin: React.FC = () => {
     }
   
   }, []);
-
+  
   useEffect(() => {
     // 목표 URL로 리다이렉션
     window.location.href='http://localhost:8080/oauth2/authorization/kakao?redirect_uri=http://localhost:3004&mode=login';

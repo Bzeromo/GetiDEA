@@ -13,7 +13,7 @@ const undoData = (
   const undoEvent = () => {
     axios
       .get(
-        `http://192.168.31.172:8080/api/project/rollback?projectId=${projectId}&userEmail=${userEmail}`
+        `http://localhost:8080/api/project/rollback?projectId=${projectId}&userEmail=${userEmail}`
       )
       .then((response) => {
         console.log(response);
@@ -69,7 +69,7 @@ const undoData = (
             }
           });
 
-          dragEnded = true;
+          // dragEnded = true;
           // sendInfoToServer();
           console.log(dragEnded)
         }

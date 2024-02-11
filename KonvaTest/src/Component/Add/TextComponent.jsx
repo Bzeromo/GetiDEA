@@ -5,7 +5,6 @@ const TextComponent = ({
   text,
   x,
   y,
-  fontSize,
   onTextChange,
   onDragEnd,
   isSelected,

@@ -1,42 +1,45 @@
 const express = require('express');
 const http = require('http');
 const WebSocket = require('ws');
-
-// import express from 'express';
-// import http from 'http';
-// import WebSocket from 'ws';
+const url = require('url');
 
 const app = express();
 const server = http.createServer(app);
-const wss = new WebSocket.Server({ server, maxPayload: 100*1024*1024 });
+const wss = new WebSocket.Server({ noServer: true });
 
-wss.on('connection', (ws) => {
-  console.log('WebSocket 연결이 활성화되었습니다.');
+const projectGroups = new Map();
+
+server.on('upgrade', (request, socket, head) => {
+  const pathname = url.parse(request.url).pathname;
+  const projectId = pathname.split('/')[1]; // URL에서 projectId 추출
+
+  wss.handleUpgrade(request, socket, head, (ws) => {
+    wss.emit('connection', ws, projectId);
+  });
+});
+
+wss.on('connection', (ws, projectId) => {
+  console.log(`WebSocket 연결 활성화, projectId: ${projectId}`);
+  if (!projectGroups.has(projectId)) {
+    projectGroups.set(projectId, new Set());
+  }
+  const clients = projectGroups.get(projectId);
+  clients.add(ws);
 
   ws.on('message', (message) => {
-    console.log(`받은 메시지: ${message}`);
-
-    // if(ws.readyState === WebSocket.OPEN){
-
-    //     ws.send(message);
-    // }
-
-    wss.clients.forEach(client => {
-        if (client.readyState === WebSocket.OPEN) {
-          client.send(message);
-          console.log("메시지를 보냈습니다.")
-        }
-      });
+    [...clients].forEach(client => {
+      if (client !== ws && client.readyState === WebSocket.OPEN) {
+        client.send(message);
+      }
+    });
   });
 
-  ws.on('error', error => {
-    console.error('WebSocket 오류 발생:', error);
+  ws.on('close', () => {
+    clients.delete(ws);
+    if (clients.size === 0) {
+      projectGroups.delete(projectId);
+    }
   });
-
-  
-  ws.on('close', function close(code, reason){
-    console.log(`연결이 닫혔습니다. 코드 : ${code}, 이유: ${reason}`)
-  })
 });
 
 server.listen(8000, () => {
