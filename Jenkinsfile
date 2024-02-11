@@ -8,6 +8,7 @@ pipeline {
          NEXUS_URL = 'http://43.202.42.142:8081'
          NEXUS_BACK_REPOSITORY = 'backBuild'
          NEXUS_CREDENTIALS_ID = 'getIdeaNexus'
+         MAX_RETRIES = 5
      }
 
     stages {
@@ -26,10 +27,8 @@ pipeline {
                     def buildFiles = [
                         'compose.yml',
                         'init-mongo.js',
-                        'init-mysql.sql',
                         '.env',
                         'redis.conf',
-                        'entrypoint.sh'
                     ]
 
                     for (file in buildFiles) {
@@ -47,55 +46,51 @@ pipeline {
             }
         }
 
-         stage('Build and Test backend') {
+        stage('Prepare DB Services') {
             steps {
-                script {
-                    echo 'Building and testing backend branch...'
-                    sh 'docker-compose -f back/giBack/compose.yml up -d --build'
-                }
-            }
-            post {
-                always {
-                    echo 'Stopping Docker Compose services...'
-                    sh 'docker-compose -f back/giBack/compose.yml down'
-                }
+                echo 'Starting database services...'
+                sh 'docker-compose -f back/giBack/compose-db.yml up -d'
             }
         }
 
-          stage('Deploy to Main') {
-            steps {
-                echo 'Deploying main branch...'
-                sh 'docker-compose -f back/giBack/compose.yml up -d --build'
-            }
-          }
+        stage('Check DB Services Health') {
+                    steps {
+                        script {
+                            // Define a helper method to wait for service health
+                            def waitForServiceHealth = { service, retries ->
+                                def healthy = false
+                                for (int i = 0; i < retries; i++) {
+                                    sleep 15
+                                    healthy = sh(script: "docker inspect --format='{{.State.Health.Status}}' ${service}", returnStdout: true).trim() == 'healthy'
+                                    if (healthy) {
+                                        break
+                                    }
+                                }
+                                if (!healthy) {
+                                    error("Service ${service} did not become healthy after ${retries} retries")
+                                }
+                            }
+                            // Call the helper method for each service
+                            waitForServiceHealth('giback-mongodb-1', MAX_RETRIES)
+                            waitForServiceHealth('giback-redis-1', MAX_RETRIES)
+                            waitForServiceHealth('giback-mysql-1', MAX_RETRIES)
+                        }
+                    }
+                }
 
-//      stage('Upload Artifacts to Nexus') {
-//             when {
-//                 branch 'back'
-//             }
-//             steps {
-//                 script {
-//                     // 백엔드 아티팩트 업로드
-//                     nexusArtifactUploader(
-//                         nexusVersion: 'nexus3',
-//                         protocol: 'http',
-//                         nexusUrl: NEXUS_URL,
-//                         groupId: 'your.group',
-//                         version: '1.0.0',
-//                         repository: NEXUS_REPOSITORY,
-//                         credentialsId: NEXUS_CREDENTIALS_ID,
-//                         artifacts: [
-//                             [artifactId: 'your-artifact-id',
-//                              classifier: '',
-//                              file: 'path/to/your/artifact/file.jar',
-//                              type: 'jar']
-//                             // 추가적인 아티팩트를 업로드하려면 여기에 추가
-//                         ]
-//                     )
-//                 }
-//             }
-//         }
-//     }
+        stage('Build Project') {
+            steps {
+                echo 'Building project...'
+                sh './gradlew build -x test'
+            }
+        }
+
+        stage('Deploy Project') {
+            steps {
+                echo 'Deploying project...'
+                sh 'java -jar back/giBack/build/libs/getidea-0.1.0.jar'
+            }
+        }
     }
 
     post {
