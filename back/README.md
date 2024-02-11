@@ -2,4 +2,4 @@
 
 ## gitlab - gerrit 연동 테스트입니다.
 
-## gerrit commit test
+## gerrit commit test!
