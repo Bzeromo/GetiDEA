@@ -49,7 +49,7 @@ pipeline {
         stage('Prepare DB Services') {
             steps {
                 echo 'Starting database services...'
-                sh 'docker-compose -f back/giBack/compose-db.yml up -d'
+                sh 'docker-compose -f back/giBack/compose.yml up -d'
             }
         }
 
