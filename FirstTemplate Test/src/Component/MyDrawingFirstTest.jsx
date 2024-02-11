@@ -969,17 +969,17 @@ const MyDrawing = () => {
     // }
 
     useEffect(() => {
-      if(arrangementType === 1){
+      if (arrangementType === 1) {
         setTextResult(inputWord + arrangementType1 + plus + arrangementType1 + text);
       }
-      else if(arrangementType === 2){
+      else if (arrangementType === 2) {
         setTextResult(inputWord + arrangementType2 + plus + arrangementType2 + text);
       }
-      else{
+      else {
         console.log("Wrong arrangementType!!");
       }
     }, [text]); // text와 arrangementType이 변경될 때마다 useEffect가 호출되도록 설정
-  
+
 
     return (
       <Text
@@ -1017,6 +1017,10 @@ const MyDrawing = () => {
 
   const firstTemplateProperties = Object.values(bubbleChatProperties);
 
+  //버튼 누르는 함수
+  const handleButtonClick = () => {
+    console.log("!!!!!!!!clike!!!!!!!!");
+  };
 
 
 
@@ -1391,6 +1395,42 @@ const MyDrawing = () => {
         </div>
       )}
 
+
+
+
+
+
+
+
+
+
+
+
+
+      {/* 템플릿 1 전용 버튼
+      <div className="absolute bottom-6 right-52 z-50  justify-center bg-white rounded-md w-16 h-[50px] flex  items-center flex-row shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]">
+        <button onClick={moveToTop}>템플릿1</button>
+      </div> */}
+
+      {/*템플릿 1 전용 버튼*/}
+      <div>
+        <button>템플릿1</button>
+      </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
       {/* 그리는 구역 */}
       <div className="absolute top-20 left-36">
         <div className="max-w-[1300px] max-h-[580px] overflow-hidden">
@@ -1421,12 +1461,15 @@ const MyDrawing = () => {
            <RandomTextComponent key={`text_${index}`} x={imgInfo.x} y={imgInfo.y} />
           ))} */}
 
+
+              {/**화면에 템플릿1 요소 출력하는 부분 */}
               {firstTemplateProperties.map((imgInfo, index) => {
                 // 랜덤한 단어를 가져옵니다.
                 const randomWords = getRandomWords();
+                const number = 1;
                 // 랜덤한 단어 중 첫 번째 단어를 선택합니다.
                 const randomWord = randomWords[0];
-
+                
                 return (
                   <React.Fragment key={imgInfo.id}>
                     {/* 이미지 컴포넌트 렌더링 */}
@@ -1441,13 +1484,13 @@ const MyDrawing = () => {
                       fontSize={7} // 원하는 폰트 크기 설정
                       textProps={{ fill: "black" }} // 추가적인 텍스트 스타일 설정 가능
                       arrangementType={imgInfo.arrangementType}
-                    />
+                      />
                   </React.Fragment>
                 );
               })}
 
               {/* {firstTemplateProperties.map((textInfo) =>(
-          ))} */}
+              ))} */}
 
 
 
@@ -1459,37 +1502,37 @@ const MyDrawing = () => {
 
               {drawing && (
                 <Line
-                  points={currentLine}
-                  stroke={currentColor}
+                points={currentLine}
+                stroke={currentColor}
                   strokeWidth={5}
                 />
-              )}
+                )}
               {drawingList.map((drawing, id) => (
                 <Line key={id} {...drawing} />
-              ))}
+                ))}
               {shapes.map((shape) => (
                 <ShapeComponent
-                  key={shape.id}
-                  shapeProps={shape}
-                  isSelected={shape.id === selectedId}
-                  onTransformEnd={handleTransformEnd}
-                  onSelect={(e) => {
-                    handleShapeClick(shape.id, e);
-                  }}
+                key={shape.id}
+                shapeProps={shape}
+                isSelected={shape.id === selectedId}
+                onTransformEnd={handleTransformEnd}
+                onSelect={(e) => {
+                  handleShapeClick(shape.id, e);
+                }}
                   onChange={(newAttrs) => {
                     const newShapes = shapes.map((s) =>
-                      s.id === shape.id ? newAttrs : s
+                    s.id === shape.id ? newAttrs : s
                     );
                     setShapes(newShapes); // 상태 업데이트
                   }}
-                />
-              ))}
+                  />
+                  ))}
               {lines.map((line) => {
                 if (line.type === "Arrow") {
                   return (
                     <ArrowComponent
-                      key={line.id}
-                      ref={lineRef}
+                    key={line.id}
+                    ref={lineRef}
                       lineProps={line}
                       isSelected={line.id === selectedId}
                       onSelect={(e) => {
