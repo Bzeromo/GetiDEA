@@ -71,9 +71,9 @@ pipeline {
                                 }
                             }
                             // Call the helper method for each service
-                            waitForServiceHealth('giback-mongodb-1', MAX_RETRIES)
-                            waitForServiceHealth('giback-redis-1', MAX_RETRIES)
-                            waitForServiceHealth('giback-mysql-1', MAX_RETRIES)
+                            waitForServiceHealth('giback_mongodb_1', MAX_RETRIES)
+                            waitForServiceHealth('giback_redis_1', MAX_RETRIES)
+                            waitForServiceHealth('giback_mysql_1', MAX_RETRIES)
                         }
                     }
                 }
