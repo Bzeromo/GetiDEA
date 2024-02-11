@@ -1,11 +1,13 @@
 package com.gi.giback.controller;
 
 import com.gi.giback.dto.FolderDTO;
+import com.gi.giback.dto.FolderNameDTO;
 import com.gi.giback.mongo.service.ProjectService;
 import com.gi.giback.mysql.entity.FolderEntity;
 import com.gi.giback.mysql.entity.LocationEntity;
 import com.gi.giback.mysql.service.FolderService;
 import com.gi.giback.mysql.service.LocationService;
+import com.gi.giback.mysql.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -34,23 +36,22 @@ public class FolderController {
     private final FolderService folderService;
     private final LocationService locationService;
     private final ProjectService projectService;
+    private final UserService userService;
 
     @Autowired
     public FolderController(FolderService folderService, LocationService locationService,
-        ProjectService projectService) {
+        ProjectService projectService, UserService userService) {
         this.folderService = folderService;
         this.locationService = locationService;
         this.projectService = projectService;
+        this.userService = userService;
     }
 
     @PostMapping("/create")
     @Operation(summary = "사용자별 폴더 생성 - 테스트 완료", description = "사용자의 폴더 생성")
     public ResponseEntity<FolderEntity> createFolder(@RequestBody FolderDTO data) {
 
-        FolderEntity folder = new FolderEntity();
-        folder.setFolderName(data.getFolderName());
-        folder.setUserEmail(data.getUserEmail());
-        FolderEntity result = folderService.createFolder(folder);
+        FolderEntity result = folderService.createFolder(data);
         if (result == null)
             return ResponseEntity.badRequest().build();
         return ResponseEntity.ok(result);
@@ -64,38 +65,20 @@ public class FolderController {
 
     @DeleteMapping("/remove")
     @Operation(summary = "폴더 삭제 - 테스트 완료", description = "폴더 삭제시 내부 프로젝트도 삭제됨")
-    public ResponseEntity<?> deleteFolder(
-            @RequestParam @Parameter(description = "사용자 이메일") String userEmail,
-            @RequestParam @Parameter(description = "삭제 폴더 이름") String folderName) {
-        List<LocationEntity> locationEntityList = locationService.getLocationsByUserEmailAndFolderName(userEmail, folderName);
+    public ResponseEntity<?> deleteFolder(@RequestBody FolderDTO data) {
 
-        for (LocationEntity location : locationEntityList) {
-            Long pid = location.getProjectId();
-
-            locationService.deleteLocationByUserEmailAndProjectId(userEmail, pid);
-            long count = locationService.countLocationsByProjectId(pid);
-
-            if (count == 0) {
-                projectService.deleteProjectByProjectId(pid);
-            }
-        }
-
-        folderService.deleteFolder(userEmail, folderName);
-        return ResponseEntity.ok().build();
+        folderService.deleteFolder(data);
+        return ResponseEntity.ok("delete folder");
     }
 
     @PatchMapping("/rename")
     @Operation(summary = "폴더 이름 변경 - 테스트 완료", description = "폴더 이름 변경")
     public ResponseEntity<FolderEntity> updateFolderName(
-            @RequestParam String userEmail,
-            @RequestParam String oldFolderName,
-            @RequestParam String newFolderName) {
+            @RequestBody FolderNameDTO data) {
 
-        if(folderService.checkFolder(userEmail, oldFolderName))
-            return ResponseEntity.ok(folderService.updateFolderName(userEmail, oldFolderName, newFolderName));
+        if(folderService.checkFolder(data.getUserEmail(), data.getBeforeFolderName()))
+            return ResponseEntity.ok(folderService.updateFolderName(data));
         else
             return ResponseEntity.badRequest().build();
-
-
     }
 }

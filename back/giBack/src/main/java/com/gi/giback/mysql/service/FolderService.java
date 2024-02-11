@@ -1,6 +1,10 @@
 package com.gi.giback.mysql.service;
 
+import com.gi.giback.dto.FolderDTO;
+import com.gi.giback.dto.FolderNameDTO;
+import com.gi.giback.mongo.service.ProjectService;
 import com.gi.giback.mysql.entity.FolderEntity;
+import com.gi.giback.mysql.entity.LocationEntity;
 import com.gi.giback.mysql.repository.FolderRepository;
 import java.util.List;
 import java.util.Optional;
@@ -13,13 +17,23 @@ import org.springframework.stereotype.Service;
 public class FolderService {
 
     private final FolderRepository folderRepository;
+    private final LocationService locationService;
+    private final ProjectService projectService;
 
     @Autowired
-    public FolderService(FolderRepository folderRepository) {
+    public FolderService(FolderRepository folderRepository, LocationService locationService,
+        ProjectService projectService) {
         this.folderRepository = folderRepository;
+        this.locationService = locationService;
+        this.projectService = projectService;
     }
 
-    public FolderEntity createFolder(FolderEntity folder) {
+    public FolderEntity createFolder(FolderDTO data) {
+        FolderEntity folder = new FolderEntity();
+
+        folder.setUserEmail(data.getUserEmail());
+        folder.setFolderName(data.getFolderName());
+
         log.info("Create folder : {}", folder.getFolderName());
         try {
             return folderRepository.save(folder);
@@ -33,7 +47,23 @@ public class FolderService {
         return folderRepository.findByUserEmail(userEmail);
     }
 
-    public void deleteFolder(String userEmail, String folderName) {
+    public void deleteFolder(FolderDTO data) {
+
+        String userEmail = data.getUserEmail();
+        String folderName = data.getFolderName();
+
+        List<LocationEntity> locationEntityList = locationService.getLocationsByUserEmailAndFolderName(userEmail, folderName);
+
+        for (LocationEntity location : locationEntityList) {
+            Long pid = location.getProjectId();
+
+            locationService.deleteLocationByUserEmailAndProjectId(userEmail, pid);
+            long count = locationService.countLocationsByProjectId(pid);
+
+            if (count == 0) {
+                projectService.deleteProjectByProjectId(pid);
+            }
+        }
         log.info("Delete User's folder : {}", folderName);
         folderRepository.deleteByUserEmailAndFolderName(userEmail, folderName);
     }
@@ -43,12 +73,17 @@ public class FolderService {
         return folderRepository.findFirstByFolderName(folderName);
     }
 
-    public FolderEntity updateFolderName(String userEmail, String oldFolderName, String newFolderName) {
-        Optional<FolderEntity> folder = folderRepository.findFirstByUserEmailAndFolderName(userEmail, oldFolderName);
-        log.info("Update folder name : {}", newFolderName);
+    public FolderEntity updateFolderName(FolderNameDTO data) {
+
+        String userEmail = data.getUserEmail();
+        String beforeFolderName = data.getBeforeFolderName();
+        String afterFolderName = data.getAfterFolderName();
+
+        Optional<FolderEntity> folder = folderRepository.findFirstByUserEmailAndFolderName(userEmail, beforeFolderName);
+        log.info("Update folder name : {}", afterFolderName);
         if (folder.isPresent()) {
             FolderEntity entity = folder.get();
-            entity.setFolderName(newFolderName);
+            entity.setFolderName(afterFolderName);
             return folderRepository.save(entity);
         }
         return null; // or throw an exception
