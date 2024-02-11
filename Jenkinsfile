@@ -91,7 +91,7 @@ pipeline {
         stage('Deploy Project') {
             steps {
                 echo 'Deploying project...'
-                sh 'java -jar back/giBack/build/libs/getidea-0.1.0.jar'
+                sh 'nohup java -jar back/giBack/build/libs/getidea-0.1.0.jar'
             }
         }
     }
