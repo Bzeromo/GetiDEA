@@ -36,49 +36,48 @@ const RandomTextComponent = ({
 };
 
 const RandomTextDisplay = ({ activeIndex }) => {
-    const [randomWords, setRandomWords] = useState([]);
-    const [displayedIndices, setDisplayedIndices] = useState([]);
-  
-    useEffect(() => {
-      function getRandomWords(words, count) {
-        const selectedWords = [];
-        while (selectedWords.length < count) {
-          const randomIndex = Math.floor(Math.random() * words.length);
-          const word = words[randomIndex];
-          if (!selectedWords.includes(word)) {
-            selectedWords.push(word);
-          }
+  const [randomWords, setRandomWords] = useState([]);
+  const [displayedIndices, setDisplayedIndices] = useState([]);
+
+  useEffect(() => {
+    function getRandomWords(words, count) {
+      const selectedWords = [];
+      while (selectedWords.length < count) {
+        const randomIndex = Math.floor(Math.random() * words.length);
+        const word = words[randomIndex];
+        if (!selectedWords.includes(word)) {
+          selectedWords.push(word);
         }
-        return selectedWords;
       }
-  
-      setRandomWords(getRandomWords(randomWordsData, 34));
-    }, []);
-  
-    useEffect(() => {
-      // 새로운 위치에만 텍스트를 표시합니다.
-      const newIndices = activeIndex.filter((index) => !displayedIndices.includes(index));
-      setDisplayedIndices((prevIndices) => [...prevIndices, ...newIndices]);
-    }, [activeIndex, displayedIndices]);
-  
-    const bubbleChatProperties = Object.values(bubbleChatPropertiesData);
-  
-    return (
-      <React.Fragment>
-        {displayedIndices.map((index) => (
-          <RandomTextComponent
-            key={index}
-            text={randomWords[index] || ""}
-            x={bubbleChatProperties[index].textPosX}
-            y={bubbleChatProperties[index].textPosY}
-            fontSize={12}
-            textProps={{ fill: "black" }}
-            arrangementType={bubbleChatProperties[index].arrangementType}
-          />
-        ))}
-      </React.Fragment>
-    );
-  };
-  
+      return selectedWords;
+    }
+
+    setRandomWords(getRandomWords(randomWordsData, 34));
+  }, []);
+
+  useEffect(() => {
+    // 새로운 위치에만 텍스트를 표시합니다.
+    const newIndices = activeIndex.filter((index) => !displayedIndices.includes(index));
+    setDisplayedIndices((prevIndices) => [...prevIndices, ...newIndices]);
+  }, [activeIndex]); // 이 부분을 수정하여 displayedIndices를 의존성 배열에서 제외합니다.
+
+  const bubbleChatProperties = Object.values(bubbleChatPropertiesData);
+
+  return (
+    <React.Fragment>
+      {displayedIndices.map((index) => (
+        <RandomTextComponent
+          key={index}
+          text={randomWords[index] || ""}
+          x={bubbleChatProperties[index].textPosX}
+          y={bubbleChatProperties[index].textPosY}
+          fontSize={12}
+          textProps={{ fill: "black" }}
+          arrangementType={bubbleChatProperties[index].arrangementType}
+        />
+      ))}
+    </React.Fragment>
+  );
+};
 
 export default RandomTextDisplay;
