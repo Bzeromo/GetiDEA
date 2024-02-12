@@ -1,6 +1,7 @@
 package com.gi.giback.mysql.service;
 
 import com.gi.giback.dto.UserDTO;
+import com.gi.giback.dto.UserRenameDTO;
 import com.gi.giback.mysql.entity.UserEntity;
 import com.gi.giback.mysql.repository.UserRepository;
 import com.gi.giback.oauth2.user.OAuth2UserInfo;
@@ -89,11 +90,11 @@ public class UserService {
     }
 
     @Transactional
-    public UserDTO updateUserName(String userEmail, String newName) {
-        return userRepository.findByUserEmail(userEmail).map(user -> {
-            user.setUserName(newName);
+    public Optional<UserDTO> updateUserName(UserRenameDTO data) {
+        return userRepository.findByUserEmail(data.getUserEmail()).map(user -> {
+            user.setUserName(data.getNewUserName());
             userRepository.save(user);
             return new UserDTO(user.getUserEmail(), user.getUserName(), user.getProfileImage());
-        }).orElseThrow(() -> new RuntimeException("User not found with email: " + userEmail));
+        });
     }
 }

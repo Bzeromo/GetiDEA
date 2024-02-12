@@ -39,7 +39,6 @@ public class ImageController {
         String result;
         try {
             result = s3UploadService.saveThumbnailImage(multipartFile);
-            log.info("result ={}", result);
             projectService.updateProjectThumbnail(projectId, result);
         } catch (IOException e) {
             return ResponseEntity.badRequest().build();
@@ -52,9 +51,6 @@ public class ImageController {
     public ResponseEntity<String> updateProfileImage(
         @RequestPart("Image") MultipartFile multipartFile,
         @RequestPart("userEmail") @Parameter(description = "사용자 이메일") String userEmail) {
-
-
-        log.info("start // email ={}", userEmail);
 
         String result;
         try {
@@ -73,6 +69,7 @@ public class ImageController {
     @Operation(summary = "프로젝트 이미지 추가", description = "프로젝트 내 삽입된 이미지 저장 후, 이미지 url 반환")
     public ResponseEntity<String> updateProfileImage(
         @RequestParam @Parameter(description = "imageBase64 : 인코딩된 이미지 ")FileUploadDTO fileUploadDTO) {
+
         String result;
         try {
             result = s3UploadService.saveImage(fileUploadDTO);

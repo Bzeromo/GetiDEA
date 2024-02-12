@@ -15,6 +15,8 @@ import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,6 +24,7 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -34,17 +37,10 @@ import org.springframework.web.bind.annotation.RestController;
 public class FolderController {
 
     private final FolderService folderService;
-    private final LocationService locationService;
-    private final ProjectService projectService;
-    private final UserService userService;
 
     @Autowired
-    public FolderController(FolderService folderService, LocationService locationService,
-        ProjectService projectService, UserService userService) {
+    public FolderController(FolderService folderService) {
         this.folderService = folderService;
-        this.locationService = locationService;
-        this.projectService = projectService;
-        this.userService = userService;
     }
 
     @PostMapping("/create")
@@ -57,18 +53,26 @@ public class FolderController {
         return ResponseEntity.ok(result);
     }
 
-    @GetMapping("/search")
+    @GetMapping("/search/{userEmail}")
     @Operation(summary = "사용자별 폴더 검색 - 테스트 완료", description = "사용자의 폴더 검색")
-    public ResponseEntity<List<FolderEntity>> getFoldersByUserEmail(@RequestParam @Parameter(description = "사용자 이메일") String userEmail) {
+    public ResponseEntity<List<FolderEntity>> getFoldersByUserEmail(@PathVariable @Parameter(description = "사용자 이메일") String userEmail) {
         return ResponseEntity.ok(folderService.getFoldersByUserEmail(userEmail));
     }
 
-    @DeleteMapping("/remove")
+    @DeleteMapping("/remove/{folderId}")
     @Operation(summary = "폴더 삭제 - 테스트 완료", description = "폴더 삭제시 내부 프로젝트도 삭제됨")
-    public ResponseEntity<?> deleteFolder(@RequestBody FolderDTO data) {
+    public ResponseEntity<?> deleteFolder(@PathVariable("folderId") Long folderId,
+        @AuthenticationPrincipal OAuth2User principal) {
 
-        folderService.deleteFolder(data);
-        return ResponseEntity.ok("delete folder");
+        if(principal == null){
+            return ResponseEntity.badRequest().build();
+        }
+        String userEmail = principal.getAttribute("email");
+        if(folderService.checkFolder(userEmail, folderId)){ // 검증
+            folderService.deleteFolder(folderId);
+            return ResponseEntity.ok("Folder deleted successfully");
+        }
+        return ResponseEntity.badRequest().build();
     }
 
     @PatchMapping("/rename")
@@ -76,9 +80,12 @@ public class FolderController {
     public ResponseEntity<FolderEntity> updateFolderName(
             @RequestBody FolderNameDTO data) {
 
-        if(folderService.checkFolder(data.getUserEmail(), data.getBeforeFolderName()))
-            return ResponseEntity.ok(folderService.updateFolderName(data));
-        else
-            return ResponseEntity.badRequest().build();
+        if(folderService.checkFolder(data.getUserEmail(), data.getFolderId())) {
+            FolderEntity entity = folderService.updateFolderName(data);
+            if(entity != null) {
+                return ResponseEntity.ok(entity);
+            }
+        }
+        return ResponseEntity.badRequest().build();
     }
 }

@@ -96,13 +96,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
                     principal.getUserInfo().getAccessToken()
             );
 
-            response.setHeader("Authorization", accessToken);
-            HttpHeaders headers = new HttpHeaders();
-            headers.setBearerAuth(accessToken);
-            headers.setBearerAuth(refreshToken);
-
             // 지금은 파라미터에 보내는 중 but body에 담아서 보내는것이 안전
-
             return UriComponentsBuilder.fromUriString(targetUrl)
                     .queryParam("access_token", accessToken)
                     .queryParam("refresh_token", refreshToken)

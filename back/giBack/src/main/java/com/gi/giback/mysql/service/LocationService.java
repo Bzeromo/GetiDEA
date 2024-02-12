@@ -1,5 +1,7 @@
 package com.gi.giback.mysql.service;
 
+import com.gi.giback.dto.LocationDTO;
+import com.gi.giback.dto.LocationMoveDTO;
 import com.gi.giback.mysql.entity.LocationEntity;
 import com.gi.giback.mysql.repository.LocationRepository;
 import java.util.List;
@@ -33,22 +35,21 @@ public class LocationService {
         return locationRepository.findByUserEmail(userEmail);
     }
 
-    public LocationEntity updateFolderName(String userEmail, String  projectName, String newFolderName) {
-        Optional<LocationEntity> entity = locationRepository.findFirstByUserEmailAndProjectName(userEmail, projectName);
+    public LocationEntity updateFolderName(LocationMoveDTO data) {
+        Optional<LocationEntity> entity = locationRepository.findFirstByUserEmailAndProjectId(
+            data.getUserEmail(), data.getProjectId());
         if (entity.isPresent()) {
             LocationEntity location = entity.get();
-            if (location.getProjectName().equals(projectName)) {
-                location.setFolderName(newFolderName);
-                return locationRepository.save(location);
-            }
+            location.setFolderName(data.getNewFolderName());
+            return locationRepository.save(location);
         }
         return null;
     }
 
-    public LocationEntity toggleBookmark(String userEmail, Long projectId) {
-        List<LocationEntity> entities = locationRepository.findByUserEmail(userEmail);
+    public LocationEntity toggleBookmark(LocationDTO data) {
+        List<LocationEntity> entities = locationRepository.findByUserEmail(data.getUserEmail());
         for (LocationEntity entity : entities) {
-            if (entity.getProjectId().equals(projectId)) {
+            if (entity.getProjectId().equals(data.getProjectId())) {
                 entity.setBookmark(!entity.getBookmark());
                 return locationRepository.save(entity);
             }

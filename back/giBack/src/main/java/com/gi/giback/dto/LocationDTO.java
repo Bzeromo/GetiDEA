@@ -4,6 +4,6 @@ import lombok.Data;
 
 @Data
 public class LocationDTO {
-    private String id;
-    private String name;
+    private String userEmail;
+    private Long projectId;
 }

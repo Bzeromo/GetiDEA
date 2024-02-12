@@ -1,16 +1,19 @@
 package com.gi.giback.controller;
 
 import com.gi.giback.dto.UserDTO;
+import com.gi.giback.dto.UserRenameDTO;
 import com.gi.giback.mysql.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -37,14 +40,11 @@ public class UserController {
     @PatchMapping("/rename")
     @Operation(summary = "사용자 이름 변경 - 테스트 완료", description = "사용자 이름 변경")
     public ResponseEntity<UserDTO> renameUser(
-        @RequestParam @Parameter(description = "사용자 이메일") String userEmail,
-        @RequestParam @Parameter(description = "새로운 이름") String newName) {
+        @RequestBody UserRenameDTO data) {
 
-        // 사용자 검증
-        List<UserDTO> userCheck = userService.searchUsersByEmail(userEmail);
-        if(userCheck.isEmpty()) return ResponseEntity.badRequest().build();
-
-        UserDTO user = userService.updateUserName(userEmail, newName);
-        return ResponseEntity.ok(user);
+        Optional<UserDTO> updatedUser = userService.updateUserName(data);
+        return updatedUser
+            .map(ResponseEntity::ok)
+            .orElseGet(() -> ResponseEntity.notFound().build());
     }
 }

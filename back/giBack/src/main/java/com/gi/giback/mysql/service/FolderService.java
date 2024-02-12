@@ -47,25 +47,29 @@ public class FolderService {
         return folderRepository.findByUserEmail(userEmail);
     }
 
-    public void deleteFolder(FolderDTO data) {
+    public void deleteFolder(Long folderId) {
 
-        String userEmail = data.getUserEmail();
-        String folderName = data.getFolderName();
+        Optional<FolderEntity> entity = folderRepository.findFirstByFolderId(folderId);
+        if(entity.isPresent()){
+            FolderEntity folder = entity.get();
+            String userEmail = folder.getUserEmail();
+            String folderName = folder.getFolderName();
 
-        List<LocationEntity> locationEntityList = locationService.getLocationsByUserEmailAndFolderName(userEmail, folderName);
+            List<LocationEntity> locationEntityList = locationService.getLocationsByUserEmailAndFolderName(userEmail, folderName);
 
-        for (LocationEntity location : locationEntityList) {
-            Long pid = location.getProjectId();
+            for (LocationEntity location : locationEntityList) {
+                Long pid = location.getProjectId();
 
-            locationService.deleteLocationByUserEmailAndProjectId(userEmail, pid);
-            long count = locationService.countLocationsByProjectId(pid);
+                locationService.deleteLocationByUserEmailAndProjectId(userEmail, pid);
+                long count = locationService.countLocationsByProjectId(pid);
 
-            if (count == 0) {
-                projectService.deleteProjectByProjectId(pid);
+                if (count == 0) {
+                    projectService.deleteProjectByProjectId(pid);
+                }
             }
+            log.info("Delete User's folder : {}", folderName);
+            folderRepository.deleteByUserEmailAndFolderName(userEmail, folderName);
         }
-        log.info("Delete User's folder : {}", folderName);
-        folderRepository.deleteByUserEmailAndFolderName(userEmail, folderName);
     }
 
     public Optional<FolderEntity> getFolderByFolderName(String folderName) {
@@ -76,21 +80,21 @@ public class FolderService {
     public FolderEntity updateFolderName(FolderNameDTO data) {
 
         String userEmail = data.getUserEmail();
-        String beforeFolderName = data.getBeforeFolderName();
-        String afterFolderName = data.getAfterFolderName();
+        Long folderId = data.getFolderId();
+        String newFolderName = data.getNewFolderName();
 
-        Optional<FolderEntity> folder = folderRepository.findFirstByUserEmailAndFolderName(userEmail, beforeFolderName);
-        log.info("Update folder name : {}", afterFolderName);
+        Optional<FolderEntity> folder = folderRepository.findFirstByUserEmailAndFolderId(userEmail, folderId);
+        log.info("Update folder name : {}", newFolderName);
         if (folder.isPresent()) {
             FolderEntity entity = folder.get();
-            entity.setFolderName(afterFolderName);
+            entity.setFolderName(newFolderName);
             return folderRepository.save(entity);
         }
         return null; // or throw an exception
     }
 
-    public boolean checkFolder(String userEmail, String oldFolderName) {
-        Optional<FolderEntity> folder = folderRepository.findFirstByUserEmailAndFolderName(userEmail, oldFolderName);
+    public boolean checkFolder(String userEmail, Long folderId) {
+        Optional<FolderEntity> folder = folderRepository.findFirstByUserEmailAndFolderId(userEmail, folderId);
         return (folder.isPresent());
     }
 }

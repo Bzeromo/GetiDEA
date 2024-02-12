@@ -2,6 +2,7 @@ package com.gi.giback.mongo.service;
 
 import com.gi.giback.dto.ProjectInfoDTO;
 import com.gi.giback.mongo.entity.ProjectEntity;
+import com.gi.giback.mongo.repository.ChatLogRepository;
 import com.gi.giback.mongo.repository.ProjectRepository;
 import com.gi.giback.dto.ProjectProcessDTO;
 import com.mongodb.bulk.BulkWriteResult;
@@ -20,11 +21,18 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class ProjectService {
-    @Autowired
-    private ProjectRepository repository;
+
+    private final ProjectRepository repository;
+    private final ChatLogRepository chatLogRepository;
+    private final MongoTemplate mongoTemplate;
 
     @Autowired
-    private MongoTemplate mongoTemplate;
+    public ProjectService(ProjectRepository repository, ChatLogRepository chatLogRepository,
+        MongoTemplate mongoTemplate) {
+        this.repository = repository;
+        this.chatLogRepository = chatLogRepository;
+        this.mongoTemplate = mongoTemplate;
+    }
 
     public boolean addProject(ProjectEntity entity) {
         repository.save(entity);
@@ -109,6 +117,7 @@ public class ProjectService {
     }
 
     public void deleteProjectByProjectId(Long projectId) {
+        chatLogRepository.deleteByProjectId(projectId);
         repository.deleteByProjectId(projectId);
     }
 

@@ -3,8 +3,8 @@ package com.gi.giback.dto;
 import lombok.Data;
 
 @Data
-public class FolderNameDTO {
+public class LocationMoveDTO {
     private String userEmail;
-    private Long folderId;
+    private Long projectId;
     private String newFolderName;
 }

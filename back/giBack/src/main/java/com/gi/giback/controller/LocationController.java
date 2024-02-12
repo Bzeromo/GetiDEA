@@ -1,5 +1,7 @@
 package com.gi.giback.controller;
 
+import com.gi.giback.dto.LocationDTO;
+import com.gi.giback.dto.LocationMoveDTO;
 import com.gi.giback.mongo.entity.ProjectEntity;
 import com.gi.giback.mongo.service.ProjectService;
 import com.gi.giback.mysql.entity.FolderEntity;
@@ -16,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -43,16 +46,16 @@ public class LocationController {
     @PostMapping("/invite") // 유저 초대시 로케이션 생성
     @Operation(summary = "프로젝트에 유저 초대 - 테스트 완료", description = "프로젝트에 유저 초대 -> 초대받은 유저 정보를 기반으로 location 엔티티 생성")
     public ResponseEntity<LocationEntity> inviteUser(
-            @RequestParam @Parameter(description = "초대할 userEmail") String userEmail,
-            @RequestParam @Parameter(description = "초대 프로젝트 ID") Long projectId) {
+            @RequestBody @Parameter(description = "초대할 userEmail, 초대 프로젝트 ID") LocationDTO data) {
         // 이 작업은 프로젝트 내부에서 실행되므로 projectId 정보가 클라이언트에 있다는 것을 가정
 
-        Optional<ProjectEntity> project = projectService.getProject(projectId);
+        Optional<ProjectEntity> project = projectService.getProject(data.getProjectId());
         if (project.isPresent()){
             String userName = null;
-            userName = userService.getUserNameByEmail(userEmail);
+            userName = userService.getUserNameByEmail(data.getUserEmail());
             if (userName != null) { // 사용자가 없으면 실행하지 않음
-                LocationEntity createdEntity = locationService.createLocation(userEmail, projectId, project.get().getProjectName(), "GetIdeaMain");
+                LocationEntity createdEntity = locationService.createLocation(data.getUserEmail(),
+                    data.getProjectId(), project.get().getProjectName(), "GetIdeaMain");
                 return ResponseEntity.ok(createdEntity);
             }
         }
@@ -62,13 +65,11 @@ public class LocationController {
     @PutMapping("/move") // 프로젝트를 디폴트에서 폴더로 지정시키면 폴더 이름을 바꿔줌
     @Operation(summary = "프로젝트 위치 이동 - 테스트 완료", description = "프로젝트 위치 이동 : 로케이션에 있는 folderName 변경")
     public ResponseEntity<LocationEntity> updateFolderName(
-            @RequestParam @Parameter(description = "사용자 이메일") String userEmail,
-            @RequestParam @Parameter(description = "이동시킬 프로젝트") String projectName,
-            @RequestParam @Parameter(description = "이동할 폴더 이름") String newFolderName) {
+            @RequestBody @Parameter(description = "사용자 이메일, 이동시킬 프로젝트, 이동할 폴더 이름")LocationMoveDTO data) {
 
-        Optional<FolderEntity> folder = folderService.getFolderByFolderName(newFolderName);
+        Optional<FolderEntity> folder = folderService.getFolderByFolderName(data.getNewFolderName());
         if(folder.isPresent()){
-            LocationEntity updatedEntity = locationService.updateFolderName(userEmail, projectName, newFolderName);
+            LocationEntity updatedEntity = locationService.updateFolderName(data);
             return ResponseEntity.ok(updatedEntity);
         }
         return ResponseEntity.badRequest().build();
@@ -77,9 +78,8 @@ public class LocationController {
     @PutMapping("/bookmark") // 북마크 해제, 등록
     @Operation(summary = "북마크 - 테스트 완료", description = "북마크 해제, 등록 기능 구현")
     public ResponseEntity<LocationEntity> toggleBookmark(
-            @RequestParam @Parameter(description = "사용자 이메일") String userEmail,
-            @RequestParam @Parameter(description = "북마크 기능 사용할 프로젝트id") Long projectId) {
-        LocationEntity updatedEntity = locationService.toggleBookmark(userEmail, projectId);
+            @RequestBody @Parameter(description = "사용자 이메일, 북마크 기능 사용할 프로젝트id") LocationDTO data) {
+        LocationEntity updatedEntity = locationService.toggleBookmark(data);
         return ResponseEntity.ok(updatedEntity);
     }
 }
