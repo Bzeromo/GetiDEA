@@ -134,89 +134,89 @@ const MyDrawing = () => {
     console.log(checkDelete);
   };
 
-  const undoEvent2 = () => {
-    axios
-      .get(
-        `http://localhost:8080/api/project/rollback?projectId=${projectId}&userEmail=${userEmail}`
-      )
-      .then((response) => {
-        console.log(response);
-        console.log(response.data);
-        if (response.data) {
-          const dataItems = response.data;
+  // const undoEvent2 = () => {
+  //   axios
+  //     .get(
+  //       `http://localhost:8080/api/project/rollback?projectId=${projectId}&userEmail=${userEmail}`
+  //     )
+  //     .then((response) => {
+  //       console.log(response);
+  //       console.log(response.data);
+  //       if (response.data) {
+  //         const dataItems = response.data;
 
-          console.log(response.data);
+  //         console.log(response.data);
 
-          Object.keys(dataItems).forEach((key) => {
-            const item = dataItems[key];
+  //         Object.keys(dataItems).forEach((key) => {
+  //           const item = dataItems[key];
 
-            switch (item.ty) {
-              case "Text":
-                setTexts((prevTexts) => updateArray(prevTexts, item));
-                console.log(`text item: `, JSON.stringify2(item, key));
+  //           switch (item.ty) {
+  //             case "Text":
+  //               setTexts((prevTexts) => updateArray(prevTexts, item));
+  //               console.log(`text item: `, JSON.stringify2(item, key));
 
-                break;
-              case "Rect":
-                setShapes((prevShapes) => updateArray2(prevShapes, item));
-                console.log(JSON.stringify(item, key) + "Rect?");
-                break;
-              case "Circle":
-                setShapes((prevShapes) => updateArray2(prevShapes, item));
-                console.log(JSON.stringify(item, key) + "Circle?");
-                break;
-              case "RegularPolygon":
-                setShapes((prevShapes) => updateArray2(prevShapes, item));
-                console.log(
-                  `RegularPolygon item with defaults: `,
-                  JSON.stringify(item)
-                );
-                break;
-              case "Line":
-                setLines((prevLines) => updateArray2(prevLines, item));
-                console.log(`Line item: `, JSON.stringify(item, key));
-                break;
-              case "Dot":
-                setLines((prevLines) => updateArray2(prevLines, item));
-                console.log(`dot item: `, JSON.stringify(item, key));
-                break;
-              case "Arrow":
-                setLines((prevLines) => updateArray2(prevLines, item));
-                console.log(`arrow item: `, JSON.stringify(item, key));
-                break;
-              case "Image":
-                setImages((prevImage) => updateArray2(prevImage, item));
-                console.log(`img item: `, JSON.stringify(item, key));
-                break;
-              default:
-                // 기타 타입 처리
-                break;
-            }
-          });
-          console.log(dragEnded)
-        }
-      })
-      .catch((error) => {
-        console.error(error);
-      }, []);
-  };
+  //               break;
+  //             case "Rect":
+  //               setShapes((prevShapes) => updateArray2(prevShapes, item));
+  //               console.log(JSON.stringify(item, key) + "Rect?");
+  //               break;
+  //             case "Circle":
+  //               setShapes((prevShapes) => updateArray2(prevShapes, item));
+  //               console.log(JSON.stringify(item, key) + "Circle?");
+  //               break;
+  //             case "RegularPolygon":
+  //               setShapes((prevShapes) => updateArray2(prevShapes, item));
+  //               console.log(
+  //                 `RegularPolygon item with defaults: `,
+  //                 JSON.stringify(item)
+  //               );
+  //               break;
+  //             case "Line":
+  //               setLines((prevLines) => updateArray2(prevLines, item));
+  //               console.log(`Line item: `, JSON.stringify(item, key));
+  //               break;
+  //             case "Dot":
+  //               setLines((prevLines) => updateArray2(prevLines, item));
+  //               console.log(`dot item: `, JSON.stringify(item, key));
+  //               break;
+  //             case "Arrow":
+  //               setLines((prevLines) => updateArray2(prevLines, item));
+  //               console.log(`arrow item: `, JSON.stringify(item, key));
+  //               break;
+  //             case "Image":
+  //               setImages((prevImage) => updateArray2(prevImage, item));
+  //               console.log(`img item: `, JSON.stringify(item, key));
+  //               break;
+  //             default:
+  //               // 기타 타입 처리
+  //               break;
+  //           }
+  //         });
+  //         console.log(dragEnded)
+  //       }
+  //     })
+  //     .catch((error) => {
+  //       console.error(error);
+  //     }, []);
+  // };
 
-  function updateArray2(array, item) {
-    const index = array.findIndex((element) => element.id === item.id);
+  // function updateArray2(array, item) {
+  //   const index = array.findIndex((element) => element.id === item.id);
 
-    if (index >= 0) {
-      // 기존 항목 업데이트
-      return array.map((element, i) =>
-        i === index ? { ...element, ...item } : element
-      );
-    } else {
-      // 새 항목 추가
-      return [...array, ...item];
-    }
-  }
+  //   if (index >= 0) {
+  //     // 기존 항목 업데이트
+  //     return array.map((element, i) =>
+  //       i === index ? { ...element, ...item } : element
+  //     );
+  //   } else {
+  //     // 새 항목 추가
+  //     return [...array, ...item];
+  //   }
+  // }
 
   const undoAll = () => {
     undo();
-    undoEvent2();
+    undoEvent();
     setCount((prevCount) => prevCount + 1); // 이 부분을 수정
     // window.location.reload();
     console.log(count); // 이 로그는 상태 업데이트가 비동기적으로 이루어지기 때문에 업데이트 이전의 값을 출력할 수 있음
@@ -225,6 +225,7 @@ const MyDrawing = () => {
     checkPost();
     console.log(checkDelete);
   }
+  
   
 
   //전체 드래그 기능 구현
@@ -886,13 +887,17 @@ const MyDrawing = () => {
       // Ctrl+C: 복사
       if (event.ctrlKey && event.key === "c") {
         // 현재 선택된 요소의 타입에 따라 다른 상태에서 검색
-        const selectedShape = shapes.find((shape) => shape.id === selectedId);
-        const selectedLine = lines.find((line) => line.id === selectedId);
-        const selectedText = texts.find((text) => text.id === selectedId);
-        const selectedImage = images.find((image) => image.id === selectedId);
+        // const selectedShape = shapes.find((shape) => shape.id === selectedId);
+        // const selectedLine = lines.find((line) => line.id === selectedId);
+        // const selectedText = texts.find((text) => text.id === selectedId);
+        // const selectedImage = images.find((image) => image.id === selectedId);
 
-        const selectedItem =
-          selectedShape || selectedLine || selectedText || selectedImage;
+        // const selectedItem =
+        //   selectedShape || selectedLine || selectedText || selectedImage;
+        const selectedItem = [shapes, lines, texts, images]
+        .flatMap(items => items)
+        .find(item => item.id === selectedId);
+    
         if (selectedItem) {
           setClipboard({ ...selectedItem, id: nanoid(), x: selectedItem.x-20, y : selectedItem.y-20 });
         }
@@ -939,7 +944,7 @@ const MyDrawing = () => {
         deleteAll();
       }
       else if(event.ctrlKey && event.key === "z"){
-        undoEvent();
+        undoAll();
       } 
     };
 

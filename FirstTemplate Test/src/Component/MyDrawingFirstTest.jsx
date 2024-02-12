@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import { Stage, Layer, Transformer, Line, Image, Text } from "react-konva";
 import axios from "axios";
-import useImage from 'use-image';
+import useImage from "use-image";
 import URLImage from "./Add/URLImage";
 import bubbleChatProperties from "./templateData/template1-position.json";
 import randaomWords from "./templateData/randomWords.json";
@@ -24,7 +24,6 @@ import getData from "./axios/getData";
 import ImageGallery from "./ImageGallery";
 
 const MyDrawing = () => {
-
   const [imageIdCounter, setImageIdCounter] = useState(0);
 
   const [rectPosition, setRectPosition] = useState({ x: 50, y: 50 });
@@ -325,8 +324,6 @@ const MyDrawing = () => {
     socket.onclose = () => {
       console.log("WebSocket 연결이 닫혔습니다.");
     };
-
-
 
     // 컴포넌트 언마운트 시 WebSocket 연결 해제
     return () => {
@@ -911,23 +908,18 @@ const MyDrawing = () => {
     setTexts(updatedTexts);
   };
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
   //Template의 정보 받아오기.,,
-  const ImageComponent = ({ src, x, y, width, height, rotation, scaleX, scaleY, color }) => {
+  const ImageComponent = ({
+    src,
+    x,
+    y,
+    width,
+    height,
+    rotation,
+    scaleX,
+    scaleY,
+    color,
+  }) => {
     const [image] = useImage(src);
 
     return (
@@ -946,72 +938,59 @@ const MyDrawing = () => {
     );
   };
 
-
   const inputWord = "이것은 당신의 아이디어";
+  const plus = "&";
+  const arrangementType1 = " ";
+  const arrangementType2 = "\n";
 
-  //랜덤한 단어의 속성 설정하기
-  const RandomTextComponent = ({ text, x, y, fontSize, textProps, arrangementType }) => {
-
+  const RandomTextComponent = ({
+    text,
+    x,
+    y,
+    fontSize,
+    textProps,
+    arrangementType,
+  }) => {
     const [textResult, setTextResult] = useState(text);
 
-    const plus = "&";
-    const arrangementType1 = " ";
-    const arrangementType2 = "\n";
-
-    // if(arrangementType === 1){
-    //   setTextResult(text + arrangementType1 + plus + arrangementType1 + inputWord); // setTextResult를 통해 상태 업데이트
-    // }
-    // else if(arrangementType === 2){
-    //   setTextResult(text + arrangementType2 + plus + arrangementType2 + plus); // setTextResult를 통해 상태 업데이트
-    // }
-    // else{
-    //   console.log("Wrong arrangementType!!");
-    // }
-
     useEffect(() => {
+      let result;
       if (arrangementType === 1) {
-        setTextResult(inputWord + arrangementType1 + plus + arrangementType1 + text);
-      }
-      else if (arrangementType === 2) {
-        setTextResult(inputWord + arrangementType2 + plus + arrangementType2 + text);
-      }
-      else {
+        result = text + arrangementType1 + plus + arrangementType1 + inputWord;
+      } else if (arrangementType === 2) {
+        result = inputWord + arrangementType2 + plus + arrangementType2 + text;
+      } else {
         console.log("Wrong arrangementType!!");
       }
-    }, [text]); // text와 arrangementType이 변경될 때마다 useEffect가 호출되도록 설정
-
+      setTextResult(result);
+    }, [text, arrangementType]); // 의존성 배열에 text와 arrangementType을 추가합니다.
 
     return (
-      <Text
-        text={textResult}
-        x={x}
-        y={y}
-        fontSize={fontSize}
-        {...textProps}
-      />
+      <Text text={textResult} x={x} y={y} fontSize={fontSize} {...textProps} />
     );
   };
-
-  // words.json 파일을 불러옵니다.
+  // words.json에서 단어 목록을 불러옵니다.
   const words = require("./templateData/randomWords.json");
+  const [randomWords, setRandomWords] = useState([]);
 
-  //랜덤한 단어를 내뱉는 함수.
-  const getRandomWords = () => {
+  // 컴포넌트 마운트 시 랜덤한 단어 배열을 생성하여 상태에 저장합니다.
+  useEffect(() => {
+    setRandomWords(getRandomWords(words, 34)); // 34개의 랜덤 단어를 선택합니다.
+  }, []); // 빈 의존성 배열을 사용하여 마운트 시에만 실행합니다.
+
+  // 랜덤한 단어를 선택하는 함수입니다.
+  // 이 함수는 이제 상태 초기화에만 사용되며, 컴포넌트 내부에서 직접 호출되지 않습니다.
+  function getRandomWords(words, count) {
     const selectedWords = [];
-    const totalWords = words.length;
-    const wordsToSelect = 34;
-
-    // 중복되지 않는 랜덤한 단어를 선택합니다.
-    while (selectedWords.length < wordsToSelect) {
-      const randomIndex = Math.floor(Math.random() * totalWords);
+    while (selectedWords.length < count) {
+      const randomIndex = Math.floor(Math.random() * words.length);
       const word = words[randomIndex];
       if (!selectedWords.includes(word)) {
         selectedWords.push(word);
       }
     }
-
     return selectedWords;
-  };
+  }
 
   const selectedWords = getRandomWords();
 
@@ -1021,16 +1000,6 @@ const MyDrawing = () => {
   const handleButtonClick = () => {
     console.log("!!!!!!!!clike!!!!!!!!");
   };
-
-
-
-
-
-
-
-
-
-
 
   return (
     <div className="absolute  inset-0 h-full w-full bg-[#EFEFEF] bg-opacity-50 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px]">
@@ -1395,18 +1364,6 @@ const MyDrawing = () => {
         </div>
       )}
 
-
-
-
-
-
-
-
-
-
-
-
-
       {/* 템플릿 1 전용 버튼
       <div className="absolute bottom-6 right-52 z-50  justify-center bg-white rounded-md w-16 h-[50px] flex  items-center flex-row shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]">
         <button onClick={moveToTop}>템플릿1</button>
@@ -1417,24 +1374,9 @@ const MyDrawing = () => {
         <button>템플릿1</button>
       </div>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
       {/* 그리는 구역 */}
       <div className="absolute top-20 left-36">
         <div className="max-w-[1300px] max-h-[580px] overflow-hidden">
-
           <Stage
             ref={stageRef}
             width={window.innerWidth}
@@ -1448,12 +1390,6 @@ const MyDrawing = () => {
             onClick={handleLayerClick}
           >
             <Layer ref={layerRef}>
-
-
-
-
-
-
               {/**이게 for문와 같은 역할. 여기서 이미지 속성에 맞게 화면에 표시될거임 */}
               {/* {firstTemplateProperties.map((imgInfo, index) => (
             console.log(selectedWords),
@@ -1461,30 +1397,21 @@ const MyDrawing = () => {
            <RandomTextComponent key={`text_${index}`} x={imgInfo.x} y={imgInfo.y} />
           ))} */}
 
-
-              {/**화면에 템플릿1 요소 출력하는 부분 */}
               {firstTemplateProperties.map((imgInfo, index) => {
-                // 랜덤한 단어를 가져옵니다.
-                const randomWords = getRandomWords();
-                const number = 1;
-                // 랜덤한 단어 중 첫 번째 단어를 선택합니다.
-                const randomWord = randomWords[0];
-                
-                return (
-                  <React.Fragment key={imgInfo.id}>
-                    {/* 이미지 컴포넌트 렌더링 */}
-                    <ImageComponent key={imgInfo.id} {...imgInfo} />
+                // 상태에서 랜덤한 단어를 선택합니다. 여기서는 예제로 첫 번째 단어를 사용합니다.
+                const randomWord = randomWords[index]; // index를 사용하여 각 imgInfo에 대한 랜덤 단어를 선택합니다.
 
-                    {/* 랜덤한 단어를 표시하는 텍스트 컴포넌트 렌더링 */}
+                return (
+                  <React.Fragment key={index}>
+                    <ImageComponent {...imgInfo} />
                     <RandomTextComponent
-                      key={`text_${index}`}
+                      text={randomWord || ""} // 랜덤 단어가 아직 로드되지 않았을 경우를 대비하여 기본값을 설정합니다.
                       x={imgInfo.textPosX}
                       y={imgInfo.textPosY}
-                      text={randomWord}
-                      fontSize={7} // 원하는 폰트 크기 설정
-                      textProps={{ fill: "black" }} // 추가적인 텍스트 스타일 설정 가능
+                      fontSize={7}
+                      textProps={{ fill: "black" }}
                       arrangementType={imgInfo.arrangementType}
-                      />
+                    />
                   </React.Fragment>
                 );
               })}
@@ -1492,47 +1419,39 @@ const MyDrawing = () => {
               {/* {firstTemplateProperties.map((textInfo) =>(
               ))} */}
 
-
-
-
-
-
-
-
-
               {drawing && (
                 <Line
-                points={currentLine}
-                stroke={currentColor}
+                  points={currentLine}
+                  stroke={currentColor}
                   strokeWidth={5}
                 />
-                )}
+              )}
               {drawingList.map((drawing, id) => (
                 <Line key={id} {...drawing} />
-                ))}
+              ))}
               {shapes.map((shape) => (
                 <ShapeComponent
-                key={shape.id}
-                shapeProps={shape}
-                isSelected={shape.id === selectedId}
-                onTransformEnd={handleTransformEnd}
-                onSelect={(e) => {
-                  handleShapeClick(shape.id, e);
-                }}
+                  key={shape.id}
+                  shapeProps={shape}
+                  isSelected={shape.id === selectedId}
+                  onTransformEnd={handleTransformEnd}
+                  onSelect={(e) => {
+                    handleShapeClick(shape.id, e);
+                  }}
                   onChange={(newAttrs) => {
                     const newShapes = shapes.map((s) =>
-                    s.id === shape.id ? newAttrs : s
+                      s.id === shape.id ? newAttrs : s
                     );
                     setShapes(newShapes); // 상태 업데이트
                   }}
-                  />
-                  ))}
+                />
+              ))}
               {lines.map((line) => {
                 if (line.type === "Arrow") {
                   return (
                     <ArrowComponent
-                    key={line.id}
-                    ref={lineRef}
+                      key={line.id}
+                      ref={lineRef}
                       lineProps={line}
                       isSelected={line.id === selectedId}
                       onSelect={(e) => {
@@ -1602,7 +1521,6 @@ const MyDrawing = () => {
                 />
               ))}
 
-
               {selectedId && (
                 <Transformer
                   ref={(node) => {
@@ -1617,9 +1535,7 @@ const MyDrawing = () => {
                   }}
                 />
               )}
-
             </Layer>
-
           </Stage>
         </div>
       </div>
