@@ -1,7 +1,6 @@
 package com.gi.giback.mysql.service;
 
 import com.gi.giback.dto.UserDTO;
-import com.gi.giback.dto.UserRenameDTO;
 import com.gi.giback.mysql.entity.UserEntity;
 import com.gi.giback.mysql.repository.UserRepository;
 import com.gi.giback.oauth2.user.OAuth2UserInfo;

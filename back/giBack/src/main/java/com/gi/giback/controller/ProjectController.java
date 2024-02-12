@@ -6,10 +6,8 @@ import com.gi.giback.dto.ProjectInfoDTO;
 import com.gi.giback.dto.ProjectRenameDTO;
 import com.gi.giback.mongo.entity.ProjectEntity;
 import com.gi.giback.mongo.service.ProjectService;
-import com.gi.giback.mongo.service.TemplateService;
 import com.gi.giback.mysql.entity.LocationEntity;
 import com.gi.giback.mysql.service.LocationService;
-import com.gi.giback.dto.ProjectProcessDTO;
 import com.gi.giback.dto.ProjectInputDTO;
 import com.gi.giback.redis.RedisService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -24,14 +22,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -158,10 +154,9 @@ public class ProjectController {
         List<LocationEntity> locationEntityList = locationService.getLocationEntityByUserEmail(userEmail);
         List<ProjectInfoDTO> projectInfoList = new ArrayList<>();
         if(!locationEntityList.isEmpty()) {
-            int size = locationEntityList.size();
 
-            for (int i=0; i<size; i++) {
-                Long projectId = locationEntityList.get(i).getProjectId();
+            for (LocationEntity locationEntity : locationEntityList) {
+                Long projectId = locationEntity.getProjectId();
                 Optional<ProjectInfoDTO> entity = projectService.getProjectInfo(projectId);
                 entity.ifPresent(projectInfoList::add);
             }

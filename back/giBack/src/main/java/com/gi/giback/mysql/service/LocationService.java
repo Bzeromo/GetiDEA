@@ -1,6 +1,5 @@
 package com.gi.giback.mysql.service;
 
-import com.gi.giback.dto.LocationDTO;
 import com.gi.giback.dto.LocationMoveDTO;
 import com.gi.giback.dto.ProjectInfoDTO;
 import com.gi.giback.mongo.service.ProjectService;

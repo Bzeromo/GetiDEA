@@ -1,8 +1,6 @@
 package com.gi.giback.mysql.service;
 
-import com.gi.giback.dto.FolderDTO;
 import com.gi.giback.dto.FolderNameDTO;
-import com.gi.giback.mongo.service.ProjectService;
 import com.gi.giback.mysql.entity.FolderEntity;
 import com.gi.giback.mysql.entity.LocationEntity;
 import com.gi.giback.mysql.repository.FolderRepository;

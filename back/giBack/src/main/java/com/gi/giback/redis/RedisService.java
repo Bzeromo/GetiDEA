@@ -107,9 +107,8 @@ public class RedisService {
 
     // projectId + UserId 기준으로 어떤 사용자가 프로젝트를 종료했을때 호출하여
     // 해당 사용자의 기록을 지움
-    public boolean deleteData(Long projectId, String userEmail) {
+    public void deleteData(Long projectId, String userEmail) {
         String key = projectId + ":" + userEmail;
         redisTemplate.delete(key);
-        return true;
     }
 }

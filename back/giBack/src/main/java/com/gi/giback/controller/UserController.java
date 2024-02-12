@@ -1,7 +1,6 @@
 package com.gi.giback.controller;
 
 import com.gi.giback.dto.UserDTO;
-import com.gi.giback.dto.UserRenameDTO;
 import com.gi.giback.mysql.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
