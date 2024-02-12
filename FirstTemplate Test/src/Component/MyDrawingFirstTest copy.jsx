@@ -1398,25 +1398,67 @@ const MyDrawing = () => {
         <button onClick={() => handleButtonClick()}>템플릿1</button>
       </div> */}
 
-      <div>
-        <button 
-        type="button" 
-        class="bg-gray-800 text-gray rounded-r-md py-2 border-l border-gray-200 hover:bg-red-700 hover:text-black px-3"
-        className = "absolute bottom-6 right-22 z-50"
-        onClick={() => handleButtonClick()}>
+      {/* <div>
+        <button
+          type="button"
+          class="bg-gray-800 text-gray rounded-r-md py-2 border-l border-gray-200 hover:bg-red-700 hover:text-black px-3"
+          className="absolute bottom-6 right-22 z-50"
+          onClick={() => handleButtonClick()}>
           <div class="flex flex-row align-middle">
             <span class="mr-2">다음</span>
-            <svg class="w-5 ml-2" 
-            fill="currentColor" 
-            viewBox="0 0 20 20" 
-            xmlns="http://www.w3.org/2000/svg">
+            <svg class="w-5 ml-2"
+              fill="currentColor"
+              viewBox="0 0 20 20"
+              xmlns="http://www.w3.org/2000/svg">
               <path fill-rule="evenodd" d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd"></path>
             </svg>
           </div>
         </button>
+      </div> */}
+
+      <div class="absolute bottom-6 right-22 z-50 bg-white p-4 rounded-lg">
+        <div class="relative bg-inherit">
+          <input
+            type="text"
+            id="username"
+            name="username"
+            class="peer bg-transparent h-10 w-72 rounded-lg text-gray-200 placeholder-transparent ring-2 px-2 ring-gray-500 focus:ring-sky-600 focus:outline-none focus:border-rose-600"
+            placeholder=" "
+          />
+          <div class="absolute flex flex-row items-center gap-2 top-1 right-1">
+            <label
+              for="username"
+              class="cursor-text text-sm text-gray-500 bg-inherit mx-1 px-1 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500 peer-placeholder-shown:top-2 peer-focus:-top-3 peer-focus:text-sky-600 peer-focus:text-sm transition-all"
+            >
+              Type your Idea!
+            </label>
+            <button
+              type="button"
+              class="bg-gray-800 text-gray rounded-r-md py-2 border-l border-gray-200 hover:bg-red-700 hover:text-black px-3"
+              onClick={() => handleButtonClick()}
+            >
+              <div class="flex flex-row align-middle">
+                <span class="mr-2">다음</span>
+                <svg
+                  class="w-5 ml-2"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    fill-rule="evenodd"
+                    d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z"
+                    clip-rule="evenodd"
+                  ></path>
+                </svg>
+              </div>
+            </button>
+          </div>
+        </div>
       </div>
 
-      
+
+
 
       {/* 그리는 구역 */}
       <div className="absolute top-20 left-36">
