@@ -6,6 +6,7 @@ import MyDrawingFirst from "./Component/MyDrawingFirst";
 import MyDrawingFirstTest from "./Component/MyDrawingFirstTest";
 import MyDrawingSecond from "./Component/MyDrawingSecond";
 import MyDrawingThird from "./Component/MyDrawingThird";
+import TutorialTest from "./Component/TutorialTest";
 
 
 function App() {
@@ -18,6 +19,8 @@ function App() {
         <Route path="/board/1/test"  element={<MyDrawingFirstTest />} />
         <Route path="/board/2"  element={<MyDrawingSecond />} />
         <Route path="/board/3"  element={<MyDrawingThird />} />
+
+        <Route path="/board/tutorial"  element={<TutorialTest />} />
         
       </Routes>
     </BrowserRouter>
