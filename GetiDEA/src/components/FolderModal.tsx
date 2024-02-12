@@ -43,7 +43,7 @@ const FolderModal: React.FC<ProfileModalProps> = ({ isOpen, closeModal ,folders 
     const folderCreate = async() => {
       
       try {
-        const response = await axios.post('http://192.168.31.172:8080/api/folder/create', 
+        const response = await axios.post('http://localhost:8080/api/folder/create', 
         {
           "userEmail" : localStorage.getItem('userEmail'),
           "folderName" : folderName
@@ -51,6 +51,7 @@ const FolderModal: React.FC<ProfileModalProps> = ({ isOpen, closeModal ,folders 
         );
         
         setFolders([...folders,folderName]);
+        
         console.log('서버 응답:', response.data);
            showAlert();
         } catch (error) {

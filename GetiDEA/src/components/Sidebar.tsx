@@ -23,8 +23,10 @@ const Sidebar = () => {
   //폴더 배열 || 배열 추가 x 배열 새로 넣기 
   const [folders, setFolders] = useState<string[]>([]);
   const [index, setIndex] = useState<number>();
+  const [length, setLength] = useState<number>();
+
   const select = (idx: number): void => {
-      const arr: boolean[] = Array(5).fill(false);
+      const arr: boolean[] = Array(length).fill(false);
       arr[idx] = true;
       console.log(arr);
       setIsSelected(arr);
@@ -48,12 +50,12 @@ const Sidebar = () => {
   useEffect(() => {
     const fetchDFolders = async () => {
       try {
-        const response = await axios.get<Folder[]>(`http://192.168.31.172:8080/api/folder/search?userEmail=jungyoanwoo@naver.com`);
+        const response = await axios.get<Folder[]>(`http://localhost:8080/api/folder/search?userEmail=jungyoanwoo@naver.com`);
        
         setFolders(response.data.map((folder: Folder) => folder.folderName));
-       
-        const dataLength = response.data.length;
-        const initialSelectedState = Array(dataLength).fill(false).map((_, index) => index === 0);
+        console.log(folders);
+        setLength(response.data.length);
+        const initialSelectedState = Array(length).fill(false).map((_, index) => index === 0);
         setIsSelected(initialSelectedState);
       } catch (error) {
         console.error('Error fetching data: ', error);
@@ -145,11 +147,12 @@ const Sidebar = () => {
             <>{
                folders.map((folder,index)=>(
                 <li key={index} className="flex justify-center mb-3  ">
-                <Link to={`folder/${folders[index]}?name=${folders[index]}`} onClick={()=>{select(4+index)}} className={!isSelected[4+index]?"w-56 flex flex-row text-center   rounded py-4 px-4 text-black hover:text-blue hover:opacity-80 " 
+                <Link to={`folder/${folders[index]}` } state={{folderName : folders[index]}} onClick={()=>{select(4+index)}} className={!isSelected[4+index]?"w-56 flex flex-row text-center   rounded py-4 px-4 text-black hover:text-blue hover:opacity-80 " 
                 :"w-56 flex flex-row text-center    rounded py-4 px-4 text-blue  " } >
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 mr-5">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12.75V12A2.25 2.25 0 0 1 4.5 9.75h15A2.25 2.25 0 0 1 21.75 12v.75m-8.69-6.44-2.12-2.12a1.5 1.5 0 0 0-1.061-.44H4.5A2.25 2.25 0 0 0 2.25 6v12a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9a2.25 2.25 0 0 0-2.25-2.25h-5.379a1.5 1.5 0 0 1-1.06-.44Z" />
                 
+                {/* 수정 버튼 */}
                 </svg>
                   <span className='inline-block font-Nanum font-medium text-base rotate-[-0.03deg]'>{folders[index]}</span>
                   <svg onClick={()=>nameChange(index)} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={!isSelected[4+index]?"w-5 h-5 absolute left-[240px] invisible":"w-5 h-5 absolute left-[240px] text-light_gray hover:text-blue"}>

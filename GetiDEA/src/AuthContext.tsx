@@ -1,11 +1,20 @@
 import React, { createContext, useContext, useState, useEffect,ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { jwtDecode } from 'jwt-decode';
 
 interface AuthContextType {
   accessToken: string | null;
   isAuthenticated: boolean;
   login: (accessToken: string, refreshToken: string) => void;
   logout: () => void;
+}
+
+interface DecodedToken {
+  sub: string;
+  iat: number;
+  exp: number;
+  userName?: string;
+  provider: string;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -25,6 +34,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const storedToken = localStorage.getItem('accessToken');
     if (storedToken) {
       setAccessToken(storedToken);
+      const decoded:DecodedToken=jwtDecode(localStorage.getItem('accessToken')??"");
+      console.log(decoded);
+      localStorage.setItem('userEmail',decoded.sub??"");
+      localStorage.setItem('userName',decoded.userName??"");
     }
   }, []);
 
@@ -42,7 +55,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     localStorage.removeItem('userName');
     localStorage.removeItem('profileImage');
     console.log("dfdfdf");
-    
+    console.log(localStorage.getItem('accessToken'));
     navigate('/');
   };
 

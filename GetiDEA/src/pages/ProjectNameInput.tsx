@@ -1,15 +1,29 @@
 // App.tsx
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useState,ChangeEvent } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate,useLocation } from 'react-router-dom';
+import axios from 'axios';
 
+
+const template: readonly string[] = ["","whiteboard", "bubble", "sixhat", "7check"];
 
 const ProjectNameInput: React.FC = () => {
+    
+    const location = useLocation();
+    const index = location.state.index;
+
+    const [projectName, setProjectName] = useState<string>('');
+    const [folderName, setFolderName] = useState<string>('');
+    
+    useEffect(()=>{
+        const name = location.state.folderName
+        setFolderName(name);
+        console.log(`선택한 템플릿  : ${name} ${template[index]}`);
+    })
 
     const navigate = useNavigate();
 
-    const [projectName, setProjectName] = useState<string>('');
-
+    
     const onChange = (e: ChangeEvent<HTMLInputElement>) => {
 
         const inputText = e.target.value;
@@ -21,7 +35,25 @@ const ProjectNameInput: React.FC = () => {
 
     };
 
-      
+    const makeProject = async() =>{
+
+        try {
+            const response = await axios.post('http://localhost:8080/api/project/make',
+            {   
+                "projectName" : projectName,
+                "templateId" : template[index],
+                "userEmail" : localStorage.getItem('userEmail'),
+                "folderName" : folderName   
+            });
+
+        
+            console.log(`프로젝트 생성 성공! ${template[index]} 의 템플릿을 가진 ${projectName}`);
+            navigate("/board");
+            } catch (error) {
+                console.error('업로드 실패:', error);
+                alert('프로젝트 생성 실패.');
+            }
+    }
   return (
 
     <div>
@@ -33,14 +65,7 @@ const ProjectNameInput: React.FC = () => {
                 Get iDEA
                 </div>
             </div>
-            <div className='flex flex-row mr-48'>
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-8 h-8 mt-1">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0" />
-                </svg>
-                <div className="inline-flex items-center justify-center w-10 h-10 ml-4 text-base text-white bg-[#81A4AD] rounded-full">
-                    TW
-                </div>
-            </div>
+          
         </div>
 
         {/* 문구 */}
@@ -73,7 +98,7 @@ const ProjectNameInput: React.FC = () => {
 
             {/* 시작 버튼 */}
             <div className={projectName.length===0 ? 'absolute invisible cursor-pointer right-28 bg-[#6AA2B8] rounded-md w-36 h-12 flex items-center justify-center': 
-                'absolute cursor-pointer right-28 bg-[#6AA2B8] rounded-md w-36 h-12 flex items-center justify-center'} onClick={()=>navigate("/board")}>
+                'absolute cursor-pointer right-28 bg-[#6AA2B8] rounded-md w-36 h-12 flex items-center justify-center'} onClick={makeProject}>
                 <div className='font-IBM font-regular text-base ml-3 text-white  rotate-[-0.03deg]'>시작</div>
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="white" className=" ml-2 w-4 h-5 ">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M17.25 8.25 21 12m0 0-3.75 3.75M21 12H3" />

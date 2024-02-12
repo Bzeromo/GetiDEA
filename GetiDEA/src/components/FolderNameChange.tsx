@@ -18,7 +18,9 @@ const FolderNameChange: React.FC<ProfileModalProps> = ({ isOpen, closeModal ,ind
     
     useEffect(() => {
        setFolderName(folders[index]);
-      },[index]); 
+       console.log(folders);
+       console.log(folderName);
+      },[isOpen]); 
 
     const showAlert = async() => {
       await Swal.fire({
@@ -37,13 +39,12 @@ const FolderNameChange: React.FC<ProfileModalProps> = ({ isOpen, closeModal ,ind
         if (length <= 8) {
             setFolderName(inputText);
         } 
-
     };
 
-    const folderCreate = async() => {
+    const rename = async() => {
       
       try {
-        const response = await axios.patch(`http://192.168.31.172:8080/api/folder/rename?userEmail=jungyoanwoo@naver.com&oldFolderName=${folders[index]}&newFolderName=${folderName}`);
+        const response = await axios.patch(`http://localhost:8080/api/folder/rename?userEmail=${localStorage.getItem('userEmail')}&oldFolderName=${folders[index]}&newFolderName=${folderName}`);
         
         console.log('서버 응답:', response.data);
            showAlert();
@@ -108,7 +109,7 @@ const FolderNameChange: React.FC<ProfileModalProps> = ({ isOpen, closeModal ,ind
                             </div>
                             <div className='flex flex-row justify-end gap-2 h-10 font-Nanum'>
                                 <button className='bg-white rounded-md border-[1.5px] text-opacity-80 text-black text-sm font-regular border-line_gray w-16 h-8' onClick={close}>취소</button>       
-                                <button className='bg-blue bg-opacity-80 rounded-md  text-opacity-80 text-white text-sm w-16 h-8' onClick={folderCreate} >수정</button>
+                                <button className='bg-blue bg-opacity-80 rounded-md  text-opacity-80 text-white text-sm w-16 h-8' onClick={rename} >수정</button>
                             </div>
                       
                     </div>

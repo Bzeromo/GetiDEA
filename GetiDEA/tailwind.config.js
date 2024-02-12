@@ -33,7 +33,7 @@ module.exports = {
         Nanum:['NanumSquare'],
         NanumGothic:['Nanum Gothic', 'sans-serif'],
         'black-han-sans': ['"Black Han Sans"', 'sans-serif'], // 폰트 이름과 폴백 지정
-        SCoreDream : ['SCoreDream'],
+     
       },
     },
     colors:{

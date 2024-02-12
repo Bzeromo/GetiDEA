@@ -33,6 +33,7 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, closeModal, profile
     const [userName, setUserName] = useState<string>('');
     const [userEmail, setUserEmail] = useState<string>('');
     const [profile, setProfile] = useState<string>('');
+
     const showAlert = async() => {
      await Swal.fire({
           text: '프로필이 수정되었습니다.',
@@ -44,7 +45,7 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, closeModal, profile
     useEffect(() => {
         const fetchData = async () => {
         try {
-          const response = await axios.get<UserResponse>(`http://192.168.31.172:8080/api/user/search?userEmail=jungyoanwoo@naver.com`);
+          const response = await axios.get<UserResponse>(`http://localhost:8080/api/user/search?userEmail=${localStorage.getItem('userEmail')}`);
           setUserName(response.data[0].userName);
           setUserEmail(response.data[0].userEmail); // userEmail 필드만 추출
           setProfile(response.data[0].profileImage); // userEmail 필드만 추출
@@ -53,13 +54,13 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, closeModal, profile
         }
         };
         fetchData();
-    }, []);
+    }, [isOpen]);
 
     // 프로필 수정 POST 요청
     const updateUserProfile = async (userInfo: ProfileJson) => {
         try {
             console.log(userInfo);
-            const response = await axios.post('http://192.168.31.172:8080/api/image/userEmail/profileImage?userEmail=yoanwoo%40naver.com', userInfo);
+            const response = await axios.post('http://localhost:8080/api/image/userEmail/profileImage?userEmail=yoanwoo%40naver.com', userInfo);
             console.log('Update success:', response.data);
         } catch (error) {
             console.error('Update failed:', error);
@@ -73,13 +74,14 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, closeModal, profile
 
     const nameChangeSave = async () =>{ 
       try {
-        const response = await axios.patch(`http://192.168.31.172:8080/api/user/rename?userEmail=${userEmail}&newName=${userName}`, {
+        const response = await axios.patch(`http://localhost:8080/api/user/rename?userEmail=${userEmail}&newName=${userName}`, {
          
             });
             console.log('서버 응답:', response.data);
-            showAlert();  
+            await showAlert();  
             localStorage.setItem('userName',userName);
             closeModal();
+            window.location.reload();
          
         } catch (error) {
             console.error('업로드 실패:', error);
@@ -106,10 +108,10 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, closeModal, profile
           const formData = new FormData();
           console.log(file)
           formData.append('Image', file); // 프로필 이미지 파일
-          formData.append('userEmail', "jungyoanwoo@naver.com");
+          formData.append('userEmail', localStorage.getItem('userEmail') ?? "");
           try {
-            await axios.post('http://192.168.31.172:8080/api/image/profile',formData);
-            
+            await axios.post('http://localhost:8080/api/image/profile',formData);
+            console.log("전송 완료")
             } catch (error) {
                 alert('파일 업로드 실패.');
             }

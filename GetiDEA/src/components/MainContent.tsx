@@ -8,7 +8,6 @@ interface User {
   profileImage: string;
 }
 
-type UserResponse = User[];
 
 const MainContent: React.FC = () => {
 
@@ -21,12 +20,13 @@ const MainContent: React.FC = () => {
   useEffect(() => {
 
     const storedUserName = localStorage.getItem('userName');
+    console.log("Dfdf")
     if (storedUserName) {
       setUserName(storedUserName);
     }
     
 
-  }, []);
+  }, [localStorage.getItem('userName')]);
 
 
   return (
