@@ -972,6 +972,7 @@ const MyDrawing = () => {
   // words.json에서 단어 목록을 불러옵니다.
   const words = require("./templateData/randomWords.json");
   const [randomWords, setRandomWords] = useState([]);
+  const [activeIndex, setActiveIndex] = useState([]);
 
   // 컴포넌트 마운트 시 랜덤한 단어 배열을 생성하여 상태에 저장합니다.
   useEffect(() => {
@@ -998,7 +999,10 @@ const MyDrawing = () => {
 
   //버튼 누르는 함수
   const handleButtonClick = () => {
-    console.log("!!!!!!!!clike!!!!!!!!");
+    setActiveIndex((prevIndices) => [
+      ...prevIndices,
+      prevIndices.length < randomWords.length ? prevIndices.length : 0,
+    ]);
   };
 
   return (
@@ -1371,7 +1375,7 @@ const MyDrawing = () => {
 
       {/*템플릿 1 전용 버튼*/}
       <div>
-        <button>템플릿1</button>
+        <button onClick={() => handleButtonClick()}>템플릿1</button>
       </div>
 
       {/* 그리는 구역 */}
@@ -1399,20 +1403,22 @@ const MyDrawing = () => {
 
               {firstTemplateProperties.map((imgInfo, index) => {
                 // 상태에서 랜덤한 단어를 선택합니다. 여기서는 예제로 첫 번째 단어를 사용합니다.
-                const randomWord = randomWords[index]; // index를 사용하여 각 imgInfo에 대한 랜덤 단어를 선택합니다.
+                const isVisible = activeIndex.includes(index); // index를 사용하여 각 imgInfo에 대한 랜덤 단어를 선택합니다.
 
                 return (
                   <React.Fragment key={index}>
-                    <ImageComponent {...imgInfo} />
+                  <ImageComponent {...imgInfo} />
+                  {isVisible && (
                     <RandomTextComponent
-                      text={randomWord || ""} // 랜덤 단어가 아직 로드되지 않았을 경우를 대비하여 기본값을 설정합니다.
+                      text={randomWords[index] || ''}
                       x={imgInfo.textPosX}
                       y={imgInfo.textPosY}
-                      fontSize={7}
-                      textProps={{ fill: "black" }}
+                      fontSize={15}
+                      textProps={{ fill: "black" }} // Konva Text 컴포넌트의 visible 속성 대신 이를 사용
                       arrangementType={imgInfo.arrangementType}
                     />
-                  </React.Fragment>
+                  )}
+                </React.Fragment>
                 );
               })}
 
