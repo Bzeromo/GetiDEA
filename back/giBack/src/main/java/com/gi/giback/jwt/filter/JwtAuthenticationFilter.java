@@ -47,7 +47,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             List<GrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"));
             UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userEmail, null, authorities); // 권한 정보 등을 추가할 수 있음
             SecurityContextHolder.getContext().setAuthentication(authentication);
-            filterChain.doFilter(request, response);
+            log.info("{}", SecurityContextHolder.getContext().getAuthentication());
 
         } else { // 액세스 토큰 만료되어서 리프레시 확인
             log.info("AccessToken is not valid");
@@ -61,7 +61,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     String newAccessToken = jwtService.createAccessToken(user.getUserEmail(), user.getUserName(), user.getProvider().toString());
                     response.setHeader("Authorization", "Bearer " + newAccessToken);
                     // 클라이언트한테 다시 액세스 토큰 전송 필요
-                    filterChain.doFilter(request, response);
 
                 } else {
 

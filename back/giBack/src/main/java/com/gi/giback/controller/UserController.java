@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -40,9 +41,13 @@ public class UserController {
     @PatchMapping("/rename")
     @Operation(summary = "사용자 이름 변경 - 테스트 완료", description = "사용자 이름 변경")
     public ResponseEntity<UserDTO> renameUser(
-        @RequestBody UserRenameDTO data) {
+        @RequestBody String newUserName, @AuthenticationPrincipal String userEmail) {
 
-        Optional<UserDTO> updatedUser = userService.updateUserName(data);
+        if(userEmail == null){
+            return ResponseEntity.badRequest().build();
+        }
+
+        Optional<UserDTO> updatedUser = userService.updateUserName(userEmail, newUserName);
         return updatedUser
             .map(ResponseEntity::ok)
             .orElseGet(() -> ResponseEntity.notFound().build());

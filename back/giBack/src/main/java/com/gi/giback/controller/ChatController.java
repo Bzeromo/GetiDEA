@@ -4,12 +4,14 @@ import com.gi.giback.dto.ChatDTO;
 import com.gi.giback.dto.ChatSendDTO;
 import com.gi.giback.mongo.service.ChatService;
 import com.gi.giback.mongo.service.ProjectService;
+import com.gi.giback.mysql.service.LocationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -26,11 +28,14 @@ public class ChatController {
 
     private final ChatService chatService;
     private final ProjectService projectService;
+    private final LocationService locationService;
 
     @Autowired
-    public ChatController(ChatService chatService, ProjectService projectService) {
+    public ChatController(ChatService chatService, ProjectService projectService,
+        LocationService locationService) {
         this.chatService = chatService;
         this.projectService = projectService;
+        this.locationService = locationService;
     }
 
     @PostMapping("/send")
@@ -38,9 +43,8 @@ public class ChatController {
     public ResponseEntity<String> addChatMessage(@RequestBody @Parameter(description = "채팅 저장할 내용") ChatSendDTO data) {
 
         boolean isProjectValid = projectService.checkProjectId(data.getProjectId());
-        boolean isChatSaved = isProjectValid && chatService.addChatLog(data);
 
-        if (isChatSaved) {
+        if (isProjectValid && chatService.addChatLog(data)) {
             return ResponseEntity.ok("채팅 저장 완료");
         } else {
             return ResponseEntity.badRequest().build();
@@ -49,9 +53,17 @@ public class ChatController {
 
     @GetMapping("/load")
     @Operation(summary = "채팅 내역 불러오기", description = "프로젝트 실행시 프로젝트와 함께 채팅도 불러와야함")
-    public ResponseEntity<List<ChatDTO>> getChatLogs(@RequestParam @Parameter(description = "채팅 로그 불러올 프로젝트 ID") Long projectId) {
-        List<ChatDTO> chatLogs = chatService.getChatLogsByProjectId(projectId);
-        if (chatLogs != null) return ResponseEntity.ok(chatLogs);
-        else return ResponseEntity.badRequest().build();
+    public ResponseEntity<List<ChatDTO>> getChatLogs(@RequestParam @Parameter(description = "채팅 로그 불러올 프로젝트 ID") Long projectId,
+        @AuthenticationPrincipal String userEmail) {
+        if(userEmail == null){
+            return ResponseEntity.badRequest().build();
+        }
+
+        if(locationService.getLocationByProjectIdAndUserEmail(projectId, userEmail).isPresent()){
+            List<ChatDTO> chatLogs = chatService.getChatLogsByProjectId(projectId);
+            return ResponseEntity.ok(chatLogs);
+
+        }
+        return ResponseEntity.badRequest().build();
     }
 }

@@ -11,6 +11,7 @@ import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -50,7 +51,11 @@ public class ImageController {
     @Operation(summary = "프로필 이미지 변경", description = "프로필 이미지 변경")
     public ResponseEntity<String> updateProfileImage(
         @RequestPart("Image") MultipartFile multipartFile,
-        @RequestPart("userEmail") @Parameter(description = "사용자 이메일") String userEmail) {
+        @AuthenticationPrincipal String userEmail) {
+
+        if(userEmail == null){
+            return ResponseEntity.badRequest().build();
+        }
 
         String result;
         try {
@@ -71,11 +76,7 @@ public class ImageController {
         @RequestParam @Parameter(description = "imageBase64 : 인코딩된 이미지 ")FileUploadDTO fileUploadDTO) {
 
         String result;
-        try {
-            result = s3UploadService.saveImage(fileUploadDTO);
-        } catch (IOException e) {
-            return ResponseEntity.badRequest().build();
-        }
+        result = s3UploadService.saveImage(fileUploadDTO);
         return ResponseEntity.ok(result);
     }
 

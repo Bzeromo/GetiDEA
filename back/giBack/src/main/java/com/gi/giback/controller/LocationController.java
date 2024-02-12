@@ -15,12 +15,12 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -78,8 +78,13 @@ public class LocationController {
     @PutMapping("/bookmark") // 북마크 해제, 등록
     @Operation(summary = "북마크 - 테스트 완료", description = "북마크 해제, 등록 기능 구현")
     public ResponseEntity<LocationEntity> toggleBookmark(
-            @RequestBody @Parameter(description = "사용자 이메일, 북마크 기능 사용할 프로젝트id") LocationDTO data) {
-        LocationEntity updatedEntity = locationService.toggleBookmark(data);
+            @RequestBody @Parameter(description = "북마크 기능 사용할 프로젝트id") Long projectId,
+        @AuthenticationPrincipal String userEmail) {
+
+        if(userEmail == null){
+            return ResponseEntity.badRequest().build();
+        }
+        LocationEntity updatedEntity = locationService.toggleBookmark(projectId, userEmail);
         return ResponseEntity.ok(updatedEntity);
     }
 }

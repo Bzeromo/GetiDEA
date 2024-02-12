@@ -90,9 +90,9 @@ public class UserService {
     }
 
     @Transactional
-    public Optional<UserDTO> updateUserName(UserRenameDTO data) {
-        return userRepository.findByUserEmail(data.getUserEmail()).map(user -> {
-            user.setUserName(data.getNewUserName());
+    public Optional<UserDTO> updateUserName(String userEmail, String newUserName) {
+        return userRepository.findByUserEmail(userEmail).map(user -> {
+            user.setUserName(newUserName);
             userRepository.save(user);
             return new UserDTO(user.getUserEmail(), user.getUserName(), user.getProfileImage());
         });

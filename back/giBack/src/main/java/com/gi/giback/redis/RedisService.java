@@ -53,8 +53,7 @@ public class RedisService {
         Long size = listOps.size(key);
         if (size != null && size > 60) { // 만약 크기가 30이 넘어가면 merge 작업 수행
             // 병합 작업 수행
-            List<ProjectProcessDTO> redisData = getAllDataProject(projectId);
-            projectService.updateData(projectId, redisData);
+            mergeProject(projectId);
         }
     }
 
@@ -72,37 +71,38 @@ public class RedisService {
     }
 
     // projectId가 일치하는 곳의 모든 사용자의 변경사항 시간 순서로 정렬후 리턴
-    public List<ProjectProcessDTO> getAllDataProject(Long projectId)
+    public boolean mergeProject(Long projectId)
         throws JsonProcessingException {
         List<ProjectProcessDTO> results = new ArrayList<>();
         ObjectMapper objectMapper = new ObjectMapper();
 
         Set<String> keys = redisTemplate.keys(projectId + ":*");
 
-        assert keys != null;
-        for (String key : keys) {
-            List<Object> data = redisTemplate.opsForList().range(key, 0, -1);
-            assert data != null;
-            for (Object o : data) {
-                ProjectProcessDTO projectProcessDTO = objectMapper.readValue((String) o,
-                    ProjectProcessDTO.class);
-                results.add(projectProcessDTO);
-            }
+        if(keys != null) {
+            for (String key : keys) {
+                List<Object> data = redisTemplate.opsForList().range(key, 0, -1);
+                assert data != null;
+                for (Object o : data) {
+                    ProjectProcessDTO projectProcessDTO = objectMapper.readValue((String) o,
+                        ProjectProcessDTO.class);
+                    results.add(projectProcessDTO);
+                }
 
-            int currentSize = data.size();
+                int currentSize = data.size();
 
-            int remainSize = 5;
-            if (currentSize > remainSize) {
-                int excessData = currentSize - remainSize;
-                // 초과하는 데이터를 삭제
-                for (int i = 0; i < excessData; i++) {
-                    redisTemplate.opsForList().leftPop(key);
+                int remainSize = 5;
+                if (currentSize > remainSize) {
+                    int excessData = currentSize - remainSize;
+                    // 초과하는 데이터를 삭제
+                    for (int i = 0; i < excessData; i++) {
+                        redisTemplate.opsForList().leftPop(key);
+                    }
                 }
             }
+            results.sort(Comparator.comparing(ProjectProcessDTO::getUpdateTime));
+            return projectService.updateData(projectId, results);
         }
-        log.info("Get all data - Redis");
-        results.sort(Comparator.comparing(ProjectProcessDTO::getUpdateTime));
-        return results;
+        return true;
     }
 
     // projectId + UserId 기준으로 어떤 사용자가 프로젝트를 종료했을때 호출하여

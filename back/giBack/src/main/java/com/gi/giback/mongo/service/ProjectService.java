@@ -1,13 +1,18 @@
 package com.gi.giback.mongo.service;
 
+import com.gi.giback.dto.ProjectCreationDTO;
 import com.gi.giback.dto.ProjectInfoDTO;
 import com.gi.giback.mongo.entity.ProjectEntity;
+import com.gi.giback.mongo.entity.TemplateEntity;
 import com.gi.giback.mongo.repository.ChatLogRepository;
 import com.gi.giback.mongo.repository.ProjectRepository;
 import com.gi.giback.dto.ProjectProcessDTO;
+import com.gi.giback.mongo.repository.TemplateRepository;
+import com.gi.giback.mysql.service.LocationService;
 import com.mongodb.bulk.BulkWriteResult;
 import com.mongodb.client.result.UpdateResult;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,33 +30,53 @@ public class ProjectService {
     private final ProjectRepository repository;
     private final ChatLogRepository chatLogRepository;
     private final MongoTemplate mongoTemplate;
+    private final TemplateRepository templateRepository;
+    private final LocationService locationService;
 
     @Autowired
     public ProjectService(ProjectRepository repository, ChatLogRepository chatLogRepository,
-        MongoTemplate mongoTemplate) {
+        MongoTemplate mongoTemplate, TemplateRepository templateRepository,
+        LocationService locationService) {
         this.repository = repository;
         this.chatLogRepository = chatLogRepository;
         this.mongoTemplate = mongoTemplate;
+        this.templateRepository = templateRepository;
+        this.locationService = locationService;
     }
 
-    public boolean addProject(ProjectEntity entity) {
-        repository.save(entity);
-        return true;
+    public ProjectEntity createProject(ProjectCreationDTO projectCreationDto) {
+
+        String projectName = projectCreationDto.getProjectName();
+        String templateId = projectCreationDto.getTemplateId();
+        String userEmail = projectCreationDto.getUserEmail();
+        String folderName = Optional.ofNullable(projectCreationDto.getFolderName())
+            .filter(name -> !name.isBlank())
+            .orElse("GetIdeaMain");
+
+
+        Optional<TemplateEntity> templateEntity = templateRepository.findById(templateId);
+        if(templateEntity.isPresent()){
+            TemplateEntity template = templateEntity.get();
+            Long projectId = getNextProjectId(); // 다음 프로젝트 id
+
+            ProjectEntity project = new ProjectEntity();
+            project.setProjectId(projectId);
+            project.setProjectName(projectName);
+            project.setTemplateId(templateId);
+            project.setThumbnail(template.getThumbnail());
+            project.setLastUpdateTime(LocalDateTime.now(ZoneId.of("Asia/Seoul")));
+            project.setData(template.getData());
+
+            ProjectEntity savedProject = repository.save(project);
+            locationService.createLocation(userEmail, projectId, projectName, folderName);
+            return savedProject;
+        }
+        return null;
     }
 
     // Project 오픈시 호출
     public Optional<ProjectEntity> getProject(Long projectId) {
         return repository.findById(projectId);
-    }
-
-    public Optional<ProjectEntity> getProjectByIdWithDay(Long projectId) {
-        LocalDateTime sevenDaysAgo = LocalDateTime.now().minusDays(7);
-
-        Query query = new Query(Criteria.where("projectId").is(projectId)
-                .andOperator(Criteria.where("lastUpdateTime").gte(sevenDaysAgo)));
-
-        ProjectEntity project = mongoTemplate.findOne(query, ProjectEntity.class);
-        return Optional.ofNullable(project);
     }
 
     // data 내용을 제외한 프로젝트 Info만 가져오는 서비스
@@ -106,9 +131,16 @@ public class ProjectService {
         Query query = new Query(Criteria.where("projectId").is(projectId));
         BulkOperations bulkOps = mongoTemplate.bulkOps(BulkOperations.BulkMode.UNORDERED, ProjectEntity.class);
 
+        LocalDateTime currentTime = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
+
+        if (datas.isEmpty()){
+            return true;
+        }
+
         for (ProjectProcessDTO data : datas) {
             String propId = data.getPropId();
-            Update update = new Update().set("data." + propId, data.getNewData());
+            Update update = new Update().set("data." + propId, data.getNewData())
+                .set("lastUpdateTime", currentTime);
             bulkOps.updateOne(query, update);
         }
 
@@ -122,8 +154,10 @@ public class ProjectService {
     }
 
     public Optional<ProjectEntity> updateProjectName(Long projectId, String newProjectName) {
+        LocalDateTime currentTime = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
         Query query = new Query(Criteria.where("projectId").is(projectId));
-        Update update = new Update().set("projectName", newProjectName);
+        Update update = new Update().set("projectName", newProjectName)
+            .set("lastUpdateTime", currentTime);
         mongoTemplate.findAndModify(query, update, ProjectEntity.class);
         return Optional.ofNullable(mongoTemplate.findOne(query, ProjectEntity.class));
     }
@@ -139,17 +173,19 @@ public class ProjectService {
         }
     }
 
-    public boolean updateProjectThumbnail(Long projectId, String imageUrl) {
+    public void updateProjectThumbnail(Long projectId, String imageUrl) {
         // projectId 검증
         Optional<ProjectEntity> entity = repository.findById(projectId);
-        if(entity.isEmpty()) return false; // 없으면 false 리턴
+        if(entity.isEmpty()) return; // 없으면 false 리턴
 
+        LocalDateTime currentTime = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
         Query query = new Query(Criteria.where("projectId").is(projectId));
-        Update update = new Update().set("thumbnail", imageUrl);
+        Update update = new Update().set("thumbnail", imageUrl)
+            .set("lastUpdateTime", currentTime);
         // 업데이트 실행 및 결과 반환
         UpdateResult result = mongoTemplate.updateFirst(query, update, ProjectEntity.class);
         // 업데이트 성공 여부 확인 (수정된 문서 수가 0보다 크면 true 반환)
-        return result.getModifiedCount() > 0;
+        result.getModifiedCount();
     }
 
     public boolean checkProjectId(Long projectId) {
