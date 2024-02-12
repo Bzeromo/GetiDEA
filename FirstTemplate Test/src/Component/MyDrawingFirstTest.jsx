@@ -5,6 +5,7 @@ import useImage from "use-image";
 import URLImage from "./Add/URLImage";
 import bubbleChatProperties from "./templateData/template1-position.json";
 import randaomWords from "./templateData/randomWords.json";
+import RandomTextDisplay from "./Add/RandomTextDisplay";
 
 import ImgComponent from "./Add/ImgComponent";
 import ShapeComponent from "./Add/ShapeComponent";
@@ -22,6 +23,7 @@ import ImageSelector from "./funciton/ImageSelector";
 import undoData from "./axios/undoData";
 import getData from "./axios/getData";
 import ImageGallery from "./ImageGallery";
+import ImageComponent from "./Add/ImageComponent";
 
 const MyDrawing = () => {
   const [imageIdCounter, setImageIdCounter] = useState(0);
@@ -908,101 +910,16 @@ const MyDrawing = () => {
     setTexts(updatedTexts);
   };
 
-  //Template의 정보 받아오기.,,
-  const ImageComponent = ({
-    src,
-    x,
-    y,
-    width,
-    height,
-    rotation,
-    scaleX,
-    scaleY,
-    color,
-  }) => {
-    const [image] = useImage(src);
-
-    return (
-      <Image
-        image={image}
-        x={x}
-        y={y}
-        width={width}
-        height={height}
-        rotation={rotation}
-        scaleX={scaleX}
-        scaleY={scaleY}
-        color={color}
-        draggable
-      />
-    );
-  };
-
-  const inputWord = "이것은 당신의 아이디어";
-  const plus = "&";
-  const arrangementType1 = " ";
-  const arrangementType2 = "\n";
-
-  const RandomTextComponent = ({
-    text,
-    x,
-    y,
-    fontSize,
-    textProps,
-    arrangementType,
-  }) => {
-    const [textResult, setTextResult] = useState(text);
-
-    useEffect(() => {
-      let result;
-      if (arrangementType === 1) {
-        result = text + arrangementType1 + plus + arrangementType1 + inputWord;
-      } else if (arrangementType === 2) {
-        result = inputWord + arrangementType2 + plus + arrangementType2 + text;
-      } else {
-        console.log("Wrong arrangementType!!");
-      }
-      setTextResult(result);
-    }, [text, arrangementType]); // 의존성 배열에 text와 arrangementType을 추가합니다.
-
-    return (
-      <Text text={textResult} x={x} y={y} fontSize={fontSize} {...textProps} />
-    );
-  };
-  // words.json에서 단어 목록을 불러옵니다.
-  const words = require("./templateData/randomWords.json");
-  const [randomWords, setRandomWords] = useState([]);
+  
   const [activeIndex, setActiveIndex] = useState([]);
-
-  // 컴포넌트 마운트 시 랜덤한 단어 배열을 생성하여 상태에 저장합니다.
-  useEffect(() => {
-    setRandomWords(getRandomWords(words, 34)); // 34개의 랜덤 단어를 선택합니다.
-  }, []); // 빈 의존성 배열을 사용하여 마운트 시에만 실행합니다.
-
-  // 랜덤한 단어를 선택하는 함수입니다.
-  // 이 함수는 이제 상태 초기화에만 사용되며, 컴포넌트 내부에서 직접 호출되지 않습니다.
-  function getRandomWords(words, count) {
-    const selectedWords = [];
-    while (selectedWords.length < count) {
-      const randomIndex = Math.floor(Math.random() * words.length);
-      const word = words[randomIndex];
-      if (!selectedWords.includes(word)) {
-        selectedWords.push(word);
-      }
-    }
-    return selectedWords;
-  }
-
-  const selectedWords = getRandomWords();
 
   const firstTemplateProperties = Object.values(bubbleChatProperties);
 
-  //버튼 누르는 함수
   const handleButtonClick = () => {
-    setActiveIndex((prevIndices) => [
-      ...prevIndices,
-      prevIndices.length < randomWords.length ? prevIndices.length : 0,
-    ]);
+    setActiveIndex((prevIndices) => {
+      const nextIndex = prevIndices.length; // 현재 배열의 길이를 다음 인덱스로 사용
+      return [...prevIndices, nextIndex];
+    });
   };
 
   return (
@@ -1400,27 +1317,16 @@ const MyDrawing = () => {
           <ImageComponent key={imgInfo.id} {...imgInfo} />,
            <RandomTextComponent key={`text_${index}`} x={imgInfo.x} y={imgInfo.y} />
           ))} */}
-
-              {firstTemplateProperties.map((imgInfo, index) => {
-                // 상태에서 랜덤한 단어를 선택합니다. 여기서는 예제로 첫 번째 단어를 사용합니다.
-                const isVisible = activeIndex.includes(index); // index를 사용하여 각 imgInfo에 대한 랜덤 단어를 선택합니다.
-
-                return (
+              <React.Fragment>
+                {firstTemplateProperties.map((imgInfo, index) => (
                   <React.Fragment key={index}>
-                  <ImageComponent {...imgInfo} />
-                  {isVisible && (
-                    <RandomTextComponent
-                      text={randomWords[index] || ''}
-                      x={imgInfo.textPosX}
-                      y={imgInfo.textPosY}
-                      fontSize={15}
-                      textProps={{ fill: "black" }} // Konva Text 컴포넌트의 visible 속성 대신 이를 사용
-                      arrangementType={imgInfo.arrangementType}
-                    />
-                  )}
-                </React.Fragment>
-                );
-              })}
+                    <ImageComponent {...imgInfo} />
+                    {activeIndex.includes(index) && (
+                      <RandomTextDisplay activeIndex={[index]} />
+                    )}
+                  </React.Fragment>
+                ))}
+              </React.Fragment>
 
               {/* {firstTemplateProperties.map((textInfo) =>(
               ))} */}
