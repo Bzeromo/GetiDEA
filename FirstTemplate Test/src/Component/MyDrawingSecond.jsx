@@ -18,6 +18,7 @@ import TextComponent from "./Add/TextComponent";
 import useEventHandler from "./funciton/useEventHandler";
 import ImageSelector from "./funciton/ImageSelector";
 import undoData from "./axios/undoData";
+import ImageComponent from "./Add/ImageComponent";
 
 const MyDrawing = () => {
   const [imageIdCounter, setImageIdCounter] = useState(0);
@@ -930,78 +931,26 @@ const MyDrawing = () => {
 
 
 
-  // 템플릿3 이미지 생성 코드
-  const templateImage3 = [
+  // 템플릿3 이미지 형식
+  const templateImage2 = 
     {
-      "id": "template3",
-      "src": "/img/template3_check7/template3.png",
+      "src": "/img/template2_6hats/template2Fix.png",
       "x": 31,  // x좌표
-      "y": 10,  // y좌표
+      "y": 110,  // y좌표
       "ty": "img",
       "type": "Image",
-      "width": 200,
-      "height": 96,
+      "width": 220,
+      "height": 90,
       "draggable": false,
       "rotation": 0,
       "scaleX": 5.86,
       "scaleY": 5.86,
     }
-  ]
 
-  
-    const templateId = 3
-  // useEffect(() => {
+    //템플릿 정보 저장하기
+    const saveTemplate= () => {
 
-  //   const templateImage3 = {
-  //     "id": "template3",
-  //     "src": "/img/template3_check7/template3.png",
-  //     "x": 31,  // x좌표
-  //     "y": 10,  // y좌표
-  //     "ty": "img",
-  //     "type": "Image",
-  //     "width": 200,
-  //     "height": 96,
-  //     "draggable": false,
-  //     "rotation": 0,
-  //     "scaleX": 5.86,
-  //     "scaleY": 5.86,
-  //   }
-
-
-  //   if (templateId == 1) {
-    
-  //   } else if (templateId == 2) {
-
-  //   } else if (templateId == 3) {
-  //     setImages([templateImage3])
-  //   } else {
-
-  //   }
-    
-  // }, [])
-
-  useEffect(() =>{
-  }, [templateId])
-
-
-  const ImageComponent = ({ src, x, y, width, height, draggable,rotation, scaleX, scaleY }) => {
-    const [image] = useImage(src);
-
-    return (
-      <Image
-        image={image}
-        x={x}
-        y={y}
-        width={width}
-        height={height}
-        rotation={rotation}
-        scaleX={scaleX}
-        scaleY={scaleY}
-        draggable={draggable}
-      />
-    );
-  };
-
+    }
 
 
 
@@ -1388,23 +1337,19 @@ const MyDrawing = () => {
           <Layer ref={layerRef}>
 
 
-          {/* 템플릿3 적용 */}
+
+          {/* Template3 - 7Check에 대한 템플릿 정보 출력 */}
           
-          {templateId === 3 && templateImage3.map((imgInfo) => (
-          <ImageComponent key={imgInfo.id} {...imgInfo} />
-          ))}
-          
-
-          
-
-
-
-
-
-
-
-
-
+          <ImageComponent 
+            src = {templateImage2.src}
+            x = {templateImage2.x}
+            y = {templateImage2.y}
+            width={templateImage2.width}
+            height={templateImage2.height}
+            rotation={templateImage2.rotation}
+            scaleX={templateImage2.scaleX}
+            scaleY={templateImage2.scaleY}
+          />
 
 
 

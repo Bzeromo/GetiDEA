@@ -833,7 +833,7 @@ const MyDrawing = () => {
   );
 
   //Layer 변경 건(이건 색 변경 확인 후에 다시 가는 걸로)
-  const { moveDown, moveUp, moveToBottom, moveToTop, moveToTemplate } = LayerFunction(
+  const { moveDown, moveUp, moveToBottom, moveToTop } = LayerFunction(
     selectedId,
     layerRef
   );
@@ -949,45 +949,24 @@ const MyDrawing = () => {
   // ]
 
   
-  const templateId = 3
-
   useEffect(() => {
+    const templateId = 3
 
     const templateImage3 = {
-      "draggable": false,
       "id": "template3",
-      "src": "/img/template3_check7/template3.png",
+      "src": "/img/template2_6hats/template2Fix.png",
       "x": 31,  // x좌표
       "y": 10,  // y좌표
-      "ty": "Image",
+      "ty": "img",
       "type": "Image",
       "width": 200,
       "height": 96,
+      "draggable": false,
       "rotation": 0,
       "scaleX": 5.86,
       "scaleY": 5.86,
     }
 
-
-    const moveToTemplate = () => {
-      if (layerRef.current) {
-        const shapes = layerRef.current.find(node => node.id() === "template3");
-        if (shapes.length > 0) {
-          shapes.forEach(shape => {
-            shape.moveToBottom();
-          });
-          layerRef.current.batchDraw();
-          console.log("살려주세용");
-        } else {
-          console.log("해당 id에 해당하는 도형을 찾을 수 없습니다.");
-        }
-      } else {
-        console.log("layerRef가 null입니다.");
-      }
-    };
-  
-    moveToTemplate();
-    console.log("현승이바보");
 
     if (templateId == 1) {
     
@@ -999,7 +978,7 @@ const MyDrawing = () => {
 
     }
     
-  }, [templateId])
+  }, [])
 
   // useEffect(() =>{
   // }, [images])

@@ -18,7 +18,6 @@ import TextComponent from "./Add/TextComponent";
 import useEventHandler from "./funciton/useEventHandler";
 import ImageSelector from "./funciton/ImageSelector";
 import undoData from "./axios/undoData";
-import ImageComponent from "./Add/ImageComponent";
 
 const MyDrawing = () => {
   const [imageIdCounter, setImageIdCounter] = useState(0);
@@ -931,9 +930,30 @@ const MyDrawing = () => {
 
 
 
-  // 템플릿3 이미지 형식
-  const templateImage3 = 
-    {
+  // 템플릿3 이미지 생성 코드
+  // const templateImage3 = [
+  //   {
+  //     "id": "template3",
+  //     "src": "/img/template3_check7/template3.png",
+  //     "x": 31,  // x좌표
+  //     "y": 10,  // y좌표
+  //     "ty": "img",
+  //     "type": "Image",
+  //     "width": 200,
+  //     "height": 96,
+  //     "draggable": false,
+  //     "rotation": 0,
+  //     "scaleX": 5.86,
+  //     "scaleY": 5.86,
+  //   }
+  // ]
+
+  
+  useEffect(() => {
+    const templateId = 3
+
+    const templateImage3 = {
+      "id": "template3",
       "src": "/img/template3_check7/template3.png",
       "x": 31,  // x좌표
       "y": 10,  // y좌표
@@ -947,10 +967,41 @@ const MyDrawing = () => {
       "scaleY": 5.86,
     }
 
-    //템플릿 정보 저장하기
-    const saveTemplate= () => {
+
+    if (templateId == 1) {
+    
+    } else if (templateId == 2) {
+
+    } else if (templateId == 3) {
+      setImages([templateImage3])
+    } else {
 
     }
+    
+  }, [])
+
+  // useEffect(() =>{
+  // }, [images])
+
+
+  const ImageComponent = ({ src, x, y, width, height, draggable,rotation, scaleX, scaleY }) => {
+    const [image] = useImage(src);
+
+    return (
+      <Image
+        image={image}
+        x={x}
+        y={y}
+        width={width}
+        height={height}
+        rotation={rotation}
+        scaleX={scaleX}
+        scaleY={scaleY}
+        draggable={draggable}
+      />
+    );
+  };
+
 
 
 
@@ -1337,19 +1388,23 @@ const MyDrawing = () => {
           <Layer ref={layerRef}>
 
 
+          {/* 템플릿3 적용 */}
+          {/* 
+          {templateId === 3 && templateImage3.map((imgInfo) => (
+          <ImageComponent key={imgInfo.id} {...imgInfo} />
+          ))}
+           */}
 
-          {/* Template3 - 7Check에 대한 템플릿 정보 출력 */}
           
-          <ImageComponent 
-            src = {templateImage3.src}
-            x = {templateImage3.x}
-            y = {templateImage3.y}
-            width={templateImage3.width}
-            height={templateImage3.height}
-            rotation={templateImage3.rotation}
-            scaleX={templateImage3.scaleX}
-            scaleY={templateImage3.scaleY}
-          />
+
+
+
+
+
+
+
+
+
 
 
 
