@@ -49,28 +49,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             SecurityContextHolder.getContext().setAuthentication(authentication);
             log.info("{}", SecurityContextHolder.getContext().getAuthentication());
 
-        } else { // 액세스 토큰 만료되어서 리프레시 확인
+        } else { // 액세스 토큰 만료되어 401 반환
             log.info("AccessToken is not valid");
-            String refreshToken = getRefreshTokenFromRequest(request);
-            if (refreshToken != null && jwtService.validateToken(refreshToken)) {
-                // 리프레시 토큰이 존재하면, 새로운 액세스 토큰 발급
-                UserEntity user = userService.getUserByRefreshToken(refreshToken);
-
-                if (user != null) {
-
-                    String newAccessToken = jwtService.createAccessToken(user.getUserEmail(), user.getUserName(), user.getProvider().toString());
-                    response.setHeader("Authorization", "Bearer " + newAccessToken);
-                    // 클라이언트한테 다시 액세스 토큰 전송 필요
-
-                } else {
-
-                    log.info("RefershToken is not valid");
-                    // 리프레시 토큰에 해당하는 사용자가 없을 때
-                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401 Unauthorized
-                    SecurityContextHolder.clearContext(); // 사용자 로그아웃
-                    // 리프레시 토큰 만기시 다시 로그인 시켜야함
-                }
-            }
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401 Unauthorized
         }
         filterChain.doFilter(request, response);
     }
