@@ -60,7 +60,6 @@ public class ImageController {
         String result;
         try {
             result = s3UploadService.saveProfileImage(multipartFile, userEmail);
-            log.info("result ={}", result);
             if(userService.updateUserProfileImage(userEmail, result)){
                 return ResponseEntity.ok(result);
             }

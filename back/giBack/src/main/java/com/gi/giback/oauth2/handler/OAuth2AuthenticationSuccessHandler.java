@@ -90,11 +90,6 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
             // 리프레시 토큰 DB 저장
             userService.updateRefreshToken(principal.getUserInfo().getEmail(), refreshToken);
 
-            log.info("email={}, name={}, accessToken={}", principal.getUserInfo().getEmail(),
-                    principal.getUserInfo().getUserName(),
-                    principal.getUserInfo().getAccessToken()
-            );
-
             // 지금은 파라미터에 보내는 중 but body에 담아서 보내는것이 안전
             return UriComponentsBuilder.fromUriString(targetUrl)
                     .queryParam("access_token", accessToken)

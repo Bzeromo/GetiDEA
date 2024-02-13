@@ -80,8 +80,12 @@ public class FolderController {
             return ResponseEntity.badRequest().build();
         }
 
+        if(folderService.checkDuplicateFolder(userEmail, data.getNewFolderName())) {
+            return ResponseEntity.badRequest().build();
+        } // 중복 폴더 체크
+
         if(folderService.checkFolder(userEmail, data.getFolderId())) {
-            FolderEntity entity = folderService.updateFolderName(data);
+            FolderEntity entity = folderService.updateFolderName(data, userEmail);
             if(entity != null) {
                 return ResponseEntity.ok(entity);
             }

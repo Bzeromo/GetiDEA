@@ -50,10 +50,8 @@ public class JwtService {
                     .setSigningKey(key) // 검증에 사용할 서명 키 설정
                     .build()
                     .parseClaimsJws(token);
-            log.info("토큰 검증 완료");
             return !claims.getBody().getExpiration().before(new Date()); // 토큰 만료 날짜가 현재 날짜보다 이후인지 확인
         } catch (SignatureException ex) {
-            log.info("토큰 검증 실패");
             return false;
         }
     }

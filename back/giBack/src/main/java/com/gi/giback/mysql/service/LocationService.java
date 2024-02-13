@@ -100,4 +100,8 @@ public class LocationService {
         location.setProjectName(newProjectName);
         return locationRepository.save(location);
     }
+
+    public void saveLocation(LocationEntity location) {
+        locationRepository.save(location);
+    }
 }

@@ -49,7 +49,6 @@ public class RedisService {
         String jsonData = objectMapper.writeValueAsString(combinedData);
 
         listOps.rightPush(key, jsonData); // 2개씩 보내지는 버그(프론트) 고쳐지면 pop 기능 제거
-        log.info("Save data - Redis");
         Long size = listOps.size(key);
         if (size != null && size > 60) { // 만약 크기가 30이 넘어가면 merge 작업 수행
             // 병합 작업 수행
@@ -60,7 +59,6 @@ public class RedisService {
     public Object getLastProjectData(Long projectId, String userEmail) { // 되돌리기에서 사용
         String key = projectId + ":" + userEmail;
         if(Boolean.TRUE.equals(redisTemplate.hasKey(key))){
-            log.info("Get last data - Redis");
             redisTemplate.opsForList().rightPop(key);
             return redisTemplate.opsForList().rightPop(key);
             // 마지막 값 pop 작업 수행 후 반환

@@ -67,7 +67,7 @@ public class LocationController {
     public ResponseEntity<LocationEntity> updateFolderName(
             @RequestBody @Parameter(description = "사용자 이메일, 이동시킬 프로젝트, 이동할 폴더 이름")LocationMoveDTO data) {
 
-        Optional<FolderEntity> folder = folderService.getFolderByFolderName(data.getNewFolderName());
+        Optional<FolderEntity> folder = folderService.getFolderByFolderName(data.getUserEmail(), data.getNewFolderName());
         if(folder.isPresent()){
             LocationEntity updatedEntity = locationService.updateFolderName(data);
             return ResponseEntity.ok(updatedEntity);

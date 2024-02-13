@@ -17,4 +17,6 @@ public interface FolderRepository extends JpaRepository<FolderEntity, String> {
     Optional<FolderEntity> findFirstByFolderId(Long folderId);
 
     Optional<FolderEntity> findFirstByUserEmailAndFolderId(String userEmail, Long folderId);
+
+    Optional<FolderEntity> findFirstByUserEmailAndFolderName(String userEmail, String newFolderName);
 }
