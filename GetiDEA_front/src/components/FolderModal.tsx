@@ -1,6 +1,6 @@
 import React from 'react';
 import { useState,useEffect,useRef,ChangeEvent, } from 'react';
-import axios from 'axios';
+import api from '../api';
 import Swal from 'sweetalert2';
 
 interface Folder {
@@ -43,15 +43,18 @@ const FolderModal: React.FC<ProfileModalProps> = ({ isOpen, closeModal ,folders 
     const folderCreate = async() => {
       
       try {
-        const response = await axios.post('http://192.168.31.172:8080/api/folder/create', 
+        const response = await api.post('/api/folder/create', folderName,
         {
-          "userEmail" : localStorage.getItem('userEmail'),
-          "folderName" : folderName
+          headers: {
+              'Content-Type': 'text/plain' // JSON 형식의 데이터를 전송한다는 것을 명시
+          }
         }
         );
-        
-        setFolders([...folders,folderName]);
-        console.log('서버 응답:', response.data);
+      
+        const newFolders = [...folders,  folderName]
+        setFolders(newFolders);
+
+        console.log('폴더 추가 후:', folders);
            showAlert();
         } catch (error) {
             console.error('업로드 실패:', error);

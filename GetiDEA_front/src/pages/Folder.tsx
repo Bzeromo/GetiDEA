@@ -1,283 +1,264 @@
-// App.tsx
-import React from 'react';
-import { useState ,useEffect, useRef,ChangeEvent, KeyboardEvent} from 'react';
-import { Link, useLocation  } from 'react-router-dom';
-import Topbar from '../components/TopBar';
-import axios from 'axios';
-import FolderNameChange from '../components/FolderNameChange';
-import Swal from 'sweetalert2';
-const Folder: React.FC = () => {
-    
-    const [isSelected, setIsSelected] = useState<boolean[]>( Array(4).fill(false));
-    const [isOpen, setIsOpen] = useState(false);
-    const [dropdownsOpen, setDropdownsOpen] = useState<boolean[]>(new Array(5).fill(false));
-    const [name, setName] = useState<string|null>('');
-    const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  // App.tsx
+  import React from 'react';
+  import { useState ,useEffect, useRef} from 'react';
+  import { Link, useLocation,useNavigate  } from 'react-router-dom';
+  import Topbar from '../components/TopBar';
+  import api from '../api';
+  import Swal from 'sweetalert2';
+  import moment from 'moment';
 
-    const openModal = () => setIsModalOpen(true);
-    const closeModal = () => setIsModalOpen(false);
+  interface project {
+    projectId: number;
+    templateId: string;
+    projectName: string;
+    thumbnail: string;
+    lastUpdateTime: Date;
+  }
 
-    const location = useLocation();
+  
 
-    useEffect(()=>{
-      const queryParams = new URLSearchParams(location.search);
-      setName(queryParams.get('name')); 
-    })
-    
-    const showAlert = async() => {
-      await Swal.fire({
-           text: '폴더가 삭제되었습니다.',
-         icon: 'success',
-         confirmButtonText: '확인'
-       });
-     };
-
-    
-
-    // 북마크 관련 함수
-    const select = (idx: number): void => {
-      const arr = [...isSelected]; // 기존 배열의 상태를 복사
-        arr[idx] = !arr[idx];
-        setIsSelected(arr);
-      };
+  const Folder: React.FC = () => {
       
-    const dropdownRef = useRef<HTMLDivElement>(null);
-  
-    // 프로젝트 메뉴 드롭다운 함수
-     const menuDropdown = (index: number) => {
-      setDropdownsOpen(prevState => 
-        prevState.map((item, idx) => idx === index ? !item : item)
-      );
-    };
-  
-   
-  
-    // 외부 클릭 처리 함수
-    const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setIsOpen(false);
-        setDropdownsOpen(new Array(dropdownsOpen.length).fill(false));
-      }
-    };
-  
-    useEffect(() => {
-      document.addEventListener('mousedown', handleClickOutside);
-      return () => document.removeEventListener('mousedown', handleClickOutside);
-    }, [isOpen,dropdownsOpen]); // 종속성 배열에 isOpen 추가
+      const [isSelected, setIsSelected] = useState<boolean[]>([]);
+      const [isOpen, setIsOpen] = useState(false);
+      const [dropdownsOpen, setDropdownsOpen] = useState<boolean[]>([]);
+      const [folderName, setFolderName] = useState<string|null>('');
+      const [projects, setProjects] = useState<project[]>([]);
+      const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+      const [isLoading, setIsLoading] = useState(true); // 로딩 상태 추가
+      const openModal = () => setIsModalOpen(true);
+      const closeModal = () => setIsModalOpen(false);
+
+      const location = useLocation();
+
+      // setName(location.state.folderName);
+
     
-  //   useEffect(() => {
-  //     const fetchData = async () => {
-  //     try {
-  //       const response = await axios.get<UserResponse>(`http://192.168.31.172:8080/api/user/search?userEmail=${localStorage.getItem('userEmail')}`);
-  //       setUserName(response.data[0].userName);
-  //       setUserEmail(response.data[0].userEmail); // userEmail 필드만 추출
-  //       setprofileImage(response.data[0].profileImage); // userEmail 필드만 추출
-  //     } catch (error) {
-  //         console.error('Error fetching data: ', error);
-  //     }
-  //     };
-  //     fetchData();
-  // }, []);
+      
+      const navigate = useNavigate();
 
-    const inputRef = useRef<HTMLInputElement>(null);
-    const containerRef = useRef<HTMLDivElement>(null);
-
-    //폴더 삭제 함수
-    const deleteFolder =async() => {
-
-      try {
-        const response = await axios.delete(`http://192.168.31.172:8080/api/folder/remove?userEmail=jungyoanwoo@naver.com&folderName=${name}`);
-
-        showAlert();
-        } catch (error) {
-            console.error('업로드 실패:', error);
-            alert('폴더 생성 실패.');
+      const DeleteAlert = async() => {
+        const result = await Swal.fire({
+          title: '정말 삭제하시겠습니까?',
+          icon: 'warning',
+          showCancelButton: true, // cancel버튼 보이기. 기본은 원래 없음
+          confirmButtonColor: '#3085d6', // confrim 버튼 색깔 지정
+          cancelButtonColor: '#d33', // cancel 버튼 색깔 지정
+          confirmButtonText: '네', // confirm 버튼 텍스트 지정
+          cancelButtonText: '아니요', // cancel 버튼 텍스트 지정
+          reverseButtons: true, // 버튼 순서 거꾸로
+        })
+        
+          if (result.isConfirmed) { // 만약 모달창에서 confirm 버튼을 눌렀다면
+            deleteFolder();
+            await Swal.fire('삭제되었습니다.','' ,'success');
+            navigate("/ ");
+            window.location.reload();
         }
-    };
+        }
+    
+        const DeleteProjectAlert = async(projectId:number) => {
+          const result = await Swal.fire({
+            title: '정말 삭제하시겠습니까?',
+            icon: 'warning',
+            showCancelButton: true, // cancel버튼 보이기. 기본은 원래 없음
+            confirmButtonColor: '#3085d6', // confrim 버튼 색깔 지정
+            cancelButtonColor: '#d33', // cancel 버튼 색깔 지정
+            confirmButtonText: '네', // confirm 버튼 텍스트 지정
+            cancelButtonText: '아니요', // cancel 버튼 텍스트 지정
+            reverseButtons: true, // 버튼 순서 거꾸로
+          })
+          
+            if (result.isConfirmed) { // 만약 모달창에서 confirm 버튼을 눌렀다면
+              deleteProject(projectId);
+              await Swal.fire('삭제되었습니다.','' ,'success');
+              navigate("/ ");
+              window.location.reload();
+          }
+          }
+      
 
+      const renew = async()=> {
+        await window.location.reload();
+        };
+
+      // 북마크 관련 함수
+      const select = (idx: number, projectId:number): void => {
+        const arr = [...isSelected]; // 기존 배열의 상태를 복사
+          arr[idx] = !arr[idx];
+          setIsSelected(arr);
+          bookmark(projectId);
+        };
+        
+      const dropdownRef = useRef<HTMLDivElement>(null);
+    
+      // 프로젝트 메뉴 드롭다운 함수
+      const menuDropdown = (index: number) => {
+        setDropdownsOpen(prevState => 
+          prevState.map((item, idx) => idx === index ? !item : item)
+        );
+      };
+    
+    
+    
+      // 외부 클릭 처리 함수
+      const handleClickOutside = (event: MouseEvent) => {
+        if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+          setIsOpen(false);
+          setDropdownsOpen(new Array(dropdownsOpen.length).fill(false));
+        }
+      };
+    
+      useEffect(() => {
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+      }, [isOpen,dropdownsOpen]); // 종속성 배열에 isOpen 추가
      
+      const inputRef = useRef<HTMLInputElement>(null);
+      const containerRef = useRef<HTMLDivElement>(null);
 
-        // useEffect(() => {
-  //   const fetchData = async () => {
-  //     try {
-  //       const response = await axios.get<UserResponse>('http://localhost:8080/user/userid=1');
-  //       setUserName(response.data.userName); // userName 필드만 추출
-  //     } catch (error) {
-  //       console.error('Error fetching data: ', error);
-  //     }
-  //   };
+      //폴더 삭제 함수
+      const deleteFolder =async() => {
 
-  //   fetchData();
-  // }, []);
+        try {
+          const response = await api.delete(`/api/folder/remove?folderName=${folderName}`);
+          
+          } catch (error) {
+              console.error('업로드 실패:', folderName);
+              alert('폴더 생성 실패.');
+          }
+      };
 
-  return (
-    <div className="flex  min-h-screen  flex-col bg-gray-100">
-      <Topbar/>
-      <div className="flex  relative  ml-28">
+      useEffect(()=>{
+        if (location.state && location.state.folderName) {
+          setFolderName(location.state.folderName);
+        }
+      },[location.state])
 
-        {/* 검색바 */}
-        <div className="flex relative">
-          <button onClick={deleteFolder}>삭제</button>
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 absolute left-4 top-3 text-gray">
-            <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+      // 프로젝트 불러오기
+      useEffect(() => {
+        const fetchProjects = async () => {
+          try {
+            const response = await api.get(`/api/project/folder?folderName=${folderName}`);
+            setProjects(response.data);
+            setIsSelected(new Array(response.data.length).fill(false));
+            setDropdownsOpen(new Array(response.data.length).fill(false));
+           
+          } catch (error) {
+            console.error('Error fetching data: ', error);
+           
+          }
+        };
+    
+        fetchProjects();
+      },[folderName]);
+
+      const bookmark = (projectId : number) =>{
+        const bookmarking = async () => {
+          try {
+            const response = await api.put(`api/location/bookmark`,projectId,{
+              headers: {
+                'Content-Type': 'text/plain' // JSON 형식의 데이터를 전송한다는 것을 명시
+            }
+            });
+           
+          } catch (error) {
+            console.error('Error fetching data: ', error);
+          }
+        };
+    
+        bookmarking();
+      }
+    
+      const deleteProject = (projectId : number) =>{
+        const deleting = async () => {
+          try {
+            const response = await api.delete(`/api/project/delete?projectId=${projectId}`);
+           
+          } catch (error) {
+            console.error('Error fetching data: ', error);
+          }
+        };
+    
+        deleting();
+      }
+
+    return (
+      <div className="flex  min-h-screen  flex-col bg-gray-100">
+        <Topbar/>
+        <div className="flex  relative  ml-28">
+
+          {/* 폴더 삭제버튼 */}
+          <div className="flex relative">
+        
+          </div>  
+        </div>
+        
+
+          <div ref={containerRef} className='flex flex-row mt-10 ml-28 font-Nanum rotate-[-0.03deg] font-semibold text-xl'>
+              {/* 폴더 이름 */}
+            {folderName}
+            <svg onClick={DeleteAlert} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 ml-[800px] hover:text-blue cursor-pointer">
+            <path strokeLinecap="round" strokeLinejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
           </svg>
 
-        </div>  
-      </div>
-       
-
-        <div ref={containerRef} className='flex flex-row mt-10 ml-28 font-Nanum rotate-[-0.03deg] font-semibold text-xl'>
-            {/* 폴더 이름 */}
-          {name}
-           
-
-        </div>
-
-        <div className=' flex flex-row flex-wrap gap-16 ml-32 mt-12'>
-
-          {/* 새 프로젝트 생성 */}
-          <Link to="/templateSelect" className='flex flex-col group justify-center items-center cursor-pointer duration-500 w-64 h-[300px] bg-[#B8D8DC] rounded-md shadow-[rgba(0,_0,_0,_0.25)_0px_4px_15px_0px] '>
-
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-10 h-10 place-self-center mt-16 text-gray">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-            </svg>
-
-              <span className='self-center mt-16 font-Nanum text-xl text-gray font-semibold rotate-[-0.03deg]'>새 프로젝트</span>
-          </Link>
-
-          {/* 최근 작업 프로젝트 */}
-            <div className='flex flex-col group  w-64 h-[300px] bg-white cursor-pointer  hover:bg-line_gray duration-700 rounded-md shadow-[rgba(0,_0,_0,_0.25)_0px_4px_15px_0px] ' >
-            
-              <div className='flex flex-row w-full'>
-                <svg onClick={()=>select(1)} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={isSelected[1]?"w-6 h-6 ml-3 mt-3 self-start fill-main cursor-pointer text-main"
-                :"w-6 h-6 ml-3 mt-3 self-start invisible group-hover:visible hover:text-main cursor-pointer text-gray"}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z" />
-                </svg>
-
-                <svg onClick={() => menuDropdown(1)} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-8 h-8 ml-44 mt-2 invisible group-hover:visible hover:text-main cursor-pointer  text-gray">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM12.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM18.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" />
-                </svg>
-
-                {dropdownsOpen[1] && (
-                <div className="absolute ml-52  w-28 px-2 text-black mt-10 origin-top-right bg-white divide-y divide-gray-100 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none" ref={dropdownRef}>
-                  <div className="py-1">
-                    <a href="/" className=" px-4 py-2 flex flex-row text-sm text-gray-700 hover:bg-gray-100 rotate-[-0.03deg]">
-                      수정</a>
-                    <a href="/" className="flex flex-row px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rotate-[-0.03deg]">
-                      이동</a>
-                    <a href="/" className=" flex flex-row px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rotate-[-0.03deg]">
-                      삭제</a>
-                  </div>
-                </div>
-                 )}
-              </div>
-
-              <img src="/projectImage1.png" alt="" className='w-44 h-44 self-center' />
-              <span className='self-center mt-5 font-Nanum text-xl font-semibold rotate-[-0.03deg]'>프로젝트 1</span>
-              <span className='self-center mt-1 font-Nanum text-sm font-regular text-gray invisible group-hover:visible rotate-[-0.03deg]'>2024-01-30 수정</span>
-            </div>
-
-            <div className='flex flex-col group  w-64 h-[300px] bg-white cursor-pointer  hover:bg-line_gray duration-700  rounded-md shadow-[rgba(0,_0,_0,_0.25)_0px_4px_15px_0px] '>
-            
-              <div className='flex flex-row w-full'>
-                  <svg onClick={()=>select(2)} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={isSelected[2]?"w-6 h-6 ml-3 mt-3 self-start fill-main cursor-pointer text-main"
-                      :"w-6 h-6 ml-3 mt-3 self-start invisible group-hover:visible hover:text-main cursor-pointer text-gray"}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z" />
-                  </svg>
-
-                <svg onClick={() => menuDropdown(2)} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-8 h-8 ml-44 mt-2 invisible group-hover:visible hover:text-main cursor-pointer  text-gray">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM12.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM18.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" />
-                </svg>
-
-                {dropdownsOpen[2] && (
-                <div className="absolute ml-52  w-28 px-2 text-black mt-10 origin-top-right bg-white divide-y divide-gray-100 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none" ref={dropdownRef}>
-                  <div className="py-1">
-                    <a href="/" className=" px-4 py-2 flex flex-row text-sm text-gray-700 hover:bg-gray-100 rotate-[-0.03deg]">
-                      수정</a>
-                    <a href="/" className="flex flex-row px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rotate-[-0.03deg]">
-                      이동</a>
-                    <a href="/" className=" flex flex-row px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rotate-[-0.03deg]">
-                      삭제</a>
-                  </div>
-                </div>
-                 )}
-              </div>
-
-              <img src="/projectImage2.png" alt="" className='w-full h-44 self-center group-hover:text-gray' />
-              <span className='self-center mt-5 font-Nanum text-xl font-semibold rotate-[-0.03deg]'>프로젝트 2</span>
-              <span className='self-center mt-1 font-Nanum text-sm font-regular text-gray invisible group-hover:visible rotate-[-0.03deg]'>2024-01-29 수정</span>
           </div>
 
-         
+          <div className=' flex flex-row flex-wrap gap-16 ml-32 mt-12'>
 
-          <div className='flex flex-col group  w-64 h-[300px] bg-white cursor-pointer hover:bg-line_gray duration-700  rounded-md shadow-[rgba(0,_0,_0,_0.25)_0px_4px_15px_0px] '>
-            
-            <div className='flex flex-row w-full'>
-                <svg onClick={()=>select(5)} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={isSelected[5]?"w-6 h-6 ml-3 mt-3 self-start fill-main cursor-pointer text-main"
-                :"w-6 h-6 ml-3 mt-3 self-start invisible group-hover:visible hover:text-main cursor-pointer text-gray"}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z" />
-                </svg>
+            {/* 새 프로젝트 생성 */}
+            <Link to="/templateSelect" state={{folderName : folderName}} className='flex flex-col group justify-center items-center cursor-pointer duration-500 w-64 h-[300px] bg-[#B8D8DC] rounded-md shadow-[rgba(0,_0,_0,_0.25)_0px_4px_15px_0px] '>
 
-              <svg onClick={() => menuDropdown(3)} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-8 h-8 ml-44 mt-2 invisible group-hover:visible hover:text-main cursor-pointer  text-gray">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM12.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM18.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" />
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-10 h-10 place-self-center mt-16 text-gray">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
               </svg>
 
-              {dropdownsOpen[3] && (
-                <div className="absolute ml-52  w-28 px-2 text-black mt-10 origin-top-right bg-white divide-y divide-gray-100 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none" ref={dropdownRef}>
-                  <div className="py-1">
-                    <a href="/" className=" px-4 py-2 flex flex-row text-sm text-gray-700 hover:bg-gray-100 rotate-[-0.03deg]">
-                      수정</a>
-                    <a href="/" className="flex flex-row px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rotate-[-0.03deg]">
-                      이동</a>
-                    <a href="/" className=" flex flex-row px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rotate-[-0.03deg]">
-                      삭제</a>
+                <span className='self-center mt-16 font-Nanum text-xl text-gray font-semibold rotate-[-0.03deg]'>새 프로젝트</span>
+            </Link>
+
+            {/* 작업 프로젝트 */}
+            <>
+            {
+              Array.isArray(projects) && projects.map((item,index)=>(
+                <div className='flex flex-col group  w-64 h-[300px] bg-white cursor-pointer  hover:bg-line_gray duration-700  rounded-md shadow-[rgba(0,_0,_0,_0.25)_0px_4px_15px_0px] '>
+            
+                  <div className='flex flex-row w-full'>
+                      <svg onClick={()=>select(index, item.projectId)} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={isSelected[index]?"w-6 h-6 ml-3 mt-3 self-start fill-main cursor-pointer text-main"
+                          :"w-6 h-6 ml-3 mt-3 self-start invisible group-hover:visible hover:text-main cursor-pointer text-gray"}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z" />
+                      </svg>
+
+                    <svg  onClick={() => menuDropdown(index)} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-8 h-8 ml-44 mt-2 invisible group-hover:visible hover:text-main cursor-pointer  text-gray">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM12.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM18.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" />
+                    </svg>
+                    {dropdownsOpen[index] && (
+                    <div className="absolute ml-52  w-28 px-2 text-black mt-10 origin-top-right bg-white divide-y divide-gray-100 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none" ref={dropdownRef}>
+                      <div className="py-1">
+                        <a href="/" className=" px-4 py-2 flex flex-row text-sm text-gray-700 hover:bg-gray-100 rotate-[-0.03deg]">
+                          수정</a>
+                        {/* <a href="/" className="flex flex-row px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rotate-[-0.03deg]">
+                          이동</a> */}
+                        <div onClick={()=>DeleteProjectAlert(item.projectId)}  className=" flex flex-row cursor-pointer px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rotate-[-0.03deg]">
+                          삭제</div>
+                      </div>
+                    </div>
+                    )}
                   </div>
+
+                  <img src={item.thumbnail} alt="" className='w-60 h-44 self-center object-scale-down roup-hover:text-gray' />
+                  <span className='self-center mt-5 font-Nanum text-xl font-semibold rotate-[-0.03deg]'>{item.projectName}</span>
+                  <span className='self-center mt-1 font-Nanum text-sm font-regular text-gray invisible group-hover:visible rotate-[-0.03deg]'>{moment(item.lastUpdateTime).format('YYYY.MM.DD HH:mm 수정')}</span>
                 </div>
-                 )}
-            </div>
+              ))
+            }</>
 
-            <img src="/Checklist-bro.png" alt="" className='w-44 h-44 self-center' />
-            <span className='self-center mt-5 font-Nanum text-xl font-semibold rotate-[-0.03deg]'>체크리스트</span>
-            <span className='self-center mt-1 font-Nanum text-sm font-regular text-gray invisible group-hover:visible rotate-[-0.03deg]'>2024-01-24 수정</span>
+              
+            {/* 아래 빈 공간 */}
+            <div className='w-full h-10'></div>
+              
           </div>
-
-          <div className='flex flex-col group  w-64 h-[300px] bg-white cursor-pointer hover:bg-line_gray duration-700  rounded-md shadow-[rgba(0,_0,_0,_0.25)_0px_4px_15px_0px] '>
-            
-            <div className='flex flex-row w-full'>
-                <svg onClick={()=>select(6)} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={isSelected[6]?"w-6 h-6 ml-3 mt-3 self-start fill-main cursor-pointer text-main"
-                :"w-6 h-6 ml-3 mt-3 self-start invisible group-hover:visible  hover:text-main cursor-pointer text-gray"}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z" />
-                </svg>
-
-              <svg onClick={() => menuDropdown(4)} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-8 h-8 ml-44 mt-2 invisible group-hover:visible hover:text-main cursor-pointer  text-gray">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM12.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM18.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" />
-              </svg>
-
-              {dropdownsOpen[4] && (
-                <div className="absolute ml-52  w-28 px-2 text-black mt-10 origin-top-right bg-white divide-y divide-gray-100 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none" ref={dropdownRef}>
-                  <div className="py-1">
-                    <a href="/" className=" px-4 py-2 flex flex-row text-sm text-gray-700 hover:bg-gray-100 rotate-[-0.03deg]">
-                      수정</a>
-                    <a href="/" className="flex flex-row px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rotate-[-0.03deg]">
-                      이동</a>
-                    <a href="/" className=" flex flex-row px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rotate-[-0.03deg]">
-                      삭제</a>
-                  </div>
-                </div>
-                 )}
-            </div>
-
-            <img src="/talking.png" alt="" className='w-full h-44 self-center' />
-            <span className='self-center mt-5 font-Nanum text-xl font-semibold rotate-[-0.03deg]'>아이디어 회의</span>
-            <span className='self-center mt-1 font-Nanum text-sm font-regular text-gray invisible group-hover:visible rotate-[-0.03deg]'>2024-01-20 수정</span>
-          </div>
-            
-          {/* 아래 빈 공간 */}
-           <div className='w-full h-10'></div>
-            
         </div>
-      </div>
-  );
-};
+    );
+  };
 
-export default Folder;
+  export default Folder;

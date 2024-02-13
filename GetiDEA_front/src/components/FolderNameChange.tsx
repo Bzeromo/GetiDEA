@@ -1,7 +1,13 @@
 import React from 'react';
 import { useState,useEffect,useRef,ChangeEvent, } from 'react';
-import axios from 'axios';
+import api from '../api';
 import Swal from 'sweetalert2';
+
+interface Folder {
+  folderId: number;
+  userEmail: string;
+  folderName: string;
+}
 
 interface ProfileModalProps {
   isOpen: boolean;
@@ -9,16 +15,20 @@ interface ProfileModalProps {
   index : number,
   folders: string[];
   setFolders : React.Dispatch<React.SetStateAction<string[]>>;
+  folderId : number;
 }
 
 
-const FolderNameChange: React.FC<ProfileModalProps> = ({ isOpen, closeModal ,index,folders,setFolders }) => {
+const FolderNameChange: React.FC<ProfileModalProps> = ({ isOpen, closeModal ,folderId, index,folders,setFolders }) => {
 
     const [folderName, setFolderName] = useState<string>('');
     
     useEffect(() => {
-       setFolderName(folders[index]);
-      },[index]); 
+      if (folders[index]) {
+        setFolderName(folders[index]);
+      }
+       console.log(folders);
+      },[isOpen]); 
 
     const showAlert = async() => {
       await Swal.fire({
@@ -37,13 +47,18 @@ const FolderNameChange: React.FC<ProfileModalProps> = ({ isOpen, closeModal ,ind
         if (length <= 8) {
             setFolderName(inputText);
         } 
-
     };
 
-    const folderCreate = async() => {
+    // 이름 변경 api 요청
+    const rename = async() => {
       
       try {
-        const response = await axios.patch(`http://192.168.31.172:8080/api/folder/rename?userEmail=jungyoanwoo@naver.com&oldFolderName=${folders[index]}&newFolderName=${folderName}`);
+        const data = {
+          "beforeFolderName" : folders[index],
+          "newFolderName" : folderName
+        }
+        console.log(folderId, folderName);
+        const response = await api.patch(`/api/folder/rename`,data);
         
         console.log('서버 응답:', response.data);
            showAlert();
@@ -53,7 +68,7 @@ const FolderNameChange: React.FC<ProfileModalProps> = ({ isOpen, closeModal ,ind
         }
         const updatedFolders = [
             ...folders.slice(0, index), // 첫 번째 부분
-            folderName,                 // 삽입할 요소
+             folderName ,                 // 삽입할 요소
             ...folders.slice(index+1)     // 두 번째 부분
           ];
         
@@ -108,7 +123,7 @@ const FolderNameChange: React.FC<ProfileModalProps> = ({ isOpen, closeModal ,ind
                             </div>
                             <div className='flex flex-row justify-end gap-2 h-10 font-Nanum'>
                                 <button className='bg-white rounded-md border-[1.5px] text-opacity-80 text-black text-sm font-regular border-line_gray w-16 h-8' onClick={close}>취소</button>       
-                                <button className='bg-blue bg-opacity-80 rounded-md  text-opacity-80 text-white text-sm w-16 h-8' onClick={folderCreate} >수정</button>
+                                <button className='bg-blue bg-opacity-80 rounded-md  text-opacity-80 text-white text-sm w-16 h-8' onClick={rename} >수정</button>
                             </div>
                       
                     </div>

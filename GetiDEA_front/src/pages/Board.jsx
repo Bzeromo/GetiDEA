@@ -955,26 +955,13 @@ const MyDrawing = () => {
       </div>
 
       {/* 그리기 툴 */}
-      <div className="absolute top-48 left-6  bg-white rounded-md w-[50px] h-[325px] flex items-center flex-col shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]">
+      <div className="absolute top-48 left-6  bg-white rounded-md w-[50px] h-[285px] flex items-center flex-col shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]">
         <img
           src="/cursor.svg"
           alt=""
           className="w-6 h-6 mt-6 cursor-pointer "
           onClick={() => changedraggable()}
         />
-
-        {/* 펜 툴 */}
-        <svg
-          className="w-6 h-6 mt-7 cursor-pointer"
-          fill={!writeToggle ? "black" : "#0064FF"}
-          onClick={() => writeSetToggle()}
-          viewBox="0 0 128 128"
-          xmlns="http://www.w3.org/2000/svg"
-          enable-background="new 0 0 128 128"
-        >
-          <path d="m36.108 110.473 70.436-70.436-18.581-18.58-70.437 70.436a2.305 2.305 0 0 0-.803 1.22l-5.476 20.803c-.01.04-.01.082-.019.121a2.492 2.492 0 0 0-.039.247 2.354 2.354 0 0 0-.009.222 1.89 1.89 0 0 0 .048.471c.008.04.008.082.019.121.007.029.021.055.031.083.023.078.053.154.086.23.029.067.057.134.09.196.037.066.077.127.121.189.041.063.083.126.13.184.047.059.1.109.152.162a1.717 1.717 0 0 0 .345.283c.063.043.124.084.192.12.062.033.128.062.195.09.076.033.151.063.23.087.028.009.054.023.083.031.04.01.081.01.121.02a2.47 2.47 0 0 0 .693.039 3.26 3.26 0 0 0 .247-.039c.04-.01.082-.01.121-.02l20.804-5.475c.505-.132.92-.425 1.22-.805zm-16.457-2.124a2.313 2.313 0 0 0-1.964-.649l3.183-12.094 11.526 11.525-12.096 3.182a2.304 2.304 0 0 0-.649-1.964zM109.702 36.879l-18.58-18.581 7.117-7.117s12.656 4.514 18.58 18.582l-7.117 7.116z"></path>
-        </svg>
-        {/* <img src="/pen.svg" alt="" className='w-6 h-6 mt-7 cursor-pointer' onClick={() => changeWrite()}/> */}
 
         {/* 도형 툴 */}
         <div>
@@ -998,7 +985,7 @@ const MyDrawing = () => {
           </svg>
           {/* <img src="/shape.svg" alt="" className={`'w-7 h-7 mt-7 cursor-pointer ' stroke-current ${shapeMenuToggle ? 'text-black0' : 'text-blue'}`}  onClick={shapeToggle}/> */}
           {shapeMenuToggle && (
-            <div className="absolute top-[120px] left-[55px]  bg-white rounded-md w-[50px] h-[140px] flex items-center flex-col shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]">
+            <div className="absolute top-[70px] left-[55px]  bg-white rounded-md w-[50px] h-[140px] flex items-center flex-col shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]">
               <svg
                 className="hover:stroke-blue w-6 h-6 mt-3 cursor-pointer"
                 onClick={() => addRectangle("Rect")}
@@ -1059,7 +1046,7 @@ const MyDrawing = () => {
           </svg>
           {/* <img src="/line.svg" alt="" className='w-7 h-7 mt-7 cursor-pointer'  onClick={lineToggle}/> */}
           {lineMenuToggle && (
-            <div className="absolute top-[180px] left-[55px]  bg-white rounded-md w-[50px] h-[120px] flex items-center flex-col shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]">
+            <div className="absolute top-[130px] left-[55px]  bg-white rounded-md w-[50px] h-[120px] flex items-center flex-col shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
@@ -1110,17 +1097,22 @@ const MyDrawing = () => {
         <img
           src="/text.svg"
           alt=""
-          className="w-6 h-6 mt-7"
+          className="w-6 h-6 mt-7 cursor-pointer"
           onClick={() => addTextBox()}
         />
 
+        {/* 이미지 넣기 툴 */}
+        <svg onClick={imgToggle} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="mt-6 w-6 h-6 cursor-pointer">
+          <path strokeLinecap="round" strokeLinejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
+        </svg>
+
         {/* 기타 툴 */}
-        <img src="/dots.svg" alt="" className="w-4 h-4 mt-7" />
+        {/* <img src="/dots.svg" alt="" className="w-4 h-4 mt-7" /> */}
       </div>
 
       {/* 삭제 버튼 */}
       <div
-        className="cursor-pointer absolute top-[540px] left-6  bg-white rounded-md w-[50px] h-[50px] flex justify-center items-center shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]"
+        className="cursor-pointer absolute top-[510px] left-6  bg-white rounded-md w-[50px] h-[50px] flex justify-center items-center shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]"
         onClick={() => deleteAll()}
       >
         <svg
@@ -1140,7 +1132,7 @@ const MyDrawing = () => {
       </div>
 
       {/* 튜토리얼 버튼 */}
-      <div className='cursor-pointer absolute top-[610px]  hover:text-blue left-6  bg-white rounded-md w-[50px] h-[50px] flex justify-center items-center shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]' >
+      <div className='cursor-pointer absolute top-[580px]  hover:text-blue left-6  bg-white rounded-md w-[50px] h-[50px] flex justify-center items-center shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]' >
         <svg
           xmlns="http://www.w3.org/2000/svg" 
           fill="none" 
@@ -1302,14 +1294,9 @@ const MyDrawing = () => {
       </div>
 
       {/* 이미지 툴 */}
-      <button
-        onClick={imgToggle}
-        className="absolute bottom-6 right-72 z-50 justify-center bg-white rounded-md w-16 h-[50px] flex items-center flex-row shadow-[rgba(0,0,0,0.25)]"
-      >
-        img
-      </button>
+    
       {imgMenuToggle && (
-        <div className="absolute bottom-[56px] right-72">
+        <div className="absolute left-[80px] bottom-5">
           {" "}
           {/* 위치 조정 필요에 따라 조절 */}
           <ImageSelector onImageSelect={addImage} />

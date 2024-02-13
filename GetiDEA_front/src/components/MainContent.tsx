@@ -1,6 +1,7 @@
 import React from 'react';
-import axios from 'axios';
+import api from '../api';
 import { useState,useEffect } from 'react';
+
 
 interface User {
   userName: string;
@@ -19,14 +20,16 @@ const MainContent: React.FC = () => {
 
   
   useEffect(() => {
-
-    const storedUserName = localStorage.getItem('userName');
-    if (storedUserName) {
-      setUserName(storedUserName);
+    const fetchData = async () => {
+    try {
+      const response = await api.get<UserResponse>(`/api/user/search?userEmail=${localStorage.getItem('userEmail')}`);
+      setUserName(response.data[0].userName);
+    } catch (error) {
+        console.error('Error fetching data: ', error);
     }
-    
-
-  }, []);
+    };
+    fetchData();
+}, []);
 
 
   return (
