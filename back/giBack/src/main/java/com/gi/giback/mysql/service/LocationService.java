@@ -68,12 +68,18 @@ public class LocationService {
 
         for (LocationEntity locationEntity : bookmarkedLocations) {
             Long projectId = locationEntity.getProjectId();
-            projectService.getProjectInfo(projectId).ifPresent(projectInfoList::add);
+            Optional<ProjectInfoDTO> projectEntity = projectService.getProjectInfo(projectId);
+            if (projectEntity.isPresent()) {
+                ProjectInfoDTO projectInfoDTO = projectEntity.get();
+                projectInfoDTO.setBookmark(locationEntity.getBookmark());
+                projectInfoList.add(projectInfoDTO);
+            }
         }
         return projectInfoList;
     }
 
     public List<LocationEntity> getLocationsByUserEmailAndFolderName(String userEmail, String folderName) {
+
         return locationRepository.findByUserEmailAndFolderName(userEmail, folderName);
     }
 

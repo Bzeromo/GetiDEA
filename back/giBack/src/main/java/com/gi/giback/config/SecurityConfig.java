@@ -84,10 +84,10 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.addAllowedOriginPattern("http://localhost:3000");
-        configuration.addAllowedOriginPattern("http://localhost:3004");
-        configuration.addAllowedOriginPattern("http://i10b104.p.ssafy.io");
-        configuration.addAllowedOriginPattern("https://i10b104.p.ssafy.io");
+//        configuration.addAllowedOriginPattern("http://localhost:3000");
+//        configuration.addAllowedOriginPattern("http://localhost:3004");
+//        configuration.addAllowedOriginPattern("http://i10b104.p.ssafy.io");
+//        configuration.addAllowedOriginPattern("https://i10b104.p.ssafy.io");
         configuration.addAllowedOriginPattern("*"); // 프론트 배포 전까지만 허용
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "DELETE", "PATCH", "PUT"));
         configuration.setAllowedHeaders(Arrays.asList("*"));

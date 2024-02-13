@@ -3,12 +3,12 @@ package com.gi.giback.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.gi.giback.dto.ProjectCreationDTO;
 import com.gi.giback.dto.ProjectInfoDTO;
+import com.gi.giback.dto.ProjectInputDTO;
 import com.gi.giback.dto.ProjectRenameDTO;
 import com.gi.giback.mongo.entity.ProjectEntity;
 import com.gi.giback.mongo.service.ProjectService;
 import com.gi.giback.mysql.entity.LocationEntity;
 import com.gi.giback.mysql.service.LocationService;
-import com.gi.giback.dto.ProjectInputDTO;
 import com.gi.giback.redis.RedisService;
 import com.gi.giback.response.ErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -151,20 +151,24 @@ public class ProjectController {
             return ResponseEntity.badRequest().body(new ErrorResponse("사용자 검증 필요"));
         }
 
-        List<LocationEntity> locationEntityList = locationService.getLocationEntityByUserEmail(userEmail);
+        List<LocationEntity> locationEntities = locationService.getLocationEntityByUserEmail(
+            userEmail);
         List<ProjectInfoDTO> projectInfoList = new ArrayList<>();
-        if(!locationEntityList.isEmpty()) {
 
-            for (LocationEntity locationEntity : locationEntityList) {
+        for (LocationEntity locationEntity : locationEntities) {
                 Long projectId = locationEntity.getProjectId();
-                Optional<ProjectInfoDTO> entity = projectService.getProjectInfo(projectId);
-                entity.ifPresent(projectInfoList::add);
+            Optional<ProjectInfoDTO> projectEntity = projectService.getProjectInfo(projectId);
+            if (projectEntity.isPresent()) {
+                ProjectInfoDTO projectInfoDTO = projectEntity.get();
+                projectInfoDTO.setBookmark(locationEntity.getBookmark());
+                projectInfoList.add(projectInfoDTO);
             }
-            List<ProjectInfoDTO> sortedProjectEntityList = projectInfoList.stream()
-                .sorted(Comparator.comparing(ProjectInfoDTO::getLastUpdateTime).reversed()).toList();
-            return ResponseEntity.ok(sortedProjectEntityList);
         }
-        return ResponseEntity.badRequest().body(new ErrorResponse("프로젝트가 없습니다."));
+        List<ProjectInfoDTO> sortedProjectEntityList = projectInfoList.stream()
+            .sorted(Comparator.comparing(ProjectInfoDTO::getLastUpdateTime).reversed()).toList();
+        return ResponseEntity.ok(sortedProjectEntityList);
+
+//        return ResponseEntity.badRequest().body(new ErrorResponse("프로젝트가 없습니다."));
     }
 
     @GetMapping("/recent") // 유저 이메일 기반으로 모든 참여되어있는 모든 프로젝트 중 최근 7일
@@ -183,7 +187,13 @@ public class ProjectController {
 
         for (LocationEntity locationEntity : locationEntityList) {
             Long projectId = locationEntity.getProjectId();
-            projectService.getProjectInfoByIdWithDay(projectId).ifPresent(projectInfoList::add);
+//            projectService.getProjectInfoByIdWithDay(projectId).ifPresent(projectInfoList::add);
+            Optional<ProjectInfoDTO> projectEntity = projectService.getProjectInfoByIdWithDay(projectId);
+            if (projectEntity.isPresent()) {
+                ProjectInfoDTO projectInfoDTO = projectEntity.get();
+                projectInfoDTO.setBookmark(locationEntity.getBookmark());
+                projectInfoList.add(projectInfoDTO);
+            }
         }
 
         List<ProjectInfoDTO> sortedProjectEntityList = projectInfoList.stream()
@@ -224,12 +234,19 @@ public class ProjectController {
             return ResponseEntity.badRequest().body(new ErrorResponse("사용자 검증 필요"));
         }
 
-        List<LocationEntity> locations = locationService.getLocationsByUserEmailAndFolderName(userEmail, folderName);
+        List<LocationEntity> locationEntities = locationService.getLocationsByUserEmailAndFolderName(
+            userEmail, folderName);
         List<ProjectInfoDTO> projectInfoList = new ArrayList<>();
 
-        for (LocationEntity locationEntity : locations) {
+        for (LocationEntity locationEntity : locationEntities) {
             Long projectId = locationEntity.getProjectId();
-            projectService.getProjectInfo(projectId).ifPresent(projectInfoList::add);
+            // projectService.getProjectInfo(projectId).ifPresent(projectInfoList::add);
+            Optional<ProjectInfoDTO> projectEntity = projectService.getProjectInfo(projectId);
+            if (projectEntity.isPresent()) {
+                ProjectInfoDTO projectInfoDTO = projectEntity.get();
+                projectInfoDTO.setBookmark(locationEntity.getBookmark());
+                projectInfoList.add(projectInfoDTO);
+            }
         }
 
         if (!projectInfoList.isEmpty()) {
