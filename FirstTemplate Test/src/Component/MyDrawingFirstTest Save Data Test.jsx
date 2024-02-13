@@ -1,8 +1,11 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
-import { Stage, Layer, Transformer, Line, Image } from "react-konva";
+import { Stage, Layer, Transformer, Line, Image, Text } from "react-konva";
 import axios from "axios";
 import useImage from "use-image";
 import URLImage from "./Add/URLImage";
+import bubbleChatProperties from "./templateData/template1-position.json";
+import randaomWords from "./templateData/randomWords.json";
+import RandomTextDisplay from "./Add/RandomTextDisplay";
 
 import ImgComponent from "./Add/ImgComponent";
 import ShapeComponent from "./Add/ShapeComponent";
@@ -18,6 +21,8 @@ import TextComponent from "./Add/TextComponent";
 import useEventHandler from "./funciton/useEventHandler";
 import ImageSelector from "./funciton/ImageSelector";
 import undoData from "./axios/undoData";
+import getData from "./axios/getData";
+import ImageGallery from "./ImageGallery";
 import ImageComponent from "./Add/ImageComponent";
 
 const MyDrawing = () => {
@@ -106,6 +111,9 @@ const MyDrawing = () => {
     useState(false);
   const [imgMenuToggle, setImgMenuToggle] = useState(false);
 
+  const projectId = 3;
+  const userEmail = "wnsrb933@naver.com";
+
   const {
     changeSelectedShapeColor,
     changeSelectedStrokeColor,
@@ -136,8 +144,9 @@ const MyDrawing = () => {
     PostDot,
     PostArrow,
     PostSave,
-  } = postData(axios);
+  } = postData(projectId, userEmail);
 
+  const { undoEvent } = undoData(axios, projectId, userEmail);
   const {
     addText,
     addRectangle,
@@ -176,9 +185,9 @@ const MyDrawing = () => {
   const {
     deleteSelectedShape,
     deleteSelectedLine,
-    deleteSelectedDrawing,
     deleteSelectedText,
     deleteSelectedImage,
+    deleteSelectedDrawing,
     deleteSelected,
   } = deleteFunction(
     shapes,
@@ -187,8 +196,8 @@ const MyDrawing = () => {
     setSelectedId,
     lines,
     setLines,
-    setDrawingList,
-    drawingList,
+    drawingList, // 이 위치가 맞아야 합니다.
+    setDrawingList, // 이 위치가 맞아야 합니다.
     texts,
     setTexts,
     images,
@@ -206,64 +215,78 @@ const MyDrawing = () => {
     console.log("업데이트됨" + selectedId);
   }, [selectedId]);
 
-  function updateArray(array, item, key) {
-    const index = array.findIndex((element) => element.id === key);
+  // function updateArray(array, item, key) {
+  //   const index = array.findIndex((element) => element.id === key);
 
-    if (index >= 0) {
-      // 기존 항목 업데이트
-      return array.map((element, i) =>
-        i === index ? { ...element, ...item } : element
-      );
-    } else {
-      // 새 항목 추가
-      return [...array, { id: key, ...item }];
-    }
-  }
+  //   if (index >= 0) {
+  //     // 기존 항목 업데이트
+  //     return array.map((element, i) =>
+  //       i === index ? { ...element, ...item } : element
+  //     );
+  //   } else {
+  //     // 새 항목 추가
+  //     return [...array, { id: key, ...item }];
+  //   }
+  // }
 
-  const GetData = () => {
-    axios
-      .get("http://192.168.31.172:8080/api/project/data/1/1")
-      .then((response) => {
-        if (response.data && response.data.data) {
-          const dataItems = response.data.data;
+  const { getProjectData, updateArray } = getData(
+    projectId,
+    setTexts,
+    setShapes,
+    setLines,
+    setImages
+  );
 
-          console.log(response);
+  // const GetData = () => {
+  //   axios
+  //     .get("http://192.168.31.172:8080/api/project/test1/1")
+  //     .then((response) => {
+  //       if (response.data && response.data.data) {
+  //         const dataItems = response.data.data;
 
-          Object.keys(dataItems).forEach((key) => {
-            const item = dataItems[key];
-            const itemWithDefaults = {
-              ...item,
-              x: item.x ?? 0, // 기본값 0으로 설정
-              y: item.y ?? 0, // 기본값 0으로 설정
-              // 필요한 다른 속성에 대해서도 기본값을 설정할 수 있습니다.
-            };
-            switch (item.ty) {
-              case "Text":
-                setTexts((prevTexts) => updateArray(prevTexts, key));
-                break;
-              case "Shape":
-                console.log(JSON.stringify(item) + "짜잔?");
-                setShapes((prevShapes) => updateArray(prevShapes, itemWithDefaults, key));
-                break;
-              case "Line":
-                setLines((prevLines) => updateArray(prevLines, item, key));
-                break;
-              case "img":
-                setImages((prevImage) => updateArray(prevImage, item, key));
-                break;
-              default:
-                // 기타 타입 처리
-                break;
-            }
-          });
-        }
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-  };
+  //         console.log(response);
 
-
+  //         Object.keys(dataItems).forEach((key) => {
+  //           const item = dataItems[key];
+  //           const itemWithDefaults = {
+  //             ...item,
+  //             x: item.x ?? 0, // 기본값 0으로 설정
+  //             y: item.y ?? 0, // 기본값 0으로 설정
+  //             // 필요한 다른 속성에 대해서도 기본값을 설정할 수 있습니다.
+  //           };
+  //           switch (item.ty) {
+  //             case "Text":
+  //               setTexts((prevTexts) =>
+  //                 updateArray(prevTexts, itemWithDefaults, key)
+  //               );
+  //               break;
+  //             case "Shape":
+  //               console.log(JSON.stringify(item) + "짜잔?");
+  //               setShapes((prevShapes) =>
+  //                 updateArray(prevShapes, itemWithDefaults, key)
+  //               );
+  //               break;
+  //             case "Line":
+  //               setLines((prevLines) =>
+  //                 updateArray(prevLines, itemWithDefaults, key)
+  //               );
+  //               break;
+  //             case "img":
+  //               setImages((prevImage) =>
+  //                 updateArray(prevImage, itemWithDefaults, key)
+  //               );
+  //               break;
+  //             default:
+  //               // 기타 타입 처리
+  //               break;
+  //           }
+  //         });
+  //       }
+  //     })
+  //     .catch((error) => {
+  //       console.error(error);
+  //     });
+  // };
 
   const [socket, setSocket] = useState(null);
 
@@ -558,7 +581,7 @@ const MyDrawing = () => {
     const id = e.target.attrs.id;
     const ty = e.target.attrs.ty;
 
-    console.log(id + "id를 확인해보자");
+    console.log(id + "id를 확ㅇ닣래보자");
     console.log(ty + " tetstsetawetfdgdfffsdfsdfsdfsdds");
     const type = e.target.attrs.type;
 
@@ -899,58 +922,63 @@ const MyDrawing = () => {
 
 
 
+  const [activeIndex, setActiveIndex] = useState([]);
+
+  const firstTemplateProperties = Object.values(bubbleChatProperties);
+
+  // 처음 렌더링 될 때 한 번만 실행되는 useEffect 설정
+  useEffect(() => {
+    // bubbleChatProperties를 이용하여 firstTemplateProperties 설정
+    const firstTemplateProperties = Object.values(bubbleChatProperties);
+    // 상태 업데이트
+    setImages(firstTemplateProperties);
+
+    //이미지 저장까지 했으니까 이제 단어까지 저장하자.
+
+    const pickedRandomWords = [];
+
+    
+
+    setTexts(pickedRandomWords);
+  }, []);
+
+  const handleButtonClick = () => {
+    setActiveIndex((prevIndices) => {
+      const nextIndex = prevIndices.length; // 현재 배열의 길이를 다음 인덱스로 사용
+      return [...prevIndices, nextIndex];
+    });
+  };
+
+  //여기서 다 처리를 해줘야함.
+  //텍스트도 다 여기서 불러와서 저장도 해야함.
+  // useEffect(() => {
+  //   // 컴포넌트가 마운트될 때 한 번만 실행되도록 합니다.
+
+  //   const updatedImages = firstTemplateProperties.map((imgInfo, index) => ({
+  //     ...imgInfo,
+  //     id: index, // 이미지 정보에 id를 추가합니다.
+  //   }));
+
+  //   setImages(updatedImages); // 상태를 한 번만 업데이트합니다.
+  // }, [firstTemplateProperties]);
+
+
+
+  // useEffect(() => {
+  //   // 컴포넌트가 마운트될 때 한 번만 실행되도록 합니다.
+  //   setImages(prevImages => {
+  //     return prevImages.map(prevImage => {
+  //       const updatedImage = firstTemplateProperties.find(newImage => newImage.id === prevImage.id);
+  //       return updatedImage ? { ...prevImage, ...updatedImage } : prevImage;
+  //     });
+  //   });
+  // }, [firstTemplateProperties]);
 
 
 
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  // 템플릿3 이미지 형식
-  const templateImage3 = 
-    {
-      "src": "/img/template3_check7/template3Fix.png",
-      "x": 31,  // x좌표
-      "y": 10,  // y좌표
-      "ty": "img",
-      "type": "Image",
-      "width": 200,
-      "height": 96,
-      "draggable": false,
-      "rotation": 0,
-      "scaleX": 5.86,
-      "scaleY": 5.86,
-    }
-
-    //템플릿 정보 저장하기
-    const saveTemplate= () => {
-
-    }
 
 
 
@@ -1270,12 +1298,12 @@ const MyDrawing = () => {
 
       {/* 오른쪽 윗 블록 */}
       <div className="absolute top-6 right-52 justify-center bg-white rounded-md w-16 h-[50px] flex  items-center flex-row shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]">
-        <button onClick={() => GetData()}>Get</button>
+        <button onClick={() => getProjectData()}>Get</button>
       </div>
 
       {/* 오른쪽 윗 블록 */}
       <div className="absolute top-6 right-94 justify-center bg-white rounded-md w-16 h-[50px] z-50 flex  items-center flex-row shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]">
-        <button onClick={() => GetData()}>Get</button>
+        <button onClick={() => PostSave()}>Save</button>
       </div>
 
       {/* 오른쪽 윗 블록 */}
@@ -1318,176 +1346,176 @@ const MyDrawing = () => {
         </div>
       )}
 
+      {/* 템플릿 1 전용 버튼
+      <div className="absolute bottom-6 right-52 z-50  justify-center bg-white rounded-md w-16 h-[50px] flex  items-center flex-row shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]">
+        <button onClick={moveToTop}>템플릿1</button>
+      </div> */}
+
+      {/*템플릿 1 전용 버튼*/}
+      <div>
+        <button onClick={() => handleButtonClick()}>템플릿1</button>
+      </div>
 
       {/* 그리는 구역 */}
-      <div className="ml-36 mt-24 h-full w-full" >
-      
-        <Stage
-          ref={stageRef}
-          width={window.innerWidth}
-          height={window.innerHeight}
-          draggable={!draggable}
-          onWheel={zoomOnWheel}
-          onMouseDown={handleMouseDown}
-          onMousemove={handleMouseMove}
-          onMouseup={handleMouseUp}
-          onDragEnd={handleDragEnd}
-          onClick={handleLayerClick}
-        >
-          <Layer ref={layerRef}>
+      <div className="absolute top-20 left-36">
+        <div className="max-w-[1300px] max-h-[580px] overflow-hidden">
+          <Stage
+            ref={stageRef}
+            width={window.innerWidth}
+            height={window.innerHeight}
+            draggable={!draggable}
+            onWheel={zoomOnWheel}
+            onMouseDown={handleMouseDown}
+            onMousemove={handleMouseMove}
+            onMouseup={handleMouseUp}
+            onDragEnd={handleDragEnd}
+            onClick={handleLayerClick}
+          >
+            <Layer ref={layerRef}>
 
+              {/* <React.Fragment>
+                {firstTemplateProperties.map((imgInfo, index) => (
+                  <React.Fragment key={index}>
+                    <ImageComponent {...imgInfo} />
+                    {activeIndex.includes(index) && (
+                      <RandomTextDisplay activeIndex={[index]} />
+                    )}
+                  </React.Fragment>
+                ))}
+              </React.Fragment> */}
 
+              <React.Fragment>
+                {firstTemplateProperties.map((imgInfo, index) => (
+                  <React.Fragment key={index}>
+                    <ImageComponent {...imgInfo} />
+                    {activeIndex.includes(index) && (
+                      <RandomTextDisplay activeIndex={[index]} />
+                    )}
+                  </React.Fragment>
+                ))}
+              </React.Fragment>
 
-          {/* Template3 - 7Check에 대한 템플릿 정보 출력 */}
-          
-          <ImageComponent 
-            src = {templateImage3.src}
-            x = {templateImage3.x}
-            y = {templateImage3.y}
-            width={templateImage3.width}
-            height={templateImage3.height}
-            rotation={templateImage3.rotation}
-            scaleX={templateImage3.scaleX}
-            scaleY={templateImage3.scaleY}
-          />
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-            {drawing && (
-              <Line
-                points={currentLine}
-                stroke={currentColor}
-                strokeWidth={5}
-              />
-            )}
-            {drawingList.map((drawing, id) => (
-              <Line key={id} {...drawing} />
-            ))}
-            {shapes.map((shape) => (
-              <ShapeComponent
-                key={shape.id}
-                shapeProps={shape}
-                isSelected={shape.id === selectedId}
-                onTransformEnd={handleTransformEnd}
-                onSelect={(e) => {
-                  handleShapeClick(shape.id, e);
-                }}
-                onChange={(newAttrs) => {
-                  const newShapes = shapes.map((s) =>
-                    s.id === shape.id ? newAttrs : s
+              {drawing && (
+                <Line
+                  points={currentLine}
+                  stroke={currentColor}
+                  strokeWidth={5}
+                />
+              )}
+              {drawingList.map((drawing, id) => (
+                <Line key={id} {...drawing} />
+              ))}
+              {shapes.map((shape) => (
+                <ShapeComponent
+                  key={shape.id}
+                  shapeProps={shape}
+                  isSelected={shape.id === selectedId}
+                  onTransformEnd={handleTransformEnd}
+                  onSelect={(e) => {
+                    handleShapeClick(shape.id, e);
+                  }}
+                  onChange={(newAttrs) => {
+                    const newShapes = shapes.map((s) =>
+                      s.id === shape.id ? newAttrs : s
+                    );
+                    setShapes(newShapes); // 상태 업데이트
+                  }}
+                />
+              ))}
+              {lines.map((line) => {
+                if (line.type === "Arrow") {
+                  return (
+                    <ArrowComponent
+                      key={line.id}
+                      ref={lineRef}
+                      lineProps={line}
+                      isSelected={line.id === selectedId}
+                      onSelect={(e) => {
+                        handleShapeClick(line.id, e);
+                      }}
+                      onChange={(newAttrs) => {
+                        const newLines = lines.map((l) =>
+                          l.id === line.id ? newAttrs : l
+                        );
+                        setLines(newLines);
+                      }}
+                    />
                   );
-                  setShapes(newShapes); // 상태 업데이트
-                }}
-              />
-            ))}
-            {lines.map((line) => {
-              if (line.type === "Arrow") {
-                return (
-                  <ArrowComponent
-                    key={line.id}
-                    ref={lineRef}
-                    lineProps={line}
-                    isSelected={line.id === selectedId}
-                    onSelect={(e) => {
-                      handleShapeClick(line.id, e);
-                    }}
-                    onChange={(newAttrs) => {
-                      const newLines = lines.map((l) =>
-                        l.id === line.id ? newAttrs : l
-                      );
-                      setLines(newLines);
-                    }}
-                  />
-                );
-              } else {
-                return (
-                  <LineComponent
-                    key={line.id}
-                    lineProps={line}
-                    ref={lineRef}
-                    isSelected={line.id === selectedId}
-                    onSelect={(e) => {
-                      handleShapeClick(line.id, e);
-                    }}
-                    onChange={(newAttrs) => {
-                      const newLines = lines.map((l) =>
-                        l.id === line.id ? newAttrs : l
-                      );
-                      setLines(newLines);
-                    }}
-                  />
-                );
-              }
-            })}
-            {texts.map((text, id) => (
-              <TextComponent
-                key={text.id}
-                textProps={text}
-                fontSize={fontSize}
-                isSelected={text.id === selectedId}
-                onSelect={(e) => {
-                  handleShapeClick(text.id, e);
-                }}
-                onChange={(newAttrs) => {
-                  const newTexts = texts.map((t) =>
-                    t.id === text.id ? { ...t, ...newAttrs } : t
+                } else {
+                  return (
+                    <LineComponent
+                      key={line.id}
+                      lineProps={line}
+                      ref={lineRef}
+                      isSelected={line.id === selectedId}
+                      onSelect={(e) => {
+                        handleShapeClick(line.id, e);
+                      }}
+                      onChange={(newAttrs) => {
+                        const newLines = lines.map((l) =>
+                          l.id === line.id ? newAttrs : l
+                        );
+                        setLines(newLines);
+                      }}
+                    />
                   );
-                  setTexts(newTexts);
-                }}
-                setSelectedId={setSelectedId}
-                onTextChange={(newText) => handleTextChange(text.id, newText)}
-              />
-            ))}
+                }
+              })}
+              {texts.map((text, id) => (
+                <TextComponent
+                  key={text.id}
+                  textProps={text}
+                  fontSize={fontSize}
+                  isSelected={text.id === selectedId}
+                  onSelect={(e) => {
+                    handleShapeClick(text.id, e);
+                  }}
+                  onChange={(newAttrs) => {
+                    const newTexts = texts.map((t) =>
+                      t.id === text.id ? { ...t, ...newAttrs } : t
+                    );
+                    setTexts(newTexts);
+                  }}
+                  setSelectedId={setSelectedId}
+                  onTextChange={(newText) => handleTextChange(text.id, newText)}
+                />
+              ))}
 
-            {images.map((img) => (
-              <ImgComponent
-                key={img.id}
-                id={img.id}
-                ty={img.ty}
-                ref={ImageRef}
-                imageSrc={img.src}
-                x={img.x}
-                y={img.y}
-                isSelected={img.id === selectedId}
-                onSelect={(e) => {
-                  handleShapeClick(img.id, e);
-                }}
-              />
-            ))}
 
-            {selectedId && (
-              <Transformer
-                ref={(node) => {
-                  if (node) {
-                    const selectedNode = node
-                      .getStage()
-                      .findOne(`#${selectedId}`);
-                    if (selectedNode) {
-                      node.attachTo(selectedNode);
+            {/* 여긴 그저 템플릿을 불러오는 공간일 뿐이다. 그렇게 되면 굳이 images에 있는 정보를 불러올 필요가 없지 않을까? */}
+              {/* {images.map((img) => (
+                <ImgComponent
+                  key={img.id}
+                  id={img.id}
+                  ty={img.ty}
+                  ref={ImageRef}
+                  imageSrc={img.src}
+                  x={img.x}
+                  y={img.y}
+                  isSelected={img.id === selectedId}
+                  onSelect={(e) => {
+                    handleShapeClick(img.id, e);
+                  }}
+                />
+              ))} */}
+
+              {selectedId && (
+                <Transformer
+                  ref={(node) => {
+                    if (node) {
+                      const selectedNode = node
+                        .getStage()
+                        .findOne(`#${selectedId}`);
+                      if (selectedNode) {
+                        node.attachTo(selectedNode);
+                      }
                     }
-                  }
-                }}
-              />
-            )}
-          </Layer>
-        </Stage>
+                  }}
+                />
+              )}
+            </Layer>
+          </Stage>
+        </div>
       </div>
     </div>
   );
