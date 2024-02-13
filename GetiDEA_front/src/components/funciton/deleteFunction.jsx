@@ -47,7 +47,7 @@ const deleteFunction = (
       case "Circle":
         deleteSelectedShape();
         break;
-      case "RegularPolygon ":
+      case "RegularPolygon":
         deleteSelectedShape();
         break;
       case "Line":
@@ -72,6 +72,8 @@ const deleteFunction = (
         break;
     }
 
+    // console.log("삭제완료")ㅌ
+
     // 선택 해제
     setSelectedId(null);
   };
@@ -79,6 +81,7 @@ const deleteFunction = (
   const deleteSelectedShape = () => {
     const newShapes = shapes.filter((shape) => shape.id !== selectedId);
     setShapes(newShapes);
+    console.log("삭제완료")
     setSelectedId(null); // 선택 해제
   };
 

@@ -5,6 +5,7 @@ import axios from "axios";
 import useImage from "use-image";
 import URLImage from "../components/Add/URLImage";
 import { debounce } from "lodash";
+import { nanoid } from "nanoid";
 
 import ImgComponent from "../components/Add/ImgComponent";
 import ShapeComponent from "../components/Add/ShapeComponent";
@@ -78,6 +79,77 @@ const MyDrawing = () => {
   const [texts, setTexts] = useState([]);
   const [images, setImages] = useState([]);
   const [currentLine, setCurrentLine] = useState([]);
+  const [wholeData, setWholeData] = useState([]);
+  const [checkDelete, setCheckDelete] = useState(false);
+
+  // ID same issue 용
+  const [shapeCounter, setShapeCounter] = useState(0);
+  const [lineCounter, setLineCounter] = useState(0);
+  const [textCounter, setTextCounter] = useState(0);
+  const [imageCounter, setImageCounter] = useState(0);
+  const [idCounter, setIdCounter] = useState(0);
+
+  //복사 붙여넣기용
+  const [clipboard, setClipboard] = useState(null);
+
+  // function checkPost() {
+  //   setCheckDelete(!checkDelete);
+  // }
+  const checkPost = () => {
+    setCheckDelete(!checkDelete);
+  };
+
+  const PostDelete2 = () => {
+    const filteredPreData = preData.find((item) => item.id === selectedId);
+
+    const postData = {
+      projectId: projectId,
+      userEmail: userEmail,
+      propId: selectedId,
+      preData: filteredPreData,
+      newData: {},
+    };
+
+    axios
+      .post("http://localhost:8080/api/project/change", postData)
+      .then((response) => {
+        // 삭제가 성공적으로 반영되었을 때 상태 업데이트
+        console.log(response);
+        setPreData((prevData) => {
+          const newData = prevData.filter((item) => item.id !== selectedId);
+          console.log("Updated data:", newData);
+          return newData; // 필터링된 새 데이터로 상태를 업데이트
+        });
+      })
+      .catch((error) => {
+        console.log(error);
+        // 오류 발생 시 실행할 코드
+      });
+  };
+
+  const deleteAll = () => {
+    deleteSelected();
+    PostDelete2();
+    setCount((prevCount) => prevCount + 1); // 이 부분을 수정
+    // window.location.reload();
+    console.log(count); // 이 로그는 상태 업데이트가 비동기적으로 이루어지기 때문에 업데이트 이전의 값을 출력할 수 있음
+    layerRef.current.batchDraw();
+    // shapeRef.current.batchDraw();
+    checkPost();
+    console.log(checkDelete);
+  };
+
+  const undoAll = () => {
+    undo();
+    undoEvent();
+    setCount((prevCount) => prevCount + 1); // 이 부분을 수정
+    // window.location.reload();
+    console.log(count); // 이 로그는 상태 업데이트가 비동기적으로 이루어지기 때문에 업데이트 이전의 값을 출력할 수 있음
+    layerRef.current.batchDraw();
+    // shapeRef.current.batchDraw();
+    checkPost();
+    console.log(checkDelete);
+  };
 
   //전체 드래그 기능 구현
   const [selectedIds, setSelectedIds] = useState([]);
@@ -92,6 +164,7 @@ const MyDrawing = () => {
   const [selectStroke, setSelectStroke] = useState("");
   const [newTextValue, setNewTextValue] = useState("");
   const [fontSize, setFontSize] = useState(10);
+  const [count, setCount] = useState(0);
 
   //설정 변경
   const [startWrite, setStartWrite] = useState(false);
@@ -109,24 +182,27 @@ const MyDrawing = () => {
   const [colorMenuToggle, setColorMenuToggle] = useState(false);
   const [currentColorMenuToggle, setCurrentColorMenuToggle] = useState(false);
   const [strokeColorMenuToggle, setStrokeColorMenuToggle] = useState(false);
-  const [CurrentStrokeColorMenuToggle, setCurrentStrokeColorMenuToggle] = useState(false);
+  const [CurrentStrokeColorMenuToggle, setCurrentStrokeColorMenuToggle] =
+    useState(false);
   const [imgMenuToggle, setImgMenuToggle] = useState(false);
 
   const projectId = 1;
   const userEmail = "wnsrb933@naver.com";
 
   const [preData, setPreData] = useState([]);
-
   useEffect(() => {
     getProjectData();
-    console.log(
-    `|\\_/|
-    |q p|   /}
-    ( 0 )"""\\
-    |"^"\`    |
-    ||_/=\\\\__|
-    `);
-    }, []);
+    console.log(`|\\_/|
+|q p|   /}
+( 0 )"""\\
+|"^"\`    |
+||_/=\\\\__|
+`);
+  }, []);
+
+  useEffect(() => {
+    console.log("탐지 완료");
+  }, [count]);
 
   useEffect(() => {
     if (shapeRef.current) {
@@ -159,12 +235,28 @@ const MyDrawing = () => {
   }, [texts]);
 
   useEffect(() => {
+    if (layerRef.current) {
+      layerRef.current.batchDraw();
+    }
+  }, []);
+
+  useEffect(() => {
     setHistory([...history, shapes]);
   }, [shapes]);
 
   useEffect(() => {
     console.log("업데이트됨" + selectedId);
+    sendInfoToServer();
+    // if(layerRef.current){
+    //   layerRef.current.batchDraw();
+    //   console.log(":teststsetst")
+    // }
   }, [selectedId]);
+
+  useEffect(() => {
+    // console.log(JSON.stringify(preData) + "preData 확인용");
+    console.log("checkdata");
+  }, [preData]);
 
   const {
     changeSelectedShapeColor,
@@ -187,10 +279,6 @@ const MyDrawing = () => {
     setSelectedId
   );
 
-  const { PostData, PostSave } = postData(projectId, userEmail, setPreData, preData);
-
-  const { undoEvent } = undoData(axios, projectId, userEmail);
-
   const {
     addText,
     addRectangle,
@@ -211,19 +299,20 @@ const MyDrawing = () => {
     setTexts,
     currentColor,
     selectStroke,
-    newTextValue,
-    setNewTextValue,
     images,
     setImages,
-    setImageIdCounter,
-    imageIdCounter,
     rectPosition,
     linePosition,
-    selectedId,
-    setTexts,
-    fontSize,
-    setFontSize,
-    setSelectedId
+    shapeCounter,
+    setShapeCounter,
+    lineCounter,
+    setLineCounter,
+    textCounter,
+    setTextCounter,
+    imageCounter,
+    setImageCounter,
+    idCounter,
+    setIdCounter
   );
 
   const {
@@ -253,7 +342,8 @@ const MyDrawing = () => {
     setTexts,
     setShapes,
     setLines,
-    setImages
+    setImages,
+    setWholeData
   );
 
   const [socket, setSocket] = useState(null);
@@ -267,7 +357,7 @@ const MyDrawing = () => {
     };
 
     socket.onmessage = (event) => {
-      console.log("서버로부터 메시지를 받았습니다:", event.data);
+      // console.log("서버로부터 메시지를 받았습니다:", event.data);
 
       if (event.data instanceof Blob) {
         const textDataPromise = new Response(event.data).text();
@@ -380,7 +470,7 @@ const MyDrawing = () => {
   const handleMouseDown = (e) => {
     if (e) {
       const newData = e.target.attrs;
-      // console.log(JSON.stringify(newData), "확인해볼래용");  
+      // console.log(JSON.stringify(newData), "확인해볼래용");
 
       setPreData((prevData) => {
         const index = prevData.findIndex((data) => data.id === newData.id);
@@ -465,6 +555,35 @@ const MyDrawing = () => {
     sendInfoToServer();
   };
 
+  const { PostData, PostSave, PostDelete, PostDrawing } = postData(
+    projectId,
+    userEmail,
+    preData,
+    selectedId,
+    sendInfoToServer,
+    wholeData,
+    setWholeData,
+    checkDelete,
+    setCheckDelete,
+    checkPost,
+    drawingList,
+    deleteSelected,
+    count,
+    setCount,
+    layerRef
+  );
+
+  const { undoEvent, updateArray } = undoData(
+    projectId,
+    userEmail,
+    setTexts,
+    setShapes,
+    setLines,
+    setImages,
+    dragEnded,
+    sendInfoToServer
+  );
+
   const handleDragEnd = async (e) => {
     if (!e || !e.target) {
       // e 또는 e.target이 undefined인 경우
@@ -482,9 +601,9 @@ const MyDrawing = () => {
     // console.log(JSON.stringify(newData))
 
     if (!id) {
-      // console.log("id 확인 " + "혹시 null인가?");
+      console.log("id 확인 " + "혹시 null인가?");
     } else {
-      // console.log("오예 성공! " + id);
+      console.log("오예 성공! " + id);
     }
 
     if (type === "Dot" || type === "Arrow" || type === "Line") {
@@ -549,7 +668,7 @@ const MyDrawing = () => {
 
     const rotationAngle = node.rotation();
 
-    // console.log(`Rotation angle: ${rotationAngle}`);
+    console.log(`Rotation angle: ${rotationAngle}`);
   };
 
   const zoomOnWheel = useCallback((e) => {
@@ -611,12 +730,19 @@ const MyDrawing = () => {
     }
   }, [dragEnded]);
 
+  useEffect(() => {
+    if (layerRef.current) {
+      layerRef.current.batchDraw();
+    }
+    console.log("이것도 탐지해봐라");
+  }, [checkDelete]);
+
   const checkObject = (shapeId, newX, newY) => {
-    // console.log(shapes);
-    // console.log(lines);
-    // console.log(texts);
-    // console.log(images);
-    // console.log(drawingList);
+    console.log(shapes);
+    console.log(lines);
+    console.log(texts);
+    console.log(images);
+    console.log(drawingList);
   };
 
   const handleColorChange = (e) => {
@@ -678,6 +804,91 @@ const MyDrawing = () => {
     layerRef
   );
 
+  // 단축키 이벤트 리스너 설정
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      // Ctrl+C: 복사
+      if (event.ctrlKey && event.key === "c") {
+        const selectedItem = [shapes, lines, texts, images]
+          .flatMap((items) => items)
+          .find((item) => item.id === selectedId);
+
+        if (selectedItem) {
+          setClipboard({
+            ...selectedItem,
+            id: nanoid(),
+            x: selectedItem.x - 20,
+            y: selectedItem.y - 20,
+          });
+        }
+        console.log("복사");
+      }
+      // Ctrl+V: 붙여넣기
+      else if (event.ctrlKey && event.key === "v") {
+        if (clipboard) {
+          // 클립보드의 타입에 따라 적절한 상태를 업데이트
+          switch (clipboard.type) {
+            case "Rect":
+              setShapes((shapes) => [...shapes, clipboard]);
+              break;
+            case "Circle":
+              setShapes((shapes) => [...shapes, clipboard]);
+              break;
+            case "RegularPolygon":
+              setShapes((shapes) => [...shapes, clipboard]);
+              break;
+            case "Line":
+              setLines((lines) => [...lines, clipboard]);
+              break;
+            case "Dot":
+              setLines((lines) => [...lines, clipboard]);
+              break;
+            case "Arrow":
+              setLines((lines) => [...lines, clipboard]);
+              break;
+            case "Text":
+              setTexts((texts) => [...texts, clipboard]);
+              break;
+            case "Image":
+              setImages((images) => [...images, clipboard]);
+              break;
+            default:
+              break;
+          }
+          setClipboard(null);
+        }
+        console.log("붙여넣기");
+      }
+      // Delete: 삭제
+      else if (event.key === "Delete" || (event.ctrlKey && event.key === "d")) {
+        deleteAll();
+      } else if (event.ctrlKey && event.key === "z") {
+        undoAll();
+      } else if (event.ctrlKey && event.key === "x") {
+        const selectedItem = [shapes, lines, texts, images]
+          .flatMap((items) => items)
+          .find((item) => item.id === selectedId);
+
+        if (selectedItem) {
+          setClipboard({
+            ...selectedItem,
+            id: nanoid(),
+            x: selectedItem.x - 20,
+            y: selectedItem.y - 20,
+          });
+          // 선택된 항목 삭제
+          deleteAll();
+        }
+        console.log("잘라내기");
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [selectedId, clipboard, shapes, lines, texts, images]); // 의존성 배열 업데이트
+
   //토글 온오프 기능
   const writeSetToggle = () => {
     setWriteToggle(!writeToggle);
@@ -696,9 +907,11 @@ const MyDrawing = () => {
     setShapeMenuToggle(false);
     setWriteToggle(false);
   };
+
   const chatToggle = () =>{
     setChatClick(!chatClick);
   }
+  
   const colorToggle = () => {
     setColorMenuToggle(!colorMenuToggle);
   };
@@ -908,7 +1121,7 @@ const MyDrawing = () => {
       {/* 삭제 버튼 */}
       <div
         className="cursor-pointer absolute top-[540px] left-6  bg-white rounded-md w-[50px] h-[50px] flex justify-center items-center shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]"
-        onClick={() => deleteSelected()}
+        onClick={() => deleteAll()}
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"

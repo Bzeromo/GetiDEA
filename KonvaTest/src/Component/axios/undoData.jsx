@@ -8,7 +8,7 @@ const undoData = (
   setLines,
   setImages,
   dragEnded,
-  sendInfoToServer,
+  sendInfoToServer
 ) => {
   const undoEvent = () => {
     axios
@@ -25,50 +25,53 @@ const undoData = (
 
           Object.keys(dataItems).forEach((key) => {
             const item = dataItems[key];
+            if (item) {
+              switch (item.ty) {
+                case "Text":
+                  setTexts((prevTexts) => updateArray(prevTexts, item));
+                  console.log(`text item: `, JSON.stringify(item, key));
 
-            switch (item.ty) {
-              case "Text":
-                setTexts((prevTexts) => updateArray(prevTexts, item));
-                console.log(`text item: `, JSON.stringify(item, key));
-
-                break;
-              case "Rect":
-                setShapes((prevShapes) => updateArray(prevShapes, item));
-                console.log(JSON.stringify(item, key) + "Rect?");
-                break;
-              case "Circle":
-                setShapes((prevShapes) => updateArray(prevShapes, item));
-                console.log(JSON.stringify(item, key) + "Circle?");
-                break;
-              case "RegularPolygon":
-                setShapes((prevShapes) => updateArray(prevShapes, item));
-                console.log(
-                  `RegularPolygon item with defaults: `,
-                  JSON.stringify(item)
-                );
-                break;
-              case "Line":
-                setLines((prevLines) => updateArray(prevLines, item));
-                console.log(`Line item: `, JSON.stringify(item, key));
-                break;
-              case "Dot":
-                setLines((prevLines) => updateArray(prevLines, item));
-                console.log(`dot item: `, JSON.stringify(item, key));
-                break;
-              case "Arrow":
-                setLines((prevLines) => updateArray(prevLines, item));
-                console.log(`arrow item: `, JSON.stringify(item, key));
-                break;
-              case "Image":
-                setImages((prevImage) => updateArray(prevImage, item));
-                console.log(`img item: `, JSON.stringify(item, key));
-                break;
-              default:
-                // 기타 타입 처리
-                break;
+                  break;
+                case "Rect":
+                  setShapes((prevShapes) => updateArray(prevShapes, item));
+                  console.log(JSON.stringify(item, key) + "Rect?");
+                  break;
+                case "Circle":
+                  setShapes((prevShapes) => updateArray(prevShapes, item));
+                  console.log(JSON.stringify(item, key) + "Circle?");
+                  break;
+                case "RegularPolygon":
+                  setShapes((prevShapes) => updateArray(prevShapes, item));
+                  console.log(
+                    `RegularPolygon item with defaults: `,
+                    JSON.stringify(item)
+                  );
+                  break;
+                case "Line":
+                  setLines((prevLines) => updateArray(prevLines, item));
+                  console.log(`Line item: `, JSON.stringify(item, key));
+                  break;
+                case "Dot":
+                  setLines((prevLines) => updateArray(prevLines, item));
+                  console.log(`dot item: `, JSON.stringify(item, key));
+                  break;
+                case "Arrow":
+                  setLines((prevLines) => updateArray(prevLines, item));
+                  console.log(`arrow item: `, JSON.stringify(item, key));
+                  break;
+                case "Image":
+                  setImages((prevImage) => updateArray(prevImage, item));
+                  console.log(`img item: `, JSON.stringify(item, key));
+                  break;
+                default:
+                  // 기타 타입 처리
+                  break;
+              }
+            } else {
+              console.log("item이 없어요");
             }
           });
-          console.log(dragEnded)
+          console.log(dragEnded);
         }
       })
       .catch((error) => {
@@ -86,10 +89,9 @@ const undoData = (
       );
     } else {
       // 새 항목 추가
-      return [...array, ...item];
+      return [...array, item]; // 수정됨: 객체를 배열에 직접 추가
     }
   }
-
   return { undoEvent, updateArray };
 };
 

@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import { Stage, Layer, Transformer, Line, Image } from "react-konva";
+import { useNavigate } from 'react-router-dom';
 import axios from "axios";
 import useImage from "use-image";
 import URLImage from "./Add/URLImage";
@@ -23,6 +24,9 @@ import undoData from "./axios/undoData";
 import getData from "./axios/getData";
 
 const MyDrawing = () => {
+
+  const navigate = useNavigate();
+
   const [imageIdCounter, setImageIdCounter] = useState(0);
 
   const [rectPosition, setRectPosition] = useState({ x: 50, y: 50 });
@@ -59,6 +63,7 @@ const MyDrawing = () => {
   const layerRef = useRef(null);
 
   //채팅방
+  const [chatClick, setChatClick] = useState(false);
   const [chatLog, setChatLog] = useState([]);
   const [chatInput, setChatInput] = useState({ nickname: "", message: "" });
 
@@ -224,9 +229,7 @@ const MyDrawing = () => {
     // shapeRef.current.batchDraw();
     checkPost();
     console.log(checkDelete);
-  }
-  
-  
+  };
 
   //전체 드래그 기능 구현
   const [selectedIds, setSelectedIds] = useState([]);
@@ -895,11 +898,16 @@ const MyDrawing = () => {
         // const selectedItem =
         //   selectedShape || selectedLine || selectedText || selectedImage;
         const selectedItem = [shapes, lines, texts, images]
-        .flatMap(items => items)
-        .find(item => item.id === selectedId);
-    
+          .flatMap((items) => items)
+          .find((item) => item.id === selectedId);
+
         if (selectedItem) {
-          setClipboard({ ...selectedItem, id: nanoid(), x: selectedItem.x-20, y : selectedItem.y-20 });
+          setClipboard({
+            ...selectedItem,
+            id: nanoid(),
+            x: selectedItem.x - 20,
+            y: selectedItem.y - 20,
+          });
         }
         console.log("복사");
       }
@@ -942,10 +950,25 @@ const MyDrawing = () => {
       // Delete: 삭제
       else if (event.key === "Delete" || (event.ctrlKey && event.key === "d")) {
         deleteAll();
-      }
-      else if(event.ctrlKey && event.key === "z"){
+      } else if (event.ctrlKey && event.key === "z") {
         undoAll();
-      } 
+      } else if (event.ctrlKey && event.key === "x") {
+        const selectedItem = [shapes, lines, texts, images]
+          .flatMap((items) => items)
+          .find((item) => item.id === selectedId);
+
+        if (selectedItem) {
+          setClipboard({
+            ...selectedItem,
+            id: nanoid(),
+            x: selectedItem.x - 20,
+            y: selectedItem.y - 20,
+          });
+          // 선택된 항목 삭제
+          deleteAll();
+        }
+        console.log("잘라내기");
+      }
     };
 
     window.addEventListener("keydown", handleKeyDown);
@@ -972,6 +995,11 @@ const MyDrawing = () => {
     setShapeMenuToggle(false);
     setWriteToggle(false);
   };
+
+  const chatToggle = () =>{
+    setChatClick(!chatClick);
+  }
+  
   const colorToggle = () => {
     setColorMenuToggle(!colorMenuToggle);
   };

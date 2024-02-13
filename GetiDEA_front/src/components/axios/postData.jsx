@@ -1,12 +1,28 @@
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import axios from "axios";
 
-const postData = (projectId, userEmail, setPreData, preData) => {
+const postData = (
+  projectId,
+  userEmail,
+  preData,
+  selectedId,
+  setPreData,
+  sendInfoToServer,
+  wholeData,
+  setWholeData,
+  checkDelete,
+  setCheckDelete,
+  checkPost,
+  drawingList,
+  deleteSelected,
+  count,
+  setCount,
+  layerRef,
+) => {
   const PostSave = () => {
     console.log(projectId);
     axios
-      .patch(
-        `http://192.168.31.172:8080/api/project/merge?projectId=${projectId}`
-      )
+      .patch(`http://localhost:8080/api/project/merge?projectId=${projectId}`)
       .then((response) => {
         console.log(response);
         // console.log(response.data);
@@ -21,8 +37,9 @@ const postData = (projectId, userEmail, setPreData, preData) => {
       console.error("이벤트 또는 대상 요소가 정의되지 않았습니다.");
       return;
     }
-    const filteredPreData = preData.filter(
-      (item) => item.propId === e.target.attrs.id
+    // console.log(JSON.stringify(preData) + "이건 post 내에서 확인용");
+    const filteredPreData = preData.find(
+      (item) => item.id === e.target.attrs.id
     );
 
     const postData = {
@@ -33,185 +50,91 @@ const postData = (projectId, userEmail, setPreData, preData) => {
       newData: e.target.attrs,
     };
     axios
-      .post("http://192.168.31.172:8080/api/project/changes", postData)
+      .post("http://localhost:8080/api/project/change", postData)
       .then((response) => {
-        // console.log(response);
-        console.log(response.data);
+        console.log(response);
       })
       .catch((error) => {
         console.log(error);
       });
   };
 
-  // const PostText = (e) => {
-  //   if (!e || !e.target) {
-  //     console.error("이벤트 또는 대상 요소가 정의되지 않았습니다.");
-  //     return;
-  //   }
-  //   const postData = {
-  //     projectId: projectId,
-  //     userEmail: userEmail,
-  //     propId: e.target.attrs.id,
-  //     preData: {},
-  //     newData: e.target.attrs,
-  //   };
-  //   axios
-  //     .post("http://192.168.31.172:8080/api/project/changes", postData)
-  //     .then((response) => {
-  //       // console.log(response);
-  //       console.log(response.data);
-  //     })
-  //     .catch((error) => {
-  //       console.log(error);
-  //     });
-  // };
+  const PostDrawing = () => {
+    const postData = {
+      projectId: projectId,
+      userEmail: userEmail,
+      propId: selectedId,
+      preData: {},
+      newData: drawingList,
+    }
+  };
 
-  // const PostRect = (e) => {
-  //   if (!e || !e.target) {
-  //     console.error("이벤트 또는 대상 요소가 정의되지 않았습니다.");
-  //     return;
-  //   }
-  //   console.log(projectId + "프로젝트 아이디야");
-  //   console.log(userEmail + "이메일 확인 중이에요");
-  //   const postData = {
-  //     projectId: projectId,
-  //     userEmail: userEmail,
-  //     propId: e.target.attrs.id,
-  //     preData: {},
-  //     newData: e.target.attrs,
-  //   };
-  //   axios
-  //     .post("http://192.168.31.172:8080/api/project/changes", postData)
+  const PostPaste = (e) => {
+    const postData = {
+      projectId: projectId,
+      userEmail: userEmail,
+      propId: selectedId,
+      preData: {},
+      newData: e.target.attrs,
+    };
+    axios
+    .post("http://localhost:8080/api/project/change", postData)
+    .then((response) => {
+      console.log(response)
+    })
+    .catce((error) =>{
+      console.log(error)
+    })
+  }
 
-  //     .then((response) => {
-  //       console.log(response.data + "check");
-  //     })
-  //     .catch((error) => {
-  //       console.log(error);
-  //     });
-  // };
+  const PostDelete = () => {
+    const filteredPreData = preData.find((item) => item.id === selectedId);
 
-  // const PostCircle = (e) => {
-  //   if (!e || !e.target) {
-  //     console.error("이벤트 또는 대상 요소가 정의되지 않았습니다.");
-  //     return;
-  //   }
-  //   const postData = {
-  //     projectId: projectId,
-  //     userEmail: userEmail,
-  //     propId: e.target.attrs.id,
-  //     preData: {},
-  //     newData: e.target.attrs,
-  //   };
-  //   axios
-  //     .post("http://192.168.31.172:8080/api/project/changes", postData)
+    const postData = {
+      projectId: projectId,
+      userEmail: userEmail,
+      propId: selectedId,
+      preData: filteredPreData,
+      newData: {},
+    };
 
-  //     .then((response) => {
-  //       // console.log(response);
-  //       console.log(response.data);
-  //     })
-  //     .catch((error) => {
-  //       console.log(error);
-  //     });
-  // };
+    axios
+      .post("http://localhost:8080/api/project/change", postData)
+      .then((response) => {
+        // 삭제가 성공적으로 반영되었을 때 상태 업데이트
+        console.log(response);
+        setPreData((prevData) => {
+          const newData = prevData.filter((item) => item.id !== selectedId);
+          console.log("Updated data:", newData);
+          return newData; // 필터링된 새 데이터로 상태를 업데이트
+        });
+        // deleteSelected();
 
-  // const PostTriangle = (e) => {
-  //   if (!e || !e.target) {
-  //     console.error("이벤트 또는 대상 요소가 정의되지 않았습니다.");
-  //     return;
-  //   }
-  //   const postData = {
-  //     projectId: projectId,
-  //     userEmail: userEmail,
-  //     propId: e.target.attrs.id,
-  //     preData: {},
-  //     newData: e.target.attrs,
-  //   };
-  //   axios
-  //     .post("http://192.168.31.172:8080/api/project/changes", postData)
-
-  //     .then((response) => {
-  //       console.log(response);
-  //       console.log(response.config.data + "test 해볼래요 x, y 받아오기");
-  //     })
-  //     .catch((error) => {
-  //       console.log(error);
-  //     });
-  // };
-
-  // const PostLine = (e) => {
-  //   if (!e || !e.target) {
-  //     console.error("이벤트 또는 대상 요소가 정의되지 않았습니다.");
-  //     return;
-  //   }
-  //   const postData = {
-  //     projectId: projectId,
-  //     userEmail: userEmail,
-  //     propId: e.target.attrs.id,
-  //     preData: {},
-  //     newData: e.target.attrs,
-  //   };
-  //   axios
-  //     .post("http://192.168.31.172:8080/api/project/changes", postData)
-
-  //     .then((response) => {
-  //       // console.log(response);
-  //       console.log(response.data);
-  //     })
-  //     .catch((error) => {
-  //       console.log(error);
-  //     });
-  // };
-  // const PostDot = (e) => {
-  //   if (!e || !e.target) {
-  //     console.error("이벤트 또는 대상 요소가 정의되지 않았습니다.");
-  //     return;
-  //   }
-  //   const postData = {
-  //     projectId: projectId,
-  //     userEmail: userEmail,
-  //     propId: e.target.attrs.id,
-  //     preData: {},
-  //     newData: e.target.attrs,
-  //   };
-  //   axios
-  //     .post("http://192.168.31.172:8080/api/project/changes", postData)
-
-  //     .then((response) => {
-  //       // console.log(response);
-  //       console.log(response.data);
-  //     })
-  //     .catch((error) => {
-  //       console.log(error);
-  //     });
-  // };
-  // const PostArrow = (e) => {
-  //   if (!e || !e.target) {
-  //     console.error("이벤트 또는 대상 요소가 정의되지 않았습니다.");
-  //     return;
-  //   }
-  //   const postData = {
-  //     projectId: projectId,
-  //     userEmail: userEmail,
-  //     propId: e.target.attrs.id,
-  //     preData: {},
-  //     newData: e.target.attrs,
-  //   };
-  //   axios
-  //     .post("http://192.168.31.172:8080/api/project/changes", postData)
-
-  //     .then((response) => {
-  //       // console.log(response);
-  //       console.log(response.data);
-  //     })
-  //     .catch((error) => {
-  //       console.log(error);
-  //     });
-  // };
+        // const check = () => {
+        //   checkPost();
+        // };
+        // // check();
+        // console.log(checkDelete);
+        // console.log(typeof setCount);
+        // // setCount(prevCount => prevCount + 1);
+        // console.log(count)
+      })
+      .catch((error) => {
+        console.log(error);
+        // 오류 발생 시 실행할 코드
+      })
+      .finally(() => {
+        // if (layerRef.current) {
+        //   layerRef.current.batchDraw();
+        // }
+      });
+  };
 
   return {
     PostData,
     PostSave,
+    PostDelete,
+    PostDrawing,
   };
 };
 
