@@ -58,6 +58,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         getRedirectStrategy().sendRedirect(request, response, targetUrl);
     }
 
+    @Override
     protected String determineTargetUrl(HttpServletRequest request, HttpServletResponse response,
                                         Authentication authentication) {
 
@@ -72,8 +73,6 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 
         OAuth2UserPrincipal principal = getOAuth2UserPrincipal(authentication);
 
-
-
         if (principal == null) {
             return UriComponentsBuilder.fromUriString(targetUrl)
                     .queryParam("error", "Login failed")
@@ -87,14 +86,14 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
             String accessToken = jwtService.createAccessToken(user.getUserEmail(), user.getUserName(), user.getProvider().toString());
             String refreshToken = jwtService.createRefreshToken(user.getUserEmail(), user.getProvider().toString());
 
+            // 쿠키에 토큰 저장
+            addTokenToCookies(response, "access_token", accessToken, 24 * 60 * 60); // 1일
+            addTokenToCookies(response, "refresh_token", refreshToken, 7 * 24 * 60 * 60); // 7일
             // 리프레시 토큰 DB 저장
             userService.updateRefreshToken(principal.getUserInfo().getEmail(), refreshToken);
 
             // 지금은 파라미터에 보내는 중 but body에 담아서 보내는것이 안전
-            return UriComponentsBuilder.fromUriString(targetUrl)
-                    .queryParam("access_token", accessToken)
-                    .queryParam("refresh_token", refreshToken)
-                    .build().toUriString();
+            return UriComponentsBuilder.fromUriString(targetUrl).build().toUriString();
 
         } else if ("unlink".equalsIgnoreCase(mode)) { // 회원 탈퇴
 
@@ -126,5 +125,13 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
     protected void clearAuthenticationAttributes(HttpServletRequest request, HttpServletResponse response) {
         super.clearAuthenticationAttributes(request);
         httpCookieOAuth2AuthorizationRequestRepository.removeAuthorizationRequestCookies(request, response);
+    }
+
+    private void addTokenToCookies(HttpServletResponse response, String name, String value, int maxAge) {
+        Cookie cookie = new Cookie(name, value);
+        cookie.setPath("/");
+        cookie.setHttpOnly(true);
+        cookie.setMaxAge(maxAge);
+        response.addCookie(cookie);
     }
 }
