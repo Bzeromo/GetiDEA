@@ -25,15 +25,12 @@ pipeline {
             steps {
                 echo 'Downloading build files from Nexus Repository...'
                 script {
-                    def buildFiles = [
-                        'compose.yml',
-                        '.env',
-                    ]
+                    withCredentials([usernamePassword(credentialsId: NEXUS_CREDENTIALS_ID, usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+                        sh "curl -u \$USERNAME:\$PASSWORD \$NEXUS_URL/repository/\$NEXUS_BACK_REPOSITORY/front/gifront/.env -o GetiDEA_front/.env"
+                    }
 
-                    for (file in buildFiles) {
-                        withCredentials([usernamePassword(credentialsId: NEXUS_CREDENTIALS_ID, usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
-                            sh "curl -u \$USERNAME:\$PASSWORD \$NEXUS_URL/repository/\$NEXUS_BACK_REPOSITORY/back/giback/$file -o back/giBack/$file"
-                        }
+                    withCredentials([usernamePassword(credentialsId: NEXUS_CREDENTIALS_ID, usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+                        sh "curl -u \$USERNAME:\$PASSWORD \$NEXUS_URL/repository/\$NEXUS_BACK_REPOSITORY/back/giback/compose.yml -o back/giBack/compose.yml"
                     }
 
                     sh 'mkdir -p back/giBack/src/main/resources'
@@ -92,11 +89,11 @@ pipeline {
         stage('Deploy Back Server') {
             steps {
                 echo 'Deploying project...'
-                dir('back/giBack/build/libs/') {
+                dir('back/giBack/build/') {
                     // 실행 권한 부여
                     sh 'chmod +x libs'
                     // 빌드 실행
-                    sh 'nohup java -jar getidea-0.1.0.jar &'
+                    sh 'nohup java -jar libs/getidea-0.1.0.jar &'
                 }
             }
         }
