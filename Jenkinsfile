@@ -92,11 +92,11 @@ pipeline {
         stage('Deploy Back Server') {
             steps {
                 echo 'Deploying project...'
-                dir('back/giBack') {
+                dir('back/giBack/build/libs/') {
                     // 실행 권한 부여
-                    sh 'chmod +x jenkins'
+                    sh 'chmod +x libs'
                     // 빌드 실행
-                    sh 'nohup java -jar build/libs/getidea-0.1.0.jar &'
+                    sh 'nohup java -jar getidea-0.1.0.jar &'
                 }
             }
         }
