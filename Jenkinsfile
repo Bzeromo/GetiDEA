@@ -91,7 +91,7 @@ pipeline {
         stage('Deploy Project') {
             steps {
                 echo 'Deploying project...'
-                sh 'sudo java -jar Getidea/back/giBack/build/libs/getidea-0.1.0.jar'
+                sh 'java -jar Getidea/back/giBack/build/libs/getidea-0.1.0.jar'
             }
         }
     }
