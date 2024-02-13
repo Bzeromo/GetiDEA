@@ -14,6 +14,9 @@ const TextComponent = ({
   onSelect,
   selectedId,
   setSelectedId,
+  fontFamily,
+  visible,
+  fontWeight,
   // transformerRef,
 }) => {
   const [textBox, setTextBox] = useState(text);

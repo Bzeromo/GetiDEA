@@ -20,10 +20,8 @@ const RandomTextComponent = ({
 
   useEffect(() => {
     let result;
-    
-
     if (arrangementType === 1) {
-      result = inputWord + arrangementType1 + plus + arrangementType1 + text;
+      result = text + arrangementType1 + plus + arrangementType1 + inputWord;
     } else if (arrangementType === 2) {
       result = inputWord + arrangementType2 + plus + arrangementType2 + text;
     } else {
@@ -33,18 +31,14 @@ const RandomTextComponent = ({
   }, [text, arrangementType]);
 
   return (
-    <Text text={textResult} 
-    x={x} 
-    y={y} 
-    fontSize={fontSize} 
-    align="center"
-    {...textProps} />
+    <Text text={textResult} x={x} y={y} fontSize={fontSize} {...textProps} />
   );
 };
 
 const RandomTextDisplay = ({ activeIndex }) => {
   const [randomWords, setRandomWords] = useState([]);
-  const [displayedIndices, setDisplayedIndices] = useState([]);
+  const [displayedIndex, setDisplayedIndex] = useState(0); // 한 번에 하나씩 표시될 요소의 인덱스
+  const [displayedIndices, setDisplayedIndices] = useState([]); // 표시된 요소들의 인덱스 배열
 
   useEffect(() => {
     function getRandomWords(words, count) {
@@ -66,24 +60,38 @@ const RandomTextDisplay = ({ activeIndex }) => {
     // 새로운 위치에만 텍스트를 표시합니다.
     const newIndices = activeIndex.filter((index) => !displayedIndices.includes(index));
     setDisplayedIndices((prevIndices) => [...prevIndices, ...newIndices]);
-  }, [activeIndex]); // 이 부분을 수정하여 displayedIndices를 의존성 배열에서 제외합니다.
+  }, [activeIndex, displayedIndices]);
 
   const bubbleChatProperties = Object.values(bubbleChatPropertiesData);
 
+  const handleNext = () => {
+    if (displayedIndex < displayedIndices.length - 1) {
+      setDisplayedIndex((prevIndex) => prevIndex + 1);
+    }
+  };
+
+  const handlePrev = () => {
+    if (displayedIndex > 0) {
+      setDisplayedIndex((prevIndex) => prevIndex - 1);
+    }
+  };
+
   return (
-    <React.Fragment>
-      {displayedIndices.map((index) => (
+    <div>
+      <button onClick={handlePrev} disabled={displayedIndex === 0}>이전</button>
+      <button onClick={handleNext} disabled={displayedIndex === displayedIndices.length - 1}>다음</button>
+      {displayedIndices.length > 0 && (
         <RandomTextComponent
-          key={index}
-          text={randomWords[index] || ""}
-          x={bubbleChatProperties[index].textPosX}
-          y={bubbleChatProperties[index].textPosY}
+          key={displayedIndices[displayedIndex]}
+          text={randomWords[displayedIndices[displayedIndex]] || ""}
+          x={bubbleChatProperties[displayedIndices[displayedIndex]].textPosX}
+          y={bubbleChatProperties[displayedIndices[displayedIndex]].textPosY}
           fontSize={8}
           textProps={{ fill: "black" }}
-          arrangementType={bubbleChatProperties[index].arrangementType}
+          arrangementType={bubbleChatProperties[displayedIndices[displayedIndex]].arrangementType}
         />
-      ))}
-    </React.Fragment>
+      )}
+    </div>
   );
 };
 

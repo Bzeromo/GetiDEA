@@ -4,8 +4,9 @@ import axios from "axios";
 import useImage from "use-image";
 import URLImage from "./Add/URLImage";
 import bubbleChatProperties from "./templateData/template1-position.json";
-import randaomWords from "./templateData/randomWords.json";
+import randomWords from "./templateData/randomWords.json";
 import RandomTextDisplay from "./Add/RandomTextDisplay";
+import RandomTextDisplayCopy from "./Add/RandomTextDisplay copy";
 
 import ImgComponent from "./Add/ImgComponent";
 import ShapeComponent from "./Add/ShapeComponent";
@@ -926,21 +927,62 @@ const MyDrawing = () => {
 
   const firstTemplateProperties = Object.values(bubbleChatProperties);
 
+
+
+
+
   // 처음 렌더링 될 때 한 번만 실행되는 useEffect 설정
   useEffect(() => {
     // bubbleChatProperties를 이용하여 firstTemplateProperties 설정
     const firstTemplateProperties = Object.values(bubbleChatProperties);
-    // 상태 업데이트
+    
+    //템플릿 정보 저장하기
     setImages(firstTemplateProperties);
 
     //이미지 저장까지 했으니까 이제 단어까지 저장하자.
 
-    const pickedRandomWords = [];
+    // 단어 저장하는 부분~~~~~~//// 단어 저장하는 부분~~~~~~//// 단어 저장하는 부분~~~~~~//
+    // const pickedRandomWords = [];
+    // const usedIndexes = new Set();
 
+    // while (pickedRandomWords.length < 34) {
+    //     const randomIndex = Math.floor(Math.random() * randomWords.length);
+
+    //   // 중복된 인덱스 확인
+    //   if (!usedIndexes.has(randomIndex)) {
+
+    //     if (firstTemplateProperties[randomIndex]){
+          
+    //       // text에는 이제 랜덤으로 pick된 단어가 들어가있음.
+    //       const text = randomWords[randomIndex];
+
+    //       // 이제 위치 정보도 같이 저장해주자.
+    //       const x = firstTemplateProperties[randomIndex].textPosX;
+    //       const y = firstTemplateProperties[randomIndex].textPosY;
+
+    //       pickedRandomWords.push({ text, x, y});
+    //       usedIndexes.add(randomIndex);
+    //     }
+    //     else{
+    //       console.error(`Template info not found for index ${randomIndex}`);
+    //     }
+
+    //   }
+    // }
+
+    // //일단 랜덤 단어는 저장할건데.. 흠.... 위치 정보도 같이 저장하고 싶은데..
+    // setTexts(pickedRandomWords);
     
+    // 단어 저장하는 부분~~~~~~//// 단어 저장하는 부분~~~~~~//// 단어 저장하는 부분~~~~~~//
 
-    setTexts(pickedRandomWords);
+
+
   }, []);
+
+  //단어가 제대로 들어갔나 확인하는 체크용!! 페이지가 랜더링 될 때 자동을 console에 찍힌다
+  useEffect(()=>{
+    console.log(texts);
+  })
 
   const handleButtonClick = () => {
     setActiveIndex((prevIndices) => {
@@ -1338,6 +1380,7 @@ const MyDrawing = () => {
       >
         img
       </button>
+
       {imgMenuToggle && (
         <div className="absolute bottom-[56px] right-72">
           {" "}
@@ -1346,10 +1389,6 @@ const MyDrawing = () => {
         </div>
       )}
 
-      {/* 템플릿 1 전용 버튼
-      <div className="absolute bottom-6 right-52 z-50  justify-center bg-white rounded-md w-16 h-[50px] flex  items-center flex-row shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]">
-        <button onClick={moveToTop}>템플릿1</button>
-      </div> */}
 
       {/*템플릿 1 전용 버튼*/}
       <div>
@@ -1384,6 +1423,18 @@ const MyDrawing = () => {
                 ))}
               </React.Fragment> */}
 
+              {/* 템플릿 요소는 이미 저장해둔 상태이고 이건 그저 띄우는 것 */}
+              {/* <React.Fragment>
+                {firstTemplateProperties.map((imgInfo, index) => (
+                  <React.Fragment key={index}>
+                    <ImageComponent {...imgInfo} />
+                    {activeIndex.includes(index) && (
+                      <RandomTextDisplay activeIndex={[index]} />
+                    )}
+                  </React.Fragment>
+                ))}
+              </React.Fragment> */}
+
               <React.Fragment>
                 {firstTemplateProperties.map((imgInfo, index) => (
                   <React.Fragment key={index}>
@@ -1394,6 +1445,7 @@ const MyDrawing = () => {
                   </React.Fragment>
                 ))}
               </React.Fragment>
+
 
               {drawing && (
                 <Line
@@ -1482,7 +1534,7 @@ const MyDrawing = () => {
               ))}
 
 
-            {/* 여긴 그저 템플릿을 불러오는 공간일 뿐이다. 그렇게 되면 굳이 images에 있는 정보를 불러올 필요가 없지 않을까? */}
+              {/* 여긴 그저 템플릿을 불러오는 공간일 뿐이다. 그렇게 되면 굳이 images에 있는 정보를 불러올 필요가 없지 않을까? */}
               {/* {images.map((img) => (
                 <ImgComponent
                   key={img.id}
@@ -1498,6 +1550,7 @@ const MyDrawing = () => {
                   }}
                 />
               ))} */}
+
 
               {selectedId && (
                 <Transformer
