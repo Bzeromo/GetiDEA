@@ -26,7 +26,7 @@ pipeline {
                 echo 'Downloading build files from Nexus Repository...'
                 script {
                     withCredentials([usernamePassword(credentialsId: NEXUS_CREDENTIALS_ID, usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
-                        sh "curl -u \$USERNAME:\$PASSWORD \$NEXUS_URL/repository/\$NEXUS_BACK_REPOSITORY/front/gifront/.env -o GetiDEA_front/.env"
+                        sh "curl -u \$USERNAME:\$PASSWORD \$NEXUS_URL/repository/\$NEXUS_BACK_REPOSITORY/front/gifront/env -o GetiDEA_front/.env"
                     }
 
                     withCredentials([usernamePassword(credentialsId: NEXUS_CREDENTIALS_ID, usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
@@ -98,30 +98,37 @@ pipeline {
 //             }
 //         }
 
-        stage('Build Frontend') {
-            steps {
-                echo 'Building frontend...'
-                dir('/front') {
-                    // 의존성 설치
-                    sh 'yarn install'
-                    sh 'yarn build'
-                }
-            }
-        }
+//         stage('Build Frontend') {
+//             steps {
+//                 script {
+//                     sh '''
+//                     export NVM_DIR="$HOME/.nvm"
+//                     [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+//                     nvm use 21.6.1
+//                     '''
+//                 }
+//                 echo 'Building frontend...'
+//                 dir('/front') {
+//                     // 의존성 설치
+//                     sh 'yarn install'
+//                     sh 'yarn build'
+//                 }
+//             }
+//         }
 
-        stage('Deploy Frontend') {
-            steps {
-                echo 'Deploying frontend...'
-                // 프론트엔드 빌드 결과물을 호스팅하는 서버에 배포합니다.
-                // 이 예시에서는 단순히 파일을 복사하는 것으로 가정합니다.
-                // 실제로는 웹 서버 디렉토리로 파일을 복사하거나, 별도의 배포 스크립트를 실행해야 할 수 있습니다.
-                // sh 'cp -R /home/jenkins/workspace/Getidea/front/build/* /path/to/web/server/directory'
-                dir('/front') {
-                    // 프로덕션 빌드 생성
-                    sh 'yarn start'
-                }
-            }
-        }
+//         stage('Deploy Frontend') {
+//             steps {
+//                 echo 'Deploying frontend...'
+//                 // 프론트엔드 빌드 결과물을 호스팅하는 서버에 배포합니다.
+//                 // 이 예시에서는 단순히 파일을 복사하는 것으로 가정합니다.
+//                 // 실제로는 웹 서버 디렉토리로 파일을 복사하거나, 별도의 배포 스크립트를 실행해야 할 수 있습니다.
+//                 // sh 'cp -R /home/jenkins/workspace/Getidea/front/build/* /path/to/web/server/directory'
+//                 dir('/front') {
+//                     // 프로덕션 빌드 생성
+//                     sh 'yarn start'
+//                 }
+//             }
+//         }
     }
 
     post {
