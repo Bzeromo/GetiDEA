@@ -16,6 +16,7 @@ pipeline {
             steps {
                 // 현재 파이프라인이 실행된 브랜치에 따라 소스 코드를 체크아웃
                 echo 'Checking out code...'
+                sh 'whoami'
                 checkout scm
             }
         }
@@ -88,10 +89,39 @@ pipeline {
             }
         }
 
-        stage('Deploy Project') {
+        stage('Deploy Back Server') {
             steps {
                 echo 'Deploying project...'
-                sh 'java -jar Getidea/back/giBack/build/libs/getidea-0.1.0.jar'
+                dir('back/giBack') {
+                    // 실행 권한 부여
+                    sh 'chmod +x jenkins'
+                    // 빌드 실행
+                    sh 'nohup java -jar build/libs/getidea-0.1.0.jar &'
+                }
+            }
+        }
+
+        stage('Build Frontend') {
+            steps {
+                echo 'Building frontend...'
+                dir('/front') {
+                    // 의존성 설치
+                    sh 'yarn'
+                }
+            }
+        }
+
+        stage('Deploy Frontend') {
+            steps {
+                echo 'Deploying frontend...'
+                // 프론트엔드 빌드 결과물을 호스팅하는 서버에 배포합니다.
+                // 이 예시에서는 단순히 파일을 복사하는 것으로 가정합니다.
+                // 실제로는 웹 서버 디렉토리로 파일을 복사하거나, 별도의 배포 스크립트를 실행해야 할 수 있습니다.
+                // sh 'cp -R /home/jenkins/workspace/Getidea/front/build/* /path/to/web/server/directory'
+                dir('/front') {
+                    // 프로덕션 빌드 생성
+                    sh 'yarn start'
+                }
             }
         }
     }
