@@ -10,6 +10,7 @@ import com.gi.giback.mysql.entity.LocationEntity;
 import com.gi.giback.mysql.service.LocationService;
 import com.gi.giback.dto.ProjectInputDTO;
 import com.gi.giback.redis.RedisService;
+import com.gi.giback.response.ErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -59,7 +60,7 @@ public class ProjectController {
         try {
             ProjectEntity project = projectService.createProject(projectCreationDto);
             if (project == null) {
-                return ResponseEntity.badRequest().build();
+                return ResponseEntity.badRequest().body(new ErrorResponse("프로젝트 생성 실패"));
             }
             return ResponseEntity.ok(project);
         } catch (Exception e) {
@@ -71,12 +72,12 @@ public class ProjectController {
     // 기존 프로젝트 실행시 호출
     @GetMapping("/open")
     @Operation(summary = "기존 프로젝트 열기 (Mongo) - 테스트 완료", description = "Redis에 임시 저장된 데이터 와 MongoDB 병합 후 MongoDB에 있는 Project 데이터 반환")
-    public ResponseEntity<ProjectEntity> getProject(
+    public ResponseEntity<?> getProject(
         @RequestParam @Parameter(description = "참여 프로젝트 Id") Long projectId)
         throws JsonProcessingException {
 
         if (!redisService.mergeProject(projectId)) { // 레디스에 데이터가 있을경우 병합
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.badRequest().body(new ErrorResponse("프로젝트 열기 실패 - 병합 오류"));
         }
 
         Optional<ProjectEntity> projectTmp = projectService.getProject(projectId);
@@ -84,7 +85,7 @@ public class ProjectController {
             ProjectEntity project = projectTmp.get();
             return ResponseEntity.ok(project);
         }
-        return ResponseEntity.badRequest().build();
+        return ResponseEntity.badRequest().body(new ErrorResponse("프로젝트 열기 실패 - 존재하지 않는 프로젝트"));
         // 여기에서 사용자한테 projectId 값도 같이 보내줌 -> 프로젝트 내부에서는 사용자가 projectId 값을 보유
     }
 
@@ -106,8 +107,7 @@ public class ProjectController {
 
         if(redisService.mergeProject(projectId))
             return ResponseEntity.ok("merge project");
-        else
-            return ResponseEntity.badRequest().build();
+        return ResponseEntity.badRequest().body(new ErrorResponse("프로젝트 병합 실패"));
     }
 
     @DeleteMapping("/close/{projectId}")
@@ -117,15 +117,15 @@ public class ProjectController {
         @AuthenticationPrincipal String userEmail)
         throws JsonProcessingException {
 
-        if(userEmail == null){
-            return ResponseEntity.badRequest().build();
+        if(userEmail == null || userEmail.equals("anonymousUser")){
+            return ResponseEntity.badRequest().body(new ErrorResponse("사용자 검증 필요"));
         }
 
         if (redisService.mergeProject(projectId)) {
             redisService.deleteData(projectId, userEmail);
             return ResponseEntity.ok("프로젝트 퇴장");
         }
-        return ResponseEntity.badRequest().build();
+        return ResponseEntity.badRequest().body(new ErrorResponse("프로젝트 퇴장 오류 - 병합 처리 에러"));
     }
 
     @DeleteMapping("/delete/{projectId}")
@@ -134,8 +134,8 @@ public class ProjectController {
         @PathVariable @Parameter(description = "삭제 프로젝트 ID") Long projectId,
         @AuthenticationPrincipal String userEmail) {
 
-        if(userEmail == null){
-            return ResponseEntity.badRequest().build();
+        if(userEmail == null || userEmail.equals("anonymousUser")){
+            return ResponseEntity.badRequest().body(new ErrorResponse("사용자 검증 필요"));
         }
 
         locationService.deleteLocationByUserEmailAndProjectId(userEmail, projectId);
@@ -144,11 +144,11 @@ public class ProjectController {
 
     @GetMapping("/all") // 유저 이메일 기반으로 모든 참여되어있는 모든 프로젝트 가져오기
     @Operation(summary = "전체 프로젝트 불러오기 - 테스트 완료", description = "사용자의 모든 프로젝트 불러오기")
-    public ResponseEntity<List<ProjectInfoDTO>> getProjectListByEmail(
+    public ResponseEntity<?> getProjectListByEmail(
         @AuthenticationPrincipal String userEmail) {
 
-        if(userEmail == null){
-            return ResponseEntity.badRequest().build();
+        if(userEmail == null || userEmail.equals("anonymousUser")){
+            return ResponseEntity.badRequest().body(new ErrorResponse("사용자 검증 필요"));
         }
 
         List<LocationEntity> locationEntityList = locationService.getLocationEntityByUserEmail(userEmail);
@@ -164,16 +164,16 @@ public class ProjectController {
                 .sorted(Comparator.comparing(ProjectInfoDTO::getLastUpdateTime).reversed()).toList();
             return ResponseEntity.ok(sortedProjectEntityList);
         }
-        return ResponseEntity.badRequest().build();
+        return ResponseEntity.badRequest().body(new ErrorResponse("프로젝트가 없습니다."));
     }
 
     @GetMapping("/recent") // 유저 이메일 기반으로 모든 참여되어있는 모든 프로젝트 중 최근 7일
     @Operation(summary = "최근 프로젝트 불러오기 (7일) - 테스트 완료", description = "사용자의 모든 프로젝트 중 최근 7일 불러오기 (갯수 지정 가능)")
-    public ResponseEntity<List<ProjectInfoDTO>> getRecentProjectListByEmail(
+    public ResponseEntity<?> getRecentProjectListByEmail(
         @AuthenticationPrincipal String userEmail, @RequestParam(required = false) Integer limit) {
 
-        if(userEmail == null){
-            return ResponseEntity.badRequest().build();
+        if(userEmail == null || userEmail.equals("anonymousUser")){
+            return ResponseEntity.badRequest().body(new ErrorResponse("사용자 검증 필요"));
         }
 
         int projectsLimit = (limit == null) ? Integer.MAX_VALUE : limit;
@@ -199,11 +199,11 @@ public class ProjectController {
 
     @GetMapping("/bookmarked") // 북마크된 프로젝트 전체
     @Operation(summary = "북마크 된 프로젝트 전체 불러오기 - 테스트 완료", description = "사용자의 모든 프로젝트 중 북마크 되어있는 프로젝트")
-    public ResponseEntity<List<ProjectInfoDTO>> getBookmarkedLocations(
+    public ResponseEntity<?> getBookmarkedLocations(
         @AuthenticationPrincipal String userEmail) {
 
-        if(userEmail == null){
-            return ResponseEntity.badRequest().build();
+        if(userEmail == null || userEmail.equals("anonymousUser")){
+            return ResponseEntity.badRequest().body(new ErrorResponse("사용자 검증 필요"));
         }
 
         List<ProjectInfoDTO> bookmarkedProject = locationService.getBookmarkedLocations(userEmail);
@@ -217,11 +217,11 @@ public class ProjectController {
 
     @GetMapping("/folder") // 유저이메일 + 폴더네임으로 가져온 프로젝트 데이터
     @Operation(summary = "폴더에 있는 프로젝트 전체 불러오기 - 테스트 완료", description = "사용자의 특정 폴더 내부에 있는 프로젝트 전달")
-    public ResponseEntity<List<ProjectInfoDTO>> getBookmarkedLocations(
+    public ResponseEntity<?> getBookmarkedLocations(
         @AuthenticationPrincipal String userEmail, @RequestParam String folderName) {
 
-        if(userEmail == null){
-            return ResponseEntity.badRequest().build();
+        if(userEmail == null || userEmail.equals("anonymousUser")){
+            return ResponseEntity.badRequest().body(new ErrorResponse("사용자 검증 필요"));
         }
 
         List<LocationEntity> locations = locationService.getLocationsByUserEmailAndFolderName(userEmail, folderName);
@@ -241,12 +241,12 @@ public class ProjectController {
 
     @PatchMapping("/rename") // 로케이션에서 사용자 확인 후 프로젝트id 기준으로 프로젝트 이름 변경
     @Operation(summary = "프로젝트 이름 변경 - 테스트 완료", description = "프로젝트 이름 변경")
-    public ResponseEntity<ProjectEntity> updateProjectName(
+    public ResponseEntity<?> updateProjectName(
         @AuthenticationPrincipal String userEmail,
         @RequestBody @Parameter(description = "프로젝트 ID, 새로운 프로젝트 이름")ProjectRenameDTO projectRenameDTO) {
 
-        if(userEmail == null){
-            return ResponseEntity.badRequest().build();
+        if(userEmail == null || userEmail.equals("anonymousUser")){
+            return ResponseEntity.badRequest().body(new ErrorResponse("사용자 검증 필요"));
         }
 
         Long projectId = projectRenameDTO.getProjectId();
@@ -269,11 +269,11 @@ public class ProjectController {
 
     @GetMapping("/rollback") // 되돌리기 기능을 위한 User별 변동사항 호출
     @Operation(summary = "이전 변경사항 불러오기 - 되돌리기 기능(Ctrl + z)", description = "userEmail과 projectId를 받아서 레디스의 임시데이터에서 최근 변경한 내용을 호출")
-    public ResponseEntity<Object> getUserData(
+    public ResponseEntity<?> getUserData(
         @RequestParam Long projectId, @AuthenticationPrincipal String userEmail) {
 
-        if(userEmail == null){
-            return ResponseEntity.badRequest().build();
+        if(userEmail == null || userEmail.equals("anonymousUser")){
+            return ResponseEntity.badRequest().body(new ErrorResponse("사용자 검증 필요"));
         }
 
         Object data = redisService.getLastProjectData(projectId, userEmail);

@@ -3,6 +3,7 @@ package com.gi.giback.controller;
 import com.gi.giback.dto.FileUploadDTO;
 import com.gi.giback.mongo.service.ProjectService;
 import com.gi.giback.mysql.service.UserService;
+import com.gi.giback.response.ErrorResponse;
 import com.gi.giback.s3.S3UploadService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -34,7 +35,7 @@ public class ImageController {
 
     @PostMapping("/thumbnail")
     @Operation(summary = "썸네일 이미지 저장", description = "썸네일 이미지 저장")
-    public ResponseEntity<String> uploadThumbnailImage(
+    public ResponseEntity<?> uploadThumbnailImage(
         @RequestPart("Image")  MultipartFile multipartFile,
         @RequestPart("projectId") Long projectId) {
         String result;
@@ -42,19 +43,19 @@ public class ImageController {
             result = s3UploadService.saveThumbnailImage(multipartFile);
             projectService.updateProjectThumbnail(projectId, result);
         } catch (IOException e) {
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.badRequest().body(new ErrorResponse("썸네일 변경 실패"));
         }
         return ResponseEntity.ok(result);
     }
 
     @PostMapping("/profile")
     @Operation(summary = "프로필 이미지 변경", description = "프로필 이미지 변경")
-    public ResponseEntity<String> updateProfileImage(
+    public ResponseEntity<?> updateProfileImage(
         @RequestPart("Image") MultipartFile multipartFile,
         @AuthenticationPrincipal String userEmail) {
 
-        if(userEmail == null){
-            return ResponseEntity.badRequest().build();
+        if(userEmail == null || userEmail.equals("anonymousUser")){
+            return ResponseEntity.badRequest().body(new ErrorResponse("사용자 검증 필요"));
         }
 
         String result;
@@ -64,9 +65,9 @@ public class ImageController {
                 return ResponseEntity.ok(result);
             }
         } catch (IOException e) {
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.badRequest().body(new ErrorResponse("프로필 이미지 변경 실패 - IOException"));
         }
-        return ResponseEntity.badRequest().build();
+        return ResponseEntity.badRequest().body(new ErrorResponse("프로필 이미지 변경 실패"));
     }
 
     @PostMapping("/project")

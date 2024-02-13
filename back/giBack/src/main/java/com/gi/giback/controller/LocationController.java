@@ -9,6 +9,7 @@ import com.gi.giback.mysql.entity.LocationEntity;
 import com.gi.giback.mysql.service.FolderService;
 import com.gi.giback.mysql.service.LocationService;
 import com.gi.giback.mysql.service.UserService;
+import com.gi.giback.response.ErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -64,7 +65,7 @@ public class LocationController {
 
     @PutMapping("/move") // 프로젝트를 디폴트에서 폴더로 지정시키면 폴더 이름을 바꿔줌
     @Operation(summary = "프로젝트 위치 이동 - 테스트 완료", description = "프로젝트 위치 이동 : 로케이션에 있는 folderName 변경")
-    public ResponseEntity<LocationEntity> updateFolderName(
+    public ResponseEntity<?> updateFolderName(
             @RequestBody @Parameter(description = "사용자 이메일, 이동시킬 프로젝트, 이동할 폴더 이름")LocationMoveDTO data) {
 
         Optional<FolderEntity> folder = folderService.getFolderByFolderName(data.getUserEmail(), data.getNewFolderName());
@@ -72,17 +73,17 @@ public class LocationController {
             LocationEntity updatedEntity = locationService.updateFolderName(data);
             return ResponseEntity.ok(updatedEntity);
         }
-        return ResponseEntity.badRequest().build();
+        return ResponseEntity.badRequest().body(new ErrorResponse("프로젝트 이동 실패"));
     }
 
     @PutMapping("/bookmark") // 북마크 해제, 등록
     @Operation(summary = "북마크 - 테스트 완료", description = "북마크 해제, 등록 기능 구현")
-    public ResponseEntity<LocationEntity> toggleBookmark(
+    public ResponseEntity<?> toggleBookmark(
             @RequestBody @Parameter(description = "북마크 기능 사용할 프로젝트id") Long projectId,
         @AuthenticationPrincipal String userEmail) {
 
-        if(userEmail == null){
-            return ResponseEntity.badRequest().build();
+        if(userEmail == null || userEmail.equals("anonymousUser")){
+            return ResponseEntity.badRequest().body(new ErrorResponse("사용자 검증 필요"));
         }
         LocationEntity updatedEntity = locationService.toggleBookmark(projectId, userEmail);
         return ResponseEntity.ok(updatedEntity);

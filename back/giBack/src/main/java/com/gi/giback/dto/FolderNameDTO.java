@@ -4,6 +4,6 @@ import lombok.Data;
 
 @Data
 public class FolderNameDTO {
-    private Long folderId;
+    private String beforeFolderName;
     private String newFolderName;
 }

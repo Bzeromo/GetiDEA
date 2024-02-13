@@ -5,6 +5,7 @@ import com.gi.giback.dto.ChatSendDTO;
 import com.gi.giback.mongo.service.ChatService;
 import com.gi.giback.mongo.service.ProjectService;
 import com.gi.giback.mysql.service.LocationService;
+import com.gi.giback.response.ErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -40,23 +41,23 @@ public class ChatController {
 
     @PostMapping("/send")
     @Operation(summary = "채팅 전송", description = "채팅 사용시 계속 호출해야함 / Mongo의 projectId가 일치하는 곳에 채팅 로그 저장")
-    public ResponseEntity<String> addChatMessage(@RequestBody @Parameter(description = "채팅 저장할 내용") ChatSendDTO data) {
+    public ResponseEntity<?> addChatMessage(@RequestBody @Parameter(description = "채팅 저장할 내용") ChatSendDTO data) {
 
         boolean isProjectValid = projectService.checkProjectId(data.getProjectId());
 
         if (isProjectValid && chatService.addChatLog(data)) {
             return ResponseEntity.ok("채팅 저장 완료");
         } else {
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.badRequest().body(new ErrorResponse("채팅 저장 실패"));
         }
     }
 
     @GetMapping("/load")
     @Operation(summary = "채팅 내역 불러오기", description = "프로젝트 실행시 프로젝트와 함께 채팅도 불러와야함")
-    public ResponseEntity<List<ChatDTO>> getChatLogs(@RequestParam @Parameter(description = "채팅 로그 불러올 프로젝트 ID") Long projectId,
+    public ResponseEntity<?> getChatLogs(@RequestParam @Parameter(description = "채팅 로그 불러올 프로젝트 ID") Long projectId,
         @AuthenticationPrincipal String userEmail) {
-        if(userEmail == null){
-            return ResponseEntity.badRequest().build();
+        if(userEmail == null || userEmail.equals("anonymousUser")){
+            return ResponseEntity.badRequest().body(new ErrorResponse("사용자 검증 필요"));
         }
 
         if(locationService.getLocationByProjectIdAndUserEmail(projectId, userEmail).isPresent()){
@@ -64,6 +65,6 @@ public class ChatController {
             return ResponseEntity.ok(chatLogs);
 
         }
-        return ResponseEntity.badRequest().build();
+        return ResponseEntity.badRequest().body(new ErrorResponse("채팅 불러오기 실패"));
     }
 }

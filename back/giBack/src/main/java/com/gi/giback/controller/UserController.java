@@ -2,6 +2,7 @@ package com.gi.giback.controller;
 
 import com.gi.giback.dto.UserDTO;
 import com.gi.giback.mysql.service.UserService;
+import com.gi.giback.response.ErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -39,11 +40,11 @@ public class UserController {
 
     @PatchMapping("/rename")
     @Operation(summary = "사용자 이름 변경 - 테스트 완료", description = "사용자 이름 변경")
-    public ResponseEntity<UserDTO> renameUser(
+    public ResponseEntity<?> renameUser(
         @RequestBody String newUserName, @AuthenticationPrincipal String userEmail) {
 
-        if(userEmail == null){
-            return ResponseEntity.badRequest().build();
+        if(userEmail == null || userEmail.equals("anonymousUser")){
+            return ResponseEntity.badRequest().body(new ErrorResponse("사용자 검증 필요"));
         }
 
         Optional<UserDTO> updatedUser = userService.updateUserName(userEmail, newUserName);

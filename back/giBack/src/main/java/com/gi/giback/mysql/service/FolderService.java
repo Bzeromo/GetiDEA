@@ -68,13 +68,12 @@ public class FolderService {
     }
 
     public FolderEntity updateFolderName(FolderNameDTO data, String userEmail) {
-        Long folderId = data.getFolderId();
         String newFolderName = data.getNewFolderName();
 
-        Optional<FolderEntity> folder = folderRepository.findFirstByFolderId(folderId);
-        log.info("Update folder name : {}", newFolderName);
-        if (folder.isPresent()) {
-            FolderEntity entity = folder.get();
+        Optional<FolderEntity> folderEntity = checkFolder(userEmail, data.getBeforeFolderName());
+        if (folderEntity.isPresent()) {
+            log.info("Update folder name : {}", newFolderName);
+            FolderEntity entity = folderEntity.get();
 
             String beforeFolderName = entity.getFolderName();
 
@@ -91,9 +90,8 @@ public class FolderService {
         return null; // or throw an exception
     }
 
-    public boolean checkFolder(String userEmail, Long folderId) {
-        Optional<FolderEntity> folder = folderRepository.findFirstByUserEmailAndFolderId(userEmail, folderId);
-        return (folder.isPresent());
+    public Optional<FolderEntity> checkFolder(String userEmail, String folderName) {
+        return folderRepository.findFirstByUserEmailAndFolderName(userEmail, folderName);
     }
 
     public boolean checkDuplicateFolder(String userEmail, String newFolderName) {
