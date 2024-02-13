@@ -1,5 +1,10 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import { Stage, Layer, Transformer, Line, Image } from "react-konva";
+
+
+import { CoachMark, ICoachProps } from "react-coach-mark";
+
+
 import axios from "axios";
 import useImage from "use-image";
 import URLImage from "./Add/URLImage";
@@ -922,11 +927,85 @@ const MyDrawing = () => {
 
 
 
+  const ref1 = useRef(null);
+  const ref2 = useRef(null);
+  const ref3 = useRef(null);
+  const ref4 = useRef(null);
 
+  const [activatedNumber, setActivateNumber] = useState(0);
+  const PrevButton = <button className="text-blue" onClick={() => setActivateNumber(activatedNumber - 1)}> 이전 </button>;
+  const NextButton = <button className="text-blue" onClick={() => setActivateNumber(activatedNumber + 1)}> 다음 </button>;
 
+  const coachList = [
+    {
+      activate: activatedNumber === 0,
+      component:
+        <div className="bg-white p-8 shadow-lg rounded-lg">
+          <p className="text-center font-Nanum font-bold text-2xl" >랜덤 버블 (Random Bubble)</p> 
+          <p className="text-center font-Nanum text-l mt-4">아이디어 또는 키워드를 입력하면, 말풍선(Bubble)이 생성됩니다.</p> 
+          <p className="text-center font-Nanum text-l">입력한 키워드와 랜덤으로 생성된 단어를 연관 지어</p> 
+          <p className="text-center font-Nanum text-l">새로운 아이디어를 생각해보는 ‘강제결합’ 기법을 경험해보세요 :D</p> 
 
+          <div className="flex justify-between items-center mt-8">
+            <button className="bg-blue-500 hover:bg-blue-700 text-white font-Nanum font-bold py-2 px-4 rounded shadow">{PrevButton}</button>
+            <span className="text-blue-800 font-Nanum">
+              1 / 4
+            </span>
+            <button className="bg-blue-500 hover:bg-blue-700 text-white font-Nanum font-bold py-2 px-4 rounded shadow">{NextButton}</button>
+          </div> 
 
+        </div>,
+      reference: ref1,
+      tooltip: { position: 'bottom-right' }
+    },
+    {
+      activate: activatedNumber === 1,
+      component:
+        <div className="bg-white p-8 shadow-lg rounded-lg">
+          <p className="text-center font-Nanum font-bold text-2xl" >Write Your iDEA!</p> 
+          <p className="text-center font-Nanum text-l mt-4">6가지 생각모자로 분석하고 싶은 아이디어를 입력해주세요.</p> 
 
+          <div className="flex justify-between items-center mt-8">
+            <button className="bg-blue-500 hover:bg-blue-700 text-white font-Nanum font-bold py-2 px-4 rounded shadow">{PrevButton}</button>
+            <span className="text-blue-800 font-Nanum">
+              2 / 4
+            </span>
+            <button className="bg-blue-500 hover:bg-blue-700 text-white font-Nanum font-bold py-2 px-4 rounded shadow">{NextButton}</button>
+          </div> 
+
+        </div>,
+      reference: ref2,
+      tooltip: { position: 'bottom' }
+    },
+    {
+      activate: activatedNumber === 2,
+      component:
+      //  <div>6개의 역할모자에 맞춰 아이디어를 분석하세요. <div>{NextButton}</div> </div>,
+      <div className="bg-white p-8 shadow-lg rounded-lg">
+        <p className="text-center font-Nanum font-bold text-xl" >6개의 생각모자에 맞춰 아이디어를 분석해보세요.</p> 
+        {/* <p className="text-center font-Nanum text-l mt-4">아이디어를 분석해보세요.</p>  */}
+
+        <div className="flex justify-between items-center mt-8">
+          <button className="bg-blue-500 hover:bg-blue-700 text-white font-Nanum font-bold py-2 px-4 rounded shadow">{PrevButton}</button>
+          <span className="text-blue-800 font-Nanum">
+            3 / 4
+          </span>
+          <button className="bg-blue-500 hover:bg-blue-700 text-white font-Nanum font-bold py-2 px-4 rounded shadow">{NextButton}</button>
+        </div> 
+
+      </div>,
+      reference: ref3,
+      tooltip: { position: 'bottom' }
+    },
+    {
+      activate: activatedNumber === 3,
+      component: <div>흰색은 ~~~ 역할입니다. <div>{NextButton}</div> </div>,
+      reference: ref4,
+      tooltip: { position: 'right' }
+    }
+  ];
+
+  const coach = coachList[activatedNumber];
 
 
 
@@ -934,6 +1013,7 @@ const MyDrawing = () => {
   // 템플릿3 이미지 형식
   const templateImage2 = 
     {
+      // "ref": ref2,
       "src": "/img/template2_6hats/template2Fix.png",
       "x": 31,  // x좌표
       "y": 110,  // y좌표
@@ -954,9 +1034,24 @@ const MyDrawing = () => {
 
 
 
-
   return (
     <div className="absolute  inset-0 h-full w-full bg-[#EFEFEF] bg-opacity-50 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px]">
+      
+
+
+      {/* 튜토리얼 연습 */}
+      <div>
+        {/* <h1 ref={ref1}>첫번째 영역</h1>
+        <p ref={ref2}>두번째 영역</p>
+        <p ref={ref3}>세번째 영역</p> */}
+        <CoachMark {...coach} />
+      </div>
+
+
+
+
+
+
       {/* 왼쪽 윗 블록 */}
       <div className="absolute top-6 left-6 pl-5 bg-white rounded-md w-96 h-[50px] flex items-center flex-row shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]">
         {/* 뒤로가기 버튼 */}
@@ -986,7 +1081,7 @@ const MyDrawing = () => {
         <div className="ml-8 border-l-2 border-line_gray">&ensp;</div>
 
         {/* 프로젝트 이름 */}
-        <div className=" ml-3 font-Nanum font-medium text-base rotate-[-0.03deg]">
+        <div ref={ref2} className=" ml-3 font-Nanum font-medium text-base rotate-[-0.03deg]">
           {projectName}
         </div>
       </div>
@@ -1269,14 +1364,14 @@ const MyDrawing = () => {
       </div>
 
       {/* 오른쪽 윗 블록 */}
-      <div className="absolute top-6 right-52 justify-center bg-white rounded-md w-16 h-[50px] flex  items-center flex-row shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]">
+      {/* <div className="absolute top-6 right-52 justify-center bg-white rounded-md w-16 h-[50px] flex  items-center flex-row shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]">
         <button onClick={() => GetData()}>Get</button>
-      </div>
+      </div> */}
 
       {/* 오른쪽 윗 블록 */}
-      <div className="absolute top-6 right-94 justify-center bg-white rounded-md w-16 h-[50px] z-50 flex  items-center flex-row shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]">
+      {/* <div className="absolute top-6 right-94 justify-center bg-white rounded-md w-16 h-[50px] z-50 flex  items-center flex-row shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]">
         <button onClick={() => GetData()}>Get</button>
-      </div>
+      </div> */}
 
       {/* 오른쪽 윗 블록 */}
       <div className="absolute top-6 right-72 justify-center bg-white rounded-md w-12 h-10 flex items-center shadow">
@@ -1319,11 +1414,19 @@ const MyDrawing = () => {
       )}
 
 
+
+      {/* 튜토리얼 */}
+      <div ref={ref1} className="absolute mx-96 mt-40" ></div>
+      <div ref={ref3} className="absolute ml-36 mt-40 h-[250px] w-[1350px]" ></div>
+
+
+
+
       {/* 그리는 구역 */}
       <div className="ml-36 mt-24 h-full w-full" >
       
         <Stage
-          ref={stageRef}
+          // ref={stageRef}
           width={window.innerWidth}
           height={window.innerHeight}
           draggable={!draggable}
@@ -1333,14 +1436,14 @@ const MyDrawing = () => {
           onMouseup={handleMouseUp}
           onDragEnd={handleDragEnd}
           onClick={handleLayerClick}
-        >
+          >
           <Layer ref={layerRef}>
-
 
 
           {/* Template3 - 7Check에 대한 템플릿 정보 출력 */}
           
-          <ImageComponent 
+          <ImageComponent
+            // ref = {templateImage2.ref}
             src = {templateImage2.src}
             x = {templateImage2.x}
             y = {templateImage2.y}
@@ -1490,6 +1593,7 @@ const MyDrawing = () => {
         </Stage>
       </div>
     </div>
+    
   );
 };
 

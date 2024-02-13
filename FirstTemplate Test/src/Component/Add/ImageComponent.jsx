@@ -3,6 +3,7 @@ import { Image } from 'react-konva';
 import useImage from 'use-image';
 
 const ImageComponent = ({
+  // ref,
   src,
   x,
   y,
@@ -18,6 +19,7 @@ const ImageComponent = ({
   if (width && height) {
     return (
       <Image
+        // ref={ref}
         image={image}
         x={x}
         y={y}
