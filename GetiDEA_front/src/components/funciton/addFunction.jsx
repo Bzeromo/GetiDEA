@@ -1,3 +1,5 @@
+import { v4 as uuidv4 } from 'uuid';
+
 const addFunction = (
   shapes,
   setShapes,
@@ -7,22 +9,25 @@ const addFunction = (
   setTexts,
   currentColor,
   selectStroke,
-  newTextValue,
-  setNewTextValue,
   images,
   setImages,
-  setImageIdCounter,
-  imageIdCounter,
   rectPosition,
   linePosition,
-  fontSize,
-  setFontSize,
-
+  shapeCounter,
+  setShapeCounter,
+  lineCounter,
+  setLineCounter,
+  textCounter,
+  setTextCounter,
+  imageCounter,
+  setImageCounter,
+  idCounter,
+  setIdCounter,
 ) => {
   const addRectangle = (type) => {
+    setIdCounter(idCounter+1);
     const newShape = {
-      id: `${type}${shapes.length + 1}`,
-      
+      id: `${type}${uuidv4()}`,
       type: "Rect",
       stroke: selectStroke,
       x: 50,
@@ -33,14 +38,14 @@ const addFunction = (
       ty: "Rect",
       // draagable: true,
       // ondragend: {handleDragEnd},
-      
     };
     setShapes([...shapes, newShape]);
   };
 
   const addCircle = (type) => {
+    setIdCounter(idCounter+1);
     const newShape = {
-      id: `${type}${shapes.length + 1}`,
+      id: `${type}${uuidv4()}`,
       type: "Circle",
       stroke: selectStroke,
       x: 50,
@@ -53,8 +58,9 @@ const addFunction = (
   };
 
   const addTriangle = (type) => {
+    setIdCounter(idCounter+1);
     const newShape = {
-      id: `${type}${shapes.length + 1}`,
+      id: `${type}${uuidv4()}`,
       type: "RegularPolygon",
       stroke: selectStroke,
       x: 50,
@@ -69,11 +75,16 @@ const addFunction = (
 
   const addLine = (type) => {
     const newLine = {
-      id: `${type}${lines.length + 1}`,
-      points: [linePosition.startX, linePosition.startY, linePosition.endX, linePosition.endY],
+      id: `${type}${uuidv4()}`,
+      points: [
+        linePosition.startX,
+        linePosition.startY,
+        linePosition.endX,
+        linePosition.endY,
+      ],
       stroke: currentColor,
       strokeWidth: 10,
-      rotation : 0,
+      rotation: 0,
       lineCap: "round",
       lineJoin: "round",
       fill: currentColor,
@@ -85,20 +96,23 @@ const addFunction = (
     setLines([...lines, newLine]);
   };
 
-  
-
   const addDashedLine = (type) => {
     const newLine = {
-      id: `${type}${lines.length + 1}`,
-      points: [linePosition.startX, linePosition.startY, linePosition.endX, linePosition.endY],
+      id: `${type}${uuidv4()}`,
+      points: [
+        linePosition.startX,
+        linePosition.startY,
+        linePosition.endX,
+        linePosition.endY,
+      ],
       stroke: currentColor,
       strokeWidth: 5,
-      rotation : 0,
+      rotation: 0,
       lineJoin: "round",
       dash: [33, 10],
       fill: currentColor,
       ty: "Dot",
-      type : "Dot",
+      type: "Dot",
       x: rectPosition.x,
       y: rectPosition.y,
     };
@@ -107,17 +121,22 @@ const addFunction = (
 
   const addDottedLine = (type) => {
     const newLine = {
-      id: `${type}${lines.length + 1}`,
-      points: [linePosition.startX, linePosition.startY, linePosition.endX, linePosition.endY],
+      id: `${type}${uuidv4()}`,
+      points: [
+        linePosition.startX,
+        linePosition.startY,
+        linePosition.endX,
+        linePosition.endY,
+      ],
       stroke: currentColor,
       strokeWidth: 10,
-      rotation : 0,
+      rotation: 0,
       lineCap: "round",
       lineJoin: "round",
       dash: [29, 20, 0.001, 20],
       fill: currentColor,
       ty: "Dot",
-      type : "Dot",
+      type: "Dot",
       x: rectPosition.x,
       y: rectPosition.y,
     };
@@ -126,44 +145,48 @@ const addFunction = (
 
   const addArrowLine = (type) => {
     const newLine = {
-      id: `${type}${lines.length + 1}`,
+      id: `${type}${uuidv4()}`,
       ty: "Arrow",
       type: "Arrow",
-      points: [linePosition.startX, linePosition.startY, linePosition.endX, linePosition.endY],
+      points: [
+        linePosition.startX,
+        linePosition.startY,
+        linePosition.endX,
+        linePosition.endY,
+      ],
       pointerLength: 20,
       // pointerLength: 20,
       stroke: currentColor,
-      rotation : 0,
+      rotation: 0,
       strokeWidth: 10,
       fill: currentColor,
       x: rectPosition.x,
       y: rectPosition.y,
     };
     setLines([...lines, newLine]);
-  }
-
+  };
 
   const addTextBox = () => {
     const newText = {
-      id: `Text-${texts.length+1}`,
+      id: `Text${uuidv4()}`,
       text: "텍스트입니다",
       x: 100,
       y: 100,
       z: 200,
       ty: "Text",
       type: "Text",
-      fontSize : 10,
+      fontSize: 10,
     };
-    console.log(newText)
+    console.log(newText);
     setTexts([...texts, newText]);
-    console.log(texts)
+    console.log(texts);
   };
 
-  
   const addImage = (src) => {
     console.log(`Adding image to layer: ${src}`); // 이미지 추가 로그
+    setIdCounter(idCounter+1);
     const newImage = {
-      id: `image_${images.length}`,
+      id: `image${uuidv4()}`,
       src,
       x: 50,
       y: 50,
@@ -183,7 +206,7 @@ const addFunction = (
     addDottedLine,
     addArrowLine,
     addImage,
-    addTextBox
+    addTextBox,
   };
 };
 

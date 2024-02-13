@@ -1,15 +1,9 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import {
-  Stage,
-  Layer,
   Rect,
   Circle,
   RegularPolygon,
   Transformer,
-  Line,
-  Text,
-  Arrow,
-  Image,
 } from "react-konva";
 
 const ShapeComponent = ({ shapeProps, isSelected, onSelect, onChange }) => {

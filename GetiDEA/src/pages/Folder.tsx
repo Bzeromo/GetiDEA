@@ -3,7 +3,7 @@
   import { useState ,useEffect, useRef} from 'react';
   import { Link, useLocation,useNavigate  } from 'react-router-dom';
   import Topbar from '../components/TopBar';
-  import axios from 'axios';
+  import api from '../api';
   import Swal from 'sweetalert2';
   import moment from 'moment';
 
@@ -15,6 +15,7 @@
     lastUpdateTime: Date;
   }
 
+  
 
   const Folder: React.FC = () => {
       
@@ -24,7 +25,7 @@
       const [folderName, setFolderName] = useState<string|null>('');
       const [projects, setProjects] = useState<project[]>([]);
       const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-
+      const [isLoading, setIsLoading] = useState(true); // 로딩 상태 추가
       const openModal = () => setIsModalOpen(true);
       const closeModal = () => setIsModalOpen(false);
 
@@ -56,7 +57,25 @@
         }
         }
     
-      
+        const DeleteProjectAlert = async(projectId:number) => {
+          const result = await Swal.fire({
+            title: '정말 삭제하시겠습니까?',
+            icon: 'warning',
+            showCancelButton: true, // cancel버튼 보이기. 기본은 원래 없음
+            confirmButtonColor: '#3085d6', // confrim 버튼 색깔 지정
+            cancelButtonColor: '#d33', // cancel 버튼 색깔 지정
+            confirmButtonText: '네', // confirm 버튼 텍스트 지정
+            cancelButtonText: '아니요', // cancel 버튼 텍스트 지정
+            reverseButtons: true, // 버튼 순서 거꾸로
+          })
+          
+            if (result.isConfirmed) { // 만약 모달창에서 confirm 버튼을 눌렀다면
+              deleteProject(projectId);
+              await Swal.fire('삭제되었습니다.','' ,'success');
+              navigate("/ ");
+              window.location.reload();
+          }
+          }
       
 
       const renew = async()=> {
@@ -94,21 +113,7 @@
         document.addEventListener('mousedown', handleClickOutside);
         return () => document.removeEventListener('mousedown', handleClickOutside);
       }, [isOpen,dropdownsOpen]); // 종속성 배열에 isOpen 추가
-      
-    //   useEffect(() => {
-    //     const fetchData = async () => {
-    //     try {
-    //       const response = await axios.get<UserResponse>(`http://192.168.31.172:8080/api/user/search?userEmail=${localStorage.getItem('userEmail')}`);
-    //       setUserName(response.data[0].userName);
-    //       setUserEmail(response.data[0].userEmail); // userEmail 필드만 추출
-    //       setprofileImage(response.data[0].profileImage); // userEmail 필드만 추출
-    //     } catch (error) {
-    //         console.error('Error fetching data: ', error);
-    //     }
-    //     };
-    //     fetchData();
-    // }, []);
-
+     
       const inputRef = useRef<HTMLInputElement>(null);
       const containerRef = useRef<HTMLDivElement>(null);
 
@@ -116,10 +121,10 @@
       const deleteFolder =async() => {
 
         try {
-          const response = await axios.delete(`http://localhost:8080/api/folder/remove?userEmail=${localStorage.getItem('userEmail')}&folderName=${folderName}`);
+          const response = await api.delete(`/api/folder/remove?folderName=${folderName}`);
           
           } catch (error) {
-              console.error('업로드 실패:', error);
+              console.error('업로드 실패:', folderName);
               alert('폴더 생성 실패.');
           }
       };
@@ -134,13 +139,14 @@
       useEffect(() => {
         const fetchProjects = async () => {
           try {
-            const response = await axios.get(`http://localhost:8080/api/project/folder?userEmail=${localStorage.getItem('userEmail')}&folderName=${folderName}`);
+            const response = await api.get(`/api/project/folder?folderName=${folderName}`);
             setProjects(response.data);
-            setIsSelected(Array(projects.length).fill(false));
-            setDropdownsOpen(Array(projects.length).fill(false));
-
+            setIsSelected(new Array(response.data.length).fill(false));
+            setDropdownsOpen(new Array(response.data.length).fill(false));
+           
           } catch (error) {
             console.error('Error fetching data: ', error);
+           
           }
         };
     
@@ -150,7 +156,11 @@
       const bookmark = (projectId : number) =>{
         const bookmarking = async () => {
           try {
-            const response = await axios.get(`http://localhost:8080/api/location/bookmark?userEmail=${localStorage.getItem('userEmail')}&projectId=${projectId}`);
+            const response = await api.put(`api/location/bookmark`,projectId,{
+              headers: {
+                'Content-Type': 'text/plain' // JSON 형식의 데이터를 전송한다는 것을 명시
+            }
+            });
            
           } catch (error) {
             console.error('Error fetching data: ', error);
@@ -160,6 +170,19 @@
         bookmarking();
       }
     
+      const deleteProject = (projectId : number) =>{
+        const deleting = async () => {
+          try {
+            const response = await api.delete(`/api/project/delete?projectId=${projectId}`);
+           
+          } catch (error) {
+            console.error('Error fetching data: ', error);
+          }
+        };
+    
+        deleting();
+      }
+
     return (
       <div className="flex  min-h-screen  flex-col bg-gray-100">
         <Topbar/>
@@ -194,12 +217,13 @@
             </Link>
 
             {/* 작업 프로젝트 */}
-            <>{
+            <>
+            {
               Array.isArray(projects) && projects.map((item,index)=>(
                 <div className='flex flex-col group  w-64 h-[300px] bg-white cursor-pointer  hover:bg-line_gray duration-700  rounded-md shadow-[rgba(0,_0,_0,_0.25)_0px_4px_15px_0px] '>
             
                   <div className='flex flex-row w-full'>
-                      <svg onClick={()=>select(index, item.projectId)} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={isSelected[2]?"w-6 h-6 ml-3 mt-3 self-start fill-main cursor-pointer text-main"
+                      <svg onClick={()=>select(index, item.projectId)} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={isSelected[index]?"w-6 h-6 ml-3 mt-3 self-start fill-main cursor-pointer text-main"
                           :"w-6 h-6 ml-3 mt-3 self-start invisible group-hover:visible hover:text-main cursor-pointer text-gray"}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z" />
                       </svg>
@@ -212,10 +236,10 @@
                       <div className="py-1">
                         <a href="/" className=" px-4 py-2 flex flex-row text-sm text-gray-700 hover:bg-gray-100 rotate-[-0.03deg]">
                           수정</a>
-                        <a href="/" className="flex flex-row px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rotate-[-0.03deg]">
-                          이동</a>
-                        <a href="/" className=" flex flex-row px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rotate-[-0.03deg]">
-                          삭제</a>
+                        {/* <a href="/" className="flex flex-row px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rotate-[-0.03deg]">
+                          이동</a> */}
+                        <div onClick={()=>DeleteProjectAlert(item.projectId)}  className=" flex flex-row cursor-pointer px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rotate-[-0.03deg]">
+                          삭제</div>
                       </div>
                     </div>
                     )}

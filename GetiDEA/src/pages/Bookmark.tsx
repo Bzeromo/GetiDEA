@@ -2,7 +2,7 @@
 import React from 'react';
 import { useState,useRef, useEffect } from 'react';
 import Topbar from '../components/TopBar';
-import axios from 'axios';
+import api from '../api';
 import moment from 'moment';
 
 interface project {
@@ -55,10 +55,10 @@ const Bookmark: React.FC = () => {
     useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get(`http://localhost:8080/api/project/bookmarked?userEmail=${localStorage.getItem('userEmail')}`);
+        const response = await api.get(`/api/project/bookmarked`);
         setProjects(response.data); 
-        setIsSelected(Array(projects.length).fill(false));
-        setDropdownsOpen(Array(projects.length).fill(false));
+        setIsSelected(new Array(response.data.length).fill(false));
+        setDropdownsOpen(new Array(response.data.length).fill(false));
       } catch (error) {
         console.error('Error fetching data: ', error);
       }
@@ -71,7 +71,11 @@ const Bookmark: React.FC = () => {
   const bookmark = (projectId : number) =>{
     const bookmarking = async () => {
       try {
-        const response = await axios.get(`http://localhost:8080/api/location/bookmark?userEmail=${localStorage.getItem('userEmail')}&projectId=${projectId}`);
+        const response = await api.put(`/api/location/bookmark`,projectId,{
+          headers: {
+            'Content-Type': 'text/plain' // JSON 형식의 데이터를 전송한다는 것을 명시
+        }
+        });
        
       } catch (error) {
         console.error('Error fetching data: ', error);
@@ -110,8 +114,8 @@ const Bookmark: React.FC = () => {
                       <div className="py-1">
                         <a href="/" className=" px-4 py-2 flex flex-row text-sm text-gray-700 hover:bg-gray-100 rotate-[-0.03deg]">
                           수정</a>
-                        <a href="/" className="flex flex-row px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rotate-[-0.03deg]">
-                          이동</a>
+                        {/* <a href="/" className="flex flex-row px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rotate-[-0.03deg]">
+                          이동</a> */}
                         <div  className=" flex flex-row cursor-pointer px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rotate-[-0.03deg]">
                           삭제</div>
                       </div>

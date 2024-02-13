@@ -1,6 +1,6 @@
 import React from 'react';
 import { useState,useEffect,useRef,ChangeEvent, } from 'react';
-import axios from 'axios';
+import api from '../api';
 import Swal from 'sweetalert2';
 
 
@@ -45,7 +45,7 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, closeModal, profile
     useEffect(() => {
         const fetchData = async () => {
         try {
-          const response = await axios.get<UserResponse>(`http://localhost:8080/api/user/search?userEmail=${localStorage.getItem('userEmail')}`);
+          const response = await api.get<UserResponse>(`/api/user/search?userEmail=${localStorage.getItem('userEmail')}`);
           setUserName(response.data[0].userName);
           setUserEmail(response.data[0].userEmail); // userEmail 필드만 추출
           setProfile(response.data[0].profileImage); // userEmail 필드만 추출
@@ -60,7 +60,7 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, closeModal, profile
     const updateUserProfile = async (userInfo: ProfileJson) => {
         try {
             console.log(userInfo);
-            const response = await axios.post('http://localhost:8080/api/image/userEmail/profileImage?userEmail=yoanwoo%40naver.com', userInfo);
+            const response = await api.post('/api/image/userEmail/profileImage', userInfo,);
             console.log('Update success:', response.data);
         } catch (error) {
             console.error('Update failed:', error);
@@ -74,9 +74,12 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, closeModal, profile
 
     const nameChangeSave = async () =>{ 
       try {
-        const response = await axios.patch(`http://localhost:8080/api/user/rename?userEmail=${userEmail}&newName=${userName}`, {
-         
-            });
+   
+        const response = await api.patch(`/api/user/rename`, userName, {
+          headers: {
+              'Content-Type': 'text/plain' // JSON 형식의 데이터를 전송한다는 것을 명시
+          }
+        });
             console.log('서버 응답:', response.data);
             await showAlert();  
             localStorage.setItem('userName',userName);
@@ -110,7 +113,7 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, closeModal, profile
           formData.append('Image', file); // 프로필 이미지 파일
           formData.append('userEmail', localStorage.getItem('userEmail') ?? "");
           try {
-            await axios.post('http://localhost:8080/api/image/profile',formData);
+            await api.post('/api/image/profile',formData);
             console.log("전송 완료")
             } catch (error) {
                 alert('파일 업로드 실패.');
