@@ -70,7 +70,7 @@ const Projects: React.FC = () => {
         setProjects(response.data);
         setIsSelected(new Array(response.data.length).fill(false));
         setDropdownsOpen(new Array(response.data.length).fill(false));
-        
+        console.log(response.data)
       } catch (error) {
         console.error('Error fetching data: ', error);
       }
@@ -111,7 +111,7 @@ const Projects: React.FC = () => {
       reverseButtons: true, // 버튼 순서 거꾸로
     })
       if (result.isConfirmed) { // 만약 모달창에서 confirm 버튼을 눌렀다면
-        await deleteProject(projectId);
+        deleteProject(projectId);
         await Swal.fire('삭제되었습니다.','' ,'success');
         window.location.reload();
     }

@@ -24,16 +24,10 @@
       const [dropdownsOpen, setDropdownsOpen] = useState<boolean[]>([]);
       const [folderName, setFolderName] = useState<string|null>('');
       const [projects, setProjects] = useState<project[]>([]);
-      const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-      const [isLoading, setIsLoading] = useState(true); // 로딩 상태 추가
-      const openModal = () => setIsModalOpen(true);
-      const closeModal = () => setIsModalOpen(false);
+      const [isLoading, setIsLoading] = useState(true);
 
       const location = useLocation();
 
-      // setName(location.state.folderName);
-
-    
       
       const navigate = useNavigate();
 
@@ -72,15 +66,10 @@
             if (result.isConfirmed) { // 만약 모달창에서 confirm 버튼을 눌렀다면
               deleteProject(projectId);
               await Swal.fire('삭제되었습니다.','' ,'success');
-              navigate("/ ");
               window.location.reload();
           }
-          }
-      
-
-      const renew = async()=> {
-        await window.location.reload();
-        };
+        }
+  
 
       // 북마크 관련 함수
       const select = (idx: number, projectId:number): void => {
@@ -114,15 +103,15 @@
         return () => document.removeEventListener('mousedown', handleClickOutside);
       }, [isOpen,dropdownsOpen]); // 종속성 배열에 isOpen 추가
      
-      const inputRef = useRef<HTMLInputElement>(null);
       const containerRef = useRef<HTMLDivElement>(null);
 
       //폴더 삭제 함수
       const deleteFolder =async() => {
 
         try {
-          const response = await api.delete(`/api/folder/remove?folderName=${folderName}`);
-          
+          const response = await api.delete(`/api/folder/remove/${folderName}`);
+          console.log(response);
+
           } catch (error) {
               console.error('업로드 실패:', folderName);
               alert('폴더 생성 실패.');
@@ -138,15 +127,19 @@
       // 프로젝트 불러오기
       useEffect(() => {
         const fetchProjects = async () => {
+          setIsLoading(true);
           try {
             const response = await api.get(`/api/project/folder?folderName=${folderName}`);
-            setProjects(response.data);
+            await setProjects(response.data);
+            console.log(response.data);
             setIsSelected(new Array(response.data.length).fill(false));
             setDropdownsOpen(new Array(response.data.length).fill(false));
            
           } catch (error) {
             console.error('Error fetching data: ', error);
            
+          }finally {
+              setIsLoading(false); // 데이터 로딩이 완료되거나 실패했을 때 로딩 상태를 false로 설정
           }
         };
     
@@ -161,7 +154,8 @@
                 'Content-Type': 'text/plain' // JSON 형식의 데이터를 전송한다는 것을 명시
             }
             });
-           
+           console.log(response);
+
           } catch (error) {
             console.error('Error fetching data: ', error);
           }
@@ -173,8 +167,9 @@
       const deleteProject = (projectId : number) =>{
         const deleting = async () => {
           try {
-            const response = await api.delete(`/api/project/delete?projectId=${projectId}`);
-           
+            const response = await api.delete(`/api/project/delete/${projectId}`);
+            console.log(response);
+
           } catch (error) {
             console.error('Error fetching data: ', error);
           }
@@ -183,6 +178,9 @@
         deleting();
       }
 
+      if (isLoading) {
+        return <div>Loading...</div>; // 로딩 중인 경우 로딩 인디케이터를 표시
+      }
     return (
       <div className="flex  min-h-screen  flex-col bg-gray-100">
         <Topbar/>

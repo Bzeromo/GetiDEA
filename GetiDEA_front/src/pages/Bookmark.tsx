@@ -4,6 +4,7 @@ import { useState,useRef, useEffect } from 'react';
 import Topbar from '../components/TopBar';
 import api from '../api';
 import moment from 'moment';
+import Swal from 'sweetalert2';
 
 interface project {
   projectId: number;
@@ -57,7 +58,7 @@ const Bookmark: React.FC = () => {
       try {
         const response = await api.get(`/api/project/bookmarked`);
         setProjects(response.data); 
-        setIsSelected(new Array(response.data.length).fill(false));
+        setIsSelected(new Array(response.data.length).fill(true));
         setDropdownsOpen(new Array(response.data.length).fill(false));
       } catch (error) {
         console.error('Error fetching data: ', error);
@@ -85,6 +86,38 @@ const Bookmark: React.FC = () => {
     bookmarking();
   }
 
+  // 프로젝트 삭제
+  const DeleteProjectAlert = async(projectId:number) => {
+    const result = await Swal.fire({
+      title: '정말 삭제하시겠습니까?',
+      icon: 'warning',
+      showCancelButton: true, // cancel버튼 보이기. 기본은 원래 없음
+      confirmButtonColor: '#3085d6', // confrim 버튼 색깔 지정
+      cancelButtonColor: '#d33', // cancel 버튼 색깔 지정
+      confirmButtonText: '네', // confirm 버튼 텍스트 지정
+      cancelButtonText: '아니요', // cancel 버튼 텍스트 지정
+      reverseButtons: true, // 버튼 순서 거꾸로
+    })
+    
+      if (result.isConfirmed) { // 만약 모달창에서 confirm 버튼을 눌렀다면
+        deleteProject(projectId);
+        await Swal.fire('삭제되었습니다.','' ,'success');
+        window.location.reload();
+    }
+  }
+
+  const deleteProject = (projectId : number) =>{
+    const deleting = async () => {
+      try {
+        const response = await api.delete(`/api/project/delete?projectId=${projectId}`);
+       
+      } catch (error) {
+        console.error('Error fetching data: ', error);
+      }
+    };
+
+    deleting();
+  }
 
   return (
     <div className="flex  min-h-screen  flex-col bg-gray-100">
@@ -101,7 +134,7 @@ const Bookmark: React.FC = () => {
                 <div className='flex flex-col group  w-64 h-[300px] bg-white cursor-pointer  hover:bg-line_gray duration-700  rounded-md shadow-[rgba(0,_0,_0,_0.25)_0px_4px_15px_0px] '>
             
                   <div className='flex flex-row w-full'>
-                      <svg onClick={()=>select(index,item.projectId)} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={isSelected[2]?"w-6 h-6 ml-3 mt-3 self-start fill-main cursor-pointer text-main"
+                      <svg onClick={()=>select(index,item.projectId)} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={isSelected[index]?"w-6 h-6 ml-3 mt-3 self-start fill-main cursor-pointer text-main"
                           :"w-6 h-6 ml-3 mt-3 self-start invisible group-hover:visible hover:text-main cursor-pointer text-gray"}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z" />
                       </svg>
@@ -116,7 +149,7 @@ const Bookmark: React.FC = () => {
                           수정</a>
                         {/* <a href="/" className="flex flex-row px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rotate-[-0.03deg]">
                           이동</a> */}
-                        <div  className=" flex flex-row cursor-pointer px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rotate-[-0.03deg]">
+                        <div onClick={()=>DeleteProjectAlert(item.projectId)} className=" flex flex-row cursor-pointer px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rotate-[-0.03deg]">
                           삭제</div>
                       </div>
                     </div>

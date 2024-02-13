@@ -5,7 +5,7 @@ import { useNavigate,useLocation } from 'react-router-dom';
 import api from '../api';
 
 
-const template: readonly string[] = ["","whiteboard", "bubble", "sixhat", "7check"];
+const template: readonly string[] = ["","whiteboard", "bubbleChat", "sixhat", "7check"];
 
 const ProjectNameInput: React.FC = () => {
     

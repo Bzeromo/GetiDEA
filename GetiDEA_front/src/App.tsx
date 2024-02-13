@@ -47,7 +47,8 @@ const App: React.FC = () => {
 
           <Route path="/templateSelect" element={<ProtectedRoute><TemplateSelect /></ProtectedRoute>} />
           <Route path="/projectnameinput" element={<ProtectedRoute><ProjectNameInput /></ProtectedRoute>} />
-          <Route path="/board" element={<ProtectedRoute><Board /></ProtectedRoute>} />
+          {/* <Route path="/board" element={<ProtectedRoute><Board /></ProtectedRoute>} /> */}
+          <Route path="/board" element={<Board />} />
         
          
       </Routes>

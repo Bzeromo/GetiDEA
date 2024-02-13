@@ -118,7 +118,7 @@ const Recent: React.FC = () => {
     const deleteProject = (projectId : number) =>{
       const deleting = async () => {
         try {
-          const response = await api.delete(`/api/project/delete?projectId=${projectId}`);
+          const response = await api.delete(`/api/project/delete/${projectId}`);
          
         } catch (error) {
           console.error('Error fetching data: ', error);
@@ -177,7 +177,7 @@ const Recent: React.FC = () => {
                     )}
                   </div>
 
-                  <img src={item.thumbnail} alt="" className='w-60 h-44 self-center object-scale-down roup-hover:text-gray' />
+                  <img src={item.thumbnail} alt="" className='w-60 h-44 self-center object-scale-down ' />
                   <span className='self-center mt-5 font-Nanum text-xl font-semibold rotate-[-0.03deg]'>{item.projectName}</span>
                   <span className='self-center mt-1 font-Nanum text-sm font-regular text-gray invisible group-hover:visible rotate-[-0.03deg]'>{moment(item.lastUpdateTime).format('YYYY.MM.DD HH:mm 수정')}</span>
                 </div>

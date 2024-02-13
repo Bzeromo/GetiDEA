@@ -65,7 +65,7 @@ const MyDrawing = () => {
   //채팅방
   const [chatClick, setChatClick] = useState(false);
   const [chatLog, setChatLog] = useState([]);
-  const [chatInput, setChatInput] = useState({ nickname: "", message: "" });
+  const [chatInput, setChatInput] = useState({ nickname: localStorage.getItem('userName'), message: "" });
 
   //드래그 끝남 여부 확인(비동기 처리 필요)
   const [dragEnded, setDragEnded] = useState(false);
@@ -397,7 +397,7 @@ const MyDrawing = () => {
     if (chatInput.nickname.trim() !== "" && chatInput.message.trim() !== "") {
       const newChat = { ...chatInput, id: new Date().getTime() };
       setChatLog((prevChatLog) => [...prevChatLog, newChat]);
-      setChatInput({ nickname: "", message: "" }); // 입력 필드 초기화
+      setChatInput({ nickname: "ㅇㄹ", message: "" }); // 입력 필드 초기화
     }
 
     // 서버에 데이터 전송
@@ -931,6 +931,15 @@ const MyDrawing = () => {
     setEraserToggle(!eraserToggle);
   };
 
+  const chatLogEndRef = useRef(null);
+
+
+  // 채팅 스크롤 관련 
+  useEffect(() => {
+    // chatLogEndRef가 가리키는 요소로 스크롤 이동
+    chatLogEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [chatLog]);
+
   return (
     <div className="absolute  inset-0 h-full w-full bg-[#EFEFEF] bg-opacity-50 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px]">
        
@@ -1189,43 +1198,75 @@ const MyDrawing = () => {
         </svg>
       </div> */}
 
+
       {/* 채팅창 */}
-      <div className={chatClick? "absolute top-20 right-10 w-80 p-7 z-20 justify-center container w-1/4 ml-auto px-4": "invisible absolute top-20 right-10 w-80 p-7 z-20 justify-center container w-1/4 ml-auto px-4 "}>
-        <div className="bg-white p-6 rounded-lg shadow-lg">
+      <div className={chatClick? "absolute top-20 right-10 w-[400px] p-3 z-20 justify-center container  ml-auto px-4": "invisible absolute top-20 right-10 w-80 p-7 z-20 justify-center container w-1/4 ml-auto px-4 "}>
+        <div className="bg-white  rounded-lg shadow-lg">
           <div className="mb-4">
-            <input
-              type="text"
-              name="nickname"
-              value={chatInput.nickname}
-              onChange={handleInputChange}
-              placeholder="닉네임"
-              className="border p-2 rounded mr-2"
-            />
-            <input
-              type="text"
-              name="message"
-              value={chatInput.message}
-              onChange={handleInputChange}
-              placeholder="메세지"
-              className="border p-2 rounded flex-1"
-            />
-          </div>
-          <button
-            onClick={sendInfoToServer}
-            className="bg-blue-500 hover:bg-blue-700 text-black font-bold py-2 px-4 rounded ml-2"
-          >
-            전송
-          </button>
-          <div
-            id="chat-log"
-            className="h-64 overflow-auto p-4 bg-gray-200 rounded"
-          >
-            {chatLog.map((chat) => (
-              <div key={chat.id}>
-                {chat.nickname}: {chat.message}
-              </div>
-            ))}
-          </div>
+           
+            <div id="chat-log" className="h-80 overflow-auto p-4 bg-gray-200 rounded hide-scrollbar">
+              {chatLog.map((chat) => (
+                chat.nickname != localStorage.getItem('userName') ? (
+                  // admin인 경우의 스타일
+                  
+                  <div key={chat.id} className="flex flex-row-reverse chat-message admin-message mr-2" style={{
+                    minWidth: '30px',
+                    
+                  
+                    margin: '5px 0', // 상하 마진 추가로 이미지와 메시지 사이 간격 조정
+                    wordWrap: 'break-word',
+                  }}>
+                      <img className="rounded-full w-12 h-12 border-[1px] border-light_gray" src={localStorage.getItem("profileImage")} alt="" style={{
+                          marginRight: '10px', // 이미지와 텍스트 사이 간격
+                          
+                        }} />
+                        <div className="bg-[#5aa5ff] drop-shadow-md text-sm max-w-40 min-w-12 font-Nanum px-3 rounded-lg mr-3 text-center flex justify-center items-center text-white">
+                        {chat.message}
+                        </div>
+                  </div>
+                ) : (
+                  // admin이 아닌 경우의 기본 스타일
+                  <div key={chat.id} className="flex flex-row chat-message admin-message mr-2" style={{
+                    minWidth: '30px',
+                    
+                  
+                    margin: '5px 0', // 상하 마진 추가로 이미지와 메시지 사이 간격 조정
+                    wordWrap: 'break-word',
+                  }}>
+                      <img className="rounded-full w-12 h-12 border-[1px] border-light_gray" src={localStorage.getItem("profileImage")} alt="" style={{
+                          marginRight: '10px', // 이미지와 텍스트 사이 간격
+                        }} />
+                        <div className="bg-white  drop-shadow-md font-Nanum text-sm px-3 max-w-40 rounded-lg mr-3 text-center flex justify-center items-center">
+                        {chat.message}
+                        </div>
+                  </div>
+                )
+              ))}
+               <div ref={chatLogEndRef} />
+            </div>
+             <div>
+              <hr className="bg-gray opacity-10 mt-1"></hr>
+             </div>
+            <div className="flex flex-row justify-center">
+              <input
+                type="text"
+                name="message"
+                value={chatInput.message}
+                onChange={handleInputChange}
+                placeholder="메시지를 입력하세요"
+                className=" p-2 rounded flex w-full h-12 text-sm focus:outline-none"
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault(); // 폼 제출을 방지
+                    sendInfoToServer();
+                  }
+                }}
+              />
+              
+            </div>
+           
+            </div>
+           
         </div>
       </div>
 
@@ -1304,11 +1345,11 @@ const MyDrawing = () => {
       )}
 
       {/* 그리는 구역 */}
-      <div className="ml-36 mt-24 h-full w-full">
+      <div className="ml-36 mt-24 h-96 w-96">
         <Stage
           ref={stageRef}
-          width={window.innerWidth}
-          height={window.innerHeight}
+          width={window.innerWidth*0.85}
+          height={window.innerHeight*0.85}
           draggable={!draggable}
           onWheel={zoomOnWheel}
           onMouseDown={handleMouseDown}
