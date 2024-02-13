@@ -41,6 +41,11 @@ public class FolderController {
         if(userEmail == null){
             return ResponseEntity.badRequest().build();
         }
+
+        if(folderService.checkDuplicateFolder(userEmail, folderName)) {
+            return ResponseEntity.badRequest().build();
+        } // 중복 폴더 체크
+
         FolderEntity result = folderService.createFolder(folderName, userEmail);
         if (result == null)
             return ResponseEntity.badRequest().build();
