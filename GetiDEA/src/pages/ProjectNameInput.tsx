@@ -2,7 +2,7 @@
 import React, { useEffect } from 'react';
 import { useState,ChangeEvent } from 'react';
 import { useNavigate,useLocation } from 'react-router-dom';
-import axios from 'axios';
+import api from '../api';
 
 
 const template: readonly string[] = ["","whiteboard", "bubble", "sixhat", "7check"];
@@ -38,7 +38,7 @@ const ProjectNameInput: React.FC = () => {
     const makeProject = async() =>{
 
         try {
-            const response = await axios.post('http://localhost:8080/api/project/make',
+            const response = await api.post('/api/project/make',
             {   
                 "projectName" : projectName,
                 "templateId" : template[index],
@@ -46,8 +46,7 @@ const ProjectNameInput: React.FC = () => {
                 "folderName" : folderName   
             });
 
-        
-            console.log(`프로젝트 생성 성공! ${template[index]} 의 템플릿을 가진 ${projectName}`);
+            console.log(response);
             navigate("/board");
             } catch (error) {
                 console.error('업로드 실패:', error);

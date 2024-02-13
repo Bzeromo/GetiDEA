@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useEffect } from 'react';
-import axios from 'axios';
+import api from '../api';
 
 interface project {
   projectId: number;
@@ -18,7 +18,7 @@ const SubContent: React.FC = () => {
     useEffect(() => {
     const fetchProjects = async () => {
       try {
-        const response = await axios.get(`http://localhost:8080/api/project/recent2?userEmail=${localStorage.getItem('userEmail')}`);
+        const response = await api.get(`/api/project/recent?limit=2`);
         setProjects(response.data); // userName 필드만 추출
         console.log("dfdf")
         } catch (error) {
@@ -38,7 +38,7 @@ const SubContent: React.FC = () => {
         <div className='flex flex-row mt-5'>
 
         {/* 새 프로젝트 생성 */}
-          <Link to="/templateSelect" state={{folderName : "폴더1"}} className='hover:scale-105 duration-500 w-56 h-56 mr-8 bg-[#B8D8DC]  opacity-60 drop-shadow-lg flex justify-center flex-col items-center' >
+          <Link to="/templateSelect" state={{folderName : ""}} className='hover:scale-105 duration-500 w-56 h-56 mr-8 bg-[#B8D8DC]  opacity-60 drop-shadow-lg flex justify-center flex-col items-center' >
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-10 h-10 absolute top-20">
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
           </svg>

@@ -1,7 +1,7 @@
 import React from 'react';
 import { useState, useRef, useEffect} from 'react';
 import ProfileModal from './ProfileModal';
-import axios from 'axios';
+import api from '../api';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../AuthContext';
 
@@ -49,8 +49,7 @@ const Topbar: React.FC = () => {
 
     const fetchData = async () => {
       try {
-        
-        const response = await axios.get<UserResponse>(`http://localhost:8080/api/user/search?userEmail=${localStorage.getItem('userEmail')}`);
+        const response = await api.get<UserResponse>(`/api/user/search?userEmail=${localStorage.getItem('userEmail')}`);
         const userName = response.data[0].userName;
         const userEmail = response.data[0].userEmail;
         const profileImage = response.data[0].profileImage;

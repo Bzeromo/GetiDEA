@@ -1,7 +1,13 @@
 import React from 'react';
 import { useState,useEffect,useRef,ChangeEvent, } from 'react';
-import axios from 'axios';
+import api from '../api';
 import Swal from 'sweetalert2';
+
+interface Folder {
+  folderId: number;
+  userEmail: string;
+  folderName: string;
+}
 
 interface ProfileModalProps {
   isOpen: boolean;
@@ -9,17 +15,19 @@ interface ProfileModalProps {
   index : number,
   folders: string[];
   setFolders : React.Dispatch<React.SetStateAction<string[]>>;
+  folderId : number;
 }
 
 
-const FolderNameChange: React.FC<ProfileModalProps> = ({ isOpen, closeModal ,index,folders,setFolders }) => {
+const FolderNameChange: React.FC<ProfileModalProps> = ({ isOpen, closeModal ,folderId, index,folders,setFolders }) => {
 
     const [folderName, setFolderName] = useState<string>('');
     
     useEffect(() => {
-       setFolderName(folders[index]);
+      if (folders[index]) {
+        setFolderName(folders[index]);
+      }
        console.log(folders);
-       console.log(folderName);
       },[isOpen]); 
 
     const showAlert = async() => {
@@ -41,10 +49,16 @@ const FolderNameChange: React.FC<ProfileModalProps> = ({ isOpen, closeModal ,ind
         } 
     };
 
+    // 이름 변경 api 요청
     const rename = async() => {
       
       try {
-        const response = await axios.patch(`http://localhost:8080/api/folder/rename?userEmail=${localStorage.getItem('userEmail')}&oldFolderName=${folders[index]}&newFolderName=${folderName}`);
+        const data = {
+          "beforeFolderName" : folders[index],
+          "newFolderName" : folderName
+        }
+        console.log(folderId, folderName);
+        const response = await api.patch(`/api/folder/rename`,data);
         
         console.log('서버 응답:', response.data);
            showAlert();
@@ -54,7 +68,7 @@ const FolderNameChange: React.FC<ProfileModalProps> = ({ isOpen, closeModal ,ind
         }
         const updatedFolders = [
             ...folders.slice(0, index), // 첫 번째 부분
-            folderName,                 // 삽입할 요소
+             folderName ,                 // 삽입할 요소
             ...folders.slice(index+1)     // 두 번째 부분
           ];
         
