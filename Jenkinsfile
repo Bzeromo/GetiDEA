@@ -112,7 +112,7 @@ pipeline {
                 dir('/front') {
                     // 의존성 설치
 //                     sh 'yarn install'
-//                     sh 'yarn build'
+//                     sh 'yarn start'
                        sh 'whoami'
                 }
             }
