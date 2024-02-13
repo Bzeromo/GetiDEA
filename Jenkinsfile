@@ -86,20 +86,21 @@ pipeline {
             }
         }
 //
-//         stage('Deploy Back Server') {
-//             steps {
-//                 echo 'Deploying project...'
-//                 dir('back/giBack/build/') {
+        stage('Deploy Back Server') {
+            steps {
+                echo 'Deploying project...'
+                dir('back/giBack/build/') {
 //                     // 실행 권한 부여
 //                     sh 'chmod +x libs'
 //                     // 빌드 실행
 //                     sh 'java -jar libs/getidea-0.1.0.jar'
-//                 }
-//             }
-//         }
+                       sh 'whoami'
+                }
+            }
+        }
 
-//         stage('Build Frontend') {
-//             steps {
+        stage('Build Frontend') {
+            steps {
 //                 script {
 //                     sh '''
 //                     export NVM_DIR="$HOME/.nvm"
@@ -107,14 +108,15 @@ pipeline {
 //                     nvm use 21.6.1
 //                     '''
 //                 }
-//                 echo 'Building frontend...'
-//                 dir('/front') {
-//                     // 의존성 설치
+                echo 'Building frontend...'
+                dir('/front') {
+                    // 의존성 설치
 //                     sh 'yarn install'
 //                     sh 'yarn build'
-//                 }
-//             }
-//         }
+                       sh 'whoami'
+                }
+            }
+        }
 
 //         stage('Deploy Frontend') {
 //             steps {
