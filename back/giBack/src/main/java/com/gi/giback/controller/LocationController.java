@@ -79,13 +79,14 @@ public class LocationController {
     @PutMapping("/bookmark") // 북마크 해제, 등록
     @Operation(summary = "북마크 - 테스트 완료", description = "북마크 해제, 등록 기능 구현")
     public ResponseEntity<?> toggleBookmark(
-            @RequestBody @Parameter(description = "북마크 기능 사용할 프로젝트id") Long projectId,
+            @RequestBody @Parameter(description = "북마크 기능 사용할 프로젝트id") String projectId,
         @AuthenticationPrincipal String userEmail) {
 
+        Long pid = Long.parseLong(projectId);
         if(userEmail == null || userEmail.equals("anonymousUser")){
             return ResponseEntity.badRequest().body(new ErrorResponse("사용자 검증 필요"));
         }
-        LocationEntity updatedEntity = locationService.toggleBookmark(projectId, userEmail);
+        LocationEntity updatedEntity = locationService.toggleBookmark(pid, userEmail);
         return ResponseEntity.ok(updatedEntity);
     }
 }
