@@ -4,7 +4,6 @@ import com.gi.giback.dto.FolderNameDTO;
 import com.gi.giback.mysql.entity.FolderEntity;
 import com.gi.giback.mysql.entity.LocationEntity;
 import com.gi.giback.mysql.repository.FolderRepository;
-import com.gi.giback.mysql.repository.LocationRepository;
 import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;

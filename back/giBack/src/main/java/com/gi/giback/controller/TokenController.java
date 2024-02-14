@@ -5,9 +5,6 @@ import com.gi.giback.mysql.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -44,9 +41,16 @@ public class TokenController {
                 // 새 액세스 토큰 생성
                 String newAccessToken = jwtService.createAccessToken(userEmail, userService.getUserNameByEmail(userEmail), userService.getProviderByEmail(userEmail));
                 // 새로 발급한 액세스 토큰을 바디로 반환
-                Map<String, String> tokenResponse = new HashMap<>();
-                tokenResponse.put("access_token", newAccessToken);
-                return ResponseEntity.ok(tokenResponse);
+                HttpHeaders responseHeaders = new HttpHeaders();
+                int maxAge = 60 * 60; // 1시간
+
+                String cookieValue = String.format("access_token=%s; Max-Age=%d;", newAccessToken, maxAge);
+
+                responseHeaders.add("Set-Cookie", cookieValue);
+
+                return ResponseEntity.ok()
+                    .headers(responseHeaders)
+                    .body("Access token refreshed successfully");
             }
         }
         SecurityContextHolder.clearContext(); // 서버측 검증 정보 무효화

@@ -1,7 +1,6 @@
 package com.gi.giback.jwt.filter;
 
 import com.gi.giback.jwt.service.JwtService;
-import com.gi.giback.mysql.entity.UserEntity;
 import com.gi.giback.mysql.service.UserService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
