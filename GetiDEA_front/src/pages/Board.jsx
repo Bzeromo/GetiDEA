@@ -1508,7 +1508,7 @@ const WhiteBoard = () => {
             />
           </div>
           <div className="mt-6 font-Nanum text-sm font-regular">
-            테두리 크기 /
+            테두리 크기 : 
             <input
               type="number"
               value={strokeWidthSize}
