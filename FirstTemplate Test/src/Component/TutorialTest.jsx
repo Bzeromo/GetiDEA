@@ -920,10 +920,16 @@ const MyDrawing = () => {
 
 
 
+  // 6hats 사용자 아이디어 입력창 (Write Your iDEA)
+  const [inputText, setInputText] = useState('');
 
+  // 사용자 아이디어 입력창 변경 함수
+  const handleInputTextChange = (event) => {
+    setInputText(event.target.value);
+  };
 
-
-
+  // 사용자 아이디어 입력창 최소 크기 설정: 1로 설정하여, 입력값이 없을 때도 input 보이게 함
+  const inputTextLength = inputText.length > 0 ? inputText.length * 2 : (inputText.length + 1 ) * 2;
 
 
   // 튜토리얼 refs
@@ -940,7 +946,7 @@ const MyDrawing = () => {
 
   // 튜토리얼 Number & Button
   const [activatedNumber, setActivateNumber] = useState(0);
-  const FirstButton = <button className="text-blue" onClick={() => setActivateNumber(activatedNumber - 1)}> 이전 </button>;
+  const FirstButton = <button className="text-blue" onClick={() => setActivateNumber(activatedNumber - 1)}> 닫기 </button>;
   const PrevButton = <button className="text-blue" onClick={() => setActivateNumber(activatedNumber - 1)}> 이전 </button>;
   const NextButton = <button className="text-blue" onClick={() => setActivateNumber(activatedNumber + 1)}> 다음 </button>;
   const FinButton = <button className="text-blue" onClick={() => setActivateNumber(activatedNumber + 1)}> 완료 </button>;
@@ -1594,6 +1600,17 @@ const MyDrawing = () => {
 
       {/* 그리는 구역 */}
       <div className="ml-36 mt-24 h-full w-full" >
+
+        <div className="flex justify-center items-center ml-[-170px]">
+          <input
+            className="h-[100px] min-w-[100px] text-center text-3xl font-Nanum"
+            type="text"
+            value={inputText}
+            onChange={handleInputTextChange}
+            size={inputTextLength}
+          />
+        </div>
+
       
         <Stage
           // ref={stageRef}
@@ -1611,6 +1628,7 @@ const MyDrawing = () => {
 
 
           {/* Template3 - 7Check에 대한 템플릿 정보 출력 */}
+
           
           <ImageComponent
             // ref = {templateImage2.ref}
