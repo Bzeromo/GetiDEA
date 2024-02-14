@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
-import { useNavigate,useLocation } from 'react-router-dom';
+import { useNavigate ,useLocation} from 'react-router-dom';
 import { Stage, Layer, Transformer, Line, Image } from "react-konva";
 import axios from "axios";
 import useImage from "use-image";
@@ -23,7 +23,7 @@ import ImageSelector from "../components/funciton/ImageSelector";
 import undoData from "../components/axios/undoData";
 import getData from "../components/axios/getData";
 
-const WhiteBoard = () => {
+const BoardTemplate2 = () => {
 
   const navigate = useNavigate();
 
@@ -48,8 +48,8 @@ const WhiteBoard = () => {
   // const [selectedImageUrls, setSelectedImageUrls] = useState([]);
 
   //프로젝트 이름
-  const [projectName, setProjectName] = useState("초기 프로젝트");
   const location = useLocation();
+  const [projectName, setProjectName] = useState("초기 프로젝트");
 
   //스테이지 초기화
   const initialScaleValue = { x: 1, y: 1 };
@@ -212,19 +212,19 @@ const WhiteBoard = () => {
     if (shapeRef.current) {
       shapeRef.current.getLayer().batchDraw();
     }
-  }, [shapes]); // shapes 상태가 변경될 때마다 실행
+  }, [shapes]); // texts 상태가 변경될 때마다 실행
 
   useEffect(() => {
     if (lineRef.current) {
       lineRef.current.getLayer().batchDraw();
     }
-  }, [lines]); // lines 상태가 변경될 때마다 실행
+  }, [lines]); // texts 상태가 변경될 때마다 실행
 
   useEffect(() => {
     if (ImageRef.current) {
       ImageRef.current.getLayer().batchDraw();
     }
-  }, [images]); // images 상태가 변경될 때마다 실행
+  }, [images]);
 
   useEffect(() => {
     if (textRef.current) {
@@ -937,7 +937,6 @@ const WhiteBoard = () => {
 
   const chatLogEndRef = useRef(null);
 
-  
 
   // 채팅 스크롤 관련 
   useEffect(() => {
@@ -969,7 +968,7 @@ const WhiteBoard = () => {
       </div>
 
       {/* 그리기 툴 */}
-      <div className="absolute top-48 left-6  bg-white rounded-md w-[50px] h-[285px] flex items-center flex-col shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]">
+      <div className="absolute top-48 left-6  bg-white rounded-md w-[50px] h-[240px] flex items-center flex-col shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]">
         <img
           src="/cursor.svg"
           alt=""
@@ -1115,10 +1114,6 @@ const WhiteBoard = () => {
           onClick={() => addTextBox()}
         />
 
-        {/* 이미지 넣기 툴 */}
-        <svg onClick={imgToggle} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="mt-6 w-6 h-6 cursor-pointer">
-          <path strokeLinecap="round" strokeLinejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
-        </svg>
 
         {/* 기타 툴 */}
         {/* <img src="/dots.svg" alt="" className="w-4 h-4 mt-7" /> */}
@@ -1126,7 +1121,7 @@ const WhiteBoard = () => {
 
       {/* 삭제 버튼 */}
       <div
-        className="cursor-pointer absolute top-[510px] left-6  bg-white rounded-md w-[50px] h-[50px] flex justify-center items-center shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]"
+        className="cursor-pointer absolute top-[460px] left-6  bg-white rounded-md w-[50px] h-[50px] flex justify-center items-center shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]"
         onClick={() => deleteAll()}
       >
         <svg
@@ -1146,7 +1141,20 @@ const WhiteBoard = () => {
       </div>
 
       {/* 튜토리얼 버튼 */}
-    
+      <div className='cursor-pointer absolute top-[530px]  hover:text-blue left-6  bg-white rounded-md w-[50px] h-[50px] flex justify-center items-center shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]' >
+        <svg
+          xmlns="http://www.w3.org/2000/svg" 
+          fill="none" 
+          viewBox="0 0 24 24" 
+          strokeWidth={1.5} 
+          stroke="currentColor" 
+          className="w-7 h-7">
+        <path 
+          strokeLinecap="round" 
+          strokeLinejoin="round" 
+          d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 5.25h.008v.008H12v-.008Z" />
+        </svg>
+      </div>
 
       {/* 실행취소 버튼 */}
       {/* <div
@@ -1477,4 +1485,4 @@ const WhiteBoard = () => {
   );
 };
 
-export default WhiteBoard;
+export default BoardTemplate2;

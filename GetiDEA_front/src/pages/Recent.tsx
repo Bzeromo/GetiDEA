@@ -1,7 +1,7 @@
 // App.tsx
 import React from 'react';
 import { useState,useRef, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link,useNavigate } from 'react-router-dom';
 import Topbar from '../components/TopBar';
 import api from '../api';
 import moment from 'moment';
@@ -17,6 +17,8 @@ interface project {
 
 
 const Recent: React.FC = () => {
+
+  const navigate= useNavigate();
 
   const [isSelected, setIsSelected] = useState<boolean[]>([]);
   const [isOpen, setIsOpen] = useState(false);
@@ -82,10 +84,8 @@ const Recent: React.FC = () => {
     const bookmarking = async () => {
       try {
         const response = await api.put(`/api/location/bookmark`,
-        projectId ,{
-          headers: {
-            'Content-Type': 'text/plain' // JSON 형식의 데이터를 전송한다는 것을 명시
-        }
+        {
+          "projectId" : projectId
         });
         console.log(response)
       } catch (error) {
@@ -128,6 +128,23 @@ const Recent: React.FC = () => {
       deleting();
     }
 
+      // 프로젝트 열기
+      const openProject = async (templateId:string,projectId:number) => {
+        if(templateId==="whiteboard"){
+          navigate("/board", {state : {projectId : projectId}})
+        }
+        else if(templateId==="bubbleChat"){
+          navigate("/board/template1", {state : {projectId : projectId}})
+        }
+        else if(templateId==="sixhat"){
+          navigate("/board/template2", {state : {projectId : projectId}})
+        }
+        else if(templateId==="7check"){
+          navigate("/board/template3", {state : {projectId : projectId}})
+        }
+      
+      };
+
   return (
     <div className="flex  min-h-screen  flex-col bg-gray-100">
 
@@ -151,7 +168,8 @@ const Recent: React.FC = () => {
           {/* 최근 작업 프로젝트 */}
           <>{projects.length > 0 ?(
               projects.map((item,index)=>(
-                <div className='flex flex-col group  w-64 h-[300px] bg-white cursor-pointer  hover:bg-line_gray duration-700  rounded-md shadow-[rgba(0,_0,_0,_0.25)_0px_4px_15px_0px] '>
+                <div className='flex flex-col group  w-64 h-[300px] bg-white cursor-pointer  hover:bg-line_gray duration-700  rounded-md shadow-[rgba(0,_0,_0,_0.25)_0px_4px_15px_0px] '
+                      >
             
                   <div className='flex flex-row w-full'>
                       <svg onClick={()=>select(index,item.projectId)} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={isSelected[index]?"w-6 h-6 ml-3 mt-3 self-start fill-main cursor-pointer text-main"
@@ -177,7 +195,7 @@ const Recent: React.FC = () => {
                     )}
                   </div>
 
-                  <img src={item.thumbnail} alt="" className='w-60 h-44 self-center object-scale-down ' />
+                  <img onClick={()=>openProject(item.templateId,item.projectId)} src={item.thumbnail} alt="" className='w-60 h-44 self-center object-scale-down ' />
                   <span className='self-center mt-5 font-Nanum text-xl font-semibold rotate-[-0.03deg]'>{item.projectName}</span>
                   <span className='self-center mt-1 font-Nanum text-sm font-regular text-gray invisible group-hover:visible rotate-[-0.03deg]'>{moment(item.lastUpdateTime).format('YYYY.MM.DD HH:mm 수정')}</span>
                 </div>

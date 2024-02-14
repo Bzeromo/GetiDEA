@@ -53,6 +53,7 @@ const Topbar: React.FC = () => {
         const userName = response.data[0].userName;
         const userEmail = response.data[0].userEmail;
         const profileImage = response.data[0].profileImage;
+        console.log(`프로필 이미지 : ${profileImage}`)
         setUserName(userName); // userName 필드만 추출
         setUserEmail(userEmail); 
         setProfileImage(profileImage); 
@@ -65,7 +66,7 @@ const Topbar: React.FC = () => {
     };
 
     fetchData();
-}, []);
+}, [profileImage,userName]);
   
   const openModal = () => {
     setIsOpen(false);

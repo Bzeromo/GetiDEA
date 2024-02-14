@@ -6,7 +6,7 @@ import useImage from "use-image";
 import URLImage from "../components/Add/URLImage";
 import { debounce } from "lodash";
 import { nanoid } from "nanoid";
-
+import api from "../api";
 import ImgComponent from "../components/Add/ImgComponent";
 import ShapeComponent from "../components/Add/ShapeComponent";
 import LineComponent from "../components/Add/LineComponent";
@@ -48,7 +48,8 @@ const WhiteBoard = () => {
   // const [selectedImageUrls, setSelectedImageUrls] = useState([]);
 
   //프로젝트 이름
-  const [projectName, setProjectName] = useState("초기 프로젝트");
+  const [projectName, setProjectName] = useState("");
+  const [project, setProject] = useState();
   const location = useLocation();
 
   //스테이지 초기화
@@ -191,9 +192,26 @@ const WhiteBoard = () => {
   const userEmail = "wnsrb933@naver.com";
 
   const [preData, setPreData] = useState([]);
+
   useEffect(() => {
-    if(location.state.name){
+    
+    if(location.state?.name){
       setProjectName(location.state.name);
+    }
+    else if(location.state?.projectId){
+      console.log(location.state.projectId)
+      const loadProject = async () => {
+        try {
+          const response = await api.get(`/api/project/open?projectId=${location.state.projectId}`);
+          setProject(response.data); // 이 시점에서 project 상태가 업데이트 됩니다.
+          setProjectName(response.data.projectName); 
+          console.log(response.data)
+        } catch (error) {
+          console.error('Error fetching data: ', error);
+        }
+      };
+  
+      loadProject();
     }
     getProjectData();
     console.log(`|\\_/|
@@ -202,7 +220,7 @@ const WhiteBoard = () => {
 |"^"\`    |
 ||_/=\\\\__|
 `);
-  }, []);
+  }, [location.state]);
 
   useEffect(() => {
     console.log("탐지 완료");
@@ -412,6 +430,7 @@ const WhiteBoard = () => {
         texts: texts,
         images: images,
         drawingList: drawingList,
+        projectId : location.state.projectId,
         newChat:
           chatInput.nickname.trim() !== "" && chatInput.message.trim() !== ""
             ? { ...chatInput, id: new Date().getTime() }
@@ -937,13 +956,27 @@ const WhiteBoard = () => {
 
   const chatLogEndRef = useRef(null);
 
-  
 
+  
   // 채팅 스크롤 관련 
   useEffect(() => {
     // chatLogEndRef가 가리키는 요소로 스크롤 이동
     chatLogEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [chatLog]);
+
+  const goHome = () =>{
+    const loadProject = async () => {
+      try {
+        const response = await api.delete(`/api/project/close/${location.state.projectId}`);
+        console.log(response)
+      } catch (error) {
+        console.error('Error fetching data: ', error);
+      }
+    };
+
+    loadProject();
+    navigate("/home");
+  }
 
   return (
     <div className="absolute  inset-0 h-full w-full bg-[#EFEFEF] bg-opacity-50 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px]">
@@ -952,7 +985,7 @@ const WhiteBoard = () => {
       <div className='absolute top-6 left-6 pl-5 bg-white rounded-md w-[410px] h-[50px] flex items-center flex-row shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]'>
       
         {/* 뒤로가기 버튼 */}
-        <svg  xmlns="http://www.w3.org/2000/svg" onClick={()=>navigate("/home")}  fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 cursor-pointer">
+        <svg  xmlns="http://www.w3.org/2000/svg" onClick={()=>goHome()}  fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 cursor-pointer">
           <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
         </svg>
 

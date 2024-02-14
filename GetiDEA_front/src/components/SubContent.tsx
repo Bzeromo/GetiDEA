@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link,useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
 import api from '../api';
 
@@ -13,7 +13,10 @@ interface project {
 
 const SubContent: React.FC = () => {
 
+    const navigate = useNavigate();
+
     const [projects, setProjects] = useState<project[]>([]);
+
 
     useEffect(() => {
     const fetchProjects = async () => {
@@ -27,6 +30,22 @@ const SubContent: React.FC = () => {
     };
     fetchProjects();
   }, []);
+
+  const openProject = async (templateId:string,projectId:number) => {
+    if(templateId==="whiteboard"){
+      navigate("/board", {state : {projectId : projectId}})
+    }
+    else if(templateId==="bubbleChat"){
+      navigate("/board/template1", {state : {projectId : projectId}})
+    }
+    else if(templateId==="sixhat"){
+      navigate("/board/template2", {state : {projectId : projectId}})
+    }
+    else if(templateId==="7check"){
+      navigate("/board/template3", {state : {projectId : projectId}})
+    }
+  
+  };
 
   return (
     
@@ -49,7 +68,8 @@ const SubContent: React.FC = () => {
         <>
   {projects.length > 0 ? (
     projects.map((item) => (
-      <div className='hover:scale-105 duration-500 w-56 h-56 mr-8 bg-white drop-shadow-lg flex justify-center flex-col items-center'>
+      <div className='cursor-pointer hover:scale-105 duration-500 w-56 h-56 mr-8 bg-white drop-shadow-lg flex justify-center flex-col items-center'
+            onClick={()=>openProject(item.templateId,item.projectId)} >
         <img src={item.thumbnail} alt="" className='w-48 h-32 object-scale-down' />
         <span className='inline-block fixed bottom-2 font-Nanum text-lg font-semibold rotate-[-0.03deg]'>{item.projectName}</span>
       </div>

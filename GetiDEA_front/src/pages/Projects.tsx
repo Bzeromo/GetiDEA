@@ -1,7 +1,7 @@
 // App.tsx
 import React from 'react';
 import { useState,useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { Link,useNavigate } from 'react-router-dom';
 import Topbar from '../components/TopBar';
 import api from '../api';
 import moment from 'moment';
@@ -16,6 +16,8 @@ interface project {
 }
 
 const Projects: React.FC = () => {
+
+  const navigate = useNavigate();
 
   const [isSelected, setIsSelected] = useState<boolean[]>([]);
   const [isOpen, setIsOpen] = useState(false);
@@ -68,7 +70,6 @@ const Projects: React.FC = () => {
         const response = await api.get(`/api/project/all`);
        
         setProjects(response.data);
-        setIsSelected(new Array(response.data.length).fill(false));
         setDropdownsOpen(new Array(response.data.length).fill(false));
         console.log(response.data)
       } catch (error) {
@@ -85,10 +86,8 @@ const Projects: React.FC = () => {
   const bookmark = (projectId : number) =>{
     const bookmarking = async () => {
       try {
-        const response = await api.put(`/api/location/bookmark`,projectId.toString(),{
-          headers: {
-            'Content-Type': 'text/plain' // JSON 형식의 데이터를 전송한다는 것을 명시
-        }
+        const response = await api.put(`/api/location/bookmark`,{
+          "projectId" :projectId
         });
        
       } catch (error) {
@@ -133,7 +132,23 @@ const Projects: React.FC = () => {
       deleting();
     }
 
-    
+      // 프로젝트 열기
+      const openProject = async (templateId:string,projectId:number) => {
+        if(templateId==="whiteboard"){
+          navigate("/board", {state : {projectId : projectId}})
+        }
+        else if(templateId==="bubbleChat"){
+          navigate("/board/template1", {state : {projectId : projectId}})
+        }
+        else if(templateId==="sixhat"){
+          navigate("/board/template2", {state : {projectId : projectId}})
+        }
+        else if(templateId==="7check"){
+          navigate("/board/template3", {state : {projectId : projectId}})
+        }
+      
+      };
+
   return (
     <div className="flex  min-h-screen  flex-col bg-gray-100">
 

@@ -118,20 +118,17 @@
           }
       };
 
+      // 프로젝트 불러오기
       useEffect(()=>{
         if (location.state && location.state.folderName) {
           setFolderName(location.state.folderName);
         }
-      },[location.state])
-
-      // 프로젝트 불러오기
-      useEffect(() => {
         const fetchProjects = async () => {
           setIsLoading(true);
           try {
             const response = await api.get(`/api/project/folder?folderName=${folderName}`);
-            await setProjects(response.data);
-            console.log(response.data);
+            setProjects(response.data);
+            console.log(`프로젝트 불러오기 : ${response.data}`);
             setIsSelected(new Array(response.data.length).fill(false));
             setDropdownsOpen(new Array(response.data.length).fill(false));
            
@@ -144,15 +141,13 @@
         };
     
         fetchProjects();
-      },[folderName]);
+      },[location.state])
 
       const bookmark = (projectId : number) =>{
         const bookmarking = async () => {
           try {
-            const response = await api.put(`api/location/bookmark`,projectId,{
-              headers: {
-                'Content-Type': 'text/plain' // JSON 형식의 데이터를 전송한다는 것을 명시
-            }
+            const response = await api.put(`api/location/bookmark`,{
+              "projectId" : projectId
             });
            console.log(response);
 
@@ -181,6 +176,24 @@
       if (isLoading) {
         return <div>Loading...</div>; // 로딩 중인 경우 로딩 인디케이터를 표시
       }
+
+      // 프로젝트 열기
+      const openProject = async (templateId:string,projectId:number) => {
+        if(templateId==="whiteboard"){
+          navigate("/board", {state : {projectId : projectId}})
+        }
+        else if(templateId==="bubbleChat"){
+          navigate("/board/template1", {state : {projectId : projectId}})
+        }
+        else if(templateId==="sixhat"){
+          navigate("/board/template2", {state : {projectId : projectId}})
+        }
+        else if(templateId==="7check"){
+          navigate("/board/template3", {state : {projectId : projectId}})
+        }
+      
+      };
+
     return (
       <div className="flex  min-h-screen  flex-col bg-gray-100">
         <Topbar/>

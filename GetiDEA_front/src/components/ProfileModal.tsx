@@ -21,9 +21,6 @@ interface ProfileJson {
   profileImage: string;
 }
 
-interface userNameJson {
-  userName: string;
-}
 
 
 type UserResponse = User[];
@@ -46,9 +43,10 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, closeModal, profile
         const fetchData = async () => {
         try {
           const response = await api.get<UserResponse>(`/api/user/search?userEmail=${localStorage.getItem('userEmail')}`);
+          console.log(response.data[0]);
           setUserName(response.data[0].userName);
-          setUserEmail(response.data[0].userEmail); // userEmail 필드만 추출
-          setProfile(response.data[0].profileImage); // userEmail 필드만 추출
+          setUserEmail(response.data[0].userEmail); 
+          setProfile(response.data[0].profileImage); 
         } catch (error) {
             console.error('Error fetching data: ', error);
         }
@@ -111,8 +109,8 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, closeModal, profile
           const formData = new FormData();
           console.log(file)
           formData.append('Image', file); // 프로필 이미지 파일
-          formData.append('userEmail', localStorage.getItem('userEmail') ?? "");
           try {
+            console.log(formData)
             await api.post('/api/image/profile',formData);
             console.log("전송 완료")
             } catch (error) {
