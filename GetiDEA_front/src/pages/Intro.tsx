@@ -1,8 +1,7 @@
 // App.tsx
 import React from 'react';
-import { useState,useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import LoginModal from '../components/LoginModal';
-import { useSearchParams ,useNavigate} from 'react-router-dom';
 
 interface CarouselImageProps {
   url: string;
@@ -50,6 +49,23 @@ const Intro: React.FC = () => {
       setActiveIndex(idx);
       select(idx);
     };
+
+    useEffect(() => {
+      const interval = setInterval(() => {
+        setActiveIndex(prevActiveIndex => {
+          const nextIndex = (prevActiveIndex + 1) % explanation.length; // 다음 인덱스 계산
+    
+          // isSelected 상태 업데이트
+          const newIsSelected = Array(explanation.length).fill(false);
+          newIsSelected[nextIndex] = true;
+          setIsSelected(newIsSelected);
+    
+          return nextIndex; // activeIndex 업데이트
+        });
+      }, 3000); // 3초마다 실행
+    
+      return () => clearInterval(interval); // 컴포넌트 언마운트 시 인터벌 정리
+    }, [explanation.length]);
     
     // 로그인 창 띄우는 함수
     const openModal = () => setIsModalOpen(true);
