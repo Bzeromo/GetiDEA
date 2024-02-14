@@ -2,6 +2,7 @@
 import React from 'react';
 import { useState,useRef, useEffect } from 'react';
 import Topbar from '../components/TopBar';
+import { useNavigate } from 'react-router-dom';
 import api from '../api';
 import moment from 'moment';
 import Swal from 'sweetalert2';
@@ -15,6 +16,8 @@ interface project {
 }
 
 const Bookmark: React.FC = () => {
+
+  const navigate = useNavigate();
 
   const [isSelected, setIsSelected] = useState<boolean[]>([]);
   const [isOpen, setIsOpen] = useState(false);
@@ -72,10 +75,8 @@ const Bookmark: React.FC = () => {
   const bookmark = (projectId : number) =>{
     const bookmarking = async () => {
       try {
-        const response = await api.put(`/api/location/bookmark`,projectId,{
-          headers: {
-            'Content-Type': 'text/plain' // JSON 형식의 데이터를 전송한다는 것을 명시
-        }
+        const response = await api.put(`/api/location/bookmark`,{
+          "projectId" : projectId
         });
        
       } catch (error) {
@@ -119,6 +120,23 @@ const Bookmark: React.FC = () => {
     deleting();
   }
 
+      // 프로젝트 열기
+      const openProject = async (templateId:string,projectId:number) => {
+        if(templateId==="whiteboard"){
+          navigate("/board", {state : {projectId : projectId}})
+        }
+        else if(templateId==="bubbleChat"){
+          navigate("/board/template1", {state : {projectId : projectId}})
+        }
+        else if(templateId==="sixhat"){
+          navigate("/board/template2", {state : {projectId : projectId}})
+        }
+        else if(templateId==="7check"){
+          navigate("/board/template3", {state : {projectId : projectId}})
+        }
+      
+      };
+
   return (
     <div className="flex  min-h-screen  flex-col bg-gray-100">
 
@@ -156,7 +174,7 @@ const Bookmark: React.FC = () => {
                     )}
                   </div>
 
-                  <img src={item.thumbnail} alt="" className='w-60 h-44 self-center object-scale-down roup-hover:text-gray' />
+                  <img src={item.thumbnail} alt="" onClick={()=>openProject(item.templateId,item.projectId)} className='w-60 h-44 self-center object-scale-down roup-hover:text-gray' />
                   <span className='self-center mt-5 font-Nanum text-xl font-semibold rotate-[-0.03deg]'>{item.projectName}</span>
                   <span className='self-center mt-1 font-Nanum text-sm font-regular text-gray invisible group-hover:visible rotate-[-0.03deg]'>{moment(item.lastUpdateTime).format('YYYY.MM.DD HH:mm 수정')}</span>
                 </div>

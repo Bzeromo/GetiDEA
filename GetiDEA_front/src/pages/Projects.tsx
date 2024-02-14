@@ -70,6 +70,7 @@ const Projects: React.FC = () => {
         const response = await api.get(`/api/project/all`);
        
         setProjects(response.data);
+        setIsSelected(response.data.map((project: { bookmark: any; }) => project.bookmark));
         setDropdownsOpen(new Array(response.data.length).fill(false));
         console.log(response.data)
       } catch (error) {
@@ -197,7 +198,7 @@ const Projects: React.FC = () => {
                     )}
                   </div>
 
-                  <img src={item.thumbnail} alt="" className='w-60 h-44 self-center object-scale-down roup-hover:text-gray' />
+                  <img src={item.thumbnail} alt="" onClick={()=>openProject(item.templateId, item.projectId)} className='w-60 h-44 self-center object-scale-down roup-hover:text-gray' />
                   <span className='self-center mt-5 font-Nanum text-xl font-semibold rotate-[-0.03deg]'>{item.projectName}</span>
                   <span className='self-center mt-1 font-Nanum text-sm font-regular text-gray invisible group-hover:visible rotate-[-0.03deg]'>{moment(item.lastUpdateTime).format('YYYY.MM.DD HH:mm 수정')}</span>
                 </div>

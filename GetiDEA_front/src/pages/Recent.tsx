@@ -64,10 +64,10 @@ const Recent: React.FC = () => {
   useEffect(() => {
     const fetchProjects = async () => {
       try {
-        const response = await api.get(`/api/project/recent?limit=10`);
+        const response = await api.get(`/api/project/recent?limit=8`);
        
         setProjects(response.data);
-        setIsSelected(new Array(response.data.length).fill(false));
+        setIsSelected(response.data.map((project: { bookmark: any; }) => project.bookmark));
         setDropdownsOpen(new Array(response.data.length).fill(false));
 
         console.log(`드롭다운 : ${dropdownsOpen.length}`)

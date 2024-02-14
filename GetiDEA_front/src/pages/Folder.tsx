@@ -129,7 +129,7 @@
             const response = await api.get(`/api/project/folder?folderName=${folderName}`);
             setProjects(response.data);
             console.log(`프로젝트 불러오기 : ${response.data}`);
-            setIsSelected(new Array(response.data.length).fill(false));
+            setIsSelected(response.data.map((project: { bookmark: any; }) => project.bookmark));
             setDropdownsOpen(new Array(response.data.length).fill(false));
            
           } catch (error) {
