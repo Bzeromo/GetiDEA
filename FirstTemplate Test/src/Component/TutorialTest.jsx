@@ -929,7 +929,7 @@ const MyDrawing = () => {
   };
 
   // 사용자 아이디어 입력창 최소 크기 설정: 1로 설정하여, 입력값이 없을 때도 input 보이게 함
-  const inputTextLength = inputText.length > 0 ? inputText.length * 2 : (inputText.length + 1 ) * 2;
+  const inputTextLength = inputText.length > 0 ? inputText.length * 2 : 23;
 
 
   // 튜토리얼 refs
@@ -1178,11 +1178,11 @@ const MyDrawing = () => {
 
 
 
+  
 
   // 템플릿3 이미지 형식
   const templateImage2 = 
     {
-      // "ref": ref2,
       "src": "/img/template2_6hats/template2Fix.png",
       "x": 31,  // x좌표
       "y": 110,  // y좌표
@@ -1205,21 +1205,6 @@ const MyDrawing = () => {
 
   return (
     <div className="absolute  inset-0 h-full w-full bg-[#EFEFEF] bg-opacity-50 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px]">
-      
-
-
-      {/* 튜토리얼 연습 */}
-      <div>
-        {/* <h1 ref={ref1}>첫번째 영역</h1>
-        <p ref={ref2}>두번째 영역</p>
-        <p ref={ref3}>세번째 영역</p> */}
-        <CoachMark {...coach} />
-      </div>
-
-
-
-
-
 
       {/* 왼쪽 윗 블록 */}
       <div className="absolute top-6 left-6 pl-5 bg-white rounded-md w-96 h-[50px] flex items-center flex-row shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]">
@@ -1483,7 +1468,7 @@ const MyDrawing = () => {
       </div>
 
       {/* 채팅방 영역 */}
-      <div className="absolute top-20 right-10 w-80 p-7 z-20 justify-center container w-1/4 ml-auto px-4">
+      {/* <div className="absolute top-20 right-10 w-80 p-7 z-20 justify-center container w-1/4 ml-auto px-4">
         <div className="bg-white p-6 rounded-lg shadow-lg">
           <div className="mb-4">
             <input
@@ -1520,7 +1505,7 @@ const MyDrawing = () => {
             ))}
           </div>
         </div>
-      </div>
+      </div> */}
 
       {/* 오른쪽 윗 블록 */}
       <div className="absolute top-6 right-32 justify-center bg-white rounded-md w-16 h-[50px] flex  items-center flex-row shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]">
@@ -1585,6 +1570,10 @@ const MyDrawing = () => {
 
 
       {/* 튜토리얼 */}
+
+      {/* 튜토리얼 불러오기 */}
+      <CoachMark {...coach} />
+
       <div ref={ref1} className="absolute mx-96 mt-40" ></div>
       <div ref={ref3} className="absolute ml-36 mt-40 h-[250px] w-[1350px]" ></div>
       <div ref={ref4} className="absolute ml-[150px] mt-40 h-[600px] w-[250px]" ></div>
@@ -1601,10 +1590,11 @@ const MyDrawing = () => {
       {/* 그리는 구역 */}
       <div className="ml-36 mt-24 h-full w-full" >
 
-        <div className="flex justify-center items-center ml-[-170px]">
+        <div className="flex justify-center items-center ml-[-170px] bg-transparent border-none">
           <input
-            className="h-[100px] min-w-[100px] text-center text-3xl font-Nanum"
+            className="h-[100px] min-w-[100px] text-center text-5xl font-Nanum rounded-2xl bg-transparent border-none"
             type="text"
+            placeholder="Write Your iDEA"
             value={inputText}
             onChange={handleInputTextChange}
             size={inputTextLength}
@@ -1613,7 +1603,6 @@ const MyDrawing = () => {
 
       
         <Stage
-          // ref={stageRef}
           width={window.innerWidth}
           height={window.innerHeight}
           draggable={!draggable}
@@ -1627,11 +1616,8 @@ const MyDrawing = () => {
           <Layer ref={layerRef}>
 
 
-          {/* Template3 - 7Check에 대한 템플릿 정보 출력 */}
-
-          
+          {/* Template2에 대한 템플릿 정보 출력 */}
           <ImageComponent
-            // ref = {templateImage2.ref}
             src = {templateImage2.src}
             x = {templateImage2.x}
             y = {templateImage2.y}
