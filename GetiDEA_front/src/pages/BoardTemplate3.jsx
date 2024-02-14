@@ -29,6 +29,8 @@ import randomWords from "../components/templateData/randomWords.json";
 import TemplateImageComponent from "../components/Add/TemplateImageComponent";
 import TemplateTextComponent from "../components/Add/TemplateTextComponent";
 
+//튜토리얼을 위한 import
+import { CoachMark, ICoachProps } from "react-coach-mark";
 
 const BoardTemplate3 = () => {
 
@@ -950,21 +952,34 @@ const BoardTemplate3 = () => {
     chatLogEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [chatLog]);
 
+
+  // 7check 사용자 아이디어 입력창 (Write Your iDEA)
+  const [inputText, setInputText] = useState('');
+
+  // 사용자 아이디어 입력창 변경 함수
+  const handleInputTextChange = (event) => {
+    setInputText(event.target.value);
+  };
+
+  // 사용자 아이디어 입력창 최소 크기 설정: 1로 설정하여, 입력값이 없을 때도 input 보이게 함
+  const inputTextLength = inputText.length > 0 ? inputText.length * 2 : 23;
+
+
   //템플릿3에 관한 요소 & 코드
   const templateImage3 =
   {
-    "src": "/img/template3_check7/template3Fix2.png",
-    "x": 31,
-    "y": 10,
+    "src": "/img/template3_check7/template3Fix3.png",
+    "x": 110.31092625853671,
+    "y": 7.876662134569187,
     "z": -100,
     "ty": "img",
     "type": "Image",
     "width": 200,
-    "height": 96,
+    "height": 112.6433526829959,
     "draggable": false,
     "rotation": 0,
-    "scaleX": 5.86,
-    "scaleY": 5.86,
+    "scaleX": 5.171183388521264,
+    "scaleY": 5.171183388521264,
   }
 
   const templateInfo = [];
@@ -973,6 +988,294 @@ const BoardTemplate3 = () => {
     templateInfo.push(templateImage3);
     setImages(templateInfo);
   }, []);
+
+  //튜토리얼을 위한 코드
+  // 튜토리얼 refs
+  const ref1 = useRef(null);
+  const ref2 = useRef(null);
+  const ref3 = useRef(null);
+  const ref4 = useRef(null);
+  const ref5 = useRef(null);
+  const ref6 = useRef(null);
+  const ref7 = useRef(null);
+  const ref8 = useRef(null);
+  const ref9 = useRef(null);
+  const ref10 = useRef(null);
+  const ref11 = useRef(null);
+  const ref12 = useRef(null);
+
+  // 튜토리얼 Number & Button
+  const [activatedNumber, setActivateNumber] = useState(0);
+  const FirstButton = <button className="text-blue" onClick={() => setActivateNumber(activatedNumber - 1)}> 닫기 </button>;
+  const PrevButton = <button className="text-blue" onClick={() => setActivateNumber(activatedNumber - 1)}> 이전 </button>;
+  const NextButton = <button className="text-blue" onClick={() => setActivateNumber(activatedNumber + 1)}> 다음 </button>;
+  const FinButton = <button className="text-blue" onClick={() => setActivateNumber(activatedNumber + 1)}> 완료 </button>;
+  const TutorialCheckButton = <button className="text-blue" onClick={() => setActivateNumber(activatedNumber + 1)}> 확인 </button>;
+
+  // 튜토리얼 버튼 함수
+  const startTutorial = () => {
+    setActivateNumber(0);
+  }
+
+  const coachList = [
+    {
+      // 튜토리얼 1. 템플릿 소개 (overview)
+      activate: activatedNumber === 0,
+      component:
+        <div className="bg-white p-8 shadow-lg rounded-lg">
+          <p className="text-center font-Nanum font-bold text-2xl" >세븐쳌 (7 Check)</p>
+          <p className="text-center font-Nanum text-l mt-4 px-28">7 Check</p>
+          <p className="text-center font-Nanum text-l">아이디어 관련 7가지 체크포인트를</p>
+          <p className="text-center font-Nanum text-l">한가지씩 점검해보는 기법입니다.</p>
+
+          <div className="flex justify-between items-center mt-8">
+            <button className="bg-blue-500 hover:bg-blue-700 text-white font-Nanum font-bold py-2 px-4 rounded shadow">{FirstButton}</button>
+            <span className="text-blue-800 font-Nanum">
+              1 / 11
+            </span>
+            <button className="bg-blue-500 hover:bg-blue-700 text-white font-Nanum font-bold py-2 px-4 rounded shadow">{NextButton}</button>
+          </div>
+
+        </div>,
+      reference: ref1,
+      tooltip: { position: 'right' }
+    },
+    {
+      // 튜토리얼 2. Write Your iDEA!
+      activate: activatedNumber === 1,
+      component:
+        <div className="bg-white p-8 shadow-lg rounded-lg">
+          <p className="text-center font-Nanum font-bold text-2xl" >Write Your iDEA!</p>
+          <p className="text-center font-Nanum text-l mt-4 px-16">점검하고자 하는 아이디어를 입력하세요.</p>
+
+          <div className="flex justify-between items-center mt-8">
+            <button className="bg-blue-500 hover:bg-blue-700 text-white font-Nanum font-bold py-2 px-4 rounded shadow">{PrevButton}</button>
+            <span className="text-blue-800 font-Nanum">
+              2 / 11
+            </span>
+            <button className="bg-blue-500 hover:bg-blue-700 text-white font-Nanum font-bold py-2 px-4 rounded shadow">{NextButton}</button>
+          </div>
+
+        </div>,
+      reference: ref2,
+      tooltip: { position: 'top' }
+    },
+    {
+      // 튜토리얼 3. 전반적인 설명
+      activate: activatedNumber === 2,
+      component:
+        <div className="bg-white p-8 shadow-lg rounded-lg">
+          <p className="text-center font-Nanum font-bold text-xl" >아이디어를 얻기 위해서 7가지를 check 해보세요.</p>
+          <p className="text-center font-Nanum text-l mt-4">카드 작성 순서는 자유입니다!</p>
+
+          <div className="flex justify-between items-center mt-8">
+            <button className="bg-blue-500 hover:bg-blue-700 text-white font-Nanum font-bold py-2 px-4 rounded shadow">{PrevButton}</button>
+            <span className="text-blue-800 font-Nanum">
+              3 / 11
+            </span>
+            <button className="bg-blue-500 hover:bg-blue-700 text-white font-Nanum font-bold py-2 px-4 rounded shadow">{NextButton}</button>
+          </div>
+
+        </div>,
+      reference: ref3,
+      tooltip: { position: 'top' }
+    },
+    {
+      // 튜토리얼 4-1. 상세 설명 (축소)
+      activate: activatedNumber === 3,
+      component:
+        <div className="bg-white p-8 shadow-lg rounded-lg">
+          <p className="text-center font-Nanum font-bold text-3xl text-black" >'축소 - Reduction'</p>
+          <p className="text-center font-Nanum text-l mt-4">아이디어를 다양한 방법으로 축소하는 카드입니다.</p>
+          <p className="text-center font-Nanum text-l">축소된 아이디어를 적어보세요!</p>
+
+          <div className="flex justify-between items-center mt-8">
+            <button className="bg-blue-500 hover:bg-blue-700 text-white font-Nanum font-bold py-2 px-4 rounded shadow">{PrevButton}</button>
+            <span className="text-blue-800 font-Nanum">
+              4 / 11
+            </span>
+            <button className="bg-blue-500 hover:bg-blue-700 text-white font-Nanum font-bold py-2 px-4 rounded shadow">{NextButton}</button>
+          </div>
+
+        </div>,
+
+      reference: ref4,
+      tooltip: { position: 'top' }
+    },
+    {
+      // 튜토리얼 4-2. 상세 설명 (확대)
+      activate: activatedNumber === 4,
+      component:
+        <div className="bg-white p-8 shadow-lg rounded-lg">
+          <p className="text-center font-Nanum font-bold text-3xl text-[#8B0000]" >'Feeling'</p>
+          <p className="text-center font-Nanum text-l mt-4">빨간색 모자는 ‘직관적’입니다.</p>
+          <p className="text-center font-Nanum text-l">아이디어에 대해 느낀 직관적 반응, 즉 감정과 정서를 제시해보세요.</p>
+          <p className="text-center font-Nanum text-l">이유 또는 근거는 필요하지 않습니다!</p>
+
+          <div className="flex justify-between items-center mt-8">
+            <button className="bg-blue-500 hover:bg-blue-700 text-white font-Nanum font-bold py-2 px-4 rounded shadow">{PrevButton}</button>
+            <span className="text-blue-800 font-Nanum">
+              5 / 10
+            </span>
+            <button className="bg-blue-500 hover:bg-blue-700 text-white font-Nanum font-bold py-2 px-4 rounded shadow">{NextButton}</button>
+          </div>
+
+        </div>,
+
+      reference: ref5,
+      tooltip: { position: 'right' }
+    },
+    {
+      // 튜토리얼 4-3. 상세 설명 (수정)
+      activate: activatedNumber === 5,
+      component:
+        <div className="bg-white p-8 shadow-lg rounded-lg">
+          <p className="text-center font-Nanum font-bold text-3xl text-yellow-600 text-[#9B870C]" >'Benefit'</p>
+          <p className="text-center font-Nanum text-l mt-4">노란색 모자는 ‘긍정적’입니다.</p>
+          <p className="text-center font-Nanum text-l">긍정적 측면, 장점, 낙관적 관점에 집중해보세요.</p>
+          <p className="text-center font-Nanum text-l">단, 타당성 검토가 필요하며, 반드시 논리적이어야 합니다!</p>
+
+          <div className="flex justify-between items-center mt-8">
+            <button className="bg-blue-500 hover:bg-blue-700 text-white font-Nanum font-bold py-2 px-4 rounded shadow">{PrevButton}</button>
+            <span className="text-blue-800 font-Nanum">
+              6 / 10
+            </span>
+            <button className="bg-blue-500 hover:bg-blue-700 text-white font-Nanum font-bold py-2 px-4 rounded shadow">{NextButton}</button>
+          </div>
+
+        </div>,
+
+      reference: ref6,
+      tooltip: { position: 'right' }
+    },
+    {
+      // 튜토리얼 4-4. 상세 설명 (대체)
+      activate: activatedNumber === 6,
+      component:
+        <div className="bg-white p-8 shadow-lg rounded-lg">
+          <p className="text-center font-Nanum font-bold text-3xl text-[#000000]" >'Critic'</p>
+          <p className="text-center font-Nanum text-l mt-4">검정색 모자는 ‘비판적’입니다.</p>
+          <p className="text-center font-Nanum text-l">부정적인 측면에서 아이디어를 판단해보세요.</p>
+          <p className="text-center font-Nanum text-l">위험, 문제, 장애물을 비판적으로 제시해보세요!</p>
+
+          <div className="flex justify-between items-center mt-8">
+            <button className="bg-blue-500 hover:bg-blue-700 text-white font-Nanum font-bold py-2 px-4 rounded shadow">{PrevButton}</button>
+            <span className="text-blue-800 font-Nanum">
+              7 / 11
+            </span>
+            <button className="bg-blue-500 hover:bg-blue-700 text-white font-Nanum font-bold py-2 px-4 rounded shadow">{NextButton}</button>
+          </div>
+
+        </div>,
+
+      reference: ref7,
+      tooltip: { position: 'bottom' }
+    },
+    {
+      // 튜토리얼 4-5. 상세 설명 (반전)
+      activate: activatedNumber === 7,
+      component:
+        <div className="bg-white p-8 shadow-lg rounded-lg">
+          <p className="text-center font-Nanum font-bold text-3xl text-[#006400]" >'Creativity'</p>
+          <p className="text-center font-Nanum text-l mt-4">초록색 모자는 ‘창의적’입니다.</p>
+          <p className="text-center font-Nanum text-l">기존과는 다른 방향을 모색해보세요.</p>
+          <p className="text-center font-Nanum text-l">새로운 아이디어, 추가적 대안, 가능성을 생각해봅시다!</p>
+
+          <div className="flex justify-between items-center mt-8">
+            <button className="bg-blue-500 hover:bg-blue-700 text-white font-Nanum font-bold py-2 px-4 rounded shadow">{PrevButton}</button>
+            <span className="text-blue-800 font-Nanum">
+              8 / 11
+            </span>
+            <button className="bg-blue-500 hover:bg-blue-700 text-white font-Nanum font-bold py-2 px-4 rounded shadow">{NextButton}</button>
+          </div>
+
+        </div>,
+
+      reference: ref8,
+      tooltip: { position: 'left' }
+    },
+    {
+      // 튜토리얼 4-6. 상세 설명 (전용)
+      activate: activatedNumber === 8,
+      component:
+        <div className="bg-white p-8 shadow-lg rounded-lg">
+          <p className="text-center font-Nanum font-bold text-3xl text-[#00008B]" >'Managing'</p>
+          <p className="text-center font-Nanum text-l mt-4">파란색 모자는 ‘종합’하는 역할입니다.</p>
+          <p className="text-center font-Nanum text-l">다른 모자의 사고를 정리하고, 전체적으로 조절해보세요.</p>
+          <p className="text-center font-Nanum text-l">구체적인 계획이나 전략을 수립해보는 것도 좋습니다!</p>
+
+          <div className="flex justify-between items-center mt-8">
+            <button className="bg-blue-500 hover:bg-blue-700 text-white font-Nanum font-bold py-2 px-4 rounded shadow">{PrevButton}</button>
+            <span className="text-blue-800 font-Nanum">
+              9 / 11
+            </span>
+            <button className="bg-blue-500 hover:bg-blue-700 text-white font-Nanum font-bold py-2 px-4 rounded shadow">{NextButton}</button>
+          </div>
+
+        </div>,
+
+      reference: ref9,
+      tooltip: { position: 'left' }
+    },
+    {
+      // 튜토리얼 4-6. 상세 설명 (결합)
+      activate: activatedNumber === 9,
+      component:
+        <div className="bg-white p-8 shadow-lg rounded-lg">
+          <p className="text-center font-Nanum font-bold text-3xl text-[#00008B]" >'Managing'</p>
+          <p className="text-center font-Nanum text-l mt-4">파란색 모자는 ‘종합’하는 역할입니다.</p>
+          <p className="text-center font-Nanum text-l">다른 모자의 사고를 정리하고, 전체적으로 조절해보세요.</p>
+          <p className="text-center font-Nanum text-l">구체적인 계획이나 전략을 수립해보는 것도 좋습니다!</p>
+
+          <div className="flex justify-between items-center mt-8">
+            <button className="bg-blue-500 hover:bg-blue-700 text-white font-Nanum font-bold py-2 px-4 rounded shadow">{PrevButton}</button>
+            <span className="text-blue-800 font-Nanum">
+              10 / 11
+            </span>
+            <button className="bg-blue-500 hover:bg-blue-700 text-white font-Nanum font-bold py-2 px-4 rounded shadow">{NextButton}</button>
+          </div>
+
+        </div>,
+
+      reference: ref10,
+      tooltip: { position: 'top' }
+    },
+    {
+      // 튜토리얼 5. 설명 마무리
+      activate: activatedNumber === 10,
+      component:
+        <div className="bg-white p-8 shadow-lg rounded-lg">
+          <p className="text-center font-Nanum font-bold text-2xl" >작성을 완료했다면 전체적으로 다시 확인해보세요</p>
+          <p className="text-center font-Nanum text-l mt-4">분명 좋은 아이디어가 떠오를겁니다 :D</p>
+
+          <div className="flex justify-between items-center mt-8">
+            <button className="bg-blue-500 hover:bg-blue-700 text-white font-Nanum font-bold py-2 px-4 rounded shadow">{PrevButton}</button>
+            <span className="text-blue-800 font-Nanum">
+              11 / 11
+            </span>
+            <button className="bg-blue-500 hover:bg-blue-700 text-white font-Nanum font-bold py-2 px-4 rounded shadow">{FinButton}</button>
+          </div>
+
+        </div>,
+
+      reference: ref11,
+      tooltip: { position: 'top' }
+    },
+    {
+      // 튜토리얼 안내 : ? 클릭 시, 튜토리얼을 다시 볼 수 있음을 안내
+      activate: activatedNumber === 11,
+      component:
+        <div className="flex bg-white p-8 shadow-lg rounded-lg">
+          <p className="text-center font-Nanum font-bold text-2xl" >튜토리얼 다시보기는 여기를 클릭하세요!</p>
+          <button className="ml-7 bg-blue-500 hover:bg-blue-700 text-white font-Nanum font-bold py-2 px-4 rounded shadow">{TutorialCheckButton}</button>
+        </div>,
+
+      reference: ref12,
+      tooltip: { position: 'right' }
+    },
+  ];
+
+  const coach = coachList[activatedNumber];
 
   return (
     <div className="absolute  inset-0 h-full w-full bg-[#EFEFEF] bg-opacity-50 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px]">
@@ -1170,8 +1473,15 @@ const BoardTemplate3 = () => {
         </svg>
       </div>
 
+      {/* 튜토리얼 - CoachMark 라이브러리 */}
+      <CoachMark {...coach} />
+
       {/* 튜토리얼 버튼 */}
-      <div className='cursor-pointer absolute top-[530px]  hover:text-blue left-6  bg-white rounded-md w-[50px] h-[50px] flex justify-center items-center shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]' >
+      <div
+        ref={ref12}
+        className='cursor-pointer absolute top-[530px]  hover:text-blue left-6  bg-white rounded-md w-[50px] h-[50px] flex justify-center items-center shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]'
+        onClick={startTutorial}
+      >
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
@@ -1185,6 +1495,20 @@ const BoardTemplate3 = () => {
             d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 5.25h.008v.008H12v-.008Z" />
         </svg>
       </div>
+
+      {/* 튜토리얼 관련 영역 지정 */}
+      <div ref={ref1} className="absolute ml-[600px] mt-[300px]" ></div>
+      <div ref={ref3} className="absolute ml-[590px] mt-[300px] h-[350px] w-[370px]" ></div>
+
+      <div ref={ref4} className="absolute ml-[250px] mt-[495px] h-[165px] w-[280px]" ></div>
+      <div ref={ref5} className="absolute ml-[290px] mt-[320px] h-[165px] w-[280px]" ></div>
+      <div ref={ref6} className="absolute ml-[330px] mt-[147px] h-[165px] w-[280px]" ></div>
+      <div ref={ref7} className="absolute ml-[630px] mt-[98px] h-[165px] w-[280px]" ></div>
+      <div ref={ref8} className="absolute ml-[925px] mt-[147px] h-[165px] w-[280px]" ></div>
+      <div ref={ref9} className="absolute ml-[965px] mt-[320px] h-[165px] w-[280px]" ></div>
+      <div ref={ref10} className="absolute ml-[1005px] mt-[495px] h-[165px] w-[280px]" ></div>
+
+      <div ref={ref11} className="absolute ml-[590px] mt-[300px] h-[350px] w-[370px]" ></div>
 
       {/* 실행취소 버튼 */}
       {/* <div
@@ -1375,6 +1699,19 @@ const BoardTemplate3 = () => {
         </div>
       )}
 
+      {/* 튜토리얼을 위한 영역 - 사용자 아이디어 작성 영역 */}
+      <div className="bottom-2 ml-[500px] absolute flex justify-center items-center rounded-2xl bg-transparent border-none shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]">
+        <input
+          ref={ref2}
+          className="h-[70px] min-w-[100px] max-w-[1300px] text-center text-5xl font-Nanum rounded-2xl bg-transparent border-none"
+          type="text"
+          placeholder="Write Your iDEA"
+          value={inputText}
+          onChange={handleInputTextChange}
+          size={inputTextLength}
+        />
+      </div>
+
       {/* 그리는 구역 */}
       <div className="ml-36 mt-24 h-96 w-96">
         <Stage
@@ -1491,7 +1828,7 @@ const BoardTemplate3 = () => {
               />
             ))}
 
-            {/* 이미지 띄우는 원본 코드 */}
+            {/* 이미지 띄우고 저장하는 원본 코드 */}
             {/* {images.map((img) => (
               <ImgComponent
                 key={img.id}
