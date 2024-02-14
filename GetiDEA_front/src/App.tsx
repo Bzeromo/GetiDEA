@@ -9,7 +9,10 @@ import Projects from './pages/Projects';
 import Folder from './pages/Folder';
 import TemplateSelect from './pages/TempleteSelect';
 import ProjectNameInput from './pages/ProjectNameInput';
-import Board from './pages/Board';
+import WhiteBoard from './pages/Board';
+import BoardTemplate1 from './pages/BoardTemplate1';
+import BoardTemplate2 from './pages/BoardTemplate2';
+import BoardTemplate3 from './pages/BoardTemplate3';
 import GoogleLogin from './pages/GoogleLogin';
 import NaverLogin from './pages/NaverLogin';
 import { Routes, Route, Navigate } from 'react-router-dom';
@@ -42,13 +45,14 @@ const App: React.FC = () => {
               <Route path="bookmark" element={<ProtectedRoute><Bookmark /></ProtectedRoute>} />
               <Route path="projects" element={<ProtectedRoute><Projects /></ProtectedRoute>} />
               <Route path="folder/:folderId" element={<ProtectedRoute><Folder /></ProtectedRoute>} />
-              {/* 중첩된 다른 라우트들을 이곳에 추가 */}
           </Route>
 
           <Route path="/templateSelect" element={<ProtectedRoute><TemplateSelect /></ProtectedRoute>} />
           <Route path="/projectnameinput" element={<ProtectedRoute><ProjectNameInput /></ProtectedRoute>} />
-          {/* <Route path="/board" element={<ProtectedRoute><Board /></ProtectedRoute>} /> */}
-          <Route path="/board" element={<Board />} />
+          <Route path="/board" element={<ProtectedRoute><WhiteBoard /></ProtectedRoute>} />
+          <Route path="/board/template1" element={<ProtectedRoute><BoardTemplate1 /></ProtectedRoute>} />
+          <Route path="/board/template2" element={<ProtectedRoute><BoardTemplate2 /></ProtectedRoute>} />
+          <Route path="/board/template3" element={<ProtectedRoute><BoardTemplate3 /></ProtectedRoute>} />
         
          
       </Routes>
