@@ -6,6 +6,7 @@ import Topbar from '../components/TopBar';
 import api from '../api';
 import moment from 'moment';
 import Swal from 'sweetalert2';
+import ProjectModal from '../components/ProjectModal';
 
 interface project {
   projectId: number;
@@ -20,10 +21,11 @@ const Projects: React.FC = () => {
   const navigate = useNavigate();
 
   const [isSelected, setIsSelected] = useState<boolean[]>([]);
-  const [isOpen, setIsOpen] = useState(false);
   const [dropdownsOpen, setDropdownsOpen] = useState<boolean[]>([]);
   const [projects, setProjects] = useState<project[]>([]);
-  
+  const [projectId, setProjectId] = useState<number>();
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [isOpen, setIsOpen] = useState(false);
  
 
   // 북마크 관련 함수
@@ -150,8 +152,16 @@ const Projects: React.FC = () => {
       
       };
 
+      const openModal = (projectId:number) => {
+        setIsOpen(false);
+        setProjectId(projectId);
+        setIsModalOpen(true);
+      }
+      const closeModal = () => setIsModalOpen(false);
+
   return (
     <div className="flex  min-h-screen  flex-col bg-gray-100">
+      <ProjectModal isOpen={isModalOpen} closeModal={closeModal} projectId={projectId??0} ></ProjectModal>
 
       <Topbar/>
     
@@ -160,7 +170,7 @@ const Projects: React.FC = () => {
         <div className=' flex flex-row flex-wrap gap-16 ml-32 mt-12'>
 
           {/* 새 프로젝트 생성 */}
-          <Link to="/templateSelect" className='flex flex-col group justify-center items-center cursor-pointer duration-500 w-64 h-[300px] bg-[#B8D8DC] rounded-md shadow-[rgba(0,_0,_0,_0.25)_0px_4px_15px_0px] '>
+          <Link to="/templateSelect" state={{folderName : ""}} className='flex flex-col group justify-center items-center cursor-pointer duration-500 w-64 h-[300px] bg-[#B8D8DC] rounded-md shadow-[rgba(0,_0,_0,_0.25)_0px_4px_15px_0px] '>
 
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-10 h-10 place-self-center mt-16 text-gray">
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
@@ -186,8 +196,8 @@ const Projects: React.FC = () => {
                     {dropdownsOpen[index] && (
                     <div className="absolute ml-52  w-28 px-2 text-black mt-10 origin-top-right bg-white divide-y divide-gray-100 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none" ref={dropdownRef}>
                       <div className="py-1">
-                        <a href="/" className=" px-4 py-2 flex flex-row text-sm text-gray-700 hover:bg-gray-100 rotate-[-0.03deg]">
-                          수정</a>
+                        <div  onClick={()=>openModal(item.projectId)} className=" px-4 py-2 flex flex-row text-sm text-gray-700 hover:bg-gray-100 rotate-[-0.03deg]">
+                          수정</div>
                         {/* <a href="/" className="flex flex-row px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rotate-[-0.03deg]">
                           이동</a> */}
                         <div  className=" flex flex-row px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rotate-[-0.03deg]"

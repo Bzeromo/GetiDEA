@@ -13,18 +13,20 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, closeModal }) => {
 
   const navigate = useNavigate();
   const auth = useAuth();
+
+  const [searchParams] = useSearchParams();
+    const accessToken = searchParams.get("access_token");
+    console.log(`토큰? : ${searchParams.get("access_token")}`)
+    const refreshToken = searchParams.get("refresh_token");
   
   useEffect(() => {
     // 페이지 로드 시 토큰 확인 로직
-    const accessToken = Cookies.get("access_token");
-    const refreshToken = Cookies.get("refresh_token");
-
-    console.log(accessToken);
-    console.log(refreshToken);
-  
+    localStorage.setItem('accessToken',accessToken ?? "" )
+    localStorage.setItem('refreshToken',refreshToken ?? "" )
     if(!!accessToken){
       navigate("/home");
     }
+    
   
   }, []);
  

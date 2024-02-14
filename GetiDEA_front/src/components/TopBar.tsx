@@ -92,13 +92,12 @@ const Topbar: React.FC = () => {
                 </div>
                 
                 {isOpen && (
-                <div className="absolute ml-8 top-10 w-36 mt-2 origin-top-right bg-white divide-y divide-gray-100 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none z-10" ref={dropdownRef}>
-                  <div className="py-1">
-                    <div className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer" onClick={openModal}>프로필 수정</div>
-                    <a href="/" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">설정</a>
-                    <div onClick={logout} className="cursor-pointer block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">로그아웃</div>
-                  </div>
+                <div className="absolute ml-6 top-10 w-28 mt-2 origin-top-right bg-white divide-y divide-gray-100 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none z-10" ref={dropdownRef}>
+                <div className="py-1">
+                  <div className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer" onClick={openModal}> 설정</div>
+                  <div onClick={logout} className="cursor-pointer block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">로그아웃</div>
                 </div>
+              </div>
                  )}
         </div>
     </div>
