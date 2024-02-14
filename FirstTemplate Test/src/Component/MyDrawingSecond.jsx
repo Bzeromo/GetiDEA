@@ -1631,19 +1631,18 @@ const MyDrawing = () => {
       )}
 
 
-      {/* 튜토리얼 */}
-
-      {/* 튜토리얼 불러오기 */}
+      {/* 튜토리얼 - CoachMark 라이브러리 */}
       <CoachMark {...coach} />
 
+      {/* 튜토리얼 관련 영역 지정 */}
       <div ref={ref1} className="absolute mx-96 mt-40" ></div>
       <div ref={ref3} className="absolute ml-36 mt-40 h-[250px] w-[1350px]" ></div>
-      <div ref={ref4} className="absolute ml-[150px] mt-40 h-[600px] w-[250px]" ></div>
+      <div ref={ref4} className="absolute ml-[150px] mt-40 h-[570px] w-[250px]" ></div>
       <div ref={ref5} className="absolute ml-[365px] mt-40 h-[600px] w-[250px]" ></div>
       <div ref={ref6} className="absolute ml-[580px] mt-40 h-[600px] w-[250px]" ></div>
       <div ref={ref7} className="absolute ml-[795px] mt-40 h-[600px] w-[250px]" ></div>
-      <div ref={ref8} className="absolute ml-[1010px] mt-40 h-[600px] w-[250px]" ></div>
-      <div ref={ref9} className="absolute ml-[1225px] mt-40 h-[600px] w-[250px]" ></div>
+      <div ref={ref8} className="absolute ml-[1000px] mt-40 h-[600px] w-[250px]" ></div>
+      <div ref={ref9} className="absolute ml-[1215px] mt-40 h-[600px] w-[250px]" ></div>
       <div ref={ref10} className="absolute mx-96 mt-40" ></div>
 
 
