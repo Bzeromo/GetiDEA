@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { useSearchParams } from "react-router-dom";
 import { useAuth } from '../AuthContext';
 import { useNavigate,Link } from 'react-router-dom';
-import GoogleLogin from '../pages/GoogleLogin';
+import Cookies from 'js-cookie';
 
 interface LoginModalProps {
   isOpen: boolean;
@@ -13,24 +13,18 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, closeModal }) => {
 
   const navigate = useNavigate();
   const auth = useAuth();
-  const redirectUri = encodeURIComponent("http://localhost:3004&mode=login");
-  const authLink = `http://localhost:8080/oauth2/authorization/google?redirect_uri=${redirectUri}`;
   
-
-  const [searchParams] = useSearchParams();
-  const accessToken = searchParams.get("access_token");
-  console.log(`토큰? : ${searchParams.get("access_token")}`)
-  const refreshToken = searchParams.get("refresh_token");
-
   useEffect(() => {
     // 페이지 로드 시 토큰 확인 로직
+    const accessToken = Cookies.get("access_token");
+    const refreshToken = Cookies.get("refresh_token");
+
     console.log(accessToken);
-    localStorage.setItem('accessToken',accessToken ?? "" )
-    localStorage.setItem('refreshToken',refreshToken ?? "" )
+    console.log(refreshToken);
+  
     if(!!accessToken){
       navigate("/home");
     }
-    
   
   }, []);
  
@@ -39,12 +33,6 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, closeModal }) => {
     auth?.login("eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJqdW5neW9hbndvb0BuYXZlci5jb20iLCJpYXQiOjE3MDcxMDkxMjEsInVzZXJOYW1lIjoi7KCV7Jew7JqwIiwicHJvdmlkZXIiOiJLQUtBTyIsImV4cCI6MTcwNzExMjcyMX0.6Sbb6dXDnIzENV1AQjoInitBgE6Dbawt-g67OIfWZ3-QMRjeHUqr_37ZlOiOkjqT3uEpEb-jZXgqwzJzsYyVsw",
     "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJqdW5neW9hbndvb0BuYXZlci5jb20iLCJpYXQiOjE3MDcxMDkxMjEsInByb3ZpZGVyIjoiS0FLQU8iLCJleHAiOjE3MDcxOTU1MjF9.RizvhwfS9rhwfl8sKPIJWkcMOfEbaPZyERhhsAan7S09BkSCerIAu4EI9chkCxYWu-Q5ckP0Ss_8BrwSYgdiRw");
   }
-  // useEffect(() => {
-  //   // accessToken 또는 refreshToken 값이 있을 때만 로그인 함수 호출
-  //   if (accessToken && refreshToken) {
-  //     auth?.login(accessToken, refreshToken);
-  //   }
-  // }, [accessToken, refreshToken,auth]);
 
   if (!isOpen) return null;
 
