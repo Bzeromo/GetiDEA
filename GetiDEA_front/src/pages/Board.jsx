@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate,useLocation } from 'react-router-dom';
 import { Stage, Layer, Transformer, Line, Image } from "react-konva";
 import axios from "axios";
 import useImage from "use-image";
@@ -49,6 +49,7 @@ const WhiteBoard = () => {
 
   //프로젝트 이름
   const [projectName, setProjectName] = useState("초기 프로젝트");
+  const location = useLocation();
 
   //스테이지 초기화
   const initialScaleValue = { x: 1, y: 1 };
@@ -191,6 +192,9 @@ const WhiteBoard = () => {
 
   const [preData, setPreData] = useState([]);
   useEffect(() => {
+    if(location.state.name){
+      setProjectName(location.state.name);
+    }
     getProjectData();
     console.log(`|\\_/|
 |q p|   /}
@@ -933,6 +937,7 @@ const WhiteBoard = () => {
 
   const chatLogEndRef = useRef(null);
 
+  
 
   // 채팅 스크롤 관련 
   useEffect(() => {
@@ -944,7 +949,7 @@ const WhiteBoard = () => {
     <div className="absolute  inset-0 h-full w-full bg-[#EFEFEF] bg-opacity-50 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px]">
        
       {/* 왼쪽 윗 블록 */}
-      <div className='absolute top-6 left-6 pl-5 bg-white rounded-md w-96 h-[50px] flex items-center flex-row shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]'>
+      <div className='absolute top-6 left-6 pl-5 bg-white rounded-md w-[410px] h-[50px] flex items-center flex-row shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]'>
       
         {/* 뒤로가기 버튼 */}
         <svg  xmlns="http://www.w3.org/2000/svg" onClick={()=>navigate("/home")}  fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 cursor-pointer">
@@ -960,7 +965,7 @@ const WhiteBoard = () => {
         <div className='ml-8 border-l-2 border-line_gray'>&ensp;</div>
 
         {/* 프로젝트 이름 */}
-        <div className=' ml-3 font-Nanum font-medium text-base rotate-[-0.03deg]'>새 프로젝트</div>
+        <div className=' ml-3 font-Nanum font-medium text-center text-base rotate-[-0.03deg]'>{projectName}</div>
       </div>
 
       {/* 그리기 툴 */}
