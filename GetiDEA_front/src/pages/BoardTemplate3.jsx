@@ -23,6 +23,13 @@ import ImageSelector from "../components/funciton/ImageSelector";
 import undoData from "../components/axios/undoData";
 import getData from "../components/axios/getData";
 
+//템플릿을 위한 import
+import bubbleChatProperties from "../components/templateData/template1-position.json";
+import randomWords from "../components/templateData/randomWords.json";
+import TemplateImageComponent from "../components/Add/TemplateImageComponent";
+import TemplateTextComponent from "../components/Add/TemplateTextComponent";
+
+
 const BoardTemplate3 = () => {
 
   const navigate = useNavigate();
@@ -937,12 +944,32 @@ const BoardTemplate3 = () => {
 
   const chatLogEndRef = useRef(null);
 
-
   // 채팅 스크롤 관련 
   useEffect(() => {
     // chatLogEndRef가 가리키는 요소로 스크롤 이동
     chatLogEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [chatLog]);
+
+    //템플릿3에 관한 요소 & 코드
+    const templateImage3 =
+    {
+      "src": "/img/template3_check7/template3Fix2.png",
+      "x": 31,  
+      "y": 10,  
+      "z": -100,
+      "ty": "img",
+      "type": "Image",
+      "width": 200,
+      "height": 96,
+      "draggable": false,
+      "rotation": 0,
+      "scaleX": 5.86,
+      "scaleY": 5.86,
+    }
+  
+    useEffect(() => {
+      setImages(templateImage3);
+    }, []);
 
   return (
     <div className="absolute  inset-0 h-full w-full bg-[#EFEFEF] bg-opacity-50 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px]">
@@ -1360,6 +1387,18 @@ const BoardTemplate3 = () => {
           onClick={handleLayerClick}
         >
           <Layer ref={layerRef}>
+            {/* Template3 - 7Check에 대한 템플릿 정보 출력 */}
+            <TemplateImageComponent
+              src={templateImage3.src}
+              x={templateImage3.x}
+              y={templateImage3.y}
+              z={templateImage3.z}
+              width={templateImage3.width}
+              height={templateImage3.height}
+              rotation={templateImage3.rotation}
+              scaleX={templateImage3.scaleX}
+              scaleY={templateImage3.scaleY}
+            />
             {drawing && (
               <Line
                 points={currentLine}
@@ -1448,7 +1487,7 @@ const BoardTemplate3 = () => {
               />
             ))}
 
-            {images.map((img) => (
+            {/* {images.map((img) => (
               <ImgComponent
                 key={img.id}
                 id={img.id}
@@ -1462,7 +1501,7 @@ const BoardTemplate3 = () => {
                   handleShapeClick(img.id, e);
                 }}
               />
-            ))}
+            ))} */}
 
             {selectedId && (
               <Transformer

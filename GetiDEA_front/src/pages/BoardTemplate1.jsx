@@ -973,7 +973,7 @@ const BoardTemplate1 = () => {
     return randomWords;
   };
 
-  const generateRandomWords2 = () => {
+  const generateRandomWords = () => {
     const selectedRandomWords = getRandomWords(randomWords, 34);
     setSelectedWords(selectedRandomWords);
 
@@ -1423,13 +1423,9 @@ const BoardTemplate1 = () => {
         </div>
       )}
 
-      <div>
-        {/* 버튼 추가 */}
-        <button onClick={generateRandomWords2}>새로운 랜덤 단어 생성</button>
-        {/* 랜덤 단어들을 표시하는 부분 */}
-        {/* {texts.map((word, index) => (
-          <div key={index}>{word.text}</div>
-        ))} */}
+      {/* 템플릿1 랜덤 단어 생성 버튼 */}
+      <div className="absolute bottom-6 left-92 z-50  bottom-5">
+        <button onClick={generateRandomWords}>새로운 랜덤 단어 생성</button>
       </div>
 
 
