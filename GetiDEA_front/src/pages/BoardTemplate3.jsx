@@ -398,11 +398,11 @@ const BoardTemplate3 = () => {
   }, []);
 
   const sendInfoToServer = () => {
-    if (chatInput.nickname.trim() !== "" && chatInput.message.trim() !== "") {
-      const newChat = { ...chatInput, id: new Date().getTime() };
-      setChatLog((prevChatLog) => [...prevChatLog, newChat]);
-      setChatInput({ nickname: localStorage.getItem('userName'), message: "" }); // 입력 필드 초기화
-    }
+    // if (chatInput.nickname.trim() !== "" && chatInput.message.trim() !== "") {
+    //   const newChat = { ...chatInput, id: new Date().getTime() };
+    //   setChatLog((prevChatLog) => [...prevChatLog, newChat]);
+    //   setChatInput({ nickname: localStorage.getItem('userName'), message: "" }); // 입력 필드 초기화
+    // }
 
     // 서버에 데이터 전송
     if (socket && socket.readyState === WebSocket.OPEN) {
