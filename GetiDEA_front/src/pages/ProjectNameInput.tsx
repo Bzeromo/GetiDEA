@@ -29,7 +29,7 @@ const ProjectNameInput: React.FC = () => {
         const inputText = e.target.value;
         const length = Array.from(inputText).length;
 
-         if (length <= 10) {
+         if (length <= 8) {
             setProjectName(inputText);
         } 
 
@@ -47,7 +47,18 @@ const ProjectNameInput: React.FC = () => {
             });
 
             console.log(response);
-            navigate("/board");
+            if(index===1){
+                navigate("/board",{state:{name :projectName}});
+            }
+            else if(index===2){
+                navigate("/board/template1",{state:{name :projectName}});
+            }
+            else if(index===3){
+                navigate("/board/template2",{state:{name :projectName}});
+            }
+            else if(index===4){
+                navigate("/board/template3",{state:{name :projectName}});
+            }
             } catch (error) {
                 console.error('업로드 실패:', error);
                 alert('프로젝트 생성 실패.');
@@ -72,7 +83,7 @@ const ProjectNameInput: React.FC = () => {
             <span className='opacity-0 animate-fadeIn ml-[36px] font-Nanum font-regular text-4xl rotate-[-0.03deg] text-[#333333]' style={{ animationDelay: '0s' }}>프로젝트 이름을 입력해주세요</span>
             <br/>
             <span className='opacity-0 animate-fadeIn ml-10 font-Nanum font-regular text-lg rotate-[-0.03deg] text-[#333333] opacity-82' style={{ animationDelay: '0.5s' }}>
-            최대 10자까지 입력 가능합니다.
+            최대 8자까지 입력 가능합니다.
             </span>
             <br />
             <span className='opacity-0 animate-fadeIn  ml-10 font-Nanum font-regular text-lg rotate-[-0.03deg] text-[#333333] opacity-82' style={{ animationDelay: '0.5s' }}>
