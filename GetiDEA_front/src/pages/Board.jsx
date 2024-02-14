@@ -804,7 +804,9 @@ const WhiteBoard = () => {
     setStrokeWidthSize(e.target.value);
     setShapes(
       shapes.map((shape) =>
-        shape.id === selectedId ? { ...shape, strokeWidth: e.target.value } : shape
+        shape.id === selectedId
+          ? { ...shape, strokeWidth: e.target.value }
+          : shape
       )
     );
   };
@@ -830,11 +832,11 @@ const WhiteBoard = () => {
   const handleInfo = (e) => {
     const target = e.target;
 
-    console.log(target + "test")
+    console.log(target + "test");
 
     setShapeWidth(e.target.width);
     setShapeHeight(e.target.height);
-  }
+  };
 
   const handleFontSize = (e) => {
     const newFontSize = parseInt(e.target.value, 10);
@@ -1486,50 +1488,67 @@ const WhiteBoard = () => {
       </div>
 
       {/* 도형 서식 창 */}
-      <div className="absolute top-32 z-20 right-5 justify-center bg-white rounded-md w-64 h-[400px] gap-6 flex flex-col shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]">
-        <div className="mt-6 font-Nanum text-sm font-regular">
-          도형 색 : 
-          <input
-            type="color"
-            value={currentColor}
-            onChange={handleColorChange}
-          />
-        </div>
-        <div className="mt-6 font-Nanum text-sm font-regular">
-          도형 테두리 색 : 
-          <input
-            type="color"
-            value={strokeCurrentColor}
-            onChange={handleStrokeColorChange}
-          />
-        </div>
-        <div className="mt-6 font-Nanum text-sm font-regular">
-          테두리 크기 / 
-          <input
-            type="number"
-            value={strokeWidthSize}
-            onChange={handleStrokeWidthChange}
-          />
-        </div>
-        <div>
+
+      {selectedId !== null && (
+        <div className="absolute top-32 z-20 right-5 justify-center bg-white rounded-md w-75 h-[450px] gap-6 flex flex-col shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]">
           <div className="mt-6 font-Nanum text-sm font-regular">
-            도형높이 4 / 
+            도형 색 :
             <input
-              type="number"
-              value={shapeHeight}
-              onChange={handleShapeHeightChange}
+              type="color"
+              value={currentColor}
+              onChange={handleColorChange}
             />
           </div>
           <div className="mt-6 font-Nanum text-sm font-regular">
-            도형너비 4 / 
+            도형 테두리 색 :
             <input
-              type="number"
-              value={shapeWidth}
-              onChange={handleShapeWidthChange}
+              type="color"
+              value={strokeCurrentColor}
+              onChange={handleStrokeColorChange}
             />
           </div>
+          <div className="mt-6 font-Nanum text-sm font-regular">
+            테두리 크기 /
+            <input
+              type="number"
+              value={strokeWidthSize}
+              onChange={handleStrokeWidthChange}
+            />
+          </div>
+          <div className="flex justify-around mt-6">
+            <button className="px-3 py-1 bg-blue-500 text-black text-sm rounded-md shadow-md hover:bg-blue-600" onClick={() => moveToBottom()}>
+              제일 아래
+            </button>
+            <button className="px-3 py-1 bg-blue-500 text-black text-sm rounded-md shadow-md hover:bg-blue-600" onClick={() => moveToTop()}>
+              제일 위
+            </button>
+            <button className="px-3 py-1 bg-blue-500 text-black text-sm rounded-md shadow-md hover:bg-blue-600" onClick={() => moveDown()}>
+              한칸 아래
+            </button>
+            <button className="px-3 py-1 bg-blue-500 text-black text-sm rounded-md shadow-md hover:bg-blue-600" onClick={() => moveUp()}>
+              한칸 위
+            </button>
+          </div>
+          <div>
+            <div className="mt-6 font-Nanum text-sm font-regular">
+              도형높이 4 /
+              <input
+                type="number"
+                value={shapeHeight}
+                onChange={handleShapeHeightChange}
+              />
+            </div>
+            <div className="mt-6 font-Nanum text-sm font-regular">
+              도형너비 4 /
+              <input
+                type="number"
+                value={shapeWidth}
+                onChange={handleShapeWidthChange}
+              />
+            </div>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* (테스트 버튼) 보드 내 요소들 체크 버튼 */}
       {/* <div className="absolute top-6 right-32 justify-center bg-white rounded-md w-16 h-[50px] flex  items-center flex-row shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]">
@@ -1561,23 +1580,23 @@ const WhiteBoard = () => {
         />
       </div> */}
 
-      {/* 한칸 위 버튼 */}
+      {/* 한칸 위 버튼 
       <div className="absolute bottom-6 right-32 z-50 justify-center bg-white rounded-md w-16 h-[50px] flex  items-center flex-row shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]">
         <button onClick={moveUp}>한칸 위</button>
       </div>
 
-      {/* 한칸 아래 버튼 */}
+      한칸 아래 버튼 
       <div className="absolute bottom-6 right-12 z-50 justify-center bg-white rounded-md w-16 h-[50px] flex  items-center flex-row shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]">
         <button onClick={moveToBottom}>한칸 아래</button>
       </div>
 
-      {/* 제일 위 버튼 */}
+      제일 위 버튼
       <div className="absolute bottom-6 right-52 z-50  justify-center bg-white rounded-md w-16 h-[50px] flex  items-center flex-row shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]">
         <button onClick={moveToTop}>제일 위</button>
-      </div>
+      </div> */}
+
 
       {/* 이미지 툴 */}
-
       {imgMenuToggle && (
         <div className="absolute left-[80px] bottom-5">
           {" "}
