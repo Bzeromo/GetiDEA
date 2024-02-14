@@ -29,7 +29,7 @@ const addFunction = (
     const newShape = {
       id: `${type}${uuidv4()}`,
       type: "Rect",
-      stroke: selectStroke,
+      stroke: "",
       x: 50,
       y: 50,
       width: 100,
@@ -47,7 +47,7 @@ const addFunction = (
     const newShape = {
       id: `${type}${uuidv4()}`,
       type: "Circle",
-      stroke: selectStroke,
+      stroke: "",
       x: 50,
       y: 50,
       radius: 50,
@@ -62,7 +62,7 @@ const addFunction = (
     const newShape = {
       id: `${type}${uuidv4()}`,
       type: "RegularPolygon",
-      stroke: selectStroke,
+      stroke: "",
       x: 50,
       y: 50,
       sides: 3,

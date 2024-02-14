@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
-import { useNavigate,useLocation } from 'react-router-dom';
+import { useNavigate, useLocation } from "react-router-dom";
 import { Stage, Layer, Transformer, Line, Image } from "react-konva";
 import axios from "axios";
 import useImage from "use-image";
@@ -24,9 +24,7 @@ import undoData from "../components/axios/undoData";
 import getData from "../components/axios/getData";
 import InviteModal from "../components/InviteModal";
 
-
 const WhiteBoard = () => {
-
   const navigate = useNavigate();
 
   const [imageIdCounter, setImageIdCounter] = useState(0);
@@ -69,7 +67,10 @@ const WhiteBoard = () => {
   //채팅방
   const [chatClick, setChatClick] = useState(false);
   const [chatLog, setChatLog] = useState([]);
-  const [chatInput, setChatInput] = useState({ nickname: localStorage.getItem('userName'), message: "" });
+  const [chatInput, setChatInput] = useState({
+    nickname: localStorage.getItem("userName"),
+    message: "",
+  });
 
   //드래그 끝남 여부 확인(비동기 처리 필요)
   const [dragEnded, setDragEnded] = useState(false);
@@ -165,8 +166,12 @@ const WhiteBoard = () => {
   const [fillColor, setFillColor] = useState("#000000");
   const [selectedId, setSelectedId] = useState(null);
   const [currentColor, setCurrentColor] = useState(fillColor);
+  const [strokeCurrentColor, setStrokeCurrentColor] = useState("");
+  const [strokeWidthSize, setStrokeWidthSize] = useState();
+  const [shapeWidth, setShapeWidth] = useState();
+  const [shapeHeight, setShapeHeight] = useState();
+
   const [selectStroke, setSelectStroke] = useState("");
-  const [newTextValue, setNewTextValue] = useState("");
   const [fontSize, setFontSize] = useState(10);
   const [count, setCount] = useState(0);
 
@@ -197,24 +202,24 @@ const WhiteBoard = () => {
   const [preData, setPreData] = useState([]);
 
   useEffect(() => {
-    
-    if(location.state?.name){
+    if (location.state?.name) {
       setProjectName(location.state.name);
-    }
-    else if(location.state?.projectId){
+    } else if (location.state?.projectId) {
       setProjectId(location.state.projectId);
       console.log(location.state.projectId);
       const loadProject = async () => {
         try {
-          const response = await api.get(`/api/project/open?projectId=${location.state.projectId}`);
+          const response = await api.get(
+            `/api/project/open?projectId=${location.state.projectId}`
+          );
           setProject(response.data); // 이 시점에서 project 상태가 업데이트 됩니다.
-          setProjectName(response.data.projectName); 
-          console.log(response.data)
+          setProjectName(response.data.projectName);
+          console.log(response.data);
         } catch (error) {
-          console.error('Error fetching data: ', error);
+          console.error("Error fetching data: ", error);
         }
       };
-  
+
       loadProject();
     }
     getProjectData();
@@ -375,7 +380,7 @@ const WhiteBoard = () => {
   const [socket, setSocket] = useState(null);
 
   useEffect(() => {
-    const socket = new WebSocket("ws://localhost:8000/");
+    const socket = new WebSocket(`ws://localhost:8000/${projectId}`);
 
     socket.onopen = () => {
       console.log("WebSocket 연결이 열렸습니다.");
@@ -423,7 +428,7 @@ const WhiteBoard = () => {
     if (chatInput.nickname.trim() !== "" && chatInput.message.trim() !== "") {
       const newChat = { ...chatInput, id: new Date().getTime() };
       setChatLog((prevChatLog) => [...prevChatLog, newChat]);
-      setChatInput({ nickname: localStorage.getItem('userName'), message: "" }); // 입력 필드 초기화
+      setChatInput({ nickname: localStorage.getItem("userName"), message: "" }); // 입력 필드 초기화
     }
 
     // 서버에 데이터 전송
@@ -434,7 +439,7 @@ const WhiteBoard = () => {
         texts: texts,
         images: images,
         drawingList: drawingList,
-        projectId : location.state.projectId,
+        projectId: location.state.projectId,
         newChat:
           chatInput.nickname.trim() !== "" && chatInput.message.trim() !== ""
             ? { ...chatInput, id: new Date().getTime() }
@@ -786,6 +791,51 @@ const WhiteBoard = () => {
     );
   };
 
+  const handleStrokeColorChange = (e) => {
+    setStrokeCurrentColor(e.target.value);
+    setShapes(
+      shapes.map((shape) =>
+        shape.id === selectedId ? { ...shape, stroke: e.target.value } : shape
+      )
+    );
+  };
+
+  const handleStrokeWidthChange = (e) => {
+    setStrokeWidthSize(e.target.value);
+    setShapes(
+      shapes.map((shape) =>
+        shape.id === selectedId ? { ...shape, strokeWidth: e.target.value } : shape
+      )
+    );
+  };
+
+  const handleShapeHeightChange = (e) => {
+    setShapeHeight(e.target.value);
+    setShapes(
+      shapes.map((shape) =>
+        shape.id === selectedId ? { ...shape, height: e.target.value } : shape
+      )
+    );
+  };
+
+  const handleShapeWidthChange = (e) => {
+    setShapeWidth(e.target.value);
+    setShapes(
+      shapes.map((shape) =>
+        shape.id === selectedId ? { ...shape, width: e.target.value } : shape
+      )
+    );
+  };
+
+  const handleInfo = (e) => {
+    const target = e.target;
+
+    console.log(target + "test")
+
+    setShapeWidth(e.target.width);
+    setShapeHeight(e.target.height);
+  }
+
   const handleFontSize = (e) => {
     const newFontSize = parseInt(e.target.value, 10);
     if (!isNaN(newFontSize)) {
@@ -804,6 +854,10 @@ const WhiteBoard = () => {
   const handleShapeClick = (id, e) => {
     e.cancelBubble = true;
     setSelectedId(id);
+    const target = e.target.attrs;
+    setStrokeWidthSize(target.strokeWidth);
+    setShapeHeight(target.height);
+    setShapeWidth(target.width);
     console.log(id);
   };
 
@@ -935,10 +989,10 @@ const WhiteBoard = () => {
     setWriteToggle(false);
   };
 
-  const chatToggle = () =>{
+  const chatToggle = () => {
     setChatClick(!chatClick);
-  }
-  
+  };
+
   const colorToggle = () => {
     setColorMenuToggle(!colorMenuToggle);
   };
@@ -960,57 +1014,75 @@ const WhiteBoard = () => {
 
   const chatLogEndRef = useRef(null);
 
-
-  
-  // 채팅 스크롤 관련 
+  // 채팅 스크롤 관련
   useEffect(() => {
     // chatLogEndRef가 가리키는 요소로 스크롤 이동
-    chatLogEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    chatLogEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [chatLog]);
 
-  const goHome = () =>{
+  const goHome = () => {
     const loadProject = async () => {
       try {
-        const response = await api.delete(`/api/project/close/${location.state.projectId}`);
-        console.log(response)
+        const response = await api.delete(
+          `/api/project/close/${location.state.projectId}`
+        );
+        console.log(response);
       } catch (error) {
-        console.error('Error fetching data: ', error);
+        console.error("Error fetching data: ", error);
       }
     };
 
     loadProject();
     navigate("/home");
-  }
+  };
 
   const openModal = (projectId) => {
     setIsOpen(false);
     setProjectId(projectId);
     setIsModalOpen(true);
-  }
+  };
   const closeModal = () => setIsModalOpen(false);
-
 
   return (
     <div className="absolute  inset-0 h-full w-full bg-[#EFEFEF] bg-opacity-50 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px]">
-       <InviteModal isOpen={isModalOpen} closeModal={closeModal} projectId={projectId}></InviteModal>
+      <InviteModal
+        isOpen={isModalOpen}
+        closeModal={closeModal}
+        projectId={projectId}
+      ></InviteModal>
       {/* 왼쪽 윗 블록 */}
-      <div className='absolute top-6 left-6 pl-5 bg-white rounded-md w-[420px] h-[50px] flex items-center flex-row shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]'>
-      
+      <div className="absolute top-6 left-6 pl-5 bg-white rounded-md w-[420px] h-[50px] flex items-center flex-row shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]">
         {/* 뒤로가기 버튼 */}
-        <svg  xmlns="http://www.w3.org/2000/svg" onClick={()=>goHome()}  fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 cursor-pointer">
-          <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          onClick={() => goHome()}
+          fill="none"
+          viewBox="0 0 24 24"
+          strokeWidth={1.5}
+          stroke="currentColor"
+          className="w-6 h-6 cursor-pointer"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M15.75 19.5 8.25 12l7.5-7.5"
+          />
         </svg>
 
-        <div className='ml-6 border-l-2 border-line_gray'>&ensp;</div>
+        <div className="ml-6 border-l-2 border-line_gray">&ensp;</div>
 
         {/* 서비스 로고 */}
-        <img src="/logo.svg" alt="" className='ml-4 w-8 h-8 '/>
-        <div className=' ml-3 font-Inter font-bold text-xl rotate-[-0.03deg]'>Get iDEA</div>
+        <img src="/logo.svg" alt="" className="ml-4 w-8 h-8 " />
+        <div className=" ml-3 font-Inter font-bold text-xl rotate-[-0.03deg]">
+          Get iDEA
+        </div>
 
-        <div className='ml-8 border-l-2 border-line_gray'>&ensp;</div>
+        <div className="ml-8 border-l-2 border-line_gray">&ensp;</div>
 
         {/* 프로젝트 이름 */}
-        <div className=' ml-3 w-32 font-Nanum font-medium text-center text-base rotate-[-0.03deg]'>{projectName}</div>
+        <div className=" ml-3 w-32 font-Nanum font-medium text-center text-base rotate-[-0.03deg]">
+          {projectName}
+        </div>
       </div>
 
       {/* 그리기 툴 */}
@@ -1161,8 +1233,20 @@ const WhiteBoard = () => {
         />
 
         {/* 이미지 넣기 툴 */}
-        <svg onClick={imgToggle} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="mt-6 w-6 h-6 cursor-pointer">
-          <path strokeLinecap="round" strokeLinejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
+        <svg
+          onClick={imgToggle}
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          strokeWidth={1.5}
+          stroke="currentColor"
+          className="mt-6 w-6 h-6 cursor-pointer"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z"
+          />
         </svg>
 
         {/* 기타 툴 */}
@@ -1191,7 +1275,6 @@ const WhiteBoard = () => {
       </div>
 
       {/* 튜토리얼 버튼 */}
-    
 
       {/* 실행취소 버튼 */}
       {/* <div
@@ -1235,55 +1318,77 @@ const WhiteBoard = () => {
         </svg>
       </div> */}
 
-
       {/* 채팅창 */}
-      <div className={chatClick? "absolute top-20 right-10 w-[350px] p-3 z-20 justify-center container  ml-auto px-4": "invisible absolute top-20 right-10 w-80 p-7 z-20 justify-center container w-1/4 ml-auto px-4 "}>
+      <div
+        className={
+          chatClick
+            ? "absolute top-20 right-10 w-[350px] p-3 z-20 justify-center container  ml-auto px-4"
+            : "invisible absolute top-20 right-10 w-80 p-7 z-20 justify-center container w-1/4 ml-auto px-4 "
+        }
+      >
         <div className="bg-white  rounded-lg shadow-lg">
           <div className="mb-4">
-           
-            <div id="chat-log" className="h-80 overflow-auto p-4 bg-gray-200 rounded hide-scrollbar">
-              {chatLog.map((chat) => (
-                chat.nickname === localStorage.getItem('userName') ? (
+            <div
+              id="chat-log"
+              className="h-80 overflow-auto p-4 bg-gray-200 rounded hide-scrollbar"
+            >
+              {chatLog.map((chat) =>
+                chat.nickname === localStorage.getItem("userName") ? (
                   // admin인 경우의 스타일
-                  
-                  <div key={chat.id} className="flex flex-row-reverse chat-message admin-message mr-2" style={{
-                    minWidth: '30px',
-                    
-                  
-                    margin: '5px 0', // 상하 마진 추가로 이미지와 메시지 사이 간격 조정
-                    wordWrap: 'break-word',
-                  }}>
-                      <img className="rounded-full w-12 h-12 border-[1px] border-light_gray" src={localStorage.getItem("profileImage")} alt="" style={{
-                          marginRight: '10px', // 이미지와 텍스트 사이 간격
-                          
-                        }} />
-                        <div className="bg-[#5aa5ff] break-all drop-shadow-md text-sm max-w-40 min-w-12 font-Nanum px-3 rounded-lg mr-3 text-center flex justify-center items-center text-white">
-                        {chat.message}
-                        </div>
+
+                  <div
+                    key={chat.id}
+                    className="flex flex-row-reverse chat-message admin-message mr-2"
+                    style={{
+                      minWidth: "30px",
+
+                      margin: "5px 0", // 상하 마진 추가로 이미지와 메시지 사이 간격 조정
+                      wordWrap: "break-word",
+                    }}
+                  >
+                    <img
+                      className="rounded-full w-12 h-12 border-[1px] border-light_gray"
+                      src={localStorage.getItem("profileImage")}
+                      alt=""
+                      style={{
+                        marginRight: "10px", // 이미지와 텍스트 사이 간격
+                      }}
+                    />
+                    <div className="bg-[#5aa5ff] break-all drop-shadow-md text-sm max-w-40 min-w-12 font-Nanum px-3 rounded-lg mr-3 text-center flex justify-center items-center text-white">
+                      {chat.message}
+                    </div>
                   </div>
                 ) : (
                   // admin이 아닌 경우의 기본 스타일
-                  <div key={chat.id} className="flex  flex-row chat-message admin-message mr-2" style={{
-                    minWidth: '30px',
-                    
-                  
-                    margin: '5px 0', // 상하 마진 추가로 이미지와 메시지 사이 간격 조정
-                    wordWrap: 'break-word',
-                  }}>
-                      <img className="rounded-full w-12 h-12 border-[1px] border-light_gray" src={localStorage.getItem("profileImage")} alt="" style={{
-                          marginRight: '10px', // 이미지와 텍스트 사이 간격
-                        }} />
-                        <div className="bg-white break-all drop-shadow-md font-Nanum text-sm px-3 max-w-40 rounded-lg mr-3 text-center flex justify-center items-center">
-                        {chat.message}
-                        </div>
+                  <div
+                    key={chat.id}
+                    className="flex  flex-row chat-message admin-message mr-2"
+                    style={{
+                      minWidth: "30px",
+
+                      margin: "5px 0", // 상하 마진 추가로 이미지와 메시지 사이 간격 조정
+                      wordWrap: "break-word",
+                    }}
+                  >
+                    <img
+                      className="rounded-full w-12 h-12 border-[1px] border-light_gray"
+                      src={localStorage.getItem("profileImage")}
+                      alt=""
+                      style={{
+                        marginRight: "10px", // 이미지와 텍스트 사이 간격
+                      }}
+                    />
+                    <div className="bg-white break-all drop-shadow-md font-Nanum text-sm px-3 max-w-40 rounded-lg mr-3 text-center flex justify-center items-center">
+                      {chat.message}
+                    </div>
                   </div>
                 )
-              ))}
-               <div ref={chatLogEndRef} />
+              )}
+              <div ref={chatLogEndRef} />
             </div>
-             <div>
+            <div>
               <hr className="bg-gray opacity-10 mt-1"></hr>
-             </div>
+            </div>
             <div className="flex flex-row">
               <input
                 type="text"
@@ -1293,49 +1398,138 @@ const WhiteBoard = () => {
                 placeholder="메시지를 입력하세요"
                 className=" p-2 rounded flex w-64 h-12 text-sm focus:outline-none"
                 onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
+                  if (e.key === "Enter") {
                     e.preventDefault(); // 폼 제출을 방지
                     sendInfoToServer();
-
                   }
                 }}
               />
-              <svg className="w-6 h-6 mt-3 ml-3 cursor-pointer drop-shadow" onClick={sendInfoToServer} viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><path d="m511.6 36.86-64 415.1a32.008 32.008 0 0 1-31.65 27.147c-4.188 0-8.319-.815-12.29-2.472l-122.6-51.1-50.86 76.29C226.3 508.5 219.8 512 212.8 512c-11.5 0-20.8-9.3-20.8-20.8v-96.18c0-7.115 2.372-14.03 6.742-19.64L416 96 122.3 360.3 19.69 317.5C8.438 312.8.812 302.2.062 289.1s5.47-23.72 16.06-29.77l448-255.1c10.69-6.109 23.88-5.547 34 1.406S513.5 24.72 511.6 36.86z" fill="#bdbdbd" ></path></svg>
+              <svg
+                className="w-6 h-6 mt-3 ml-3 cursor-pointer drop-shadow"
+                onClick={sendInfoToServer}
+                viewBox="0 0 512 512"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="m511.6 36.86-64 415.1a32.008 32.008 0 0 1-31.65 27.147c-4.188 0-8.319-.815-12.29-2.472l-122.6-51.1-50.86 76.29C226.3 508.5 219.8 512 212.8 512c-11.5 0-20.8-9.3-20.8-20.8v-96.18c0-7.115 2.372-14.03 6.742-19.64L416 96 122.3 360.3 19.69 317.5C8.438 312.8.812 302.2.062 289.1s5.47-23.72 16.06-29.77l448-255.1c10.69-6.109 23.88-5.547 34 1.406S513.5 24.72 511.6 36.86z"
+                  fill="#bdbdbd"
+                ></path>
+              </svg>
             </div>
-           
-            </div>
-           
+          </div>
         </div>
       </div>
 
       {/* 오른쪽 윗 블록 */}
-      <div className='absolute top-6 right-32 justify-center bg-white rounded-md w-64 h-[50px] gap-8 flex  items-center flex-row shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]'>
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="hover:stroke-blue w-7 h-7 cursor-pointer">
-        <path strokeLinecap="round" strokeLinejoin="round" d="m15.75 10.5 4.72-4.72a.75.75 0 0 1 1.28.53v11.38a.75.75 0 0 1-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 0 0 2.25-2.25v-9a2.25 2.25 0 0 0-2.25-2.25h-9A2.25 2.25 0 0 0 2.25 7.5v9a2.25 2.25 0 0 0 2.25 2.25Z" />
+      <div className="absolute top-6 right-32 justify-center bg-white rounded-md w-64 h-[50px] gap-8 flex  items-center flex-row shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          strokeWidth={1.5}
+          stroke="currentColor"
+          className="hover:stroke-blue w-7 h-7 cursor-pointer"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="m15.75 10.5 4.72-4.72a.75.75 0 0 1 1.28.53v11.38a.75.75 0 0 1-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 0 0 2.25-2.25v-9a2.25 2.25 0 0 0-2.25-2.25h-9A2.25 2.25 0 0 0 2.25 7.5v9a2.25 2.25 0 0 0 2.25 2.25Z"
+          />
         </svg>
 
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="hover:stroke-blue w-7 h-7 cursor-pointer">
-        <path strokeLinecap="round" strokeLinejoin="round" d="M12 18.75a6 6 0 0 0 6-6v-1.5m-6 7.5a6 6 0 0 1-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 0 1-3-3V4.5a3 3 0 1 1 6 0v8.25a3 3 0 0 1-3 3Z" />
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          strokeWidth={1.5}
+          stroke="currentColor"
+          className="hover:stroke-blue w-7 h-7 cursor-pointer"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M12 18.75a6 6 0 0 0 6-6v-1.5m-6 7.5a6 6 0 0 1-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 0 1-3-3V4.5a3 3 0 1 1 6 0v8.25a3 3 0 0 1-3 3Z"
+          />
         </svg>
 
-        <svg className="hover:stroke-blue w-7 h-7 cursor-pointer" onClick={chatToggle} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" >
-        <path strokeLinecap="round" strokeLinejoin="round" d="M8.625 9.75a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375m-13.5 3.01c0 1.6 1.123 2.994 2.707 3.227 1.087.16 2.185.283 3.293.369V21l4.184-4.183a1.14 1.14 0 0 1 .778-.332 48.294 48.294 0 0 0 5.83-.498c1.585-.233 2.708-1.626 2.708-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z" />
+        <svg
+          className="hover:stroke-blue w-7 h-7 cursor-pointer"
+          onClick={chatToggle}
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          strokeWidth={1.5}
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M8.625 9.75a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375m-13.5 3.01c0 1.6 1.123 2.994 2.707 3.227 1.087.16 2.185.283 3.293.369V21l4.184-4.183a1.14 1.14 0 0 1 .778-.332 48.294 48.294 0 0 0 5.83-.498c1.585-.233 2.708-1.626 2.708-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z"
+          />
         </svg>
 
-        <svg onClick={()=>openModal(projectId)} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidtfh={1.5} stroke="currentColor" className="hover:stroke-blue w-7 h-7 cursor-pointer">
-        <path strokeLinecap="round" strokeLinejoin="round" d="M9 8.25H7.5a2.25 2.25 0 0 0-2.25 2.25v9a2.25 2.25 0 0 0 2.25 2.25h9a2.25 2.25 0 0 0 2.25-2.25v-9a2.25 2.25 0 0 0-2.25-2.25H15m0-3-3-3m0 0-3 3m3-3V15" />
+        <svg
+          onClick={() => openModal(projectId)}
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          strokeWidtfh={1.5}
+          stroke="currentColor"
+          className="hover:stroke-blue w-7 h-7 cursor-pointer"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M9 8.25H7.5a2.25 2.25 0 0 0-2.25 2.25v9a2.25 2.25 0 0 0 2.25 2.25h9a2.25 2.25 0 0 0 2.25-2.25v-9a2.25 2.25 0 0 0-2.25-2.25H15m0-3-3-3m0 0-3 3m3-3V15"
+          />
         </svg>
       </div>
 
-
       {/* 도형 서식 창 */}
-      <div className='absolute top-32 right-5 justify-center bg-white rounded-md w-64 h-[400px] gap-8 flex  flex-row shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]'>
-                <div className="mt-6 font-Nanum text-xl font-regular">
-                  도형 서식
-                </div>
+      <div className="absolute top-32 z-20 right-5 justify-center bg-white rounded-md w-64 h-[400px] gap-6 flex flex-col shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]">
+        <div className="mt-6 font-Nanum text-sm font-regular">
+          도형 색 : 
+          <input
+            type="color"
+            value={currentColor}
+            onChange={handleColorChange}
+          />
         </div>
-                
-
+        <div className="mt-6 font-Nanum text-sm font-regular">
+          도형 테두리 색 : 
+          <input
+            type="color"
+            value={strokeCurrentColor}
+            onChange={handleStrokeColorChange}
+          />
+        </div>
+        <div className="mt-6 font-Nanum text-sm font-regular">
+          테두리 크기 / 
+          <input
+            type="number"
+            value={strokeWidthSize}
+            onChange={handleStrokeWidthChange}
+          />
+        </div>
+        <div>
+          <div className="mt-6 font-Nanum text-sm font-regular">
+            도형높이 4 / 
+            <input
+              type="number"
+              value={shapeHeight}
+              onChange={handleShapeHeightChange}
+            />
+          </div>
+          <div className="mt-6 font-Nanum text-sm font-regular">
+            도형너비 4 / 
+            <input
+              type="number"
+              value={shapeWidth}
+              onChange={handleShapeWidthChange}
+            />
+          </div>
+        </div>
+      </div>
 
       {/* (테스트 버튼) 보드 내 요소들 체크 버튼 */}
       {/* <div className="absolute top-6 right-32 justify-center bg-white rounded-md w-16 h-[50px] flex  items-center flex-row shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]">
@@ -1383,7 +1577,7 @@ const WhiteBoard = () => {
       </div>
 
       {/* 이미지 툴 */}
-    
+
       {imgMenuToggle && (
         <div className="absolute left-[80px] bottom-5">
           {" "}
@@ -1392,14 +1586,12 @@ const WhiteBoard = () => {
         </div>
       )}
 
-
-
       {/* 그리는 구역 */}
       <div className="ml-36 mt-24 h-96 w-96">
         <Stage
           ref={stageRef}
-          width={window.innerWidth*0.85}
-          height={window.innerHeight*0.85}
+          width={window.innerWidth * 0.85}
+          height={window.innerHeight * 0.85}
           draggable={!draggable}
           onWheel={zoomOnWheel}
           onMouseDown={handleMouseDown}
@@ -1436,6 +1628,7 @@ const WhiteBoard = () => {
                   );
                   setShapes(newShapes); // 상태 업데이트
                 }}
+                // onDoubleClick={(e) => handleInfo(e)}
               />
             ))}
             {lines.map((line) => {
