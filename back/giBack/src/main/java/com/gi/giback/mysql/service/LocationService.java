@@ -25,12 +25,12 @@ public class LocationService {
         this.projectService = projectService;
     }
 
-    public LocationEntity createLocation(String userEmail, Long projectId, String projectName, String FolderName) {
+    public LocationEntity createLocation(String userEmail, Long projectId, String projectName, String folderName) {
         LocationEntity locationEntity = LocationEntity.builder()
                 .userEmail(userEmail)
                 .projectId(projectId)
                 .projectName(projectName)
-                .folderName(FolderName)
+                .folderName(folderName)
                 .build();
         return locationRepository.save(locationEntity);
     }

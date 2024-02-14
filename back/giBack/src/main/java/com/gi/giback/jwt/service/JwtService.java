@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @Service
 public class JwtService {
-    private final SecretKey key = Keys.secretKeyFor(SignatureAlgorithm.HS512); // 안전한 키 생성;
+    private final SecretKey key = Keys.secretKeyFor(SignatureAlgorithm.HS512);
 
     @Value("${jwt.access.expiration}")
     private int jwtExpirationMs;

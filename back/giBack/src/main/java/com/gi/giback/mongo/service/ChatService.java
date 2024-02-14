@@ -16,8 +16,11 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class ChatService {
+    private final MongoTemplate mongoTemplate;
     @Autowired
-    private MongoTemplate mongoTemplate;
+    public ChatService(MongoTemplate mongoTemplate) {
+        this.mongoTemplate = mongoTemplate;
+    }
 
     public boolean addChatLog(ChatSendDTO data) {
         Long projectId = data.getProjectId();

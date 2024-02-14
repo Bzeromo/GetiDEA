@@ -20,11 +20,9 @@ import org.springframework.web.filter.OncePerRequestFilter;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
-    private final UserService userService;
 
-    public JwtAuthenticationFilter(JwtService jwtService, UserService userService) {
+    public JwtAuthenticationFilter(JwtService jwtService) {
         this.jwtService = jwtService;
-        this.userService = userService;
     }
 
     @Override
@@ -51,14 +49,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401 Unauthorized
         }
         filterChain.doFilter(request, response);
-    }
-
-    private String getRefreshTokenFromRequest(HttpServletRequest request) {
-        String refreshToken = request.getHeader("Authorization-refresh");
-        if (refreshToken != null && refreshToken.startsWith("Bearer ")) {
-            return refreshToken.substring(7);
-        }
-        return null;
     }
 
     private String getTokenFromRequest(HttpServletRequest request) {
