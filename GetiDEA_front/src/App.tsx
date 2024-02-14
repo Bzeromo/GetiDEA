@@ -49,10 +49,15 @@ const App: React.FC = () => {
 
           <Route path="/templateSelect" element={<ProtectedRoute><TemplateSelect /></ProtectedRoute>} />
           <Route path="/projectnameinput" element={<ProtectedRoute><ProjectNameInput /></ProtectedRoute>} />
-          <Route path="/board" element={<ProtectedRoute><WhiteBoard /></ProtectedRoute>} />
+          {/* <Route path="/board" element={<ProtectedRoute><WhiteBoard /></ProtectedRoute>} />
           <Route path="/board/template1" element={<ProtectedRoute><BoardTemplate1 /></ProtectedRoute>} />
           <Route path="/board/template2" element={<ProtectedRoute><BoardTemplate2 /></ProtectedRoute>} />
-          <Route path="/board/template3" element={<ProtectedRoute><BoardTemplate3 /></ProtectedRoute>} />
+          <Route path="/board/template3" element={<ProtectedRoute><BoardTemplate3 /></ProtectedRoute>} /> */}
+
+          <Route path="/board" element={<WhiteBoard />} />
+          <Route path="/board/template1" element={<BoardTemplate1 />} />
+          <Route path="/board/template2" element={<BoardTemplate2 />} />
+          <Route path="/board/template3" element={<BoardTemplate3 />} />
         
          
       </Routes>

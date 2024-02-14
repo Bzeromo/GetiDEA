@@ -192,9 +192,9 @@ const BoardTemplate2 = () => {
 
   const [preData, setPreData] = useState([]);
   useEffect(() => {
-    if(location.state.name){
-      setProjectName(location.state.name);
-    }
+    // if(location.state.name){
+    //   setProjectName(location.state.name);
+    // }
     getProjectData();
     console.log(`|\\_/|
 |q p|   /}
