@@ -1085,9 +1085,8 @@ const BoardTemplate3 = () => {
       activate: activatedNumber === 3,
       component:
         <div className="bg-white p-8 shadow-lg rounded-lg">
-          <p className="text-center font-Nanum font-bold text-3xl text-black" >'축소 - Reduction'</p>
+          <p className="text-center font-Nanum font-bold text-3xl text-[#EBEB00]" >'축소 - Reduction'</p>
           <p className="text-center font-Nanum text-l mt-4">아이디어를 다양한 방법으로 축소하는 카드입니다.</p>
-          <p className="text-center font-Nanum text-l">축소된 아이디어를 적어보세요!</p>
 
           <div className="flex justify-between items-center mt-8">
             <button className="bg-blue-500 hover:bg-blue-700 text-white font-Nanum font-bold py-2 px-4 rounded shadow">{PrevButton}</button>
@@ -1107,11 +1106,8 @@ const BoardTemplate3 = () => {
       activate: activatedNumber === 4,
       component:
         <div className="bg-white p-8 shadow-lg rounded-lg">
-          <p className="text-center font-Nanum font-bold text-3xl text-[#8B0000]" >'Feeling'</p>
-          <p className="text-center font-Nanum text-l mt-4">빨간색 모자는 ‘직관적’입니다.</p>
-          <p className="text-center font-Nanum text-l">아이디어에 대해 느낀 직관적 반응, 즉 감정과 정서를 제시해보세요.</p>
-          <p className="text-center font-Nanum text-l">이유 또는 근거는 필요하지 않습니다!</p>
-
+          <p className="text-center font-Nanum font-bold text-3xl text-[#FF8C00]" >'확대 - Enlargement'</p>
+          <p className="text-center font-Nanum text-l mt-4">아이디어를 다양한 방법으로 확대하는 카드입니다.</p>
           <div className="flex justify-between items-center mt-8">
             <button className="bg-blue-500 hover:bg-blue-700 text-white font-Nanum font-bold py-2 px-4 rounded shadow">{PrevButton}</button>
             <span className="text-blue-800 font-Nanum">
@@ -1130,10 +1126,8 @@ const BoardTemplate3 = () => {
       activate: activatedNumber === 5,
       component:
         <div className="bg-white p-8 shadow-lg rounded-lg">
-          <p className="text-center font-Nanum font-bold text-3xl text-yellow-600 text-[#9B870C]" >'Benefit'</p>
-          <p className="text-center font-Nanum text-l mt-4">노란색 모자는 ‘긍정적’입니다.</p>
-          <p className="text-center font-Nanum text-l">긍정적 측면, 장점, 낙관적 관점에 집중해보세요.</p>
-          <p className="text-center font-Nanum text-l">단, 타당성 검토가 필요하며, 반드시 논리적이어야 합니다!</p>
+          <p className="text-center font-Nanum font-bold text-3xl text-yellow-600 text-[#32CD32]" >'수정 - Modification'</p>
+          <p className="text-center font-Nanum text-l mt-4">아이디어를 다양한 방법으로 수정 및 변화하는 카드입니다.</p>
 
           <div className="flex justify-between items-center mt-8">
             <button className="bg-blue-500 hover:bg-blue-700 text-white font-Nanum font-bold py-2 px-4 rounded shadow">{PrevButton}</button>
@@ -1153,10 +1147,8 @@ const BoardTemplate3 = () => {
       activate: activatedNumber === 6,
       component:
         <div className="bg-white p-8 shadow-lg rounded-lg">
-          <p className="text-center font-Nanum font-bold text-3xl text-[#000000]" >'Critic'</p>
-          <p className="text-center font-Nanum text-l mt-4">검정색 모자는 ‘비판적’입니다.</p>
-          <p className="text-center font-Nanum text-l">부정적인 측면에서 아이디어를 판단해보세요.</p>
-          <p className="text-center font-Nanum text-l">위험, 문제, 장애물을 비판적으로 제시해보세요!</p>
+          <p className="text-center font-Nanum font-bold text-3xl text-[#4682B4]" >'대체 - Alternation'</p>
+          <p className="text-center font-Nanum text-l mt-4">아이디어를 다른 것으로 대체 할 수 있는지 확인하는 카드입니다.</p>
 
           <div className="flex justify-between items-center mt-8">
             <button className="bg-blue-500 hover:bg-blue-700 text-white font-Nanum font-bold py-2 px-4 rounded shadow">{PrevButton}</button>
@@ -1176,10 +1168,8 @@ const BoardTemplate3 = () => {
       activate: activatedNumber === 7,
       component:
         <div className="bg-white p-8 shadow-lg rounded-lg">
-          <p className="text-center font-Nanum font-bold text-3xl text-[#006400]" >'Creativity'</p>
-          <p className="text-center font-Nanum text-l mt-4">초록색 모자는 ‘창의적’입니다.</p>
-          <p className="text-center font-Nanum text-l">기존과는 다른 방향을 모색해보세요.</p>
-          <p className="text-center font-Nanum text-l">새로운 아이디어, 추가적 대안, 가능성을 생각해봅시다!</p>
+          <p className="text-center font-Nanum font-bold text-3xl text-[#000080]" >'반전 - Reversion'</p>
+          <p className="text-center font-Nanum text-l mt-4">아이디어의 다양한 요소를 바꾸거나 재정렬해보는 카드입니다.</p>
 
           <div className="flex justify-between items-center mt-8">
             <button className="bg-blue-500 hover:bg-blue-700 text-white font-Nanum font-bold py-2 px-4 rounded shadow">{PrevButton}</button>
@@ -1199,10 +1189,8 @@ const BoardTemplate3 = () => {
       activate: activatedNumber === 8,
       component:
         <div className="bg-white p-8 shadow-lg rounded-lg">
-          <p className="text-center font-Nanum font-bold text-3xl text-[#00008B]" >'Managing'</p>
-          <p className="text-center font-Nanum text-l mt-4">파란색 모자는 ‘종합’하는 역할입니다.</p>
-          <p className="text-center font-Nanum text-l">다른 모자의 사고를 정리하고, 전체적으로 조절해보세요.</p>
-          <p className="text-center font-Nanum text-l">구체적인 계획이나 전략을 수립해보는 것도 좋습니다!</p>
+          <p className="text-center font-Nanum font-bold text-3xl text-[#800080]" >'전용 - Diversion'</p>
+          <p className="text-center font-Nanum text-l mt-4">아이디어를 다른 용도로 바꿀 수 있는지 확인하는 카드입니다.</p>
 
           <div className="flex justify-between items-center mt-8">
             <button className="bg-blue-500 hover:bg-blue-700 text-white font-Nanum font-bold py-2 px-4 rounded shadow">{PrevButton}</button>
@@ -1222,10 +1210,8 @@ const BoardTemplate3 = () => {
       activate: activatedNumber === 9,
       component:
         <div className="bg-white p-8 shadow-lg rounded-lg">
-          <p className="text-center font-Nanum font-bold text-3xl text-[#00008B]" >'Managing'</p>
-          <p className="text-center font-Nanum text-l mt-4">파란색 모자는 ‘종합’하는 역할입니다.</p>
-          <p className="text-center font-Nanum text-l">다른 모자의 사고를 정리하고, 전체적으로 조절해보세요.</p>
-          <p className="text-center font-Nanum text-l">구체적인 계획이나 전략을 수립해보는 것도 좋습니다!</p>
+          <p className="text-center font-Nanum font-bold text-3xl text-[#9400D3]" >'결합 - Combination'</p>
+          <p className="text-center font-Nanum text-l mt-4">아이디어를 다양한 것들과 결합해보는 카드입니다.</p>
 
           <div className="flex justify-between items-center mt-8">
             <button className="bg-blue-500 hover:bg-blue-700 text-white font-Nanum font-bold py-2 px-4 rounded shadow">{PrevButton}</button>
