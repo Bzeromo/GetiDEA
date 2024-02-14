@@ -986,109 +986,108 @@ const MyDrawing = () => {
 
   const inputWord = "당신의 아이디어";
 
-  //버튼 누르면 랜덤 단어가 나오는 함수
+  // 버튼 누르면 랜덤 단어가 나오는 함수
   // 버튼 클릭 시 호출되는 함수
-  // const generateRandomWords = () => {
-  //   const pickedRandomWords = [];
+  const generateRandomWords = () => {
+    const pickedRandomWords = [];
+    const usedIndexes = new Set();
+
+    while (pickedRandomWords.length < 34) {
+      const randomIndex = Math.floor(Math.random() * randomWords.length);
+
+      if (!usedIndexes.has(randomIndex)) {
+        usedIndexes.add(randomIndex); // 중복 방지를 위해 인덱스를 먼저 추가
+        if (firstTemplateProperties[randomIndex]) {
+          let random = randomWords[randomIndex];
+          console.log(random);
+          let text = "";
+          const and = "&";
+          const plus = " ";
+          const space = " ";
+          const line = "\n";
+
+          if (firstTemplateProperties[randomIndex].arrangementType === 1) {
+            text = inputWord + space + and + space + random;
+          } else if (firstTemplateProperties[randomIndex].arrangementType === 2) {
+            text = inputWord + line + and + line + random;
+          } else {
+            console.log("Wrong ArrangeType!!!");
+          }
+
+          const fontSize = 8;
+          const x = firstTemplateProperties[randomIndex].textPosX;
+          const y = firstTemplateProperties[randomIndex].textPosY;
+          const align = "center";
+          const draggable = false; // 드래그 방지
+          const onSelect = false; // 선택 방지
+          const onClick = false; // 클릭 방지
+
+          pickedRandomWords.push({ text, x, y, fontSize, align, draggable, onSelect, onClick });
+        } else {
+          console.error(`Template info not found for index ${randomIndex}`);
+        }
+      }
+    }
+
+    setTexts(pickedRandomWords);
+  };
+
+  // const [selectedWords, setSelectedWords] = useState([]);
+
+  // const getRandomWords = (words, count) => {
+  //   const randomWords = [];
   //   const usedIndexes = new Set();
 
-  //   while (pickedRandomWords.length < 34) {
-  //     const randomIndex = Math.floor(Math.random() * randomWords.length);
+  //   while (randomWords.length < count && usedIndexes.size < words.length) {
+  //     const randomIndex = Math.floor(Math.random() * words.length);
 
   //     if (!usedIndexes.has(randomIndex)) {
-  //       usedIndexes.add(randomIndex); // 중복 방지를 위해 인덱스를 먼저 추가
-  //       if (firstTemplateProperties[randomIndex]) {
-  //         let random = randomWords[randomIndex];
-  //         console.log(random);
-  //         let text = "";
-  //         const and = "&";
-  //         const plus = " ";
-  //         const space = " ";
-  //         const line = "\n";
-
-  //         if (firstTemplateProperties[randomIndex].arrangementType === 1) {
-  //           text = inputWord + space + and + space + random;
-  //         } else if (firstTemplateProperties[randomIndex].arrangementType === 2) {
-  //           text = inputWord + line + and + line + random;
-  //         } else {
-  //           console.log("Wrong ArrangeType!!!");
-  //         }
-
-  //         const fontSize = 8;
-  //         const x = firstTemplateProperties[randomIndex].textPosX;
-  //         const y = firstTemplateProperties[randomIndex].textPosY;
-  //         const align = "center";
-  //         const draggable = false; // 드래그 방지
-  //         const onSelect = false; // 선택 방지
-  //         const onClick = false; // 클릭 방지
-
-  //         pickedRandomWords.push({ text, x, y, fontSize, align, draggable, onSelect, onClick });
-  //       } else {
-  //         console.error(`Template info not found for index ${randomIndex}`);
-  //       }
+  //       usedIndexes.add(randomIndex);
+  //       randomWords.push(words[randomIndex]);
   //     }
   //   }
 
-  //   setTexts(pickedRandomWords);
+  //   return randomWords;
   // };
 
-  const [selectedWords, setSelectedWords] = useState([]);
+  // const generateRandomWords2 = () => {
+  //   const selectedRandomWords = getRandomWords(randomWords, 34);
+  //   setSelectedWords(selectedRandomWords);
 
-  const getRandomWords = (words, count) => {
-    const randomWords = [];
-    const usedIndexes = new Set();
+  //   let index = 0;
+  //   const and = "&";
+  //   const plus = " ";
+  //   const space = " ";
+  //   const line = "\n";
+  //   const randomWordsResult = [];
 
-    while (randomWords.length < count && usedIndexes.size < words.length) {
-      const randomIndex = Math.floor(Math.random() * words.length);
+  //   while (index < 34) {
+  //     const text = selectedRandomWords[index];
+  //     let result = "";
 
-      if (!usedIndexes.has(randomIndex)) {
-        usedIndexes.add(randomIndex);
-        randomWords.push(words[randomIndex]);
-      }
-    }
+  //     if (firstTemplateProperties[index].arrangementType === 1) {
+  //       result = inputWord + space + and + space + text;
+  //     }
+  //     else {
+  //       result = inputWord + line + and + line + text;
+  //     }
 
-    return randomWords;
-  };
+  //     const fontSize = 8; //템플릿에 나타나는 글자 크기 조정
+  //     const x = firstTemplateProperties[index].textPosX;
+  //     const y = firstTemplateProperties[index].textPosY;
+  //     const align = "center";
+  //     const draggable = false; // 드래그 방지
+  //     const onSelect = false; // 선택 방지
+  //     const onClick = false; // 클릭 방지
 
-  const generateRandomWords2 = () => {
-    const selectedRandomWords = getRandomWords(randomWords, 34);
-    setSelectedWords(selectedRandomWords);
+  //     randomWordsResult.push({ result, x, y, fontSize, align, draggable, onSelect, onClick });
 
-    let index = 0;
-    const and = "&";
-    const plus = " ";
-    const space = " ";
-    const line = "\n";
-    const randomWordsResult = [];
+  //     index++;
+  //   }
+  //   console.log(randomWordsResult);
 
-    while (index < 34) {
-      const pickedRandomWords = selectedRandomWords[index];
-      let text = "";
-
-      if (firstTemplateProperties[index].arrangementType === 1) {
-        text = inputWord + space + and + space + pickedRandomWords;
-      }
-      else {
-        text = inputWord + line + and + line + pickedRandomWords;
-      }
-
-      const fontSize = 8; //템플릿에 나타나는 글자 크기 조정
-      const x = firstTemplateProperties[index].textPosX;
-      const y = firstTemplateProperties[index].textPosY;
-      const align = "center";
-      const draggable = false; // 드래그 방지
-      const onSelect = false; // 선택 방지
-      const onClick = false; // 클릭 방지
-
-      randomWordsResult.push({ text, x, y, fontSize, align, draggable, onSelect, onClick });
-
-      index++;
-    }
-    console.log(randomWordsResult);
-
-    setTexts(randomWordsResult);
-
-  };
+  //   setTexts(randomWordsResult);
+  // };
 
 
 

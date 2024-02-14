@@ -4,9 +4,7 @@ import axios from "axios";
 import useImage from "use-image";
 import URLImage from "./Add/URLImage";
 import bubbleChatProperties from "./templateData/template1-position.json";
-import randomWords from "./templateData/randomWords.json";
-import RandomTextDisplay from "./Add/RandomTextDisplay";
-import RandomTextDisplayCopy from "./Add/RandomTextDisplay copy";
+import randaomWords from "./templateData/randomWords.json";
 
 import ImgComponent from "./Add/ImgComponent";
 import ShapeComponent from "./Add/ShapeComponent";
@@ -24,11 +22,6 @@ import ImageSelector from "./funciton/ImageSelector";
 import undoData from "./axios/undoData";
 import getData from "./axios/getData";
 import ImageGallery from "./ImageGallery";
-
-
-//템플릿에 해당하는 import
-import ImageComponent from "./Add/ImageComponent";
-import Template1TextComponent from "./Add/Template1TextComponent";
 
 const MyDrawing = () => {
   const [imageIdCounter, setImageIdCounter] = useState(0);
@@ -927,167 +920,121 @@ const MyDrawing = () => {
 
 
 
-  const [activeIndex, setActiveIndex] = useState([]);
-
-  const firstTemplateProperties = Object.values(bubbleChatProperties);
 
 
 
 
 
-  // 처음 렌더링 될 때 한 번만 실행되는 useEffect 설정
+  //Template의 정보 받아오기.,,
+  const ImageComponent = ({
+    src,
+    x,
+    y,
+    width,
+    height,
+    rotation,
+    scaleX,
+    scaleY,
+    color,
+  }) => {
+    const [image] = useImage(src);
+
+    return (
+      <Image
+        image={image}
+        x={x}
+        y={y}
+        width={width}
+        height={height}
+        rotation={rotation}
+        scaleX={scaleX}
+        scaleY={scaleY}
+        color={color}
+        draggable
+      />
+    );
+  };
+
   useEffect(() => {
     // bubbleChatProperties를 이용하여 firstTemplateProperties 설정
     const firstTemplateProperties = Object.values(bubbleChatProperties);
 
     //템플릿 정보 저장하기
     setImages(firstTemplateProperties);
-
-    //이미지 저장까지 했으니까 이제 단어까지 저장하자.
-
-    // 단어 저장하는 부분~~~~~~//// 단어 저장하는 부분~~~~~~//// 단어 저장하는 부분~~~~~~//
-    // const pickedRandomWords = [];
-    // const usedIndexes = new Set();
-
-    // while (pickedRandomWords.length < 34) {
-    //     const randomIndex = Math.floor(Math.random() * randomWords.length);
-
-    //   // 중복된 인덱스 확인
-    //   if (!usedIndexes.has(randomIndex)) {
-
-    //     if (firstTemplateProperties[randomIndex]){
-
-    //       // text에는 이제 랜덤으로 pick된 단어가 들어가있음.
-    //       const text = randomWords[randomIndex];
-    //       const fontSize = 8;
-
-    //       // 이제 위치 정보도 같이 저장해주자.
-    //       const x = firstTemplateProperties[randomIndex].textPosX;
-    //       const y = firstTemplateProperties[randomIndex].textPosY;
-
-    //       pickedRandomWords.push({ text, x, y, fontSize});
-    //       usedIndexes.add(randomIndex);
-    //     }
-    //     else{
-    //       console.error(`Template info not found for index ${randomIndex}`);
-    //     }
-
-    //   }
-    // }
-
-    // //일단 랜덤 단어는 저장할건데.. 흠.... 위치 정보도 같이 저장하고 싶은데..
-    // setTexts(pickedRandomWords);
-
-    // 단어 저장하는 부분~~~~~~//// 단어 저장하는 부분~~~~~~//// 단어 저장하는 부분~~~~~~//
-
   }, []);
 
 
 
-  const inputWord = "당신의 아이디어";
 
-  //버튼 누르면 랜덤 단어가 나오는 함수
-  // 버튼 클릭 시 호출되는 함수
-  // const generateRandomWords = () => {
-  //   const pickedRandomWords = [];
-  //   const usedIndexes = new Set();
 
-  //   while (pickedRandomWords.length < 34) {
-  //     const randomIndex = Math.floor(Math.random() * randomWords.length);
 
-  //     if (!usedIndexes.has(randomIndex)) {
-  //       usedIndexes.add(randomIndex); // 중복 방지를 위해 인덱스를 먼저 추가
-  //       if (firstTemplateProperties[randomIndex]) {
-  //         let random = randomWords[randomIndex];
-  //         console.log(random);
-  //         let text = "";
-  //         const and = "&";
-  //         const plus = " ";
-  //         const space = " ";
-  //         const line = "\n";
 
-  //         if (firstTemplateProperties[randomIndex].arrangementType === 1) {
-  //           text = inputWord + space + and + space + random;
-  //         } else if (firstTemplateProperties[randomIndex].arrangementType === 2) {
-  //           text = inputWord + line + and + line + random;
-  //         } else {
-  //           console.log("Wrong ArrangeType!!!");
-  //         }
+  const inputWord = "이것은 당신의 아이디어";
+  const plus = "&";
+  const arrangementType1 = " ";
+  const arrangementType2 = "\n";
 
-  //         const fontSize = 8;
-  //         const x = firstTemplateProperties[randomIndex].textPosX;
-  //         const y = firstTemplateProperties[randomIndex].textPosY;
-  //         const align = "center";
-  //         const draggable = false; // 드래그 방지
-  //         const onSelect = false; // 선택 방지
-  //         const onClick = false; // 클릭 방지
+  const RandomTextComponent = ({
+    text,
+    x,
+    y,
+    fontSize,
+    textProps,
+    arrangementType,
+  }) => {
+    const [textResult, setTextResult] = useState(text);
 
-  //         pickedRandomWords.push({ text, x, y, fontSize, align, draggable, onSelect, onClick });
-  //       } else {
-  //         console.error(`Template info not found for index ${randomIndex}`);
-  //       }
-  //     }
-  //   }
+    useEffect(() => {
+      let result;
+      if (arrangementType === 1) {
+        result = text + arrangementType1 + plus + arrangementType1 + inputWord;
+      } else if (arrangementType === 2) {
+        result = inputWord + arrangementType2 + plus + arrangementType2 + text;
+      } else {
+        console.log("Wrong arrangementType!!");
+      }
+      setTextResult(result);
+    }, [text, arrangementType]); // 의존성 배열에 text와 arrangementType을 추가합니다.
 
-  //   setTexts(pickedRandomWords);
-  // };
+    return (
+      <Text text={textResult} x={x} y={y} fontSize={fontSize} {...textProps} />
+    );
+  };
+  // words.json에서 단어 목록을 불러옵니다.
+  const words = require("./templateData/randomWords.json");
+  //randomWords와 setRandomWords는 빈 배열로 선언
+  const [randomWords, setRandomWords] = useState([]);
+  const [activeIndex, setActiveIndex] = useState([]);
 
-  const [selectedWords, setSelectedWords] = useState([]);
+  // 컴포넌트 마운트 시 랜덤한 단어 배열을 생성하여 상태에 저장합니다.
+  useEffect(() => {
+    setRandomWords(getRandomWords(words, 34)); // 34개의 랜덤 단어를 선택합니다.
+  }, []); // 빈 의존성 배열을 사용하여 마운트 시에만 실행합니다.
 
-  const getRandomWords = (words, count) => {
-    const randomWords = [];
-    const usedIndexes = new Set();
-
-    while (randomWords.length < count && usedIndexes.size < words.length) {
+  // 랜덤한 단어를 선택하는 함수입니다.
+  // 이 함수는 이제 상태 초기화에만 사용되며, 컴포넌트 내부에서 직접 호출되지 않습니다.
+  function getRandomWords(words, count) {
+    const selectedWords = [];
+    while (selectedWords.length < count) {
       const randomIndex = Math.floor(Math.random() * words.length);
-
-      if (!usedIndexes.has(randomIndex)) {
-        usedIndexes.add(randomIndex);
-        randomWords.push(words[randomIndex]);
+      const word = words[randomIndex];
+      if (!selectedWords.includes(word)) {
+        selectedWords.push(word);
       }
     }
+    return selectedWords;
+  }
 
-    return randomWords;
-  };
+  const selectedWords = getRandomWords();
 
-  const generateRandomWords2 = () => {
-    const selectedRandomWords = getRandomWords(randomWords, 34);
-    setSelectedWords(selectedRandomWords);
+  const firstTemplateProperties = Object.values(bubbleChatProperties);
 
-    let index = 0;
-    const and = "&";
-    const plus = " ";
-    const space = " ";
-    const line = "\n";
-    const randomWordsResult = [];
-
-    while (index < 34) {
-      const pickedRandomWords = selectedRandomWords[index];
-      let text = "";
-
-      if (firstTemplateProperties[index].arrangementType === 1) {
-        text = inputWord + space + and + space + pickedRandomWords;
-      }
-      else {
-        text = inputWord + line + and + line + pickedRandomWords;
-      }
-
-      const fontSize = 8; //템플릿에 나타나는 글자 크기 조정
-      const x = firstTemplateProperties[index].textPosX;
-      const y = firstTemplateProperties[index].textPosY;
-      const align = "center";
-      const draggable = false; // 드래그 방지
-      const onSelect = false; // 선택 방지
-      const onClick = false; // 클릭 방지
-
-      randomWordsResult.push({ text, x, y, fontSize, align, draggable, onSelect, onClick });
-
-      index++;
-    }
-    console.log(randomWordsResult);
-
-    setTexts(randomWordsResult);
-
+  //버튼 누르는 함수
+  const handleButtonClick = () => {
+    setActiveIndex((prevIndices) => [
+      ...prevIndices,
+      prevIndices.length < randomWords.length ? prevIndices.length : 0,
+    ]);
   };
 
 
@@ -1108,80 +1055,7 @@ const MyDrawing = () => {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  // //단어가 제대로 들어갔나 확인하는 체크용!! 페이지가 랜더링 될 때 자동을 console에 찍힌다
-  // useEffect(() => {
-  //   console.log(texts);
-  // })
-
-  // const handleButtonClick = () => {
-  //   setActiveIndex((prevIndices) => {
-  //     const nextIndex = prevIndices.length; // 현재 배열의 길이를 다음 인덱스로 사용
-  //     return [...prevIndices, nextIndex];
-  //   });
-  // };
-
-  //여기서 다 처리를 해줘야함.
-  //텍스트도 다 여기서 불러와서 저장도 해야함.
-  // useEffect(() => {
-  //   // 컴포넌트가 마운트될 때 한 번만 실행되도록 합니다.
-
-  //   const updatedImages = firstTemplateProperties.map((imgInfo, index) => ({
-  //     ...imgInfo,
-  //     id: index, // 이미지 정보에 id를 추가합니다.
-  //   }));
-
-  //   setImages(updatedImages); // 상태를 한 번만 업데이트합니다.
-  // }, [firstTemplateProperties]);
-
-
-
-  // useEffect(() => {
-  //   // 컴포넌트가 마운트될 때 한 번만 실행되도록 합니다.
-  //   setImages(prevImages => {
-  //     return prevImages.map(prevImage => {
-  //       const updatedImage = firstTemplateProperties.find(newImage => newImage.id === prevImage.id);
-  //       return updatedImage ? { ...prevImage, ...updatedImage } : prevImage;
-  //     });
-  //   });
-  // }, [firstTemplateProperties]);
-
-
-
-
-
-
-
-
-
-
+  
   return (
     <div className="absolute  inset-0 h-full w-full bg-[#EFEFEF] bg-opacity-50 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px]">
       {/* 왼쪽 윗 블록 */}
@@ -1537,7 +1411,6 @@ const MyDrawing = () => {
       >
         img
       </button>
-
       {imgMenuToggle && (
         <div className="absolute bottom-[56px] right-72">
           {" "}
@@ -1546,21 +1419,77 @@ const MyDrawing = () => {
         </div>
       )}
 
+      {/* 템플릿 1 전용 버튼
+      <div className="absolute bottom-6 right-52 z-50  justify-center bg-white rounded-md w-16 h-[50px] flex  items-center flex-row shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]">
+        <button onClick={moveToTop}>템플릿1</button>
+      </div> */}
 
       {/*템플릿 1 전용 버튼*/}
       {/* <div>
         <button onClick={() => handleButtonClick()}>템플릿1</button>
       </div> */}
 
-      {/* 랜덤단어를 계속해서 생성해주는 함수 */}
-      <div>
-        {/* 버튼 추가 */}
-        <button onClick={generateRandomWords2}>새로운 랜덤 단어 생성</button>
-        {/* 랜덤 단어들을 표시하는 부분 */}
-        {/* {texts.map((word, index) => (
-          <div key={index}>{word.text}</div>
-        ))} */}
+      {/* <div>
+        <button
+          type="button"
+          class="bg-gray-800 text-gray rounded-r-md py-2 border-l border-gray-200 hover:bg-red-700 hover:text-black px-3"
+          className="absolute bottom-6 right-22 z-50"
+          onClick={() => handleButtonClick()}>
+          <div class="flex flex-row align-middle">
+            <span class="mr-2">다음</span>
+            <svg class="w-5 ml-2"
+              fill="currentColor"
+              viewBox="0 0 20 20"
+              xmlns="http://www.w3.org/2000/svg">
+              <path fill-rule="evenodd" d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+            </svg>
+          </div>
+        </button>
+      </div> */}
+
+      <div class="absolute bottom-6 right-22 z-50 bg-white p-4 rounded-lg">
+        <div class="relative bg-inherit">
+          <input
+            type="text"
+            id="username"
+            name="username"
+            class="peer bg-transparent h-10 w-72 rounded-lg text-gray-200 placeholder-transparent ring-2 px-2 ring-gray-500 focus:ring-sky-600 focus:outline-none focus:border-rose-600"
+            placeholder=" "
+          />
+          <div class="absolute flex flex-row items-center gap-2 top-1 right-1">
+            <label
+              for="username"
+              class="cursor-text text-sm text-gray-500 bg-inherit mx-1 px-1 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500 peer-placeholder-shown:top-2 peer-focus:-top-3 peer-focus:text-sky-600 peer-focus:text-sm transition-all"
+            >
+              Type your Idea!
+            </label>
+            <button
+              type="button"
+              class="bg-gray-800 text-gray rounded-r-md py-2 border-l border-gray-200 hover:bg-red-700 hover:text-black px-3"
+              onClick={() => handleButtonClick()}
+            >
+              <div class="flex flex-row align-middle">
+                <span class="mr-2">다음</span>
+                <svg
+                  class="w-5 ml-2"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    fill-rule="evenodd"
+                    d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z"
+                    clip-rule="evenodd"
+                  ></path>
+                </svg>
+              </div>
+            </button>
+          </div>
+        </div>
       </div>
+
+
+
 
       {/* 그리는 구역 */}
       <div className="absolute top-20 left-36">
@@ -1579,38 +1508,48 @@ const MyDrawing = () => {
           >
             <Layer ref={layerRef}>
 
-              {/* <React.Fragment>
-                {firstTemplateProperties.map((imgInfo, index) => (
+
+              {firstTemplateProperties.map((imgInfo, index) => {
+                // 상태에서 랜덤한 단어를 선택합니다. 여기서는 예제로 첫 번째 단어를 사용합니다.
+                const isVisible = activeIndex.includes(index); // index를 사용하여 각 imgInfo에 대한 랜덤 단어를 선택합니다.
+
+                return (
                   <React.Fragment key={index}>
                     <ImageComponent {...imgInfo} />
-                    {activeIndex.includes(index) && (
-                      <RandomTextDisplay activeIndex={[index]} />
+                    {isVisible && (
+                      <RandomTextComponent
+                        text={randomWords[index] || ''}
+                        x={imgInfo.textPosX}
+                        y={imgInfo.textPosY}
+                        fontSize={8}
+                        textProps={{ fill: "black" }} // Konva Text 컴포넌트의 visible 속성 대신 이를 사용
+                        arrangementType={imgInfo.arrangementType}
+                      />
                     )}
                   </React.Fragment>
-                ))}
-              </React.Fragment> */}
+                );
+              })}
 
-              {/* <React.Fragment>
-                {firstTemplateProperties.map((imgInfo, index) => (
-                  <React.Fragment key={index}>
-                    <ImageComponent {...imgInfo} />
-                    {activeIndex.includes(index) && (
-                      <RandomTextDisplay activeIndex={[index]} />
-                    )}
-                  </React.Fragment>
-                ))}
-              </React.Fragment> */}
+                
 
-              <React.Fragment>
-                {firstTemplateProperties.map((imgInfo, index) => (
-                  <React.Fragment key={index}>
-                    <ImageComponent {...imgInfo} />
-                    {/* {activeIndex.includes(index) && (
-                      <RandomTextDisplay activeIndex={[index]} />
-                    )} */}
-                  </React.Fragment>
-                ))}
-              </React.Fragment>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
               {drawing && (
@@ -1679,7 +1618,7 @@ const MyDrawing = () => {
                   );
                 }
               })}
-              {/* {texts.map((text, id) => (
+              {texts.map((text, id) => (
                 <TextComponent
                   key={text.id}
                   textProps={text}
@@ -1697,40 +1636,7 @@ const MyDrawing = () => {
                   setSelectedId={setSelectedId}
                   onTextChange={(newText) => handleTextChange(text.id, newText)}
                 />
-              ))} */}
-              {/* {texts.map((text) => (
-                <Template1TextComponent
-                  textProps={text}
-                />
-              ))} */}
-
-              {texts.map((text, index) => (
-                text.id === undefined ? (
-                  <Template1TextComponent
-                    key={index}
-                    textProps={text}
-                  />
-                ) : (
-                  <TextComponent
-                    key={text.id}
-                    textProps={text}
-                    fontSize={fontSize}
-                    isSelected={text.id === selectedId}
-                    onSelect={(e) => {
-                      handleShapeClick(text.id, e);
-                    }}
-                    onChange={(newAttrs) => {
-                      const newTexts = texts.map((t) =>
-                        t.id === text.id ? { ...t, ...newAttrs } : t
-                      );
-                      setTexts(newTexts);
-                    }}
-                    setSelectedId={setSelectedId}
-                    onTextChange={(newText) => handleTextChange(text.id, newText)}
-                  />
-                )
               ))}
-
 
               {/* {images.map((img) => (
                 <ImgComponent
@@ -1747,7 +1653,6 @@ const MyDrawing = () => {
                   }}
                 />
               ))} */}
-
 
               {selectedId && (
                 <Transformer

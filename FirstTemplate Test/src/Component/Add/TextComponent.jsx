@@ -7,6 +7,7 @@ const TextComponent = ({
   y,
   fontSize,
   onTextChange,
+  draggable,
   onDragEnd,
   isSelected,
   // setIsSelected,

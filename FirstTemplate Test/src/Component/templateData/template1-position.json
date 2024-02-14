@@ -26,8 +26,8 @@
             "scaleX": 1,
             "scaleY": 1,
             "arrangementType": 2,
-            "textPosX": 610,
-            "textPosY": 40
+            "textPosX": 605,
+            "textPosY": 42
         },
         "3": {
             "src": "/img/template1_bubble_chat/bubble_chat3.svg",
@@ -71,7 +71,7 @@
             "scaleX": 0.8806672555544259,
             "scaleY": 0.8806672555544254,
             "arrangementType": 2,
-            "textPosX": 440,
+            "textPosX": 438,
             "textPosY": 300
         },
         "6": {
@@ -86,7 +86,7 @@
             "scaleX": 1,
             "scaleY": 1,
             "arrangementType": 1,
-            "textPosX": 387,
+            "textPosX": 380,
             "textPosY": 413
         },
         "7": {
@@ -102,7 +102,7 @@
             "scaleY": 0.8691179176751737,
             "arrangementType": 2,
             "textPosX": 582,
-            "textPosY": 400
+            "textPosY": 397
         },
         "8": {
             "src": "/img/template1_bubble_chat/bubble_chat8.svg",
@@ -341,8 +341,8 @@
             "scaleX": 0.9337794981547395,
             "scaleY": 0.9337794981547394,
             "arrangementType": 2,
-            "textPosX": 280,
-            "textPosY": 65
+            "textPosX": 270,
+            "textPosY": 70
         },
         "24": {
             "src": "/img/template1_bubble_chat/bubble_chat24.svg",
@@ -350,14 +350,14 @@
             "y": -4.564078800000004,
             "ty": "img",
             "type": "Image",
-            "width": 145.71948998178505,
+            "width": 147,
             "height": 200,
             "draggable": false,
             "scaleX": 1,
             "scaleY": 1,
             "arrangementType": 2,
-            "textPosX": 125,
-            "textPosY": 22 
+            "textPosX": 123,
+            "textPosY": 29 
         },
         "25": {
             "src": "/img/template1_bubble_chat/bubble_chat25.svg",
@@ -416,8 +416,8 @@
             "scaleX": 1,
             "scaleY": 1,
             "arrangementType": 2,
-            "textPosX": 620,
-            "textPosY": -97 
+            "textPosX": 613,
+            "textPosY": -93  
         },
         "29": {
             "src": "/img/template1_bubble_chat/bubble_chat29.svg",
@@ -486,7 +486,7 @@
             "y": 184.25763120000008,
             "ty": "img",
             "type": "Image",
-            "width": 190,
+            "width": 200,
             "height": 200,
             "draggable": false,
             "scaleX": 1,
