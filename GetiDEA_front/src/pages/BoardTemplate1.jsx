@@ -1446,6 +1446,7 @@ const BoardTemplate1 = () => {
           onClick={handleLayerClick}
         >
           <Layer ref={layerRef}>
+            {/* 템플릿 요소 띄우기 */}
             <React.Fragment>
               {firstTemplateProperties.map((imgInfo, index) => (
                 <React.Fragment key={index}>
@@ -1524,6 +1525,55 @@ const BoardTemplate1 = () => {
               }
             })}
 
+            {/* 이미지 띄우고 저장하는 원본 코드 */}
+            {/* {images.map((img) => (
+              <ImgComponent
+                key={img.id}
+                id={img.id}
+                ty={img.ty}
+                ref={ImageRef}
+                imageSrc={img.src}
+                x={img.x}
+                y={img.y}
+                isSelected={img.id === selectedId}
+                onSelect={(e) => {
+                  handleShapeClick(img.id, e);
+                }}
+              />
+            ))} */}
+
+            {images.map((img, index) => (
+              img.id === undefined ? (
+                <TemplateImageComponent
+                  key={index}
+                  image={img}
+                  x={img.x}
+                  y={img.y}
+                  width={img.width}
+                  height={img.height}
+                  rotation={img.rotation}
+                  scaleX={img.scaleX}
+                  scaleY={img.scaleY}
+                  color={img.color}
+                />
+              ) : (
+                <ImgComponent
+                  key={img.id}
+                  id={img.id}
+                  ty={img.ty}
+                  ref={ImageRef}
+                  imageSrc={img.src}
+                  x={img.x}
+                  y={img.y}
+                  isSelected={img.id === selectedId}
+                  onSelect={(e) => {
+                    handleShapeClick(img.id, e);
+                  }}
+                />
+              )
+            ))}
+
+
             {/* 원본 코드 */}
             {/* {texts.map((text, id) => (
               <TextComponent
@@ -1571,21 +1621,6 @@ const BoardTemplate1 = () => {
                 />
               )
             ))}
-            {/* {images.map((img) => (
-              <ImgComponent
-                key={img.id}
-                id={img.id}
-                ty={img.ty}
-                ref={ImageRef}
-                imageSrc={img.src}
-                x={img.x}
-                y={img.y}
-                isSelected={img.id === selectedId}
-                onSelect={(e) => {
-                  handleShapeClick(img.id, e);
-                }}
-              />
-            ))} */}
 
             {selectedId && (
               <Transformer
