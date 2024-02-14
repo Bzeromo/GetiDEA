@@ -1,7 +1,6 @@
 import React, { createContext, useContext, useState, useEffect,ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
-import Cookies from 'js-cookie';
 
 interface AuthContextType {
   accessToken: string | null;
@@ -27,37 +26,36 @@ interface AuthProviderProps {
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const [accessToken, setAccessToken] = useState<string | null>(null);
-  const isAuthenticated = !!Cookies.get('access_token');
+  const isAuthenticated = !!localStorage.getItem('accessToken');
   const navigate = useNavigate();
 
   useEffect(() => {
     // 페이지 로드 시 토큰 확인 로직
-    const storedToken = Cookies.get('access_token');
+    const storedToken = localStorage.getItem('accessToken');
     if (storedToken) {
       setAccessToken(storedToken);
-      const decoded:DecodedToken=jwtDecode(Cookies.get('access_token')??"");
+      const decoded:DecodedToken=jwtDecode(localStorage.getItem('accessToken')??"");
       console.log(decoded);
       localStorage.setItem('userEmail',decoded.sub??"");
       localStorage.setItem('provider',decoded.provider??"");
-      localStorage.setItem('userName',decoded.userName??""); // 저장까지 된거 확인
+      localStorage.setItem('userName',decoded.userName??"");
     }
   }, []);
 
-  const login = (token: string) => {
+  const login = (token: string, refreshToken: string) => {
+    localStorage.setItem('accessToken', token);
+    // RefreshToken은 안전하게 처리하세요. 예: HttpOnly Cookie
     setAccessToken(token);
     navigate('/home');
   };
 
   const logout = () => {
-    Cookies.remove('access_token');
-    Cookies.remove('refresh_token');
-    localStorage.removeItem('userEmail');
-    localStorage.removeItem('userName');
     localStorage.removeItem('accessToken');
     localStorage.removeItem('refreshToken');
+    localStorage.removeItem('userEmail');
+    localStorage.removeItem('userName');
     localStorage.removeItem('profileImage');
     localStorage.removeItem('provider');
-    console.log("logout");
     navigate('/');
   };
 

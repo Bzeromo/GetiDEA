@@ -6,6 +6,7 @@
   import api from '../api';
   import Swal from 'sweetalert2';
   import moment from 'moment';
+import ProjectModal from '../components/ProjectModal';
 
   interface project {
     projectId: number;
@@ -20,11 +21,14 @@
   const Folder: React.FC = () => {
       
       const [isSelected, setIsSelected] = useState<boolean[]>([]);
-      const [isOpen, setIsOpen] = useState(false);
       const [dropdownsOpen, setDropdownsOpen] = useState<boolean[]>([]);
       const [folderName, setFolderName] = useState<string|null>('');
       const [projects, setProjects] = useState<project[]>([]);
       const [isLoading, setIsLoading] = useState(true);
+      const [projectId, setProjectId] = useState<number>();
+      const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+      const [isOpen, setIsOpen] = useState(false);
+
 
       const location = useLocation();
 
@@ -118,31 +122,49 @@
           }
       };
 
-      // 프로젝트 불러오기
-      useEffect(()=>{
-        if (location.state && location.state.folderName) {
-          setFolderName(location.state.folderName);
+      // 프로젝트 열기
+      const openProject = async (templateId:string,projectId:number) => {
+        if(templateId==="whiteboard"){
+          navigate("/board", {state : {projectId : projectId}})
         }
-        const fetchProjects = async () => {
-          setIsLoading(true);
-          try {
-            const response = await api.get(`/api/project/folder?folderName=${folderName}`);
-            setProjects(response.data);
-            console.log(`프로젝트 불러오기 : ${response.data}`);
-            setIsSelected(response.data.map((project: { bookmark: any; }) => project.bookmark));
-            setDropdownsOpen(new Array(response.data.length).fill(false));
-           
-          } catch (error) {
-            console.error('Error fetching data: ', error);
-           
-          }finally {
-              setIsLoading(false); // 데이터 로딩이 완료되거나 실패했을 때 로딩 상태를 false로 설정
-          }
-        };
-    
-        fetchProjects();
-      },[location.state])
+        else if(templateId==="bubbleChat"){
+          navigate("/board/template1", {state : {projectId : projectId}})
+        }
+        else if(templateId==="sixhat"){
+          navigate("/board/template2", {state : {projectId : projectId}})
+        }
+        else if(templateId==="7check"){
+          navigate("/board/template3", {state : {projectId : projectId}})
+        }
+      
+      };
 
+      // 프로젝트 불러오기
+
+      useEffect(() => {
+        if (location.state && location.state.folderName) {
+          const newFolderName = location.state.folderName as string; // location.state.folderName의 타입을 string으로 명시적 형변환
+          setFolderName(newFolderName);
+          fetchProjects(newFolderName); // 상태 업데이트 직후 API 호출
+        }
+      }, [location.state]);
+
+      const fetchProjects = async (currentFolderName: string) => {
+        setIsLoading(true);
+        try {
+          const response = await api.get(`/api/project/folder?folderName=${currentFolderName}`);
+          setProjects(response.data);
+          console.log(`프로젝트 불러오기 : ${response.data.length}`);
+          setIsSelected(response.data.map((project: { bookmark: boolean; }) => project.bookmark));
+          setDropdownsOpen(new Array(response.data.length).fill(false));
+        } catch (error) {
+          console.error('Error fetching data: ', error);
+        } finally {
+          setIsLoading(false);
+        }
+      };
+
+      
       const bookmark = (projectId : number) =>{
         const bookmarking = async () => {
           try {
@@ -177,25 +199,18 @@
         return <div>Loading...</div>; // 로딩 중인 경우 로딩 인디케이터를 표시
       }
 
-      // 프로젝트 열기
-      const openProject = async (templateId:string,projectId:number) => {
-        if(templateId==="whiteboard"){
-          navigate("/board", {state : {projectId : projectId}})
-        }
-        else if(templateId==="bubbleChat"){
-          navigate("/board/template1", {state : {projectId : projectId}})
-        }
-        else if(templateId==="sixhat"){
-          navigate("/board/template2", {state : {projectId : projectId}})
-        }
-        else if(templateId==="7check"){
-          navigate("/board/template3", {state : {projectId : projectId}})
-        }
-      
-      };
+
+      const openModal = (projectId:number) => {
+        setIsOpen(false);
+        setProjectId(projectId);
+        setIsModalOpen(true);
+      }
+      const closeModal = () => setIsModalOpen(false);
 
     return (
       <div className="flex  min-h-screen  flex-col bg-gray-100">
+        <ProjectModal isOpen={isModalOpen} closeModal={closeModal} projectId={projectId??0} ></ProjectModal>
+
         <Topbar/>
         <div className="flex  relative  ml-28">
 
@@ -245,8 +260,8 @@
                     {dropdownsOpen[index] && (
                     <div className="absolute ml-52  w-28 px-2 text-black mt-10 origin-top-right bg-white divide-y divide-gray-100 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none" ref={dropdownRef}>
                       <div className="py-1">
-                        <a href="/" className=" px-4 py-2 flex flex-row text-sm text-gray-700 hover:bg-gray-100 rotate-[-0.03deg]">
-                          수정</a>
+                        <div onClick={()=>openModal(item.projectId)} className=" px-4 py-2 flex flex-row text-sm text-gray-700 hover:bg-gray-100 rotate-[-0.03deg]">
+                          수정</div>
                         {/* <a href="/" className="flex flex-row px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rotate-[-0.03deg]">
                           이동</a> */}
                         <div onClick={()=>DeleteProjectAlert(item.projectId)}  className=" flex flex-row cursor-pointer px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rotate-[-0.03deg]">
@@ -256,7 +271,7 @@
                     )}
                   </div>
 
-                  <img src={item.thumbnail} alt="" className='w-60 h-44 self-center object-scale-down roup-hover:text-gray' />
+                  <img src={item.thumbnail} alt="" onClick={()=>openProject(item.templateId,item.projectId)} className='w-60 h-44 self-center object-scale-down roup-hover:text-gray' />
                   <span className='self-center mt-5 font-Nanum text-xl font-semibold rotate-[-0.03deg]'>{item.projectName}</span>
                   <span className='self-center mt-1 font-Nanum text-sm font-regular text-gray invisible group-hover:visible rotate-[-0.03deg]'>{moment(item.lastUpdateTime).format('YYYY.MM.DD HH:mm 수정')}</span>
                 </div>

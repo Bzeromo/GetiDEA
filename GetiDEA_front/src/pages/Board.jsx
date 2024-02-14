@@ -22,6 +22,8 @@ import useEventHandler from "../components/funciton/useEventHandler";
 import ImageSelector from "../components/funciton/ImageSelector";
 import undoData from "../components/axios/undoData";
 import getData from "../components/axios/getData";
+import InviteModal from "../components/InviteModal";
+
 
 const WhiteBoard = () => {
 
@@ -188,9 +190,10 @@ const WhiteBoard = () => {
     useState(false);
   const [imgMenuToggle, setImgMenuToggle] = useState(false);
 
-  const projectId = 1;
   const userEmail = "wnsrb933@naver.com";
-
+  const [projectId, setProjectId] = useState();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
   const [preData, setPreData] = useState([]);
 
   useEffect(() => {
@@ -199,7 +202,8 @@ const WhiteBoard = () => {
       setProjectName(location.state.name);
     }
     else if(location.state?.projectId){
-      console.log(location.state.projectId)
+      setProjectId(location.state.projectId);
+      console.log(location.state.projectId);
       const loadProject = async () => {
         try {
           const response = await api.get(`/api/project/open?projectId=${location.state.projectId}`);
@@ -978,9 +982,17 @@ const WhiteBoard = () => {
     navigate("/home");
   }
 
+  const openModal = (projectId) => {
+    setIsOpen(false);
+    setProjectId(projectId);
+    setIsModalOpen(true);
+  }
+  const closeModal = () => setIsModalOpen(false);
+
+
   return (
     <div className="absolute  inset-0 h-full w-full bg-[#EFEFEF] bg-opacity-50 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px]">
-       
+       <InviteModal isOpen={isModalOpen} closeModal={closeModal} projectId={projectId}></InviteModal>
       {/* 왼쪽 윗 블록 */}
       <div className='absolute top-6 left-6 pl-5 bg-white rounded-md w-[420px] h-[50px] flex items-center flex-row shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]'>
       
@@ -1310,10 +1322,20 @@ const WhiteBoard = () => {
         <path strokeLinecap="round" strokeLinejoin="round" d="M8.625 9.75a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375m-13.5 3.01c0 1.6 1.123 2.994 2.707 3.227 1.087.16 2.185.283 3.293.369V21l4.184-4.183a1.14 1.14 0 0 1 .778-.332 48.294 48.294 0 0 0 5.83-.498c1.585-.233 2.708-1.626 2.708-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z" />
         </svg>
 
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidtfh={1.5} stroke="currentColor" className="hover:stroke-blue w-7 h-7 cursor-pointer">
+        <svg onClick={()=>openModal(projectId)} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidtfh={1.5} stroke="currentColor" className="hover:stroke-blue w-7 h-7 cursor-pointer">
         <path strokeLinecap="round" strokeLinejoin="round" d="M9 8.25H7.5a2.25 2.25 0 0 0-2.25 2.25v9a2.25 2.25 0 0 0 2.25 2.25h9a2.25 2.25 0 0 0 2.25-2.25v-9a2.25 2.25 0 0 0-2.25-2.25H15m0-3-3-3m0 0-3 3m3-3V15" />
         </svg>
       </div>
+
+
+      {/* 도형 서식 창 */}
+      <div className='absolute top-32 right-5 justify-center bg-white rounded-md w-64 h-[400px] gap-8 flex  flex-row shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]'>
+                <div className="mt-6 font-Nanum text-xl font-regular">
+                  도형 서식
+                </div>
+        </div>
+                
+
 
       {/* (테스트 버튼) 보드 내 요소들 체크 버튼 */}
       {/* <div className="absolute top-6 right-32 justify-center bg-white rounded-md w-16 h-[50px] flex  items-center flex-row shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]">
@@ -1369,6 +1391,8 @@ const WhiteBoard = () => {
           <ImageSelector onImageSelect={addImage} />
         </div>
       )}
+
+
 
       {/* 그리는 구역 */}
       <div className="ml-36 mt-24 h-96 w-96">
