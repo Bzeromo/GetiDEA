@@ -6,7 +6,7 @@ import useImage from "use-image";
 import URLImage from "../components/Add/URLImage";
 import { debounce } from "lodash";
 import { nanoid } from "nanoid";
-
+import api from "../api";
 import ImgComponent from "../components/Add/ImgComponent";
 import ShapeComponent from "../components/Add/ShapeComponent";
 import LineComponent from "../components/Add/LineComponent";
@@ -29,6 +29,7 @@ import randomWords from "../components/templateData/randomWords.json";
 import TemplateImageComponent from "../components/Add/TemplateImageComponent";
 import TemplateTextComponent from "../components/Add/TemplateTextComponent";
 
+import InviteModal from "../components/InviteModal";
 const BoardTemplate1 = () => {
 
   const navigate = useNavigate();
@@ -193,9 +194,10 @@ const BoardTemplate1 = () => {
     useState(false);
   const [imgMenuToggle, setImgMenuToggle] = useState(false);
 
-  const projectId = 1;
   const userEmail = "wnsrb933@naver.com";
-
+  const [projectId, setProjectId] = useState();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
   const [preData, setPreData] = useState([]);
   useEffect(() => {
     // if(location.state.name){
@@ -953,8 +955,8 @@ const BoardTemplate1 = () => {
     // console.log(firstTemplateProperties);
   }, []);
 
-  //유저에게 입력받을 아이디어
-  const inputWord = "당신의 아이디어";
+  //유저에게 입력받을 키워드  
+  const [inputWord,setInputWord] = useState('');
   const [selectedWords, setSelectedWords] = useState([]);
 
   const getRandomWords = (words, count) => {
@@ -976,6 +978,7 @@ const BoardTemplate1 = () => {
   const generateRandomWords = () => {
     const selectedRandomWords = getRandomWords(randomWords, 34);
     setSelectedWords(selectedRandomWords);
+    setInputWord('');
 
     let index = 0;
     const and = "&";
@@ -1022,8 +1025,93 @@ const BoardTemplate1 = () => {
     chatLogEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [chatLog]);
 
+  const nameChange = async (e) => {
+    const inputText = e.target.value;
+    const length = Array.from(inputText).length;
+
+    if (length <= 8) {
+      setInputWord(inputText);
+  } 
+   };
+
+   const goHome = () => {
+    const loadProject = async () => {
+      try {
+        const response = await api.delete(
+          `/api/project/close/${location.state.projectId}`
+        );
+        console.log(response);
+      } catch (error) {
+        console.error("Error fetching data: ", error);
+      }
+    };
+
+    loadProject();
+    navigate("/home");
+  };
+
+  const openModal = (projectId) => {
+    setIsOpen(false);
+    setProjectId(projectId);
+    setIsModalOpen(true);
+  };
+  const closeModal = () => setIsModalOpen(false);
+  
+
   return (
     <div className="absolute  inset-0 h-full w-full bg-[#EFEFEF] bg-opacity-50 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px]">
+
+ {/* 키워드 입력 바 */}
+ <div className="absolute bottom-3 left-[610px]">
+
+ <InviteModal
+        isOpen={isModalOpen}
+        closeModal={closeModal}
+        projectId={projectId}
+      ></InviteModal>
+       <label class="mx-auto mt-40 relative drop-shadow-md bg-white min-w-sm max-w-2xl flex flex-col md:flex-row items-center justify-center border py-2 px-2 rounded-2xl gap-2 shadow-2xl focus-within:border-gray-300"
+          for="search-bar">
+          <input id="search-bar" 
+                  placeholder="키워드를 입력해주세요"
+                  value={inputWord}
+                  onChange={nameChange}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault(); // 폼 제출을 방지
+                      generateRandomWords();
+  
+                    }
+                  }}
+                  className="px-6 py-2 w-full rounded-md flex-1 outline-none bg-white"/>
+          <button
+            class="w-full md:w-auto px-6 py-3 bg-black border-black text-white fill-white active:scale-95 duration-100 border will-change-transform overflow-hidden relative rounded-xl transition-all disabled:opacity-70"
+            onClick={generateRandomWords}  >
+              
+            <div class="relative">
+
+              <div
+                class="flex items-center justify-center h-3 w-3 absolute inset-1/2 -translate-x-1/2 -translate-y-1/2 transition-all">
+                <svg class="opacity-0 animate-spin w-full h-full" xmlns="http://www.w3.org/2000/svg" fill="none"
+                    viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
+                        stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                    </path>
+                </svg>
+              </div>
+
+                <div class="flex items-center transition-all opacity-1 valid:"><span
+                        class="text-sm font-semibold whitespace-nowrap truncate mx-auto">
+                        생성
+                    </span>
+                </div>
+
+            </div>
+        
+          </button>
+        </label>
+       </div>
 
       {/* 왼쪽 윗 블록 */}
       <div className='absolute top-6 left-6 pl-5 bg-white rounded-md w-[410px] h-[50px] flex items-center flex-row shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]'>
@@ -1363,7 +1451,7 @@ const BoardTemplate1 = () => {
           <path strokeLinecap="round" strokeLinejoin="round" d="M8.625 9.75a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375m-13.5 3.01c0 1.6 1.123 2.994 2.707 3.227 1.087.16 2.185.283 3.293.369V21l4.184-4.183a1.14 1.14 0 0 1 .778-.332 48.294 48.294 0 0 0 5.83-.498c1.585-.233 2.708-1.626 2.708-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z" />
         </svg>
 
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidtfh={1.5} stroke="currentColor" className="hover:stroke-blue w-7 h-7 cursor-pointer">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none"  onClick={() => openModal(projectId)} viewBox="0 0 24 24" strokeWidtfh={1.5} stroke="currentColor" className="hover:stroke-blue w-7 h-7 cursor-pointer">
           <path strokeLinecap="round" strokeLinejoin="round" d="M9 8.25H7.5a2.25 2.25 0 0 0-2.25 2.25v9a2.25 2.25 0 0 0 2.25 2.25h9a2.25 2.25 0 0 0 2.25-2.25v-9a2.25 2.25 0 0 0-2.25-2.25H15m0-3-3-3m0 0-3 3m3-3V15" />
         </svg>
       </div>
@@ -1398,20 +1486,7 @@ const BoardTemplate1 = () => {
         />
       </div> */}
 
-      {/* 한칸 위 버튼 */}
-      <div className="absolute bottom-6 right-32 z-50 justify-center bg-white rounded-md w-16 h-[50px] flex  items-center flex-row shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]">
-        <button onClick={moveUp}>한칸 위</button>
-      </div>
-
-      {/* 한칸 아래 버튼 */}
-      <div className="absolute bottom-6 right-12 z-50 justify-center bg-white rounded-md w-16 h-[50px] flex  items-center flex-row shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]">
-        <button onClick={moveToBottom}>한칸 아래</button>
-      </div>
-
-      {/* 제일 위 버튼 */}
-      <div className="absolute bottom-6 right-52 z-50  justify-center bg-white rounded-md w-16 h-[50px] flex  items-center flex-row shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]">
-        <button onClick={moveToTop}>제일 위</button>
-      </div>
+     
 
       {/* 이미지 툴 */}
 
@@ -1423,10 +1498,7 @@ const BoardTemplate1 = () => {
         </div>
       )}
 
-      {/* 템플릿1 랜덤 단어 생성 버튼 */}
-      <div className="absolute bottom-6 left-92 z-50  bottom-5">
-        <button onClick={generateRandomWords}>새로운 랜덤 단어 생성</button>
-      </div>
+     
 
 
 
@@ -1436,7 +1508,7 @@ const BoardTemplate1 = () => {
         <Stage
           ref={stageRef}
           width={window.innerWidth * 0.85}
-          height={window.innerHeight * 0.85}
+          height={window.innerHeight * 0.75}
           draggable={!draggable}
           onWheel={zoomOnWheel}
           onMouseDown={handleMouseDown}
