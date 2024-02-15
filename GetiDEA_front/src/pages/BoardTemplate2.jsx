@@ -1115,8 +1115,7 @@ const BoardTemplate2 = () => {
       className="text-blue"
       onClick={() => setActivateNumber(activatedNumber - 1)}
     >
-      {" "}
-      닫기{" "}
+      닫기
     </button>
   );
   const PrevButton = (
@@ -1124,8 +1123,7 @@ const BoardTemplate2 = () => {
       className="text-blue"
       onClick={() => setActivateNumber(activatedNumber - 1)}
     >
-      {" "}
-      이전{" "}
+      이전
     </button>
   );
   const NextButton = (
@@ -1133,8 +1131,7 @@ const BoardTemplate2 = () => {
       className="text-blue"
       onClick={() => setActivateNumber(activatedNumber + 1)}
     >
-      {" "}
-      다음{" "}
+      다음
     </button>
   );
   const FinButton = (
@@ -1142,8 +1139,7 @@ const BoardTemplate2 = () => {
       className="text-blue"
       onClick={() => setActivateNumber(activatedNumber + 1)}
     >
-      {" "}
-      완료{" "}
+      완료
     </button>
   );
   const TutorialCheckButton = (
@@ -1151,8 +1147,7 @@ const BoardTemplate2 = () => {
       className="text-blue"
       onClick={() => setActivateNumber(activatedNumber + 1)}
     >
-      {" "}
-      확인{" "}
+      확인
     </button>
   );
 
@@ -1161,12 +1156,24 @@ const BoardTemplate2 = () => {
     setActivateNumber(0);
   };
 
+  const endTutorial = () => {
+    setActivateNumber(11);
+  };
+
   const coachList = [
     {
       // 튜토리얼 1. 템플릿 소개 (overview)
       activate: activatedNumber === 0,
       component: (
         <div className="bg-white p-8 shadow-lg rounded-lg">
+          <div className="flex justify-end">
+            <button
+              className="bg-blue-500 hover:bg-blue-700 text-black font-Nanum font-bold text-2xl"
+              onClick={() => endTutorial()}
+            >
+              X
+            </button>
+          </div>
           <p className="text-center font-Nanum font-bold text-2xl">
             6개의 생각모자 (6hats)
           </p>
@@ -1199,6 +1206,14 @@ const BoardTemplate2 = () => {
       activate: activatedNumber === 1,
       component: (
         <div className="bg-white p-8 shadow-lg rounded-lg">
+          <div className="flex justify-end">
+            <button
+              className="bg-blue-500 hover:bg-blue-700 text-black font-Nanum font-bold text-2xl"
+              onClick={() => endTutorial()}
+            >
+              X
+            </button>
+          </div>
           <p className="text-center font-Nanum font-bold text-2xl">
             Write Your iDEA!
           </p>
@@ -1225,6 +1240,14 @@ const BoardTemplate2 = () => {
       activate: activatedNumber === 2,
       component: (
         <div className="bg-white p-8 shadow-lg rounded-lg">
+          <div className="flex justify-end">
+            <button
+              className="bg-blue-500 hover:bg-blue-700 text-black font-Nanum font-bold text-2xl"
+              onClick={() => endTutorial()}
+            >
+              X
+            </button>
+          </div>
           <p className="text-center font-Nanum font-bold text-xl">
             6개의 생각모자에 맞춰 아이디어를 분석해보세요.
           </p>
@@ -1251,6 +1274,14 @@ const BoardTemplate2 = () => {
       activate: activatedNumber === 3,
       component: (
         <div className="bg-white p-8 shadow-lg rounded-lg">
+          <div className="flex justify-end">
+            <button
+              className="bg-blue-500 hover:bg-blue-700 text-black font-Nanum font-bold text-2xl"
+              onClick={() => endTutorial()}
+            >
+              X
+            </button>
+          </div>
           <p className="text-center font-Nanum font-bold text-3xl text-[#A9A9A9]">
             'Information'
           </p>
@@ -1281,6 +1312,14 @@ const BoardTemplate2 = () => {
       activate: activatedNumber === 4,
       component: (
         <div className="bg-white p-8 shadow-lg rounded-lg">
+          <div className="flex justify-end">
+            <button
+              className="bg-blue-500 hover:bg-blue-700 text-black font-Nanum font-bold text-2xl"
+              onClick={() => endTutorial()}
+            >
+              X
+            </button>
+          </div>
           <p className="text-center font-Nanum font-bold text-3xl text-[#8B0000]">
             'Feeling'
           </p>
@@ -1314,6 +1353,14 @@ const BoardTemplate2 = () => {
       activate: activatedNumber === 5,
       component: (
         <div className="bg-white p-8 shadow-lg rounded-lg">
+          <div className="flex justify-end">
+            <button
+              className="bg-blue-500 hover:bg-blue-700 text-black font-Nanum font-bold text-2xl"
+              onClick={() => endTutorial()}
+            >
+              X
+            </button>
+          </div>
           <p className="text-center font-Nanum font-bold text-3xl text-yellow-600 text-[#9B870C]">
             'Benefit'
           </p>
@@ -1347,6 +1394,14 @@ const BoardTemplate2 = () => {
       activate: activatedNumber === 6,
       component: (
         <div className="bg-white p-8 shadow-lg rounded-lg">
+          <div className="flex justify-end">
+            <button
+              className="bg-blue-500 hover:bg-blue-700 text-black font-Nanum font-bold text-2xl"
+              onClick={() => endTutorial()}
+            >
+              X
+            </button>
+          </div>
           <p className="text-center font-Nanum font-bold text-3xl text-[#000000]">
             'Critic'
           </p>
@@ -1380,6 +1435,14 @@ const BoardTemplate2 = () => {
       activate: activatedNumber === 7,
       component: (
         <div className="bg-white p-8 shadow-lg rounded-lg">
+          <div className="flex justify-end">
+            <button
+              className="bg-blue-500 hover:bg-blue-700 text-black font-Nanum font-bold text-2xl"
+              onClick={() => endTutorial()}
+            >
+              X
+            </button>
+          </div>
           <p className="text-center font-Nanum font-bold text-3xl text-[#006400]">
             'Creativity'
           </p>
@@ -1413,6 +1476,14 @@ const BoardTemplate2 = () => {
       activate: activatedNumber === 8,
       component: (
         <div className="bg-white p-8 shadow-lg rounded-lg">
+          <div className="flex justify-end">
+            <button
+              className="bg-blue-500 hover:bg-blue-700 text-black font-Nanum font-bold text-2xl"
+              onClick={() => endTutorial()}
+            >
+              X
+            </button>
+          </div>
           <p className="text-center font-Nanum font-bold text-3xl text-[#00008B]">
             'Managing'
           </p>
