@@ -2192,15 +2192,15 @@ const BoardTemplate3 = () => {
       )}
 
       {/* 사용자 아이디어 작성 영역 - 템플릿의 inputText 관련 */}
-      <div className="top-5 ml-[500px] absolute flex justify-center rounded-2xl items-center bg-transparent border-none shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]">
+      <div className="top-5 ml-[500px] absolute flex  rounded-2xl items-center bg-transparent border-none shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]">
         <input
           ref={ref2}
-          className="h-[70px] min-w-[100px] max-w-[1300px] text-center text-5xl font-Nanum rounded-2xl bg-transparent border-none"
+          className="h-[70px] w-[500px] text-center text-5xl font-Nanum rounded-2xl bg-transparent border-none"
           type="text"
           placeholder="Write Your iDEA"
           value={inputText}
           onChange={handleInputTextChange}
-          size={inputTextLength}
+          maxLength={9} // 최대 글자 수를 조정할 수 있습니다.
         />
       </div>
 

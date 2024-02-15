@@ -1167,14 +1167,6 @@ const BoardTemplate2 = () => {
       activate: activatedNumber === 0,
       component: (
         <div className="bg-white p-8 shadow-lg rounded-lg">
-          <div className="flex justify-end">
-            <button
-              className="bg-blue-500 hover:bg-blue-700 text-black font-Nanum font-bold text-2xl"
-              onClick={() => endTutorial()}
-            >
-              X
-            </button>
-          </div>
           <p className="text-center font-Nanum font-bold text-2xl">
             6개의 생각모자 (6hats)
           </p>
@@ -1577,7 +1569,7 @@ const BoardTemplate2 = () => {
   };
 
   //템플릿2 정보 저장
-  const saveTemplate = () => {};
+  const saveTemplate = () => { };
 
   return (
     <div className="absolute  inset-0 h-full w-full bg-[#EFEFEF] bg-opacity-50 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px]">
@@ -1892,9 +1884,8 @@ const BoardTemplate2 = () => {
         </svg>
       </div> */}
       <div
-        className={`${
-          isVisible ? "block" : "hidden"
-        } absolute right-6 top-20 p-2.5 max-w-[200px] flex flex-col space-y-2.5`}
+        className={`${isVisible ? "block" : "hidden"
+          } absolute right-6 top-20 p-2.5 max-w-[200px] flex flex-col space-y-2.5`}
       >
         <video ref={myVideoRef} autoPlay muted className="w-full" />
         {/* 자신의 비디오 */}
@@ -2125,16 +2116,15 @@ const BoardTemplate2 = () => {
         </div>
       )}
 
-      {/* 사용자 아이디어 작성 영역 - 템플릿의 inputText 관련 */}
-      <div className="top-5 ml-[500px] absolute flex justify-center rounded-2xl items-center bg-transparent border-none shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]">
+      <div className="top-5 ml-[500px] absolute flex  rounded-2xl items-center bg-transparent border-none shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]">
         <input
           ref={ref2}
-          className="h-[70px] min-w-[100px] max-w-[1300px] text-center text-5xl font-Nanum rounded-2xl bg-transparent border-none"
+          className="h-[70px] w-[500px] text-center text-5xl font-Nanum rounded-2xl bg-transparent border-none"
           type="text"
           placeholder="Write Your iDEA"
           value={inputText}
           onChange={handleInputTextChange}
-          size={inputTextLength}
+          maxLength={9} // 최대 글자 수를 조정할 수 있습니다.
         />
       </div>
 
