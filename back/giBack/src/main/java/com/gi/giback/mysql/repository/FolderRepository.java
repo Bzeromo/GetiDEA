@@ -12,6 +12,11 @@ public interface FolderRepository extends JpaRepository<FolderEntity, String> {
     List<FolderEntity> findByUserEmail(String userEmail);
     @Transactional
     void deleteByUserEmailAndFolderName(String userEmail, String folderName);
-    Optional<FolderEntity> findFirstByUserEmailAndFolderName(String userEmail, String folderName);
     Optional<FolderEntity> findFirstByFolderName(String folderName);
+
+    Optional<FolderEntity> findFirstByFolderId(Long folderId);
+
+    Optional<FolderEntity> findFirstByUserEmailAndFolderId(String userEmail, Long folderId);
+
+    Optional<FolderEntity> findFirstByUserEmailAndFolderName(String userEmail, String newFolderName);
 }

@@ -3,6 +3,7 @@ package com.gi.giback.controller;
 import com.gi.giback.dto.FileUploadDTO;
 import com.gi.giback.mongo.service.ProjectService;
 import com.gi.giback.mysql.service.UserService;
+import com.gi.giback.response.ErrorResponse;
 import com.gi.giback.s3.S3UploadService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -11,6 +12,7 @@ import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -33,52 +35,48 @@ public class ImageController {
 
     @PostMapping("/thumbnail")
     @Operation(summary = "썸네일 이미지 저장", description = "썸네일 이미지 저장")
-    public ResponseEntity<String> uploadThumbnailImage(
+    public ResponseEntity<?> uploadThumbnailImage(
         @RequestPart("Image")  MultipartFile multipartFile,
         @RequestPart("projectId") Long projectId) {
         String result;
         try {
             result = s3UploadService.saveThumbnailImage(multipartFile);
-            log.info("result ={}", result);
             projectService.updateProjectThumbnail(projectId, result);
         } catch (IOException e) {
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.badRequest().body(new ErrorResponse("썸네일 변경 실패"));
         }
         return ResponseEntity.ok(result);
     }
 
     @PostMapping("/profile")
     @Operation(summary = "프로필 이미지 변경", description = "프로필 이미지 변경")
-    public ResponseEntity<String> updateProfileImage(
+    public ResponseEntity<?> updateProfileImage(
         @RequestPart("Image") MultipartFile multipartFile,
-        @RequestPart("userEmail") @Parameter(description = "사용자 이메일") String userEmail) {
+        @AuthenticationPrincipal String userEmail) {
 
-
-        log.info("start // email ={}", userEmail);
+        if(userEmail == null || userEmail.equals("anonymousUser")){
+            return ResponseEntity.badRequest().body(new ErrorResponse("사용자 검증 필요"));
+        }
 
         String result;
         try {
             result = s3UploadService.saveProfileImage(multipartFile, userEmail);
-            log.info("result ={}", result);
             if(userService.updateUserProfileImage(userEmail, result)){
                 return ResponseEntity.ok(result);
             }
         } catch (IOException e) {
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.badRequest().body(new ErrorResponse("프로필 이미지 변경 실패 - IOException"));
         }
-        return ResponseEntity.badRequest().build();
+        return ResponseEntity.badRequest().body(new ErrorResponse("프로필 이미지 변경 실패"));
     }
 
     @PostMapping("/project")
     @Operation(summary = "프로젝트 이미지 추가", description = "프로젝트 내 삽입된 이미지 저장 후, 이미지 url 반환")
     public ResponseEntity<String> updateProfileImage(
         @RequestParam @Parameter(description = "imageBase64 : 인코딩된 이미지 ")FileUploadDTO fileUploadDTO) {
+
         String result;
-        try {
-            result = s3UploadService.saveImage(fileUploadDTO);
-        } catch (IOException e) {
-            return ResponseEntity.badRequest().build();
-        }
+        result = s3UploadService.saveImage(fileUploadDTO);
         return ResponseEntity.ok(result);
     }
 

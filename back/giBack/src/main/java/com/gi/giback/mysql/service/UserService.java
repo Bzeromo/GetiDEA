@@ -89,11 +89,11 @@ public class UserService {
     }
 
     @Transactional
-    public UserDTO updateUserName(String userEmail, String newName) {
+    public Optional<UserDTO> updateUserName(String userEmail, String newUserName) {
         return userRepository.findByUserEmail(userEmail).map(user -> {
-            user.setUserName(newName);
+            user.setUserName(newUserName);
             userRepository.save(user);
             return new UserDTO(user.getUserEmail(), user.getUserName(), user.getProfileImage());
-        }).orElseThrow(() -> new RuntimeException("User not found with email: " + userEmail));
+        });
     }
 }

@@ -33,7 +33,7 @@ public class MySqlConfig {
     public LocalContainerEntityManagerFactoryBean mysqlEntityManager() {
         LocalContainerEntityManagerFactoryBean em = new LocalContainerEntityManagerFactoryBean();
         em.setDataSource(mysqlDataSource());
-        em.setPackagesToScan(new String[] {"com.gi.giback.mysql"});
+        em.setPackagesToScan("com.gi.giback.mysql");
 
         HibernateJpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
         vendorAdapter.setShowSql(true);

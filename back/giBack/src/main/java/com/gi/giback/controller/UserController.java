@@ -2,15 +2,19 @@ package com.gi.giback.controller;
 
 import com.gi.giback.dto.UserDTO;
 import com.gi.giback.mysql.service.UserService;
+import com.gi.giback.response.ErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -36,15 +40,16 @@ public class UserController {
 
     @PatchMapping("/rename")
     @Operation(summary = "사용자 이름 변경 - 테스트 완료", description = "사용자 이름 변경")
-    public ResponseEntity<UserDTO> renameUser(
-        @RequestParam @Parameter(description = "사용자 이메일") String userEmail,
-        @RequestParam @Parameter(description = "새로운 이름") String newName) {
+    public ResponseEntity<?> renameUser(
+        @RequestBody String newUserName, @AuthenticationPrincipal String userEmail) {
 
-        // 사용자 검증
-        List<UserDTO> userCheck = userService.searchUsersByEmail(userEmail);
-        if(userCheck.isEmpty()) return ResponseEntity.badRequest().build();
+        if(userEmail == null || userEmail.equals("anonymousUser")){
+            return ResponseEntity.badRequest().body(new ErrorResponse("사용자 검증 필요"));
+        }
 
-        UserDTO user = userService.updateUserName(userEmail, newName);
-        return ResponseEntity.ok(user);
+        Optional<UserDTO> updatedUser = userService.updateUserName(userEmail, newUserName);
+        return updatedUser
+            .map(ResponseEntity::ok)
+            .orElseGet(() -> ResponseEntity.notFound().build());
     }
 }

@@ -2,6 +2,7 @@
 .conf
 *.yml
 *.log
+*.sh
 init-mongo.js
 init-mysql.sql
 node_modules/

@@ -49,19 +49,16 @@ public class RedisService {
         String jsonData = objectMapper.writeValueAsString(combinedData);
 
         listOps.rightPush(key, jsonData); // 2개씩 보내지는 버그(프론트) 고쳐지면 pop 기능 제거
-        log.info("Save data - Redis");
         Long size = listOps.size(key);
         if (size != null && size > 60) { // 만약 크기가 30이 넘어가면 merge 작업 수행
             // 병합 작업 수행
-            List<ProjectProcessDTO> redisData = getAllDataProject(projectId);
-            projectService.updateData(projectId, redisData);
+            mergeProject(projectId);
         }
     }
 
     public Object getLastProjectData(Long projectId, String userEmail) { // 되돌리기에서 사용
         String key = projectId + ":" + userEmail;
         if(Boolean.TRUE.equals(redisTemplate.hasKey(key))){
-            log.info("Get last data - Redis");
             redisTemplate.opsForList().rightPop(key);
             return redisTemplate.opsForList().rightPop(key);
             // 마지막 값 pop 작업 수행 후 반환
@@ -72,44 +69,44 @@ public class RedisService {
     }
 
     // projectId가 일치하는 곳의 모든 사용자의 변경사항 시간 순서로 정렬후 리턴
-    public List<ProjectProcessDTO> getAllDataProject(Long projectId)
+    public boolean mergeProject(Long projectId)
         throws JsonProcessingException {
         List<ProjectProcessDTO> results = new ArrayList<>();
         ObjectMapper objectMapper = new ObjectMapper();
 
         Set<String> keys = redisTemplate.keys(projectId + ":*");
 
-        assert keys != null;
-        for (String key : keys) {
-            List<Object> data = redisTemplate.opsForList().range(key, 0, -1);
-            assert data != null;
-            for (Object o : data) {
-                ProjectProcessDTO projectProcessDTO = objectMapper.readValue((String) o,
-                    ProjectProcessDTO.class);
-                results.add(projectProcessDTO);
-            }
+        if(keys != null) {
+            for (String key : keys) {
+                List<Object> data = redisTemplate.opsForList().range(key, 0, -1);
+                assert data != null;
+                for (Object o : data) {
+                    ProjectProcessDTO projectProcessDTO = objectMapper.readValue((String) o,
+                        ProjectProcessDTO.class);
+                    results.add(projectProcessDTO);
+                }
 
-            int currentSize = data.size();
+                int currentSize = data.size();
 
-            int remainSize = 5;
-            if (currentSize > remainSize) {
-                int excessData = currentSize - remainSize;
-                // 초과하는 데이터를 삭제
-                for (int i = 0; i < excessData; i++) {
-                    redisTemplate.opsForList().leftPop(key);
+                int remainSize = 5;
+                if (currentSize > remainSize) {
+                    int excessData = currentSize - remainSize;
+                    // 초과하는 데이터를 삭제
+                    for (int i = 0; i < excessData; i++) {
+                        redisTemplate.opsForList().leftPop(key);
+                    }
                 }
             }
+            results.sort(Comparator.comparing(ProjectProcessDTO::getUpdateTime));
+            return projectService.updateData(projectId, results);
         }
-        log.info("Get all data - Redis");
-        results.sort(Comparator.comparing(ProjectProcessDTO::getUpdateTime));
-        return results;
+        return true;
     }
 
     // projectId + UserId 기준으로 어떤 사용자가 프로젝트를 종료했을때 호출하여
     // 해당 사용자의 기록을 지움
-    public boolean deleteData(Long projectId, String userEmail) {
+    public void deleteData(Long projectId, String userEmail) {
         String key = projectId + ":" + userEmail;
         redisTemplate.delete(key);
-        return true;
     }
 }

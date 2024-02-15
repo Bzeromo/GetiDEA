@@ -20,7 +20,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.http.HttpHeaders;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
@@ -59,6 +58,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         getRedirectStrategy().sendRedirect(request, response, targetUrl);
     }
 
+    @Override
     protected String determineTargetUrl(HttpServletRequest request, HttpServletResponse response,
                                         Authentication authentication) {
 
@@ -73,8 +73,6 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 
         OAuth2UserPrincipal principal = getOAuth2UserPrincipal(authentication);
 
-
-
         if (principal == null) {
             return UriComponentsBuilder.fromUriString(targetUrl)
                     .queryParam("error", "Login failed")
@@ -88,25 +86,14 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
             String accessToken = jwtService.createAccessToken(user.getUserEmail(), user.getUserName(), user.getProvider().toString());
             String refreshToken = jwtService.createRefreshToken(user.getUserEmail(), user.getProvider().toString());
 
+            // 쿠키에 토큰 저장
+            addTokenToCookies(response, "access_token", accessToken, 24 * 60 * 60); // 1일
+            addTokenToCookies(response, "refresh_token", refreshToken, 7 * 24 * 60 * 60); // 7일
             // 리프레시 토큰 DB 저장
             userService.updateRefreshToken(principal.getUserInfo().getEmail(), refreshToken);
 
-            log.info("email={}, name={}, accessToken={}", principal.getUserInfo().getEmail(),
-                    principal.getUserInfo().getUserName(),
-                    principal.getUserInfo().getAccessToken()
-            );
-
-            response.setHeader("Authorization", accessToken);
-            HttpHeaders headers = new HttpHeaders();
-            headers.setBearerAuth(accessToken);
-            headers.setBearerAuth(refreshToken);
-
             // 지금은 파라미터에 보내는 중 but body에 담아서 보내는것이 안전
-
-            return UriComponentsBuilder.fromUriString(targetUrl)
-                    .queryParam("access_token", accessToken)
-                    .queryParam("refresh_token", refreshToken)
-                    .build().toUriString();
+            return UriComponentsBuilder.fromUriString(targetUrl).build().toUriString();
 
         } else if ("unlink".equalsIgnoreCase(mode)) { // 회원 탈퇴
 
@@ -138,5 +125,13 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
     protected void clearAuthenticationAttributes(HttpServletRequest request, HttpServletResponse response) {
         super.clearAuthenticationAttributes(request);
         httpCookieOAuth2AuthorizationRequestRepository.removeAuthorizationRequestCookies(request, response);
+    }
+
+    private void addTokenToCookies(HttpServletResponse response, String name, String value, int maxAge) {
+        Cookie cookie = new Cookie(name, value);
+        cookie.setPath("/");
+
+        cookie.setMaxAge(maxAge);
+        response.addCookie(cookie);
     }
 }

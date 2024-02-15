@@ -10,6 +10,7 @@ public class ProjectInfoDTO {
     private Long projectId;
     private String templateId;
     private String projectName;
+    private boolean bookmark;
     private String thumbnail;
     private LocalDateTime lastUpdateTime;
 }

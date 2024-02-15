@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @Service
 public class JwtService {
-    private SecretKey key = Keys.secretKeyFor(SignatureAlgorithm.HS512); // 안전한 키 생성;
+    private final SecretKey key = Keys.secretKeyFor(SignatureAlgorithm.HS512);
 
     @Value("${jwt.access.expiration}")
     private int jwtExpirationMs;
@@ -50,10 +50,8 @@ public class JwtService {
                     .setSigningKey(key) // 검증에 사용할 서명 키 설정
                     .build()
                     .parseClaimsJws(token);
-            log.info("토큰 검증 완료");
             return !claims.getBody().getExpiration().before(new Date()); // 토큰 만료 날짜가 현재 날짜보다 이후인지 확인
         } catch (SignatureException ex) {
-            log.info("토큰 검증 실패");
             return false;
         }
     }

@@ -1,51 +1,64 @@
 package com.gi.giback.mysql.service;
 
+import com.gi.giback.dto.LocationMoveDTO;
+import com.gi.giback.dto.ProjectInfoDTO;
+import com.gi.giback.mongo.service.ProjectService;
 import com.gi.giback.mysql.entity.LocationEntity;
 import com.gi.giback.mysql.repository.LocationRepository;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 @Service
 @Slf4j
 public class LocationService {
     private final LocationRepository locationRepository;
+    private final ProjectService projectService;
 
     @Autowired
-    public LocationService(LocationRepository locationRepository) {
+    public LocationService(LocationRepository locationRepository, @Lazy ProjectService projectService) {
         this.locationRepository = locationRepository;
+        this.projectService = projectService;
     }
 
-    public LocationEntity createLocation(String userEmail, Long projectId, String projectName, String FolderName) {
-        log.info("Get folder : {}", userEmail);
+    public LocationEntity createLocation(String userEmail, Long projectId, String projectName, String folderName) {
+        if(checkLocation(userEmail, projectId)) {
+            return null;
+        }
+
         LocationEntity locationEntity = LocationEntity.builder()
                 .userEmail(userEmail)
                 .projectId(projectId)
                 .projectName(projectName)
-                .folderName(FolderName)
+                .folderName(folderName)
                 .build();
         return locationRepository.save(locationEntity);
+    }
+
+    private boolean checkLocation(String userEmail, Long projectId) {
+        return locationRepository.findByProjectIdAndUserEmail(projectId, userEmail).isPresent() ;
     }
 
     public List<LocationEntity> getLocationEntityByUserEmail(String userEmail) {
         return locationRepository.findByUserEmail(userEmail);
     }
 
-    public LocationEntity updateFolderName(String userEmail, String  projectName, String newFolderName) {
-        Optional<LocationEntity> entity = locationRepository.findFirstByUserEmailAndProjectName(userEmail, projectName);
+    public LocationEntity updateFolderName(LocationMoveDTO data) {
+        Optional<LocationEntity> entity = locationRepository.findFirstByUserEmailAndProjectId(
+            data.getUserEmail(), data.getProjectId());
         if (entity.isPresent()) {
             LocationEntity location = entity.get();
-            if (location.getProjectName().equals(projectName)) {
-                location.setFolderName(newFolderName);
-                return locationRepository.save(location);
-            }
+            location.setFolderName(data.getNewFolderName());
+            return locationRepository.save(location);
         }
         return null;
     }
 
-    public LocationEntity toggleBookmark(String userEmail, Long projectId) {
+    public LocationEntity toggleBookmark(Long projectId, String userEmail) {
         List<LocationEntity> entities = locationRepository.findByUserEmail(userEmail);
         for (LocationEntity entity : entities) {
             if (entity.getProjectId().equals(projectId)) {
@@ -56,15 +69,25 @@ public class LocationService {
         return null;
     }
 
-    public List<LocationEntity> getBookmarkedLocations(String userEmail) {
-        return locationRepository.findByUserEmailAndBookmarkTrue(userEmail);
-    }
+    public List<ProjectInfoDTO> getBookmarkedLocations(String userEmail) {
 
-    public Optional<LocationEntity> getLocationByUserEmailAndFolderName(String userEmail, String folderName) {
-        return locationRepository.findFirstByUserEmailAndFolderName(userEmail, folderName);
+        List<LocationEntity> bookmarkedLocations = locationRepository.findByUserEmailAndBookmarkTrue(userEmail);
+        List<ProjectInfoDTO> projectInfoList = new ArrayList<>();
+
+        for (LocationEntity locationEntity : bookmarkedLocations) {
+            Long projectId = locationEntity.getProjectId();
+            Optional<ProjectInfoDTO> projectEntity = projectService.getProjectInfo(projectId);
+            if (projectEntity.isPresent()) {
+                ProjectInfoDTO projectInfoDTO = projectEntity.get();
+                projectInfoDTO.setBookmark(locationEntity.getBookmark());
+                projectInfoList.add(projectInfoDTO);
+            }
+        }
+        return projectInfoList;
     }
 
     public List<LocationEntity> getLocationsByUserEmailAndFolderName(String userEmail, String folderName) {
+
         return locationRepository.findByUserEmailAndFolderName(userEmail, folderName);
     }
 
@@ -72,12 +95,12 @@ public class LocationService {
         return locationRepository.findByProjectIdAndUserEmail(projectId, userEmail);
     }
 
-    public Optional<LocationEntity> getLocationByProjectNameAndUserEmail(String projectName, String userEmail) {
-        return locationRepository.findByProjectNameAndUserEmail(projectName, userEmail);
-    }
-
     public void deleteLocationByUserEmailAndProjectId(String userEmail, Long projectId) {
         locationRepository.deleteByUserEmailAndProjectId(userEmail, projectId);
+        long count = countLocationsByProjectId(projectId);
+        if (count == 0) {
+            projectService.deleteProjectByProjectId(projectId);
+        }
     }
 
     public long countLocationsByProjectId(Long projectId) {
@@ -90,5 +113,9 @@ public class LocationService {
 
         location.setProjectName(newProjectName);
         return locationRepository.save(location);
+    }
+
+    public void saveLocation(LocationEntity location) {
+        locationRepository.save(location);
     }
 }

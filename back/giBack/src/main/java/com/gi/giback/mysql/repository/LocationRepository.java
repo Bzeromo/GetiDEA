@@ -23,5 +23,5 @@ public interface LocationRepository extends JpaRepository<LocationEntity, String
 
     Optional<LocationEntity> findByProjectNameAndUserEmail(String projectName, String userEmail);
 
-    Optional<LocationEntity> findFirstByUserEmailAndProjectName(String userEmail, String projectName);
+    Optional<LocationEntity> findFirstByUserEmailAndProjectId(String userEmail, Long projectId);
 }
