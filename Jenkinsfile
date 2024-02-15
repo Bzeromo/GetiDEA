@@ -42,37 +42,37 @@ pipeline {
             }
         }
 
-        stage('Prepare DB Services') {
-            steps {
-                echo 'Starting database services...'
-                sh 'docker-compose -f back/giBack/compose.yml up -d'
-            }
-        }
+//         stage('Prepare DB Services') {
+//             steps {
+//                 echo 'Starting database services...'
+//                 sh 'docker-compose -f back/giBack/compose.yml up -d'
+//             }
+//         }
 
-        stage('Check DB Services Health') {
-                    steps {
-                        script {
-                            // Define a helper method to wait for service health
-                            def waitForServiceHealth = { service, retries ->
-                                def healthy = false
-                                for (int i = 0; i < retries; i++) {
-                                    sleep 15
-                                    healthy = sh(script: "docker inspect --format='{{.State.Health.Status}}' ${service}", returnStdout: true).trim() == 'healthy'
-                                    if (healthy) {
-                                        break
-                                    }
-                                }
-                                if (!healthy) {
-                                    error("Service ${service} did not become healthy after ${retries} retries")
-                                }
-                            }
-                            // Call the helper method for each service
-                            waitForServiceHealth('giback_mongodb_1', MAX_RETRIES)
-                            waitForServiceHealth('giback_redis_1', MAX_RETRIES)
-                            waitForServiceHealth('giback_mysql_1', MAX_RETRIES)
-                        }
-                    }
-                }
+//         stage('Check DB Services Health') {
+//                     steps {
+//                         script {
+//                             // Define a helper method to wait for service health
+//                             def waitForServiceHealth = { service, retries ->
+//                                 def healthy = false
+//                                 for (int i = 0; i < retries; i++) {
+//                                     sleep 15
+//                                     healthy = sh(script: "docker inspect --format='{{.State.Health.Status}}' ${service}", returnStdout: true).trim() == 'healthy'
+//                                     if (healthy) {
+//                                         break
+//                                     }
+//                                 }
+//                                 if (!healthy) {
+//                                     error("Service ${service} did not become healthy after ${retries} retries")
+//                                 }
+//                             }
+//                             // Call the helper method for each service
+//                             waitForServiceHealth('giback_mongodb_1', MAX_RETRIES)
+//                             waitForServiceHealth('giback_redis_1', MAX_RETRIES)
+//                             waitForServiceHealth('giback_mysql_1', MAX_RETRIES)
+//                         }
+//                     }
+//                 }
 
         stage('Build Project') {
             steps {
@@ -90,11 +90,11 @@ pipeline {
             steps {
                 echo 'Deploying project...'
                 dir('back/giBack/build/') {
-                    // 실행 권한 부여
-                    sh 'chmod +x libs'
-                    // 빌드 실행
-                    sh 'java -jar libs/getidea-0.1.0.jar'
-                       sh 'whoami'
+//                     // 실행 권한 부여
+//                     sh 'chmod +x libs'
+//                     // 빌드 실행
+//                     sh 'java -jar libs/getidea-0.1.0.jar'
+                    sh 'whoami'
                 }
             }
         }
@@ -104,8 +104,8 @@ pipeline {
                 echo 'Building frontend...'
                 dir('/front') {
                     // 의존성 설치
-                    sh 'yarn install'
-                    sh 'yarn start'
+//                     sh 'yarn install'
+//                     sh 'yarn start'
                     sh 'whoami'
                 }
             }
