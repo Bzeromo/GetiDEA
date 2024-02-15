@@ -779,6 +779,7 @@ const WhiteBoard = () => {
 
   const handleColorChange = (e) => {
     setCurrentColor(e.target.value);
+    setShapeColor(e.target.value);
     setShapes(
       shapes.map((shape) =>
         shape.id === selectedId ? { ...shape, fill: e.target.value } : shape
@@ -793,6 +794,8 @@ const WhiteBoard = () => {
 
   const handleStrokeColorChange = (e) => {
     setStrokeCurrentColor(e.target.value);
+    setShapeStrokeColor(e.target.value);
+    
     setShapes(
       shapes.map((shape) =>
         shape.id === selectedId ? { ...shape, stroke: e.target.value } : shape

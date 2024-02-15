@@ -348,6 +348,7 @@ const BoardTemplate1 = () => {
   };
 
   const handleColorChange = (e) => {
+    setShapeColor(e.target.value);
     setCurrentColor(e.target.value);
     setShapes(
       shapes.map((shape) =>
@@ -956,6 +957,7 @@ const BoardTemplate1 = () => {
   };
 
   const handleStrokeColorChange = (e) => {
+    setShapeStrokeColor(e.target.value);
     setStrokeCurrentColor(e.target.value);
     setShapes(
       shapes.map((shape) =>
@@ -1889,7 +1891,7 @@ const BoardTemplate1 = () => {
           isVisible ? "block" : "hidden"
         } absolute right-6 top-20 p-2.5 max-w-[200px] flex flex-col space-y-2.5`}
       >
-        <video ref={myVideoRef} autoPlay muted className="w-full z-50" />
+        <video ref={myVideoRef} autoPlay muted className="w-full z-40 " />
         {/* 자신의 비디오 */}
         {streams.map(({ stream, peerId }) => (
           <Video key={peerId} stream={stream} />
@@ -2054,7 +2056,7 @@ const BoardTemplate1 = () => {
   {/* 도형 서식 창 */}
 
   {selectedId !== null && (
-        <div className="absolute top-32 z-20 right-5 justify-center  bg-white rounded-md w-60 h-[500px] flex flex-col shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]">
+        <div className="absolute top-32 z-50 right-5 justify-center  bg-white rounded-md w-60 h-[500px] flex flex-col shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]">
             <div className="mt-3 ml-5 w-4/5  items-center flex  drop-shadow-md bg-white  h-12 rounded-xl">
               <span className="text-xl font-bold ml-8 font-Inter text-black">도형</span>
             </div>
@@ -2374,7 +2376,7 @@ function Video({ stream }) {
     <video
       ref={ref}
       autoPlay
-      className="w-[150px] m-2 p-2.5" // Tailwind CSS 클래스 적용
+      className="w-[250px] m-2 p-2.5 " // Tailwind CSS 클래스 적용
     />
   );
 }
