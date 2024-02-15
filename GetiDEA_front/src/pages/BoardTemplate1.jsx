@@ -56,7 +56,7 @@ const BoardTemplate1 = () => {
 
   //프로젝트 이름
   const location = useLocation();
-  const [projectName, setProjectName] = useState("초기 프로젝트");
+  const [projectName, setProjectName] = useState("");
 
   //스테이지 초기화
   const initialScaleValue = { x: 1, y: 1 };
@@ -195,15 +195,19 @@ const BoardTemplate1 = () => {
   const [imgMenuToggle, setImgMenuToggle] = useState(false);
 
   const userEmail = "wnsrb933@naver.com";
-  const [projectId, setProjectId] = useState();
+  let projectId = 0;
+  
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [preData, setPreData] = useState([]);
   useEffect(() => {
-    // if(location.state.name){
-    //   setProjectName(location.state.name);
-    // }
-    getProjectData();
+    if (location.state?.name) {
+      setProjectName(location.state.name);
+    } else if (location.state?.projectId) {
+      projectId=location.state.projectId;
+   
+    }
+    getProjectData(projectId);
     console.log(`|\\_/|
 |q p|   /}
 ( 0 )"""\\
@@ -1052,7 +1056,6 @@ const BoardTemplate1 = () => {
 
   const openModal = (projectId) => {
     setIsOpen(false);
-    setProjectId(projectId);
     setIsModalOpen(true);
   };
   const closeModal = () => setIsModalOpen(false);
