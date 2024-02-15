@@ -64,8 +64,8 @@ public class SecurityConfig {
                 .formLogin(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests((requests) -> requests
-                        .requestMatchers("/oauth2/**", "/googlelogin/**", "/kakaologin/**", "/naverlogin/**", "/login/**",
-                            "/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**", "/webjars/**").permitAll()
+                        .requestMatchers("/**","/oauth2/**", "/googlelogin/**", "/kakaologin/**", "/naverlogin/**", "/login/**",
+                            "/swagger-ui/**", "/v3/api-docs/**", "/login/**", "/api/**", "/swagger-resources/**", "/webjars/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(sessions -> sessions.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -87,7 +87,7 @@ public class SecurityConfig {
         configuration.addAllowedOriginPattern("http://i10b104.p.ssafy.io:3004");
         configuration.addAllowedOriginPattern("http://i10b104.p.ssafy.io:8084");
         configuration.addAllowedOriginPattern("https://i10b104.p.ssafy.io");
-//        configuration.addAllowedOriginPattern("*"); // 프론트 배포 전까지만 허용
+        configuration.addAllowedOriginPattern("*"); // 프론트 배포 전까지만 허용
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "DELETE", "PATCH", "PUT"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
         configuration.setAllowCredentials(true);
