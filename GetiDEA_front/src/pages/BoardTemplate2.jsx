@@ -855,16 +855,16 @@ const BoardTemplate2 = () => {
     setStagePosition(newPos);
   }, []);
 
-  const resetZoom = useCallback(() => {
+  const resetZoom = () => {
     const stage = stageRef.current;
     if (!stage) {
       return;
     }
     stage.scale({ x: 1, y: 1 });
     stage.position({ x: 0, y: 0 });
-    stagePosition({ x: 0, y: 0 });
+    setStagePosition({ x: 0, y: 0 });
     setStageScale({ x: 1, y: 1 });
-  }, []);
+  };
 
   useEffect(() => {
     // 드래그 작업이 완료되었고, 상태가 변경되었다면 서버에 전송
@@ -1153,6 +1153,7 @@ const BoardTemplate2 = () => {
 
   // 튜토리얼 버튼 함수
   const startTutorial = () => {
+    resetZoom();
     setActivateNumber(0);
   };
 
