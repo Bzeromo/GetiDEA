@@ -100,6 +100,11 @@ const BoardTemplate2 = () => {
   //복사 붙여넣기용
   const [clipboard, setClipboard] = useState(null);
 
+  //도형 서식 관련
+  const [shapeColor, setShapeColor] = useState("");
+  const [shapeStrokeColor, setShapeStrokeColor] = useState("");
+  const [strokeCurrentColor, setStrokeCurrentColor] = useState("#000000");
+  const [strokeWidthSize, setStrokeWidthSize] = useState();
   // function checkPost() {
   //   setCheckDelete(!checkDelete);
   // }
@@ -891,6 +896,7 @@ const BoardTemplate2 = () => {
   };
 
   const handleColorChange = (e) => {
+    setShapeColor(e.target.value);
     setCurrentColor(e.target.value);
     setShapes(
       shapes.map((shape) =>
@@ -1077,6 +1083,28 @@ const BoardTemplate2 = () => {
   };
 
   const chatLogEndRef = useRef(null);
+
+  const handleStrokeColorChange = (e) => {
+    setShapeStrokeColor(e.target.value);
+    setStrokeCurrentColor(e.target.value);
+    setShapes(
+      shapes.map((shape) =>
+        shape.id === selectedId ? { ...shape, stroke: e.target.value } : shape
+      )
+    );
+  };
+
+  const handleStrokeWidthChange = (e) => {
+    setStrokeCurrentColor(e.target.value)
+    setStrokeWidthSize(e.target.value);
+    setShapes(
+      shapes.map((shape) =>
+        shape.id === selectedId
+          ? { ...shape, strokeWidth: e.target.value }
+          : shape
+      )
+    );
+  };
 
   // 채팅 스크롤 관련
   useEffect(() => {
@@ -1696,7 +1724,7 @@ const BoardTemplate2 = () => {
       </div>
 
       {/* 그리기 툴 */}
-      <div className="absolute top-48 left-6  bg-white rounded-md w-[50px] h-[240px] flex items-center flex-col shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]">
+      <div className="absolute top-48 left-6  bg-white rounded-md w-[50px] h-[280px] flex items-center flex-col shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]">
         <img
           src="/cursor.svg"
           alt=""
@@ -1704,6 +1732,16 @@ const BoardTemplate2 = () => {
           onClick={() => changedraggable()}
         />
 
+<svg
+          className="w-6 h-6 mt-7 cursor-pointer"
+          fill={!writeToggle ? "#000000" : "#0064FF"}
+          onClick={() => writeSetToggle()}
+          viewBox="0 0 128 128"
+          xmlns="http://www.w3.org/2000/svg"
+          enable-background="new 0 0 128 128"
+        >
+          <path d="m36.108 110.473 70.436-70.436-18.581-18.58-70.437 70.436a2.305 2.305 0 0 0-.803 1.22l-5.476 20.803c-.01.04-.01.082-.019.121a2.492 2.492 0 0 0-.039.247 2.354 2.354 0 0 0-.009.222 1.89 1.89 0 0 0 .048.471c.008.04.008.082.019.121.007.029.021.055.031.083.023.078.053.154.086.23.029.067.057.134.09.196.037.066.077.127.121.189.041.063.083.126.13.184.047.059.1.109.152.162a1.717 1.717 0 0 0 .345.283c.063.043.124.084.192.12.062.033.128.062.195.09.076.033.151.063.23.087.028.009.054.023.083.031.04.01.081.01.121.02a2.47 2.47 0 0 0 .693.039 3.26 3.26 0 0 0 .247-.039c.04-.01.082-.01.121-.02l20.804-5.475c.505-.132.92-.425 1.22-.805zm-16.457-2.124a2.313 2.313 0 0 0-1.964-.649l3.183-12.094 11.526 11.525-12.096 3.182a2.304 2.304 0 0 0-.649-1.964zM109.702 36.879l-18.58-18.581 7.117-7.117s12.656 4.514 18.58 18.582l-7.117 7.116z"></path>
+        </svg>
         {/* 도형 툴 */}
         <div>
           <svg
@@ -1848,7 +1886,7 @@ const BoardTemplate2 = () => {
 
       {/* 삭제 버튼 */}
       <div
-        className="cursor-pointer absolute top-[460px] left-6  bg-white rounded-md w-[50px] h-[50px] flex justify-center items-center shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]"
+        className="cursor-pointer absolute top-[500px] left-6  bg-white rounded-md w-[50px] h-[50px] flex justify-center items-center shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]"
         onClick={() => deleteAll()}
       >
         <svg
@@ -1872,8 +1910,8 @@ const BoardTemplate2 = () => {
 
       {/* 튜토리얼 버튼 */}
       <div
-        ref={ref11}
-        className="cursor-pointer absolute top-[530px]  hover:text-blue left-6  bg-white rounded-md w-[50px] h-[50px] flex justify-center items-center shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]"
+        ref={ref5}
+        className="cursor-pointer absolute top-[570px]  hover:text-blue left-6  bg-white rounded-md w-[50px] h-[50px] flex justify-center items-center shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]"
         onClick={startTutorial}
       >
         <svg
@@ -1976,7 +2014,7 @@ const BoardTemplate2 = () => {
     } absolute right-6 top-20 p-2.5 max-w-[200px] flex flex-col space-y-2.5`}
 
       >
-        <video ref={myVideoRef} autoPlay muted className="w-full z-50" />
+        <video ref={myVideoRef} autoPlay muted className="w-full z-40" />
         {/* 자신의 비디오 */}
         {streams.map(({ stream, peerId }) => (
           <Video key={peerId} stream={stream} />
@@ -2011,16 +2049,11 @@ const BoardTemplate2 = () => {
                       wordWrap: "break-word",
                     }}
                   >
-                    <img
-                      className="rounded-full w-12 h-12 border-[1px] border-light_gray"
-                      src={localStorage.getItem("profileImage")}
-                      alt=""
-                      style={{
-                        marginRight: "10px", // 이미지와 텍스트 사이 간격
-                      }}
-                    />
-                    <div className="bg-[#5aa5ff] break-all drop-shadow-md text-sm max-w-40 min-w-12 font-Nanum px-3 rounded-lg mr-3 text-center flex justify-center items-center text-white">
+                    <div className="flex flex-col">
+                    <span className="ml-auto ">{localStorage.getItem("userName")}</span>
+                    <div className="bg-[#5aa5ff]  break-all drop-shadow-md text-sm max-w-40 min-w-12 font-Nanum px-3 rounded-lg mr-3 text-center flex justify-center items-center text-white">
                       {chat.message}
+                    </div>
                     </div>
                   </div>
                 ) : (
@@ -2035,16 +2068,11 @@ const BoardTemplate2 = () => {
                       wordWrap: "break-word",
                     }}
                   >
-                    <img
-                      className="rounded-full w-12 h-12 border-[1px] border-light_gray"
-                      src={localStorage.getItem("profileImage")}
-                      alt=""
-                      style={{
-                        marginRight: "10px", // 이미지와 텍스트 사이 간격
-                      }}
-                    />
-                    <div className="bg-white break-all drop-shadow-md font-Nanum text-sm px-3 max-w-40 rounded-lg mr-3 text-center flex justify-center items-center">
+                    <div className="flex flex-col">
+                    <span className="ml-auto ">{localStorage.getItem("userName")}</span>
+                    <div className="bg-[#5aa5ff]  break-all drop-shadow-md text-sm max-w-40 min-w-12 font-Nanum px-3 rounded-lg mr-3 text-center flex justify-center items-center text-white">
                       {chat.message}
+                    </div>
                     </div>
                   </div>
                 )
@@ -2136,6 +2164,55 @@ const BoardTemplate2 = () => {
         </svg>
       </div>
 
+{/* 도형 서식 창 */}
+
+{selectedId !== null && (
+        <div className="absolute top-32 z-50 right-5 justify-center  bg-white rounded-md w-60 h-[500px] flex flex-col shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]">
+            <div className="mt-3 ml-5 w-4/5  items-center flex  drop-shadow-md bg-white  h-12 rounded-xl">
+              <span className="text-xl font-bold ml-8 font-Inter text-black">도형</span>
+            </div>
+            <div className="flex flex-row h-12 mt-3 ml-5">
+              <span className="mt-1 mr-5" >색상</span>
+            <input
+            className="h-8 w-8"
+              type="color"
+              value={shapeColor}
+              onChange={handleColorChange}
+            />
+            <span className="ml-3 mt-1">{currentColor}  </span>
+            </div>
+            <div className="mt-3 ml-5 w-4/5  items-center flex   drop-shadow-md bg-white  h-12 rounded-xl">
+              <span className="text-xl font-bold ml-8 font-Inter text-black">테두리</span>
+            </div>
+            <div className="flex flex-row h-12 mt-3 ml-5">
+              <span className="mt-1 mr-5" >색상</span>
+            <input
+            className="h-8 w-8"
+              type="color"
+              value={shapeStrokeColor}
+              onChange={handleStrokeColorChange}
+            />
+            <span className="ml-3 mt-1">{strokeCurrentColor}  </span>
+            </div>
+            <div className="flex flex-row h-12 mt-3 ml-5">
+              <span className="mr-5" >크기</span>
+              <input
+              type="number"
+              className="w-8 h-6"
+              value={strokeWidthSize}
+              onChange={handleStrokeWidthChange}
+            />
+            </div>
+            <div className="mt-3 ml-5 w-4/5  items-center flex    drop-shadow-md bg-white  h-12 rounded-xl">
+              <span className="text-xl font-bold ml-8 font-Inter text-black">위치</span>
+            </div>
+      
+          <div>
+           
+          </div>
+        </div>
+      )}
+
       {/* (테스트 버튼) 보드 내 요소들 체크 버튼 */}
       {/* <div className="absolute top-6 right-32 justify-center bg-white rounded-md w-16 h-[50px] flex  items-center flex-row shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]">
         <button onClick={() => checkObject()}>Check</button>
@@ -2166,21 +2243,7 @@ const BoardTemplate2 = () => {
         />
       </div> */}
 
-      {/* 한칸 위 버튼 */}
-      <div className="absolute bottom-6 right-32 z-50 justify-center bg-white rounded-md w-16 h-[50px] flex  items-center flex-row shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]">
-        <button onClick={moveUp}>한칸 위</button>
-      </div>
-
-      {/* 한칸 아래 버튼 */}
-      <div className="absolute bottom-6 right-12 z-50 justify-center bg-white rounded-md w-16 h-[50px] flex  items-center flex-row shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]">
-        <button onClick={moveToBottom}>한칸 아래</button>
-      </div>
-
-      {/* 제일 위 버튼 */}
-      <div className="absolute bottom-6 right-52 z-50  justify-center bg-white rounded-md w-16 h-[50px] flex  items-center flex-row shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]">
-        <button onClick={moveToTop}>제일 위</button>
-      </div>
-
+      
       {/* 이미지 툴 */}
 
       {imgMenuToggle && (
