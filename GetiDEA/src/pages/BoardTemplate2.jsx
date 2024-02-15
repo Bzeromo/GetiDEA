@@ -2049,16 +2049,11 @@ const BoardTemplate2 = () => {
                       wordWrap: "break-word",
                     }}
                   >
-                    <img
-                      className="rounded-full w-12 h-12 border-[1px] border-light_gray"
-                      src={localStorage.getItem("profileImage")}
-                      alt=""
-                      style={{
-                        marginRight: "10px", // 이미지와 텍스트 사이 간격
-                      }}
-                    />
-                    <div className="bg-[#5aa5ff] break-all drop-shadow-md text-sm max-w-40 min-w-12 font-Nanum px-3 rounded-lg mr-3 text-center flex justify-center items-center text-white">
+                    <div className="flex flex-col">
+                    <span className="ml-auto ">{localStorage.getItem("userName")}</span>
+                    <div className="bg-[#5aa5ff]  break-all drop-shadow-md text-sm max-w-40 min-w-12 font-Nanum px-3 rounded-lg mr-3 text-center flex justify-center items-center text-white">
                       {chat.message}
+                    </div>
                     </div>
                   </div>
                 ) : (
@@ -2073,16 +2068,11 @@ const BoardTemplate2 = () => {
                       wordWrap: "break-word",
                     }}
                   >
-                    <img
-                      className="rounded-full w-12 h-12 border-[1px] border-light_gray"
-                      src={localStorage.getItem("profileImage")}
-                      alt=""
-                      style={{
-                        marginRight: "10px", // 이미지와 텍스트 사이 간격
-                      }}
-                    />
-                    <div className="bg-white break-all drop-shadow-md font-Nanum text-sm px-3 max-w-40 rounded-lg mr-3 text-center flex justify-center items-center">
+                    <div className="flex flex-col">
+                    <span className="ml-auto ">{localStorage.getItem("userName")}</span>
+                    <div className="bg-[#5aa5ff]  break-all drop-shadow-md text-sm max-w-40 min-w-12 font-Nanum px-3 rounded-lg mr-3 text-center flex justify-center items-center text-white">
                       {chat.message}
+                    </div>
                     </div>
                   </div>
                 )
