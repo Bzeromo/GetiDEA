@@ -1,4 +1,4 @@
-import axios from "axios";
+import api from "../../../api";
 
 interface Item {
   ty: string;
@@ -19,8 +19,8 @@ const getData = (
   setImages: SetStateAction<Item[]>
 ) => {
   const getProjectData = () => {
-    axios
-      .get(`http://192.168.31.172:8080/api/project/data?projectId=${projectId}`)
+    api
+      .get(`/api/project/data?projectId=${projectId}`)
       .then((response) => {
         const data = response.data;
         if (data && data.data) {

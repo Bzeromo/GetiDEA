@@ -17,11 +17,9 @@ const KakaoLogin: React.FC = () => {
     // localStorage.setItem('accessToken',accessToken ?? "" )
     // localStorage.setItem('refreshToken',refreshToken ?? "" )
 
-    // const access_Token = Cookies.get('access_token');
-    // const refresh_Token = Cookies.get('refresh_token');
+     const access_Token = Cookies.get('access_token');
+     const refresh_Token = Cookies.get('refresh_token');
 
-    const access_Token = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJqdW5neW9hbndvb0BuYXZlci5jb20iLCJpYXQiOjE3MDc5NjI0OTgsInVzZXJOYW1lIjoi7KCV7Jew7JqwIiwicHJvdmlkZXIiOiJLQUtBTyIsImV4cCI6MTcwNzk2NjA5OH0.iqPoafDntKIu-PCa5UZz9J7U-mzAMBDyB0srlKbeArUJsYHkhNxq8iUt19S0LA1Ou7dWTTedKpfcAuK6ZqWlMA"
-    const refresh_Token = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJqdW5neW9hbndvb0BuYXZlci5jb20iLCJpYXQiOjE3MDc5NjI0OTgsInByb3ZpZGVyIjoiS0FLQU8iLCJleHAiOjE3MDgwNDg4OTh9.8PU8vzyctKPEcVfOOgzaZlueY4I56PJCAVLxriP8-uD0f-DWwgKheB0B1SvO2O3yjdVVq-SuopeAsPTqYjn_XQ"
 
     console.log(Cookies.get('access_token'));
     console.log(refreshToken);

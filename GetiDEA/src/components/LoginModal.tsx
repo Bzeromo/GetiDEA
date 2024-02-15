@@ -66,7 +66,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, closeModal }) => {
                             </svg>
 
                             <div className="space-y-4 mt-5">
-                                <h2 className="mb-8 text-2xl text-center text-Nanum dark:text-white font-light rotate-[-0.03deg]">로그인
+                                <h2 className="mb-8 text-2xl text-center text-Nanum font-light rotate-[-0.03deg]">로그인
                                 </h2>
                             </div>
                             <div className="mt-12 grid space-y-4">

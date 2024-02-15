@@ -204,7 +204,7 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, closeModal, profile
                             
 
                             <div className=" mt-3 flex flex-row gap-72 items-center justify-center ">
-                                <h2 className="text-2xl mt-2 text-center font-Nanum  dark:text-white font-bold rotate-[-0.03deg]">내 프로필
+                                <h2 className="text-2xl mt-2 text-center font-Nanum  font-bold rotate-[-0.03deg]">내 프로필
                                 </h2>
                                 <svg  onClick={closeModal} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-7 h-7 ml-6  text-light_gray cursor-pointer">
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />

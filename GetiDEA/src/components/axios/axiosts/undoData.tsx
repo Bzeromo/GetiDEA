@@ -1,9 +1,9 @@
-import axios from "axios";
+import api from "../../../api";
 
 const undoData = (projectId: number, userEmail: string): () => void => {
   const undoEvent = (): void => {
-    axios
-      .get(`http://192.168.31.172:8080/api/project/${projectId}/${userEmail}`)
+    api
+      .get(`/api/project/${projectId}/${userEmail}`)
       .then((response) => {
         console.log(response);
       })

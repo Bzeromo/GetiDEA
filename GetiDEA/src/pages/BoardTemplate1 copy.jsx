@@ -6,7 +6,6 @@ import useImage from "use-image";
 import URLImage from "../components/Add/URLImage";
 import { debounce } from "lodash";
 import { nanoid } from "nanoid";
-
 import ImgComponent from "../components/Add/ImgComponent";
 import ShapeComponent from "../components/Add/ShapeComponent";
 import LineComponent from "../components/Add/LineComponent";
@@ -23,7 +22,12 @@ import ImageSelector from "../components/funciton/ImageSelector";
 import undoData from "../components/axios/undoData";
 import getData from "../components/axios/getData";
 
-const BoardTemplate3 = () => {
+import bubbleChatProperties from "../components/templateData/template1-position.json";
+import randomWords from "../components/templateData/randomWords.json";
+import TemplateImageComponent from "../components/Add/TemplateImageComponent";
+import TemplateTextComponent from "../components/Add/TemplateTextComponent";
+
+const BoardTemplate1 = () => {
 
   const navigate = useNavigate();
 
@@ -937,6 +941,77 @@ const BoardTemplate3 = () => {
 
   const chatLogEndRef = useRef(null);
 
+   //템플릿1에 관한 요소 & 코드
+   const firstTemplateProperties = Object.values(bubbleChatProperties);
+
+   //템플릿 기본 세팅 : 템플릿 요소 저장
+   useEffect(() => {
+     setImages(firstTemplateProperties);
+     // 이미지 저장 확인을 위한 console.log
+     // console.log(firstTemplateProperties);
+   }, []);
+ 
+   //유저에게 입력받을 아이디어
+   const [inputWord,setInputWord] = useState('');
+   const [selectedWords, setSelectedWords] = useState([]);
+ 
+   const getRandomWords = (words, count) => {
+     const randomWords = [];
+     const usedIndexes = new Set();
+ 
+     while (randomWords.length < count && usedIndexes.size < words.length) {
+       const randomIndex = Math.floor(Math.random() * words.length);
+ 
+       if (!usedIndexes.has(randomIndex)) {
+         usedIndexes.add(randomIndex);
+         randomWords.push(words[randomIndex]);
+       }
+     }
+ 
+     return randomWords;
+   };
+  const generateRandomWords = () => {
+    const selectedRandomWords = getRandomWords(randomWords, 34);
+    setSelectedWords(selectedRandomWords);
+    setInputWord('');
+
+    let index = 0;
+    const and = "&";
+    const plus = " ";
+    const space = " ";
+    const line = "\n";
+    const randomWordsResult = [];
+
+    while (index < 34) {
+      const pickedRandomWords = selectedRandomWords[index];
+      let text = "";
+
+      if (firstTemplateProperties[index].arrangementType === 1) {
+        text = inputWord + space + and + space + pickedRandomWords;
+      }
+      else {
+        text = inputWord + line + and + line + pickedRandomWords;
+      }
+
+      const fontSize = 8; //템플릿에 나타나는 글자 크기 조정
+      const x = firstTemplateProperties[index].textPosX;
+      const y = firstTemplateProperties[index].textPosY;
+      const align = "center";
+      const draggable = false; // 드래그 방지
+      const onSelect = false; // 선택 방지
+      const onClick = false; // 클릭 방지
+
+      randomWordsResult.push({ text, x, y, fontSize, align, draggable, onSelect, onClick });
+
+      index++;
+    }
+
+    //랜덤 단어 확인을 위한 console.log
+    console.log(randomWordsResult);
+
+    setTexts(randomWordsResult);
+
+  };
 
   // 채팅 스크롤 관련 
   useEffect(() => {
@@ -944,8 +1019,63 @@ const BoardTemplate3 = () => {
     chatLogEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [chatLog]);
 
+  const nameChange = async (e) => {
+    const inputText = e.target.value;
+    const length = Array.from(inputText).length;
+
+    if (length <= 8) {
+      setInputWord(inputText);
+  } 
+   };
+   
   return (
     <div className="absolute  inset-0 h-full w-full bg-[#EFEFEF] bg-opacity-50 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px]">
+       
+       {/* 키워드 입력 바 */}
+       <div className="absolute bottom-3 left-[610px]">
+       <label class="mx-auto mt-40 relative drop-shadow-md bg-white min-w-sm max-w-2xl flex flex-col md:flex-row items-center justify-center border py-2 px-2 rounded-2xl gap-2 shadow-2xl focus-within:border-gray-300"
+          for="search-bar">
+          <input id="search-bar" 
+                  placeholder="키워드를 입력해주세요"
+                  value={inputWord}
+                  onChange={nameChange}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault(); // 폼 제출을 방지
+                      generateRandomWords();
+  
+                    }
+                  }}
+                  className="px-6 py-2 w-full rounded-md flex-1 outline-none bg-white"/>
+          <button
+            class="w-full md:w-auto px-6 py-3 bg-black border-black text-white fill-white active:scale-95 duration-100 border will-change-transform overflow-hidden relative rounded-xl transition-all disabled:opacity-70"
+            onClick={generateRandomWords}  >
+              
+            <div class="relative">
+
+              <div
+                class="flex items-center justify-center h-3 w-3 absolute inset-1/2 -translate-x-1/2 -translate-y-1/2 transition-all">
+                <svg class="opacity-0 animate-spin w-full h-full" xmlns="http://www.w3.org/2000/svg" fill="none"
+                    viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
+                        stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                    </path>
+                </svg>
+              </div>
+
+                <div class="flex items-center transition-all opacity-1 valid:"><span
+                        class="text-sm font-semibold whitespace-nowrap truncate mx-auto">
+                        생성
+                    </span>
+                </div>
+
+            </div>
+        
+          </button>
+        </label>
+       </div>
        
       {/* 왼쪽 윗 블록 */}
       <div className='absolute top-6 left-6 pl-5 bg-white rounded-md w-[410px] h-[50px] flex items-center flex-row shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]'>
@@ -968,7 +1098,7 @@ const BoardTemplate3 = () => {
       </div>
 
       {/* 그리기 툴 */}
-      <div className="absolute top-48 left-6  bg-white rounded-md w-[50px] h-[240px] flex items-center flex-col shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]">
+      <div className="absolute top-48 left-6  bg-white rounded-md w-[50px] h-[280px] flex items-center flex-col shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]">
         <img
           src="/cursor.svg"
           alt=""
@@ -1114,6 +1244,10 @@ const BoardTemplate3 = () => {
           onClick={() => addTextBox()}
         />
 
+        {/* 이미지 넣기 툴 */}
+        <svg onClick={imgToggle} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="mt-6 w-6 h-6 cursor-pointer">
+          <path strokeLinecap="round" strokeLinejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
+        </svg>
 
         {/* 기타 툴 */}
         {/* <img src="/dots.svg" alt="" className="w-4 h-4 mt-7" /> */}
@@ -1121,7 +1255,7 @@ const BoardTemplate3 = () => {
 
       {/* 삭제 버튼 */}
       <div
-        className="cursor-pointer absolute top-[460px] left-6  bg-white rounded-md w-[50px] h-[50px] flex justify-center items-center shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]"
+        className="cursor-pointer absolute top-[510px] left-6  bg-white rounded-md w-[50px] h-[50px] flex justify-center items-center shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]"
         onClick={() => deleteAll()}
       >
         <svg
@@ -1141,7 +1275,7 @@ const BoardTemplate3 = () => {
       </div>
 
       {/* 튜토리얼 버튼 */}
-      <div className='cursor-pointer absolute top-[530px]  hover:text-blue left-6  bg-white rounded-md w-[50px] h-[50px] flex justify-center items-center shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]' >
+      <div className='cursor-pointer absolute top-[580px]  hover:text-blue left-6  bg-white rounded-md w-[50px] h-[50px] flex justify-center items-center shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]' >
         <svg
           xmlns="http://www.w3.org/2000/svg" 
           fill="none" 
@@ -1320,20 +1454,7 @@ const BoardTemplate3 = () => {
         />
       </div> */}
 
-      {/* 한칸 위 버튼 */}
-      <div className="absolute bottom-6 right-32 z-50 justify-center bg-white rounded-md w-16 h-[50px] flex  items-center flex-row shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]">
-        <button onClick={moveUp}>한칸 위</button>
-      </div>
-
-      {/* 한칸 아래 버튼 */}
-      <div className="absolute bottom-6 right-12 z-50 justify-center bg-white rounded-md w-16 h-[50px] flex  items-center flex-row shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]">
-        <button onClick={moveToBottom}>한칸 아래</button>
-      </div>
-
-      {/* 제일 위 버튼 */}
-      <div className="absolute bottom-6 right-52 z-50  justify-center bg-white rounded-md w-16 h-[50px] flex  items-center flex-row shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]">
-        <button onClick={moveToTop}>제일 위</button>
-      </div>
+   
 
       {/* 이미지 툴 */}
     
@@ -1344,13 +1465,13 @@ const BoardTemplate3 = () => {
           <ImageSelector onImageSelect={addImage} />
         </div>
       )}
-
+ 
       {/* 그리는 구역 */}
       <div className="ml-36 mt-24 h-96 w-96">
         <Stage
           ref={stageRef}
           width={window.innerWidth*0.85}
-          height={window.innerHeight*0.85}
+          height={window.innerHeight*0.75}
           draggable={!draggable}
           onWheel={zoomOnWheel}
           onMouseDown={handleMouseDown}
@@ -1360,6 +1481,16 @@ const BoardTemplate3 = () => {
           onClick={handleLayerClick}
         >
           <Layer ref={layerRef}>
+
+             {/* 템플릿 요소 띄우기 */}
+             {/* <React.Fragment>
+              {firstTemplateProperties.map((imgInfo, index) => (
+                <React.Fragment key={index}>
+                  <TemplateImageComponent {...imgInfo} />
+                </React.Fragment>
+              ))}
+            </React.Fragment> */}
+
             {drawing && (
               <Line
                 points={currentLine}
@@ -1428,6 +1559,40 @@ const BoardTemplate3 = () => {
                 );
               }
             })}
+
+{images.map((img, index) => (
+              img.id === undefined ? (
+                <TemplateImageComponent
+                  key={index}
+                  image={img}
+                  x={img.x}
+                  y={img.y}
+                  width={img.width}
+                  height={img.height}
+                  rotation={img.rotation}
+                  scaleX={img.scaleX}
+                  scaleY={img.scaleY}
+                  color={img.color}
+                />
+              ) : (
+                <ImgComponent
+                  key={img.id}
+                  id={img.id}
+                  ty={img.ty}
+                  ref={ImageRef}
+                  imageSrc={img.src}
+                  x={img.x}
+                  y={img.y}
+                  isSelected={img.id === selectedId}
+                  onSelect={(e) => {
+                    handleShapeClick(img.id, e);
+                  }}
+                />
+              )
+            ))}
+
+
+
             {texts.map((text, id) => (
               <TextComponent
                 key={text.id}
@@ -1464,6 +1629,33 @@ const BoardTemplate3 = () => {
               />
             ))}
 
+{texts.map((text, index) => (
+              text.id === undefined ? (
+                <TemplateTextComponent
+                  key={index}
+                  textProps={text}
+                />
+              ) : (
+                <TextComponent
+                  key={text.id}
+                  textProps={text}
+                  fontSize={fontSize}
+                  isSelected={text.id === selectedId}
+                  onSelect={(e) => {
+                    handleShapeClick(text.id, e);
+                  }}
+                  onChange={(newAttrs) => {
+                    const newTexts = texts.map((t) =>
+                      t.id === text.id ? { ...t, ...newAttrs } : t
+                    );
+                    setTexts(newTexts);
+                  }}
+                  setSelectedId={setSelectedId}
+                  onTextChange={(newText) => handleTextChange(text.id, newText)}
+                />
+              )
+            ))}
+
             {selectedId && (
               <Transformer
                 ref={(node) => {
@@ -1485,4 +1677,4 @@ const BoardTemplate3 = () => {
   );
 };
 
-export default BoardTemplate3;
+export default BoardTemplate1;

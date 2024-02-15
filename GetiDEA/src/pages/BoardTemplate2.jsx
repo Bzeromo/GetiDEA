@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import { useNavigate ,useLocation} from 'react-router-dom';
 import { Stage, Layer, Transformer, Line, Image } from "react-konva";
-import axios from "axios";
+import api from "../api";
 import useImage from "use-image";
 import URLImage from "../components/Add/URLImage";
 import { debounce } from "lodash";
@@ -111,8 +111,8 @@ const BoardTemplate2 = () => {
       newData: {},
     };
 
-    axios
-      .post("http://localhost:8080/api/project/change", postData)
+    api
+      .post("/api/project/change", postData)
       .then((response) => {
         // 삭제가 성공적으로 반영되었을 때 상태 업데이트
         console.log(response);

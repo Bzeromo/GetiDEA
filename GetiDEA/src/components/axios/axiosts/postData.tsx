@@ -1,4 +1,4 @@
-import axios from "axios";
+import api from "../../../api";
 
 interface EventTargetAttrs {
   id: string;
@@ -39,8 +39,8 @@ interface PostData {
 const postData = (projectId: number, userEmail: string) => {
   const PostSave = () => {
     console.log(projectId);
-    axios
-      .patch(`http://192.168.31.172:8080/api/project/merge?projectId=${projectId}`)
+    api
+      .patch(`/api/project/merge?projectId=${projectId}`)
       .then((response) => {
         console.log(response);
       })
@@ -61,8 +61,8 @@ const postData = (projectId: number, userEmail: string) => {
       preData: {},
       newData: e.target.attrs,
     };
-    axios
-      .post("http://192.168.31.172:8080/api/project/changes", postData)
+    api
+      .post("/api/project/changes", postData)
       .then((response) => {
         console.log(response.data);
       })

@@ -103,9 +103,9 @@ const InviteModal: React.FC<InviteModalProps> = ({ isOpen, closeModal ,projectId
                             </svg>
 
                             <div className="space-y-2 mt-3">
-                                <h2 className="mb-1 text-2xl text-center text-Nanum dark:text-white font-regular rotate-[-0.03deg]">초대하기
+                                <h2 className="mb-1 text-2xl text-center text-Nanum  font-regular rotate-[-0.03deg]">초대하기
                                 </h2>
-                                <h2 className="mb-8 text-sm text-center text-Nanum dark:text-white font-light rotate-[-0.03deg]">같이 프로젝트에 참여할 팀원들을 초대하세요
+                                <h2 className="mb-8 text-sm text-center text-Nanum  font-light rotate-[-0.03deg]">같이 프로젝트에 참여할 팀원들을 초대하세요
                                 </h2>
                             </div>
 

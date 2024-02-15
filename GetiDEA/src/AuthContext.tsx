@@ -28,14 +28,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const [accessToken, setAccessToken] = useState<string | null>(null);
   // const isAuthenticated = !!localStorage.getItem('accessToken');
-  // const isAuthenticated = !!Cookies.get('access_token');
-  const isAuthenticated = true;
+   const isAuthenticated = !!Cookies.get('access_token');
   const navigate = useNavigate();
 
   useEffect(() => {
     // 페이지 로드 시 토큰 확인 로직
-    // const storedToken = Cookies.get('access_token');
-    const storedToken = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJqdW5neW9hbndvb0BuYXZlci5jb20iLCJpYXQiOjE3MDc5NjI0OTgsInVzZXJOYW1lIjoi7KCV7Jew7JqwIiwicHJvdmlkZXIiOiJLQUtBTyIsImV4cCI6MTcwNzk2NjA5OH0.iqPoafDntKIu-PCa5UZz9J7U-mzAMBDyB0srlKbeArUJsYHkhNxq8iUt19S0LA1Ou7dWTTedKpfcAuK6ZqWlMA"
+     const storedToken = Cookies.get('access_token');
     // const storedToken = localStorage.getItem('accessToken');
     if (storedToken) {
       setAccessToken(storedToken);
