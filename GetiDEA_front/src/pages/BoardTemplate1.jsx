@@ -199,7 +199,7 @@ const BoardTemplate1 = () => {
   const [imgMenuToggle, setImgMenuToggle] = useState(false);
 
   const userEmail = "wnsrb933@naver.com";
-  let projectId = 0;
+  const projectId = 2;
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
@@ -562,6 +562,7 @@ const BoardTemplate1 = () => {
         texts: texts,
         images: images,
         drawingList: drawingList,
+        projectId: projectId,
         newChat:
           chatInput.nickname.trim() !== "" && chatInput.message.trim() !== ""
             ? { ...chatInput, id: new Date().getTime() }
