@@ -24,10 +24,13 @@ import undoData from "../components/axios/undoData";
 import getData from "../components/axios/getData";
 
 //템플릿을 위한 import
-import bubbleChatProperties from "../components/templateData/template1-position.json";
+import bubbleChatProperties from "../components/templateData/template1-position copy.json";
 import randomWords from "../components/templateData/randomWords.json";
 import TemplateImageComponent from "../components/Add/TemplateImageComponent";
 import TemplateTextComponent from "../components/Add/TemplateTextComponent";
+
+//Coah-Mark를 위한 import
+import { CoachMark, ICoachProps } from "react-coach-mark";
 
 import InviteModal from "../components/InviteModal";
 const BoardTemplate1 = () => {
@@ -197,7 +200,7 @@ const BoardTemplate1 = () => {
   const userEmail = "wnsrb933@naver.com";
 
   let projectId = 0;
-  
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [preData, setPreData] = useState([]);
@@ -205,8 +208,8 @@ const BoardTemplate1 = () => {
     if (location.state?.name) {
       setProjectName(location.state.name);
     } else if (location.state?.projectId) {
-      projectId=location.state.projectId;
-   
+      projectId = location.state.projectId;
+
     }
     getProjectData(projectId);
     console.log(`|\\_/|
@@ -962,7 +965,7 @@ const BoardTemplate1 = () => {
   }, []);
 
   //유저에게 입력받을 키워드  
-  const [inputWord,setInputWord] = useState('');
+  const [inputWord, setInputWord] = useState('');
   const [selectedWords, setSelectedWords] = useState([]);
 
   const getRandomWords = (words, count) => {
@@ -1004,7 +1007,7 @@ const BoardTemplate1 = () => {
         text = inputWord + line + and + line + pickedRandomWords;
       }
 
-      const fontSize = 8; //템플릿에 나타나는 글자 크기 조정
+      const fontSize = 14; //템플릿에 나타나는 글자 크기 조정
       const x = firstTemplateProperties[index].textPosX;
       const y = firstTemplateProperties[index].textPosY;
       const align = "center";
@@ -1024,6 +1027,149 @@ const BoardTemplate1 = () => {
 
   };
 
+  //튜토리얼 refs
+  const ref1 = useRef(null);
+  const ref2 = useRef(null);
+  const ref3 = useRef(null);
+  const ref4 = useRef(null);
+  const ref5 = useRef(null);
+  // const ref6 = useRef(null);
+
+  // 튜토리얼 Number & Button
+  const [activatedNumber, setActivateNumber] = useState(0);
+  const FirstButton = <button className="text-blue" onClick={() => setActivateNumber(activatedNumber - 1)}> 닫기 </button>;
+  const PrevButton = <button className="text-blue" onClick={() => setActivateNumber(activatedNumber - 1)}> 이전 </button>;
+  const NextButton = <button className="text-blue" onClick={() => setActivateNumber(activatedNumber + 1)}> 다음 </button>;
+  const FinButton = <button className="text-blue" onClick={() => setActivateNumber(activatedNumber + 1)}> 완료 </button>;
+  const TutorialCheckButton = <button className="text-blue" onClick={() => setActivateNumber(activatedNumber + 1)}> 확인 </button>;
+
+  // 튜토리얼 버튼 함수
+  const startTutorial = () => {
+    setActivateNumber(0);
+  }
+
+  const coachList = [
+    {
+      // 튜토리얼 1. 템플릿 소개 (overview)
+      activate: activatedNumber === 0,
+      component:
+        <div className="bg-white p-8 shadow-lg rounded-lg">
+          <p className="text-center font-Nanum font-bold text-2xl" >랜덤 버블 (Random Bubble)</p>
+          <p className="text-center font-Nanum text-l mt-4 px-28">아이디어를 입력하면, 말풍선(Bubble)에 랜덤 키워드와 함께 등장합니다.</p>
+          <p className="text-center font-Nanum text-l">입력한 키워드와 랜덤으로 생성된 단어를 연관 지어</p>
+          <p className="text-center font-Nanum text-l">새로운 아이디어를 생각해보는 ‘강제결합’ 기법을 경험해보세요 :D</p>
+
+          <div className="flex justify-between items-center mt-8">
+            <button className="bg-blue-500 hover:bg-blue-700 text-white font-Nanum font-bold py-2 px-4 rounded shadow">{FirstButton}</button>
+            <span className="text-blue-800 font-Nanum">
+              1 / 4
+            </span>
+            <button className="bg-blue-500 hover:bg-blue-700 text-white font-Nanum font-bold py-2 px-4 rounded shadow">{NextButton}</button>
+          </div>
+
+        </div>,
+      reference: ref1,
+      tooltip: { position: 'bottom-right' }
+    },
+    {
+      // 튜토리얼 2. 키워드를 입력하세요
+      activate: activatedNumber === 1,
+      component:
+        <div className="bg-white p-8 shadow-lg rounded-lg">
+          <p className="text-center font-Nanum font-bold text-2xl" >키워드를 입력해보세요!</p>
+          <p className="text-center font-Nanum text-l mt-4 px-16">아이디어 또는 키워드를 입력하고</p>
+          <p className="text-center font-Nanum text-l mt-4 px-16">‘Bubble’ 버튼을 눌러보세요.</p>
+
+          <div className="flex justify-between items-center mt-8">
+            <button className="bg-blue-500 hover:bg-blue-700 text-white font-Nanum font-bold py-2 px-4 rounded shadow">{PrevButton}</button>
+            <span className="text-blue-800 font-Nanum">
+              2 / 4
+            </span>
+            <button className="bg-blue-500 hover:bg-blue-700 text-white font-Nanum font-bold py-2 px-4 rounded shadow">{NextButton}</button>
+          </div>
+
+        </div>,
+      reference: ref2,
+      tooltip: { position: 'top' }
+    },
+    {
+      // 튜토리얼 3. 입력한 아이디어와 랜덤한 키워드가 포함된 버블 설명
+      activate: activatedNumber === 2,
+      component:
+        <div className="bg-white p-8 shadow-lg rounded-lg">
+          <p className="text-center font-Nanum text-l" >입력한 키워드와 랜덤으로 생성된 단어를 포함한</p>
+          <p className="text-center font-Nanum font-bold mt-4 text-xl" >말풍선(Bubble)이 생성됩니다.</p>
+
+          <div className="flex justify-between items-center mt-8">
+            <button className="bg-blue-500 hover:bg-blue-700 text-white font-Nanum font-bold py-2 px-4 rounded shadow">{PrevButton}</button>
+            <span className="text-blue-800 font-Nanum">
+              3 / 4
+            </span>
+            <button className="bg-blue-500 hover:bg-blue-700 text-white font-Nanum font-bold py-2 px-4 rounded shadow">{NextButton}</button>
+          </div>
+
+        </div>,
+      reference: ref3,
+      tooltip: { position: 'right' }
+    },
+    {
+      // 튜토리얼 3. 설명 쓰기
+      activate: activatedNumber === 3,
+      component:
+        <div className="bg-white p-8 shadow-lg rounded-lg">
+          <p className="text-center font-Nanum font-bold text-xl" >두 단어를 결합하여</p>
+          <p className="text-center font-Nanum font-bold text-xl" >새로운 iDEA를 떠올려보세요!</p>
+          <p className="text-center font-Nanum text-l mt-4">새롭게 떠오른 생각들을 여기에 적어보세요</p>
+
+          <div className="flex justify-between items-center mt-8">
+            <button className="bg-blue-500 hover:bg-blue-700 text-white font-Nanum font-bold py-2 px-4 rounded shadow">{PrevButton}</button>
+            <span className="text-blue-800 font-Nanum">
+              4 / 4
+            </span>
+            <button className="bg-blue-500 hover:bg-blue-700 text-white font-Nanum font-bold py-2 px-4 rounded shadow">{NextButton}</button>
+          </div>
+
+        </div>,
+
+      reference: ref4,
+      tooltip: { position: 'right' }
+    },
+    // {
+    //   // 튜토리얼 4. 다른 버블들이 많다고 알려주기
+    //   activate: activatedNumber === 4,
+    //   component:
+    //     <div className="bg-white p-8 shadow-lg rounded-lg">
+    //       <p className="text-center font-Nanum font-bold text-xl" >화면 바깥에 더 많은 말풍선(bubble)들이 생성되어 있습니다.</p>
+    //       <p className="text-center font-Nanum text-l mt-4">더 많은 말풍선(bubble)들을 확인하고 아이디어를 얻어보세요!</p>
+
+    //       <div className="flex justify-between items-center mt-8">
+    //         <button className="bg-blue-500 hover:bg-blue-700 text-white font-Nanum font-bold py-2 px-4 rounded shadow">{PrevButton}</button>
+    //         <span className="text-blue-800 font-Nanum">
+    //           5 / 5
+    //         </span>
+    //         <button className="bg-blue-500 hover:bg-blue-700 text-white font-Nanum font-bold py-2 px-4 rounded shadow">{NextButton}</button>
+    //       </div>
+
+    //     </div>,
+
+    //   reference: ref5,
+    //   tooltip: { position: 'bottom' }
+    // },
+    {
+      // 튜토리얼 안내 : ? 클릭 시, 튜토리얼을 다시 볼 수 있음을 안내
+      activate: activatedNumber === 4,
+      component:
+        <div className="flex bg-white p-8 shadow-lg rounded-lg">
+          <p className="text-center font-Nanum font-bold text-2xl" >튜토리얼 다시보기는 여기를 클릭하세요!</p>
+          <button className="ml-7 bg-blue-500 hover:bg-blue-700 text-white font-Nanum font-bold py-2 px-4 rounded shadow">{TutorialCheckButton}</button>
+        </div>,
+
+      reference: ref5,
+      tooltip: { position: 'right' }
+    },
+  ];
+
+  const coach = coachList[activatedNumber];
 
   // 채팅 스크롤 관련 
   useEffect(() => {
@@ -1035,12 +1181,12 @@ const BoardTemplate1 = () => {
     const inputText = e.target.value;
     const length = Array.from(inputText).length;
 
-    if (length <= 10) {
+    if (length <= 8) {
       setInputWord(inputText);
-  } 
-   };
+    }
+  };
 
-   const goHome = () => {
+  const goHome = () => {
     const loadProject = async () => {
       try {
         const response = await api.delete(
@@ -1061,62 +1207,64 @@ const BoardTemplate1 = () => {
     setIsModalOpen(true);
   };
   const closeModal = () => setIsModalOpen(false);
-  
+
 
   return (
     <div className="absolute  inset-0 h-full w-full bg-[#EFEFEF] bg-opacity-50 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px]">
 
- {/* 키워드 입력 바 */}
- <div className="absolute bottom-3 left-[610px]">
+      {/* 키워드 입력 바 */}
+      <div className="absolute bottom-3 left-[610px]">
 
- <InviteModal
-        isOpen={isModalOpen}
-        closeModal={closeModal}
-        projectId={projectId}
-      ></InviteModal>
-       <label class="mx-auto mt-40 relative drop-shadow-md bg-white min-w-sm max-w-2xl flex flex-col md:flex-row items-center justify-center border py-2 px-2 rounded-2xl gap-2 shadow-2xl focus-within:border-gray-300"
+        <InviteModal
+          isOpen={isModalOpen}
+          closeModal={closeModal}
+          projectId={projectId}
+        ></InviteModal>
+        <label 
+        ref={ref2}
+        class="mx-auto mt-40 relative drop-shadow-md bg-white min-w-sm max-w-2xl flex flex-col md:flex-row items-center justify-center border py-2 px-2 rounded-2xl gap-2 shadow-2xl focus-within:border-gray-300"
           for="search-bar">
-          <input id="search-bar" 
-                  placeholder="키워드를 입력해주세요"
-                  value={inputWord}
-                  onChange={nameChange}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      e.preventDefault(); // 폼 제출을 방지
-                      generateRandomWords();
-  
-                    }
-                  }}
-                  className="px-6 py-2 w-full rounded-md flex-1 outline-none bg-white"/>
+          <input id="search-bar"
+            placeholder="키워드를 입력해주세요"
+            value={inputWord}
+            onChange={nameChange}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                e.preventDefault(); // 폼 제출을 방지
+                generateRandomWords();
+
+              }
+            }}
+            className="px-6 py-2 w-full rounded-md flex-1 outline-none bg-white" />
           <button
             class="w-full md:w-auto px-6 py-3 bg-black border-black text-white fill-white active:scale-95 duration-100 border will-change-transform overflow-hidden relative rounded-xl transition-all disabled:opacity-70"
             onClick={generateRandomWords}  >
-              
+
             <div class="relative">
 
               <div
                 class="flex items-center justify-center h-3 w-3 absolute inset-1/2 -translate-x-1/2 -translate-y-1/2 transition-all">
                 <svg class="opacity-0 animate-spin w-full h-full" xmlns="http://www.w3.org/2000/svg" fill="none"
-                    viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
-                        stroke-width="4"></circle>
-                    <path class="opacity-75" fill="currentColor"
-                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
-                    </path>
+                  viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
+                    stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                  </path>
                 </svg>
               </div>
 
-                <div class="flex items-center transition-all opacity-1 valid:"><span
-                        class="text-sm font-semibold whitespace-nowrap truncate mx-auto">
-                        생성
-                    </span>
-                </div>
+              <div class="flex items-center transition-all opacity-1 valid:"><span
+                class="text-sm font-semibold whitespace-nowrap truncate mx-auto">
+                Bubble
+              </span>
+              </div>
 
             </div>
-        
+
           </button>
         </label>
-       </div>
+      </div>
 
       {/* 왼쪽 윗 블록 */}
       <div className='absolute top-6 left-6 pl-5 bg-white rounded-md w-[410px] h-[50px] flex items-center flex-row shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]'>
@@ -1311,8 +1459,15 @@ const BoardTemplate1 = () => {
         </svg>
       </div>
 
+      {/* 튜토리얼 - CoachMark 라이브러리 */}
+      <CoachMark {...coach} />
+
       {/* 튜토리얼 버튼 */}
-      <div className='cursor-pointer absolute top-[530px]  hover:text-blue left-6  bg-white rounded-md w-[50px] h-[50px] flex justify-center items-center shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]' >
+      <div
+        ref={ref5}
+        className='cursor-pointer absolute top-[530px]  hover:text-blue left-6  bg-white rounded-md w-[50px] h-[50px] flex justify-center items-center shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]'
+        onClick={startTutorial}
+      >
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
@@ -1326,6 +1481,12 @@ const BoardTemplate1 = () => {
             d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 5.25h.008v.008H12v-.008Z" />
         </svg>
       </div>
+
+      {/* 튜토리얼 관련 영역 지정 */}
+      <div ref={ref1} className="absolute ml-[430px] mt-[220px]" ></div>
+      <div ref={ref3} className="absolute ml-[670px] mt-[220px] h-[360px] w-[210px]" ></div>
+      <div ref={ref4} className="absolute ml-[690px] mt-[320px] h-[190px] w-[160px]" ></div>
+      {/* <div ref={ref5} className="absolute ml-[430px] mt-[100px]" ></div> */}
 
       {/* 실행취소 버튼 */}
       {/* <div
@@ -1456,7 +1617,7 @@ const BoardTemplate1 = () => {
           <path strokeLinecap="round" strokeLinejoin="round" d="M8.625 9.75a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375m-13.5 3.01c0 1.6 1.123 2.994 2.707 3.227 1.087.16 2.185.283 3.293.369V21l4.184-4.183a1.14 1.14 0 0 1 .778-.332 48.294 48.294 0 0 0 5.83-.498c1.585-.233 2.708-1.626 2.708-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z" />
         </svg>
 
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none"  onClick={() => openModal(projectId)} viewBox="0 0 24 24" strokeWidtfh={1.5} stroke="currentColor" className="hover:stroke-blue w-7 h-7 cursor-pointer">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" onClick={() => openModal(projectId)} viewBox="0 0 24 24" strokeWidtfh={1.5} stroke="currentColor" className="hover:stroke-blue w-7 h-7 cursor-pointer">
           <path strokeLinecap="round" strokeLinejoin="round" d="M9 8.25H7.5a2.25 2.25 0 0 0-2.25 2.25v9a2.25 2.25 0 0 0 2.25 2.25h9a2.25 2.25 0 0 0 2.25-2.25v-9a2.25 2.25 0 0 0-2.25-2.25H15m0-3-3-3m0 0-3 3m3-3V15" />
         </svg>
       </div>
@@ -1491,7 +1652,7 @@ const BoardTemplate1 = () => {
         />
       </div> */}
 
-     
+
 
       {/* 이미지 툴 */}
 
@@ -1503,7 +1664,7 @@ const BoardTemplate1 = () => {
         </div>
       )}
 
-     
+
 
 
 
