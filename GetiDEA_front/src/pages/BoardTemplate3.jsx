@@ -723,16 +723,16 @@ const BoardTemplate3 = () => {
     setStagePosition(newPos);
   }, []);
 
-  const resetZoom = useCallback(() => {
+  const resetZoom = () => {
     const stage = stageRef.current;
     if (!stage) {
       return;
     }
     stage.scale({ x: 1, y: 1 });
     stage.position({ x: 0, y: 0 });
-    stagePosition({ x: 0, y: 0 });
+    setStagePosition({ x: 0, y: 0 });
     setStageScale({ x: 1, y: 1 });
-  }, []);
+  };
 
   useEffect(() => {
     // 드래그 작업이 완료되었고, 상태가 변경되었다면 서버에 전송
@@ -1014,6 +1014,7 @@ const BoardTemplate3 = () => {
 
   // 튜토리얼 버튼 함수
   const startTutorial = () => {
+    resetZoom();
     setActivateNumber(0);
   }
 
@@ -1024,8 +1025,7 @@ const BoardTemplate3 = () => {
       component:
         <div className="bg-white p-8 shadow-lg rounded-lg">
           <p className="text-center font-Nanum font-bold text-2xl" >세븐쳌 (7 Check)</p>
-          <p className="text-center font-Nanum text-l mt-4 px-28">7 Check</p>
-          <p className="text-center font-Nanum text-l">아이디어 관련 7가지 체크포인트를</p>
+          <p className="text-center font-Nanum text-l mt-4 px-28">아이디어 관련 7가지 체크포인트를</p>
           <p className="text-center font-Nanum text-l">한가지씩 점검해보는 기법입니다.</p>
 
           <div className="flex justify-between items-center mt-8">
@@ -1038,7 +1038,7 @@ const BoardTemplate3 = () => {
 
         </div>,
       reference: ref1,
-      tooltip: { position: 'right' }
+      tooltip: { position: 'left' }
     },
     {
       // 튜토리얼 2. Write Your iDEA!
@@ -1058,15 +1058,16 @@ const BoardTemplate3 = () => {
 
         </div>,
       reference: ref2,
-      tooltip: { position: 'top' }
+      tooltip: { position: 'bottom' }
     },
     {
       // 튜토리얼 3. 전반적인 설명
       activate: activatedNumber === 2,
       component:
         <div className="bg-white p-8 shadow-lg rounded-lg">
-          <p className="text-center font-Nanum font-bold text-xl" >아이디어를 얻기 위해서 7가지를 check 해보세요.</p>
-          <p className="text-center font-Nanum text-l mt-4">카드 작성 순서는 자유입니다!</p>
+          <p className="text-center font-Nanum font-bold text-l" >각 카드의 예시를 참고하며</p>
+          <p className="text-center font-Nanum font-bold text-2xl mt-2" >총 7가지를 check 해보세요.</p>
+          <p className="text-center font-Nanum text-l mt-6">카드 작성 순서는 자유입니다!</p>
 
           <div className="flex justify-between items-center mt-8">
             <button className="bg-blue-500 hover:bg-blue-700 text-white font-Nanum font-bold py-2 px-4 rounded shadow">{PrevButton}</button>
@@ -1085,8 +1086,11 @@ const BoardTemplate3 = () => {
       activate: activatedNumber === 3,
       component:
         <div className="bg-white p-8 shadow-lg rounded-lg">
-          <p className="text-center font-Nanum font-bold text-3xl text-[#EBEB00]" >'축소 - Reduction'</p>
-          <p className="text-center font-Nanum text-l mt-4">아이디어를 다양한 방법으로 축소하는 카드입니다.</p>
+          <p className="text-center font-Nanum font-bold text-3xl text-[#ffc71d]" >'축소 - Reduction'</p>
+          <p className="text-center font-Nanum text-l mt-4">아이디어를 작게, 낮게, 짧게,</p>
+          <p className="text-center font-Nanum text-l">얇게, 가볍게, 생략, 분할,</p>
+          <p className="text-center font-Nanum text-l">제거, 단축, 단순화 해볼까요?</p>
+          <p className="text-center font-Nanum text-sm mt-3">ex. 전화기의 선과 안테나를 없애면 어떨까?</p>
 
           <div className="flex justify-between items-center mt-8">
             <button className="bg-blue-500 hover:bg-blue-700 text-white font-Nanum font-bold py-2 px-4 rounded shadow">{PrevButton}</button>
@@ -1107,7 +1111,10 @@ const BoardTemplate3 = () => {
       component:
         <div className="bg-white p-8 shadow-lg rounded-lg">
           <p className="text-center font-Nanum font-bold text-3xl text-[#FF8C00]" >'확대 - Enlargement'</p>
-          <p className="text-center font-Nanum text-l mt-4">아이디어를 다양한 방법으로 확대하는 카드입니다.</p>
+          <p className="text-center font-Nanum text-l mt-4">빈도, 강도, 크기, 가치, 재료 등을 확대하고 과장해볼까요?</p>
+          <p className="text-center font-Nanum text-l">크게, 길게, 넓게, 두껍게, 무겁게 해볼까요?</p>
+          <p className="text-center font-Nanum text-sm mt-3">ex. PC방에서 음식 메뉴와 비중을 확대하면 어떨까?</p>
+
           <div className="flex justify-between items-center mt-8">
             <button className="bg-blue-500 hover:bg-blue-700 text-white font-Nanum font-bold py-2 px-4 rounded shadow">{PrevButton}</button>
             <span className="text-blue-800 font-Nanum">
@@ -1127,7 +1134,9 @@ const BoardTemplate3 = () => {
       component:
         <div className="bg-white p-8 shadow-lg rounded-lg">
           <p className="text-center font-Nanum font-bold text-3xl text-yellow-600 text-[#32CD32]" >'수정 - Modification'</p>
-          <p className="text-center font-Nanum text-l mt-4">아이디어를 다양한 방법으로 수정 및 변화하는 카드입니다.</p>
+          <p className="text-center font-Nanum text-l mt-4">의미, 색, 소리, 움직임, 형태, 양식 등을</p>
+          <p className="text-center font-Nanum text-l">변화시켜볼까요?</p>
+          <p className="text-center font-Nanum text-sm mt-3">ex. 시계의 종소리를 뻐꾸기 울음소리로 바꾸면 어떨까?</p>
 
           <div className="flex justify-between items-center mt-8">
             <button className="bg-blue-500 hover:bg-blue-700 text-white font-Nanum font-bold py-2 px-4 rounded shadow">{PrevButton}</button>
@@ -1148,7 +1157,9 @@ const BoardTemplate3 = () => {
       component:
         <div className="bg-white p-8 shadow-lg rounded-lg">
           <p className="text-center font-Nanum font-bold text-3xl text-[#4682B4]" >'대체 - Alternation'</p>
-          <p className="text-center font-Nanum text-l mt-4">아이디어를 다른 것으로 대체 할 수 있는지 확인하는 카드입니다.</p>
+          <p className="text-center font-Nanum text-l mt-4">대체할 방법, 물품, 사람, 재료, 장소, 과정이 있나요?</p>
+          <p className="text-center font-Nanum text-l">사람, 물건, 재료, 소재, 기법, 동력, 장소, 위치, 표기 방법 등을 대체해볼까요?</p>
+          <p className="text-center font-Nanum text-sm mt-3">ex. 젓가락의 재질을 나무로 바꿔보면 어떨까?</p>
 
           <div className="flex justify-between items-center mt-8">
             <button className="bg-blue-500 hover:bg-blue-700 text-white font-Nanum font-bold py-2 px-4 rounded shadow">{PrevButton}</button>
@@ -1169,7 +1180,9 @@ const BoardTemplate3 = () => {
       component:
         <div className="bg-white p-8 shadow-lg rounded-lg">
           <p className="text-center font-Nanum font-bold text-3xl text-[#000080]" >'반전 - Reversion'</p>
-          <p className="text-center font-Nanum text-l mt-4">아이디어의 다양한 요소를 바꾸거나 재정렬해보는 카드입니다.</p>
+          <p className="text-center font-Nanum text-l mt-4">순서, 위치, 기능, 모양 등을 바꾸거나 재정렬 해봅시다!</p>
+          <p className="text-center font-Nanum text-l">앞뒤, 위아래, 좌우, 겉과 안, 역할, 순서를 바꿔볼까요?</p>
+          <p className="text-center font-Nanum text-sm mt-3">ex. 김밥의 김과 밥의 위치를 바꾸면 어떨까?</p>
 
           <div className="flex justify-between items-center mt-8">
             <button className="bg-blue-500 hover:bg-blue-700 text-white font-Nanum font-bold py-2 px-4 rounded shadow">{PrevButton}</button>
@@ -1190,7 +1203,9 @@ const BoardTemplate3 = () => {
       component:
         <div className="bg-white p-8 shadow-lg rounded-lg">
           <p className="text-center font-Nanum font-bold text-3xl text-[#800080]" >'전용 - Diversion'</p>
-          <p className="text-center font-Nanum text-l mt-4">아이디어를 다른 용도로 바꿀 수 있는지 확인하는 카드입니다.</p>
+          <p className="text-center font-Nanum text-l mt-4">다른 용도를 사용하거나, 사용자를 바꿀 수 있나요?</p>
+          <p className="text-center font-Nanum text-l">다른 아이디어를 빌리거나 흉내 내도 좋아요!</p>
+          <p className="text-center font-Nanum text-sm mt-3">ex. 장갑을 실외 말고 부엌에서 사용하면 어떨까?</p>
 
           <div className="flex justify-between items-center mt-8">
             <button className="bg-blue-500 hover:bg-blue-700 text-white font-Nanum font-bold py-2 px-4 rounded shadow">{PrevButton}</button>
@@ -1211,7 +1226,9 @@ const BoardTemplate3 = () => {
       component:
         <div className="bg-white p-8 shadow-lg rounded-lg">
           <p className="text-center font-Nanum font-bold text-3xl text-[#9400D3]" >'결합 - Combination'</p>
-          <p className="text-center font-Nanum text-l mt-4">아이디어를 다양한 것들과 결합해보는 카드입니다.</p>
+          <p className="text-center font-Nanum text-l mt-4">다른 아이디어, 재료, 부품, 목적, 단위 등을 결합해볼까요?</p>
+          <p className="text-center font-Nanum text-l">랜덤 단어로 시도하고 싶다면, '랜덤 버블'을 이용해보세요!</p>
+          <p className="text-center font-Nanum text-sm mt-3">ex. 장갑과 모자를 합쳐서 새로운 것을 만들면 어떨까?</p>
 
           <div className="flex justify-between items-center mt-8">
             <button className="bg-blue-500 hover:bg-blue-700 text-white font-Nanum font-bold py-2 px-4 rounded shadow">{PrevButton}</button>
@@ -1231,8 +1248,9 @@ const BoardTemplate3 = () => {
       activate: activatedNumber === 10,
       component:
         <div className="bg-white p-8 shadow-lg rounded-lg">
-          <p className="text-center font-Nanum font-bold text-2xl" >작성을 완료했다면 전체적으로 다시 확인해보세요</p>
-          <p className="text-center font-Nanum text-l mt-4">분명 좋은 아이디어가 떠오를겁니다 :D</p>
+          <p className="text-center font-Nanum font-bold text-l" >작성 완료 후에는</p>
+          <p className="text-center font-Nanum font-bold text-2xl mt-2" >전체적으로 다시 확인해보세요!</p>
+          <p className="text-center font-Nanum text-l mt-4">좋은 아이디어를 발견할 수 있을거에요 :D</p>
 
           <div className="flex justify-between items-center mt-8">
             <button className="bg-blue-500 hover:bg-blue-700 text-white font-Nanum font-bold py-2 px-4 rounded shadow">{PrevButton}</button>
@@ -1483,7 +1501,8 @@ const BoardTemplate3 = () => {
       </div>
 
       {/* 튜토리얼 관련 영역 지정 */}
-      <div ref={ref1} className="absolute ml-[600px] mt-[300px]" ></div>
+      {/* <div ref={ref1} className="absolute ml-[600px] mt-[300px]" ></div> */}
+      <div ref={ref1} className="absolute ml-[590px] mt-[300px] h-[350px] w-[370px]" ></div>
       <div ref={ref3} className="absolute ml-[590px] mt-[300px] h-[350px] w-[370px]" ></div>
 
       <div ref={ref4} className="absolute ml-[250px] mt-[495px] h-[165px] w-[280px]" ></div>
