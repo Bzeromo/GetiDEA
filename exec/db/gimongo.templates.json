@@ -1,0 +1,48 @@
+[{
+  "_id": "whiteboard",
+  "templateName": "whiteboard",
+  "lastUpdateTime": {
+    "$date": "2024-01-01T00:00:00.000Z"
+  },
+  "author": "admin",
+  "thumbnail": "https://getidea-s3.s3.ap-northeast-2.amazonaws.com/thumbnailImage/whiteboard.png",
+  "description": "화이트 보드",
+  "price": 0,
+  "data": {}
+},
+{
+  "_id": "bubbleChat",
+  "templateName": "bubbleChat",
+  "lastUpdateTime": {
+    "$date": "2024-01-01T00:00:00.000Z"
+  },
+  "author": "admin",
+  "thumbnail": "https://getidea-s3.s3.ap-northeast-2.amazonaws.com/thumbnailImage/bubbleChat.png",
+  "description": "아이디어 말풍선",
+  "price": 0,
+  "data": {}
+},
+{
+  "_id": "sixhat",
+  "templateName": "sixhat",
+  "lastUpdateTime": {
+    "$date": "2024-01-01T00:00:00.000Z"
+  },
+  "author": "admin",
+  "thumbnail": "https://getidea-s3.s3.ap-northeast-2.amazonaws.com/thumbnailImage/sixhat.png",
+  "description": "6개의 생각하는 모자",
+  "price": 0,
+  "data": {}
+},
+{
+  "_id": "7check",
+  "templateName": "7check",
+  "lastUpdateTime": {
+    "$date": "2024-01-01T00:00:00.000Z"
+  },
+  "author": "admin",
+  "thumbnail": "https://getidea-s3.s3.ap-northeast-2.amazonaws.com/thumbnailImage/7Check.png",
+  "description": "7 Check",
+  "price": 0,
+  "data": {}
+}]
