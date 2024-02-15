@@ -82,6 +82,7 @@ pipeline {
                     sh 'chmod +x gradlew'
                     // 빌드 실행
                     sh './gradlew build -x test'
+
                 }
             }
         }
