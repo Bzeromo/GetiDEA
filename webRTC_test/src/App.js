@@ -10,7 +10,6 @@ function App() {
         <Route path="/"  element={<VideoCall />} />
       </Routes>
     </BrowserRouter>
-   
   );
 }
 

@@ -20,9 +20,10 @@ const VideoCall = () => {
       if (myVideoRef.current) {
         myVideoRef.current.srcObject = stream;
       }
-      if (!pcRef.current || !socketRef.current) {
-        return;
-      }
+      // 스트림 트랙을 추가하기 전에만 필요, 트랙을 추가하는 반복문 안에서는 불필요
+      // if (!pcRef.current || !socketRef.current) {
+      //   return;
+      // }
       stream.getTracks().forEach((track) => {
         // if (!pcRef.current) {
         //   return;
@@ -90,7 +91,9 @@ const VideoCall = () => {
   };
 
   useEffect(() => {
+    // socketRef.current = io("localhost:8000");
     socketRef.current = io("localhost:8080");
+    // socketRef.current = io("http://192.168.31.143:3000/");
 
     pcRef.current = new RTCPeerConnection({
       iceServers: [

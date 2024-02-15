@@ -1,19 +1,58 @@
-import './App.css';
+// App.tsx
+import React from 'react';
+import Intro from './pages/Intro';
+import Layout from './components/Layout';
+import Home from './pages/Home';
+import Recent from './pages/Recent';
+import Bookmark from './pages/Bookmark';
+import Projects from './pages/Projects';
+import Folder from './pages/Folder';
+import TemplateSelect from './pages/TempleteSelect';
+import ProjectNameInput from './pages/ProjectNameInput';
+import Board from './pages/Board';
+import GoogleLogin from './pages/GoogleLogin';
+import NaverLogin from './pages/NaverLogin';
+import { Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider, useAuth } from './AuthContext';
+import KakaoLogin from './pages/KakaoLogin';
 
-function App() {
+
+const ProtectedRoute: React.FC<{ children: JSX.Element }> = ({ children }) => {
+  const auth = useAuth();
+  return auth?.isAuthenticated ? children : <Navigate to="/" replace />;
+};
+
+const LoginRoute: React.FC<{ children: JSX.Element }> = ({ children }) => {
+  const auth = useAuth();
+  console.log( `로그인됨? : ${auth?.isAuthenticated}`);
+  return auth?.isAuthenticated ? <Navigate to="/home" replace /> : children;
+};
+const App: React.FC = () => {
   return (
-    <div className="App">
-      <div>
-        <h1>test</h1>
-        <br/>
-        <h1>으라차차</h1>
-        <br/>
-        <h1>안녕하세요, 저희 팀 이름은 부정 선거 의혹이 있지만 어찌됐든 반장이자 설문담당자이자 비행기 소리에 귀 기울일줄 아는 섬세한 백엔드 담당이자 백엔드 리더이자 프론트 보조이자 팀원1이자 점심알리미이자 노트북대리수령자이자 면담담당자이자 칭호컬렉터이자 우리팀 아이돌이자 대법관이자 면접관이자 인사담당자 원픽이자 흑막이자 서울대 교수 강의를 쌩까며 3일만에 역사가 되고 감투의 무게를 견딜 수 있지만 커밋과 하이무 미드나잇축과 회식이 두려우며 무한도전을 좋아하여 노홍철의 음주운전을 옹호했지만 남을 배웅할줄 알며 시도때도 없이 자리를 바꾸는, 남의 뿌듯한 표정만 보면 킹받는, 부끄러울 땐 냉수를 마시는 남자이며 특강 듣다 갑자기 노래를 틀어제끼는 에티켓을 여전히 잃어버린 말이 안나오는 팡머, 아직도 감투가 모자란데 400자 남짓한 문장을 1시간 동안 말할 수 있는, 성장판보다 긴 칭호를 가진, 가는 걸음마다 신경이 많이 쓰이는 알파폴드-02 임현승입니다를 줄여서 그 긴거입니다.</h1>
-        <br/>
-        <h1>임현승 화이팅!</h1>
-      </div>
-    </div>
+    <AuthProvider>
+      <Routes>
+        
+        <Route path="/" element={<LoginRoute><Intro /></LoginRoute>} />
+        <Route path="/googlelogin" element={<GoogleLogin />} />
+        <Route path="/naverlogin" element={<NaverLogin />} />
+        <Route path="/kakaologin" element={<KakaoLogin />} />
+          <Route path='/' element={<Layout />}>
+              <Route path="home"  element={<ProtectedRoute><Home /></ProtectedRoute>} />
+              <Route path="recent" element={<ProtectedRoute><Recent /></ProtectedRoute>} />
+              <Route path="bookmark" element={<ProtectedRoute><Bookmark /></ProtectedRoute>} />
+              <Route path="projects" element={<ProtectedRoute><Projects /></ProtectedRoute>} />
+              <Route path="folder/:folderId" element={<ProtectedRoute><Folder /></ProtectedRoute>} />
+              {/* 중첩된 다른 라우트들을 이곳에 추가 */}
+          </Route>
+
+          <Route path="/templateSelect" element={<ProtectedRoute><TemplateSelect /></ProtectedRoute>} />
+          <Route path="/projectnameinput" element={<ProtectedRoute><ProjectNameInput /></ProtectedRoute>} />
+          <Route path="/board" element={<ProtectedRoute><Board /></ProtectedRoute>} />
+        
+         
+      </Routes>
+    </AuthProvider>
   );
-}
+};
 
 export default App;
