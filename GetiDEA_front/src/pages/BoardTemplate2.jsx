@@ -1167,14 +1167,6 @@ const BoardTemplate2 = () => {
       activate: activatedNumber === 0,
       component: (
         <div className="bg-white p-8 shadow-lg rounded-lg">
-          <div className="flex justify-end">
-            <button
-              className="bg-blue-500 hover:bg-blue-700 text-black font-Nanum font-bold text-2xl"
-              onClick={() => endTutorial()}
-            >
-              X
-            </button>
-          </div>
           <p className="text-center font-Nanum font-bold text-2xl">
             6개의 생각모자 (6hats)
           </p>

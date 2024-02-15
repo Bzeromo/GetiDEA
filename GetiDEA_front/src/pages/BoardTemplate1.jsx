@@ -865,16 +865,16 @@ const BoardTemplate1 = () => {
     setStagePosition(newPos);
   }, []);
 
-  const resetZoom = useCallback(() => {
+  const resetZoom = () => {
     const stage = stageRef.current;
     if (!stage) {
       return;
     }
     stage.scale({ x: 1, y: 1 });
     stage.position({ x: 0, y: 0 });
-    stagePosition({ x: 0, y: 0 });
+    setStagePosition({ x: 0, y: 0 });
     setStageScale({ x: 1, y: 1 });
-  }, []);
+  };
 
   useEffect(() => {
     // 드래그 작업이 완료되었고, 상태가 변경되었다면 서버에 전송
@@ -1226,7 +1226,12 @@ const BoardTemplate1 = () => {
 
   // 튜토리얼 버튼 함수
   const startTutorial = () => {
+    resetZoom();
     setActivateNumber(0);
+  };
+
+  const endTutorial = () => {
+    setActivateNumber(5);
   };
 
   const coachList = [
@@ -1267,6 +1272,15 @@ const BoardTemplate1 = () => {
       activate: activatedNumber === 1,
       component: (
         <div className="bg-white p-8 shadow-lg rounded-lg">
+          <div className="flex justify-end">
+            <button
+              className="bg-blue-500 hover:bg-blue-700 text-black font-Nanum font-bold text-2xl"
+              onClick={() => endTutorial()}
+            >
+              X
+            </button>
+          </div>
+
           <p className="text-center font-Nanum font-bold text-2xl">
             키워드를 입력해보세요!
           </p>
@@ -1296,6 +1310,15 @@ const BoardTemplate1 = () => {
       activate: activatedNumber === 2,
       component: (
         <div className="bg-white p-8 shadow-lg rounded-lg">
+          <div className="flex justify-end">
+            <button
+              className="bg-blue-500 hover:bg-blue-700 text-black font-Nanum font-bold text-2xl"
+              onClick={() => endTutorial()}
+            >
+              X
+            </button>
+          </div>
+
           <p className="text-center font-Nanum text-l">
             입력한 키워드와 랜덤으로 생성된 단어를 포함한
           </p>
@@ -1322,6 +1345,15 @@ const BoardTemplate1 = () => {
       activate: activatedNumber === 3,
       component: (
         <div className="bg-white p-8 shadow-lg rounded-lg">
+          <div className="flex justify-end">
+            <button
+              className="bg-blue-500 hover:bg-blue-700 text-black font-Nanum font-bold text-2xl"
+              onClick={() => endTutorial()}
+            >
+              X
+            </button>
+          </div>
+          
           <p className="text-center font-Nanum font-bold text-xl">
             두 단어를 결합하여
           </p>
