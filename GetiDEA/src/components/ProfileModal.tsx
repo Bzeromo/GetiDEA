@@ -2,7 +2,7 @@ import React from 'react';
 import { useState,useEffect,useRef,ChangeEvent, } from 'react';
 import api from '../api';
 import Swal from 'sweetalert2';
-
+import { useNavigate } from 'react-router-dom';
 
 interface ProfileModalProps {
   isOpen: boolean;
@@ -21,14 +21,13 @@ interface ProfileJson {
   profileImage: string;
 }
 
-interface userNameJson {
-  userName: string;
-}
 
 
 type UserResponse = User[];
 
 const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, closeModal, profileImage, setProfileImage }) => {
+
+    const navigate = useNavigate();
 
     const [userName, setUserName] = useState<string>('');
     const [userEmail, setUserEmail] = useState<string>('');
@@ -46,9 +45,10 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, closeModal, profile
         const fetchData = async () => {
         try {
           const response = await api.get<UserResponse>(`/api/user/search?userEmail=${localStorage.getItem('userEmail')}`);
+          console.log(response.data[0]);
           setUserName(response.data[0].userName);
-          setUserEmail(response.data[0].userEmail); // userEmail 필드만 추출
-          setProfile(response.data[0].profileImage); // userEmail 필드만 추출
+          setUserEmail(response.data[0].userEmail); 
+          setProfile(response.data[0].profileImage); 
         } catch (error) {
             console.error('Error fetching data: ', error);
         }
@@ -69,7 +69,12 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, closeModal, profile
 
     //유저 이름 변경 관련
     const nameChange = async (e: ChangeEvent<HTMLInputElement>) => {
-        setUserName(e.target.value);
+      const inputText = e.target.value;
+      const length = Array.from(inputText).length;
+
+      if (length <= 8) {
+        setUserName(inputText);
+    } 
     };
 
     const nameChangeSave = async () =>{ 
@@ -111,8 +116,8 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, closeModal, profile
           const formData = new FormData();
           console.log(file)
           formData.append('Image', file); // 프로필 이미지 파일
-          formData.append('userEmail', localStorage.getItem('userEmail') ?? "");
           try {
+            console.log(formData)
             await api.post('/api/image/profile',formData);
             console.log("전송 완료")
             } catch (error) {
@@ -121,11 +126,55 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, closeModal, profile
           }
       };
 
-      // 저장 버튼 클릭 시 유저 정보 변경
-      const changeUserProfile =()=> {
-        closeModal();
-        
-    }
+      const handleUnlinkConfirm = () => {
+        Swal.fire({
+          title: '정말 탈퇴하시겠습니까?',
+          text: "탈퇴 후에는 정보를 복구할 수 없습니다.",
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#3085d6',
+          cancelButtonColor: '#ef4444',
+          confirmButtonText: '탈퇴',
+          cancelButtonText: '취소'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            // 탈퇴 절차 진행
+            handleUnlink();
+          }
+        });
+      };
+
+      const handleUnlink = () => {
+        const provider = localStorage.getItem('provider'); // 'google', 'kakao', 'naver' 등이 저장될 수 있음
+        let unlinkUrl;
+      
+        // provider 값에 따라 언링크 URL 설정
+        switch (provider) {
+          case 'GOOGLE':
+            unlinkUrl = `${process.env.REACT_APP_GOOGLE_LOGIN_URI}?redirect_uri=${process.env.REACT_APP_UNLINK_REDIRECT_URI}`;
+            break;
+          case 'KAKAO':
+            unlinkUrl = `${process.env.REACT_APP_KAKAO_LOGIN_URI}?redirect_uri=${process.env.REACT_APP_UNLINK_REDIRECT_URI}`;
+            break;
+          case 'NAVER':
+            unlinkUrl = `${process.env.REACT_APP_NAVER_LOGIN_URI}?redirect_uri=${process.env.REACT_APP_UNLINK_REDIRECT_URI}`;
+            break;
+          default:
+            console.error('Unknown provider or provider not set');
+            return;
+        }
+      
+        // 언링크 URL로 리다이렉트
+       
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
+        localStorage.removeItem('userEmail');
+        localStorage.removeItem('userName');
+        localStorage.removeItem('profileImage');
+        localStorage.removeItem('provider');
+        navigate('/');
+        window.location.href = unlinkUrl;
+      };
 
   if (!isOpen) return null;
 
@@ -190,9 +239,17 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, closeModal, profile
                                     <input className='w-full h-12 rounded-md border-2 px-3 border-line_gray' type="text" value={userEmail} disabled/>
                                 </div>
                             </div>
-                            <div className='flex flex-row justify-end gap-2 h-10 font-Nanum'>
-                                <button className='bg-white rounded-md border-[1.5px] text-opacity-80 text-black text-sm font-regular border-line_gray w-16 h-8' onClick={closeModal}>취소</button>       
-                                <button className='bg-blue bg-opacity-80 rounded-md  text-opacity-80 text-white text-sm w-16 h-8' onClick={nameChangeSave}>저장</button>
+                            <div className='flex flex-row justify-between items-center gap-2 h-10 font-Nanum'>
+                                <button
+                                  className='bg-[#ef4444] rounded-md border-[1.5px] text-opacity-80 text-white text-sm font-regular border-line_gray w-20 h-8'
+                                  onClick={handleUnlinkConfirm}
+                                >
+                                  회원 탈퇴
+                                </button>
+                                <div className="flex gap-2">
+                                    <button className='bg-white rounded-md border-[1.5px] text-opacity-80 text-black text-sm font-regular border-line_gray w-16 h-8' onClick={closeModal}>취소</button>       
+                                    <button className='bg-blue bg-opacity-80 rounded-md text-opacity-80 text-white text-sm w-16 h-8' onClick={nameChangeSave}>저장</button>
+                                </div>
                             </div>
                       
                     </div>

@@ -26,6 +26,7 @@ const Sidebar = () => {
   const [folderNames, setFolderNames] =useState<string[]>([]);
   const [index, setIndex] = useState<number>();
   const [length, setLength] = useState<number>();
+  const [isLoading, setIsLoading] = useState(true); 
 
   const select = (idx: number): void => {
       const arr: boolean[] = Array(length).fill(false);
@@ -62,6 +63,8 @@ const Sidebar = () => {
         setIsSelected(initialSelectedState);
       } catch (error) {
         console.error('Error fetching data: ', error);
+      }finally {
+        setIsLoading(false); // 데이터 로딩이 완료되거나 실패했을 때 로딩 상태를 false로 설정
       }
     };
 
@@ -73,6 +76,7 @@ const Sidebar = () => {
     
     setIsNameChangeModalOpen(true);
   }
+
   return (
     <div className="flex-shrink-0 min-h-svh w-80 bg-side scrollbar  scrollbar-thumb-red ">
 
@@ -150,6 +154,7 @@ const Sidebar = () => {
 				  <ul className='p-4'>
             <>{
               folderNames.length > 0 ?(
+                
                 folderNames.map((folder,index)=>(
                 <li key={index} className="flex justify-center mb-3  ">
                 <Link to={`folder/${folder}` } state={{folderName : folder}} onClick={()=>{select(4+index)}} className={!isSelected[4+index]?"w-56 flex flex-row text-center   rounded py-4 px-4 text-black hover:text-blue hover:opacity-80 " 

@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect,ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
+import Cookies from 'js-cookie';
 
 interface AuthContextType {
   accessToken: string | null;
@@ -26,17 +27,23 @@ interface AuthProviderProps {
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const [accessToken, setAccessToken] = useState<string | null>(null);
-  const isAuthenticated = !!localStorage.getItem('accessToken');
+  // const isAuthenticated = !!localStorage.getItem('accessToken');
+  // const isAuthenticated = !!Cookies.get('access_token');
+  const isAuthenticated = true;
   const navigate = useNavigate();
 
   useEffect(() => {
     // 페이지 로드 시 토큰 확인 로직
-    const storedToken = localStorage.getItem('accessToken');
+    // const storedToken = Cookies.get('access_token');
+    const storedToken = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJqdW5neW9hbndvb0BuYXZlci5jb20iLCJpYXQiOjE3MDc5NjI0OTgsInVzZXJOYW1lIjoi7KCV7Jew7JqwIiwicHJvdmlkZXIiOiJLQUtBTyIsImV4cCI6MTcwNzk2NjA5OH0.iqPoafDntKIu-PCa5UZz9J7U-mzAMBDyB0srlKbeArUJsYHkhNxq8iUt19S0LA1Ou7dWTTedKpfcAuK6ZqWlMA"
+    // const storedToken = localStorage.getItem('accessToken');
     if (storedToken) {
       setAccessToken(storedToken);
-      const decoded:DecodedToken=jwtDecode(localStorage.getItem('accessToken')??"");
+      // const decoded:DecodedToken=jwtDecode(localStorage.getItem('accessToken')??"");
+      const decoded:DecodedToken=jwtDecode(storedToken);
       console.log(decoded);
       localStorage.setItem('userEmail',decoded.sub??"");
+      localStorage.setItem('provider',decoded.provider??"");
       localStorage.setItem('userName',decoded.userName??"");
     }
   }, []);
@@ -54,8 +61,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     localStorage.removeItem('userEmail');
     localStorage.removeItem('userName');
     localStorage.removeItem('profileImage');
-    console.log("dfdfdf");
-    console.log(localStorage.getItem('accessToken'));
+    localStorage.removeItem('provider');
     navigate('/');
   };
 
