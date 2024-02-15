@@ -3,6 +3,7 @@ import { useState,useEffect,useRef,ChangeEvent, } from 'react';
 import api from '../api';
 import Swal from 'sweetalert2';
 import { useNavigate } from 'react-router-dom';
+import Cookies from 'js-cookie';
 
 interface ProfileModalProps {
   isOpen: boolean;
@@ -166,12 +167,15 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, closeModal, profile
       
         // 언링크 URL로 리다이렉트
        
-        localStorage.removeItem('accessToken');
-        localStorage.removeItem('refreshToken');
-        localStorage.removeItem('userEmail');
-        localStorage.removeItem('userName');
-        localStorage.removeItem('profileImage');
-        localStorage.removeItem('provider');
+
+      Cookies.remove('access_token');
+      Cookies.remove('refresh_token');
+      localStorage.removeItem('userEmail');
+      localStorage.removeItem('userName');
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
+      localStorage.removeItem('profileImage');
+      localStorage.removeItem('provider');
         navigate('/');
         window.location.href = unlinkUrl;
       };

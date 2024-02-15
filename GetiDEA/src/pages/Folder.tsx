@@ -123,7 +123,11 @@ import ProjectModal from '../components/ProjectModal';
       };
 
       // 프로젝트 열기
-      const openProject = async (templateId:string,projectId:number) => {
+      const openProject = async (templateId:string,projectId:number, projectName:string) => {
+
+        localStorage.setItem('projectId', projectId.toString());
+        localStorage.setItem('projectName', projectName);
+
         if(templateId==="whiteboard"){
           navigate("/board", {state : {projectId : projectId}})
         }
@@ -138,6 +142,7 @@ import ProjectModal from '../components/ProjectModal';
         }
       
       };
+
 
       // 프로젝트 불러오기
 
@@ -271,7 +276,7 @@ import ProjectModal from '../components/ProjectModal';
                     )}
                   </div>
 
-                  <img src={item.thumbnail} alt="" onClick={()=>openProject(item.templateId,item.projectId)} className='w-60 h-44 self-center object-scale-down roup-hover:text-gray' />
+                  <img src={item.thumbnail} alt="" onClick={()=>openProject(item.templateId,item.projectId,item.projectName)} className='w-60 h-44 self-center object-scale-down roup-hover:text-gray' />
                   <span className='self-center mt-5 font-Nanum text-xl font-semibold rotate-[-0.03deg]'>{item.projectName}</span>
                   <span className='self-center mt-1 font-Nanum text-sm font-regular text-gray invisible group-hover:visible rotate-[-0.03deg]'>{moment(item.lastUpdateTime).format('YYYY.MM.DD HH:mm 수정')}</span>
                 </div>

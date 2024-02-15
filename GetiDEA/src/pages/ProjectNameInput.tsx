@@ -45,8 +45,13 @@ const ProjectNameInput: React.FC = () => {
                 "userEmail" : localStorage.getItem('userEmail'),
                 "folderName" : folderName   
             });
+            console.log("프로젝트 아이디는!!!!!!!!!!!!!!!!!!");
+            console.log(response.data.projectId);
+            
+            localStorage.setItem('projectId', response.data.projectId.toString());
+            localStorage.setItem('projectName', projectName);
+    
 
-            console.log(response);
             if(index===1){
                 navigate("/board",{state:{name :projectName}});
             }

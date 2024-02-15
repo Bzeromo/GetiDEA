@@ -1,7 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Stage, Layer, Transformer, Line, Image } from "react-konva";
-import axios from "axios";
 import useImage from "use-image";
 import URLImage from "../components/Add/URLImage";
 import { debounce } from "lodash";
@@ -68,7 +67,7 @@ const WhiteBoard = () => {
   const [chatClick, setChatClick] = useState(false);
   const [chatLog, setChatLog] = useState([]);
   const [chatInput, setChatInput] = useState({
-    nickname: localStorage.getItem("userName"),
+    nickname: localStorage.getItem('userName'),
     message: "",
   });
 
@@ -163,10 +162,10 @@ const WhiteBoard = () => {
   const transformerRef = useRef();
 
   //초기값
-  const [fillColor, setFillColor] = useState("#000000");
+  const [fillColor, setFillColor] = useState("#ffffff");
   const [selectedId, setSelectedId] = useState(null);
   const [currentColor, setCurrentColor] = useState(fillColor);
-  const [strokeCurrentColor, setStrokeCurrentColor] = useState("");
+  const [strokeCurrentColor, setStrokeCurrentColor] = useState("#000000");
   const [strokeWidthSize, setStrokeWidthSize] = useState();
   const [shapeWidth, setShapeWidth] = useState();
   const [shapeHeight, setShapeHeight] = useState();
@@ -179,6 +178,8 @@ const WhiteBoard = () => {
   const [startWrite, setStartWrite] = useState(false);
   const [draggable, setDraggable] = useState(false);
   const [drawing, setDrawing] = useState(false);
+  const [shapeColor, setShapeColor] = useState("");
+  const [shapeStrokeColor, setShapeStrokeColor] = useState("");
 
   // const [startEraser, setStartEraser] = useState(false);
   // const [text, setText] = useState(""); // 텍스트 입력 상태 추가
@@ -195,22 +196,20 @@ const WhiteBoard = () => {
     useState(false);
   const [imgMenuToggle, setImgMenuToggle] = useState(false);
 
-  const userEmail = "wnsrb933@naver.com";
-  let projectId = 0;
+  let projectId = parseInt(localStorage.getItem('projectId'));
+  const userEmail = localStorage.getItem('userEmail');
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [preData, setPreData] = useState([]);
 
   useEffect(() => {
-    if (location.state?.name) {
-      setProjectName(location.state.name);
-    } else if (location.state?.projectId) {
-      projectId=location.state.projectId;
+     if (location.state?.projectId) {
       console.log(location.state.projectId);
       const loadProject = async () => {
         try {
           const response = await api.get(
-            `/api/project/open?projectId=${location.state.projectId}`
+            `/api/project/open?projectId=${projectId}`
           );
           setProject(response.data); // 이 시점에서 project 상태가 업데이트 됩니다.
           setProjectName(response.data.projectName);
@@ -343,7 +342,8 @@ const WhiteBoard = () => {
     imageCounter,
     setImageCounter,
     idCounter,
-    setIdCounter
+    setIdCounter,
+    strokeCurrentColor,
   );
 
   const {
@@ -380,7 +380,7 @@ const WhiteBoard = () => {
   const [socket, setSocket] = useState(null);
 
   useEffect(() => {
-    const socket = new WebSocket(`ws://localhost:8000/${projectId}`);
+    const socket = new WebSocket(`${process.env.REACT_APP_WEBSOCKET_URL}/${projectId}`);
 
     socket.onopen = () => {
       console.log("WebSocket 연결이 열렸습니다.");
@@ -860,6 +860,8 @@ const WhiteBoard = () => {
     setStrokeWidthSize(target.strokeWidth);
     setShapeHeight(target.height);
     setShapeWidth(target.width);
+    setShapeColor(target.fill);
+    setShapeStrokeColor(target.stroke);
     console.log(id);
   };
 
@@ -1026,16 +1028,17 @@ const WhiteBoard = () => {
     const loadProject = async () => {
       try {
         const response = await api.delete(
-          `/api/project/close/${location.state.projectId}`
+          `/api/project/close/${projectId}`
         );
-        console.log(`삭제했다~~~ ${location.state.projectId}`);
+        console.log(response);
       } catch (error) {
         console.error("Error fetching data: ", error);
       }
     };
 
     loadProject();
-    
+    localStorage.removeItem('projectId');
+    localStorage.removeItem('projectName');
     navigate("/home");
   };
 
@@ -1088,14 +1091,25 @@ const WhiteBoard = () => {
       </div>
 
       {/* 그리기 툴 */}
-      <div className="absolute top-48 left-6  bg-white rounded-md w-[50px] h-[285px] flex items-center flex-col shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]">
+      <div className="absolute top-48 left-6  bg-white rounded-md w-[50px] h-[325px] flex items-center flex-col shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]">
         <img
           src="/cursor.svg"
           alt=""
           className="w-6 h-6 mt-6 cursor-pointer "
           onClick={() => changedraggable()}
         />
-
+        
+<svg
+          className="w-6 h-6 mt-7 cursor-pointer"
+          fill={!writeToggle ? "#000000" : "#0064FF"}
+          onClick={() => writeSetToggle()}
+          viewBox="0 0 128 128"
+          xmlns="http://www.w3.org/2000/svg"
+          enable-background="new 0 0 128 128"
+        >
+          <path d="m36.108 110.473 70.436-70.436-18.581-18.58-70.437 70.436a2.305 2.305 0 0 0-.803 1.22l-5.476 20.803c-.01.04-.01.082-.019.121a2.492 2.492 0 0 0-.039.247 2.354 2.354 0 0 0-.009.222 1.89 1.89 0 0 0 .048.471c.008.04.008.082.019.121.007.029.021.055.031.083.023.078.053.154.086.23.029.067.057.134.09.196.037.066.077.127.121.189.041.063.083.126.13.184.047.059.1.109.152.162a1.717 1.717 0 0 0 .345.283c.063.043.124.084.192.12.062.033.128.062.195.09.076.033.151.063.23.087.028.009.054.023.083.031.04.01.081.01.121.02a2.47 2.47 0 0 0 .693.039 3.26 3.26 0 0 0 .247-.039c.04-.01.082-.01.121-.02l20.804-5.475c.505-.132.92-.425 1.22-.805zm-16.457-2.124a2.313 2.313 0 0 0-1.964-.649l3.183-12.094 11.526 11.525-12.096 3.182a2.304 2.304 0 0 0-.649-1.964zM109.702 36.879l-18.58-18.581 7.117-7.117s12.656 4.514 18.58 18.582l-7.117 7.116z"></path>
+        </svg>
+        
         {/* 도형 툴 */}
         <div>
           <svg
@@ -1116,6 +1130,8 @@ const WhiteBoard = () => {
             <circle cx="17" cy="17" r="3" />
             <rect height="6" rx="1" width="6" x="4" y="14" />
           </svg>
+
+
           {/* <img src="/shape.svg" alt="" className={`'w-7 h-7 mt-7 cursor-pointer ' stroke-current ${shapeMenuToggle ? 'text-black0' : 'text-blue'}`}  onClick={shapeToggle}/> */}
           {shapeMenuToggle && (
             <div className="absolute top-[70px] left-[55px]  bg-white rounded-md w-[50px] h-[140px] flex items-center flex-col shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]">
@@ -1257,7 +1273,7 @@ const WhiteBoard = () => {
 
       {/* 삭제 버튼 */}
       <div
-        className="cursor-pointer absolute top-[510px] left-6  bg-white rounded-md w-[50px] h-[50px] flex justify-center items-center shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]"
+        className="cursor-pointer absolute top-[560px] left-6  bg-white rounded-md w-[50px] h-[50px] flex justify-center items-center shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]"
         onClick={() => deleteAll()}
       >
         <svg
@@ -1490,62 +1506,61 @@ const WhiteBoard = () => {
       {/* 도형 서식 창 */}
 
       {selectedId !== null && (
-        <div className="absolute top-32 z-20 right-5 justify-center bg-white rounded-md w-75 h-[450px] gap-6 flex flex-col shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]">
-          <div className="mt-6 font-Nanum text-sm font-regular">
-            도형 색 :
+        <div className="absolute top-32 z-20 right-5 justify-center  bg-white rounded-md w-60 h-[500px] flex flex-col shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]">
+            <div className="mt-3 ml-5 w-4/5  items-center flex  drop-shadow-md bg-white  h-12 rounded-xl">
+              <span className="text-xl font-bold ml-8 font-Inter text-black">도형</span>
+            </div>
+            <div className="flex flex-row h-12 mt-3 ml-5">
+              <span className="mt-1 mr-5" >색상</span>
             <input
+            className="h-8 w-8"
               type="color"
-              value={currentColor}
+              value={shapeColor}
               onChange={handleColorChange}
             />
-          </div>
-          <div className="mt-6 font-Nanum text-sm font-regular">
-            도형 테두리 색 :
+            <span className="ml-3 mt-1">{currentColor}  </span>
+            </div>
+            <div className="mt-3 ml-5 w-4/5  items-center flex   drop-shadow-md bg-white  h-12 rounded-xl">
+              <span className="text-xl font-bold ml-8 font-Inter text-black">테두리</span>
+            </div>
+            <div className="flex flex-row h-12 mt-3 ml-5">
+              <span className="mt-1 mr-5" >색상</span>
             <input
+            className="h-8 w-8"
               type="color"
-              value={strokeCurrentColor}
+              value={shapeStrokeColor}
               onChange={handleStrokeColorChange}
             />
-          </div>
-          <div className="mt-6 font-Nanum text-sm font-regular">
-            테두리 크기 : 
-            <input
+            <span className="ml-3 mt-1">{strokeCurrentColor}  </span>
+            </div>
+            <div className="flex flex-row h-12 mt-3 ml-5">
+              <span className="mr-5" >크기</span>
+              <input
               type="number"
+              className="w-8 h-6"
               value={strokeWidthSize}
               onChange={handleStrokeWidthChange}
             />
-          </div>
+            </div>
+            <div className="mt-3 ml-5 w-4/5  items-center flex    drop-shadow-md bg-white  h-12 rounded-xl">
+              <span className="text-xl font-bold ml-8 font-Inter text-black">위치</span>
+            </div>
           <div className="flex justify-around mt-6">
-            <button className="px-3 py-1 bg-blue-500 text-black text-sm rounded-md shadow-md hover:bg-blue-600" onClick={() => moveToBottom()}>
+            <button className="px-3 py-1 bg-blue-500 text-black text-sm rounded-md  hover:bg-blue-600" onClick={() => moveToBottom()}>
               제일 아래
             </button>
-            <button className="px-3 py-1 bg-blue-500 text-black text-sm rounded-md shadow-md hover:bg-blue-600" onClick={() => moveToTop()}>
+            <button className="px-3 py-1 bg-blue-500 text-black text-sm rounded-md  hover:bg-blue-600" onClick={() => moveToTop()}>
               제일 위
             </button>
-            <button className="px-3 py-1 bg-blue-500 text-black text-sm rounded-md shadow-md hover:bg-blue-600" onClick={() => moveDown()}>
+            <button className="px-3 py-1 bg-blue-500 text-black text-sm rounded-md  hover:bg-blue-600" onClick={() => moveDown()}>
               한칸 아래
             </button>
-            <button className="px-3 py-1 bg-blue-500 text-black text-sm rounded-md shadow-md hover:bg-blue-600" onClick={() => moveUp()}>
+            <button className="px-3 py-1 bg-blue-500 text-black text-sm rounded-md  hover:bg-blue-600" onClick={() => moveUp()}>
               한칸 위
             </button>
           </div>
           <div>
-            <div className="mt-6 font-Nanum text-sm font-regular">
-              도형높이 4 /
-              <input
-                type="number"
-                value={shapeHeight}
-                onChange={handleShapeHeightChange}
-              />
-            </div>
-            <div className="mt-6 font-Nanum text-sm font-regular">
-              도형너비 4 /
-              <input
-                type="number"
-                value={shapeWidth}
-                onChange={handleShapeWidthChange}
-              />
-            </div>
+           
           </div>
         </div>
       )}

@@ -1,5 +1,4 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
-import axios from "axios";
 import api from "../../api";
 
 const postData = (
@@ -22,8 +21,8 @@ const postData = (
 ) => {
   const PostSave = () => {
     console.log(projectId);
-    axios
-      .patch(`http://localhost:8080/api/project/merge?projectId=${projectId}`)
+    api
+      .patch(`/api/project/merge?projectId=${projectId}`)
       .then((response) => {
         console.log(response);
         // console.log(response.data);
@@ -50,8 +49,8 @@ const postData = (
       preData: filteredPreData,
       newData: e.target.attrs,
     };
-    axios
-      .post("http://localhost:8080/api/project/change", postData)
+    api
+      .post("/api/project/change", postData)
       .then((response) => {
         console.log(response);
       })
@@ -78,8 +77,8 @@ const postData = (
       preData: {},
       newData: e.target.attrs,
     };
-    axios
-    .post("http://localhost:8080/api/project/change", postData)
+    api
+    .post("/api/project/change", postData)
     .then((response) => {
       console.log(response)
     })
@@ -99,8 +98,8 @@ const postData = (
       newData: {},
     };
 
-    axios
-      .post("http://localhost:8080/api/project/change", postData)
+    api
+      .post("/api/project/change", postData)
       .then((response) => {
         // 삭제가 성공적으로 반영되었을 때 상태 업데이트
         console.log(response);

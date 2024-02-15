@@ -31,9 +31,14 @@ const SubContent: React.FC = () => {
     fetchProjects();
   }, []);
 
-  const openProject = async (templateId:string,projectId:number) => {
-    
+  const openProject = async (templateId:string,projectId:number,projectName:string) => {
+
+    localStorage.setItem('projectId', projectId.toString());
+    localStorage.setItem('projectName', projectName);
+
+   
     if(templateId==="whiteboard"){
+
       navigate("/board", {state : {projectId : projectId}})
     }
     else if(templateId==="bubbleChat"){
@@ -70,7 +75,7 @@ const SubContent: React.FC = () => {
   {projects.length > 0 ? (
     projects.map((item) => (
       <div className='cursor-pointer hover:scale-105 duration-500 w-56 h-56 mr-8 bg-white drop-shadow-lg flex justify-center flex-col items-center'
-            onClick={()=>openProject(item.templateId,item.projectId)} >
+            onClick={()=>openProject(item.templateId,item.projectId,item.projectName)} >
         <img src={item.thumbnail} alt="" className='w-48 h-32 object-scale-down' />
         <span className='inline-block fixed bottom-2 font-Nanum text-lg font-semibold rotate-[-0.03deg]'>{item.projectName}</span>
       </div>

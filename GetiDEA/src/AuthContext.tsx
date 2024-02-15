@@ -27,18 +27,15 @@ interface AuthProviderProps {
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const [accessToken, setAccessToken] = useState<string | null>(null);
-  // const isAuthenticated = !!localStorage.getItem('accessToken');
-   const isAuthenticated = !!Cookies.get('access_token');
+  const isAuthenticated = !!Cookies.get('access_token');
   const navigate = useNavigate();
 
   useEffect(() => {
     // 페이지 로드 시 토큰 확인 로직
-     const storedToken = Cookies.get('access_token');
-    // const storedToken = localStorage.getItem('accessToken');
+    const storedToken = Cookies.get('access_token');
     if (storedToken) {
       setAccessToken(storedToken);
-      // const decoded:DecodedToken=jwtDecode(localStorage.getItem('accessToken')??"");
-      const decoded:DecodedToken=jwtDecode(storedToken);
+      const decoded:DecodedToken=jwtDecode(Cookies.get('access_token')??"");
       console.log(decoded);
       localStorage.setItem('userEmail',decoded.sub??"");
       localStorage.setItem('provider',decoded.provider??"");
@@ -47,19 +44,20 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   }, []);
 
   const login = (token: string, refreshToken: string) => {
-    localStorage.setItem('accessToken', token);
-    // RefreshToken은 안전하게 처리하세요. 예: HttpOnly Cookie
     setAccessToken(token);
     navigate('/home');
   };
 
   const logout = () => {
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('refreshToken');
+    Cookies.remove('access_token');
+    Cookies.remove('refresh_token');
     localStorage.removeItem('userEmail');
     localStorage.removeItem('userName');
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
     localStorage.removeItem('profileImage');
     localStorage.removeItem('provider');
+    console.log("logout");
     navigate('/');
   };
 

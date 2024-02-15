@@ -1,12 +1,11 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
-import { useNavigate ,useLocation} from 'react-router-dom';
+import { useNavigate, useLocation } from "react-router-dom";
 import { Stage, Layer, Transformer, Line, Image } from "react-konva";
-import api from "../api";
 import useImage from "use-image";
 import URLImage from "../components/Add/URLImage";
 import { debounce } from "lodash";
 import { nanoid } from "nanoid";
-
+import api from "../api";
 import ImgComponent from "../components/Add/ImgComponent";
 import ShapeComponent from "../components/Add/ShapeComponent";
 import LineComponent from "../components/Add/LineComponent";
@@ -23,8 +22,18 @@ import ImageSelector from "../components/funciton/ImageSelector";
 import undoData from "../components/axios/undoData";
 import getData from "../components/axios/getData";
 
-const BoardTemplate3 = () => {
+import Peer from "peerjs";
 
+//템플릿을 위한 import
+import bubbleChatProperties from "../components/templateData/template1-position.json";
+import randomWords from "../components/templateData/randomWords.json";
+import TemplateImageComponent from "../components/Add/TemplateImageComponent";
+import TemplateTextComponent from "../components/Add/TemplateTextComponent";
+
+//튜토리얼을 위한 import
+import { CoachMark, ICoachProps } from "react-coach-mark";
+
+const BoardTemplate3 = () => {
   const navigate = useNavigate();
 
   const [imageIdCounter, setImageIdCounter] = useState(0);
@@ -66,7 +75,10 @@ const BoardTemplate3 = () => {
   //채팅방
   const [chatClick, setChatClick] = useState(false);
   const [chatLog, setChatLog] = useState([]);
-  const [chatInput, setChatInput] = useState({ nickname: localStorage.getItem('userName'), message: "" });
+  const [chatInput, setChatInput] = useState({
+    nickname: localStorage.getItem("userName"),
+    message: "",
+  });
 
   //드래그 끝남 여부 확인(비동기 처리 필요)
   const [dragEnded, setDragEnded] = useState(false);
@@ -187,14 +199,147 @@ const BoardTemplate3 = () => {
     useState(false);
   const [imgMenuToggle, setImgMenuToggle] = useState(false);
 
-  const projectId = 1;
-  const userEmail = "wnsrb933@naver.com";
+  let projectId = parseInt(localStorage.getItem('projectId'));
+  const userEmail = localStorage.getItem('userEmail');
+
+  const [peer, setPeer] = useState(null);
+  const [isRegistered, setIsRegistered] = useState(false);
+  const [streams, setStreams] = useState([]);
+  const [stream, setStream] = useState("");
+  const myVideoRef = useRef();
+  const [localStream, setLocalStream] = useState(null); // 스트림 상태 추가
+  const [peerId, setPeerId] = useState("");
+  const [isVisible, setIsVisible] = useState(true);
+
+  const toggleVisibility = () => {
+    setIsVisible((prev) => !prev);
+  };
+
+  useEffect(() => {
+    // Peer 객체 생성 및 이벤트 리스너 설정
+    const myPeer = new Peer();
+    setPeer(myPeer);
+
+    navigator.mediaDevices
+      .getUserMedia({ video: true, audio: true })
+      .then((stream) => {
+        myVideoRef.current.srcObject = stream;
+        setLocalStream(stream);
+
+        myPeer.on("open", (id) => {
+          console.log("My peer ID is: ", id);
+          setPeerId(id);
+          setIsRegistered(true);
+
+          // Peer 등록
+          registerPeer(id, projectId)
+            .then((response) => response.json())
+            .then((data) => {
+              if (data.success) {
+                console.log("Registration successful");
+              } else {
+                console.error("Registration failed", data.message);
+              }
+            })
+            .catch((err) => console.error("Error registering peer", err));
+
+          fetchUsersAndConnect(myPeer, projectId, stream);
+        });
+
+        myPeer.on("call", (call) => {
+          call.answer(stream);
+          call.on("stream", (remoteStream) => {
+            addVideoStream(remoteStream, call.peer);
+          });
+        });
+      })
+      .catch((err) => console.error("Failed to get local stream", err));
+
+    // beforeunload 이벤트 핸들러
+    const handleBeforeUnload = () => {
+      if (peerId) {
+        const data = JSON.stringify({ peerId: peerId, projectId: projectId });
+        const blob = new Blob([data], { type: "application/json" });
+        const beaconSent = navigator.sendBeacon(`${process.env.REACT_APP_PEERJS_URL}/unregister`, blob);
+        console.log("Beacon sent: ", beaconSent);
+      }
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+      if (localStream) {
+        localStream.getTracks().forEach((track) => track.stop());
+      }
+      if (myPeer) {
+        myPeer.destroy();
+      }
+    };
+  }, []); // 의존성 배열을 비워 컴포넌트 마운트 시 한 번만 실행
+  useEffect(() => {
+    // 페이지를 벗어날 때 서버에 사용자 등록 해제 요청을 보내는 로직
+    const handleBeforeUnload = () => {
+      const data = JSON.stringify({ peerId: peerId, projectId: projectId });
+      const blob = new Blob([data], { type: "application/json" });
+      navigator.sendBeacon(`${process.env.REACT_APP_PEERJS_URL}/unregister`, blob);
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    console.log("test");
+
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, [peerId, projectId]); // useEffect 의존성에 peerId 추가
+
+  const registerPeer = (peerId, projectId) => {
+    return fetch(`${process.env.REACT_APP_PEERJS_URL}/register`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ peerId, projectId }),
+    });
+  };
+
+  const fetchUsersAndConnect = (myPeer, projectId, stream) => {
+    fetch(`${process.env.REACT_APP_PEERJS_URL}/users/${projectId}`)
+      .then((response) => response.json())
+      .then((users) => {
+        users.forEach(({ peerId: otherPeerId }) => {
+          if (otherPeerId !== myPeer.id) {
+            const call = myPeer.call(otherPeerId, stream);
+            call.on("stream", (remoteStream) =>
+              addVideoStream(remoteStream, otherPeerId)
+            );
+          }
+        });
+      });
+  };
+
+  const addVideoStream = (stream, peerId) => {
+    setStreams((prevStreams) => {
+      // 동일한 peerId를 가진 스트림이 이미 있는지 확인
+      const alreadyExists = prevStreams.some(
+        (stream) => stream.peerId === peerId
+      );
+
+      // 이미 존재하지 않는 경우에만 새 스트림 추가
+      if (!alreadyExists) {
+        console.log(`Adding video stream for peerId: ${peerId}`);
+        return [...prevStreams, { stream, peerId }];
+      } else {
+        console.log(`Stream for peerId: ${peerId} already exists.`);
+        return prevStreams;
+      }
+    });
+  };
+
 
   const [preData, setPreData] = useState([]);
   useEffect(() => {
-    if(location.state.name){
-      setProjectName(location.state.name);
-    }
+    // if(location.state.name){
+    //   setProjectName(location.state.name);
+    // }
+    setProjectName(localStorage.getItem('projectName'));
     getProjectData();
     console.log(`|\\_/|
 |q p|   /}
@@ -353,7 +498,7 @@ const BoardTemplate3 = () => {
   const [socket, setSocket] = useState(null);
 
   useEffect(() => {
-    const socket = new WebSocket("ws://localhost:8000/");
+    const socket = new WebSocket(`${process.env.REACT_APP_WEBSOCKET_URL}`);
 
     socket.onopen = () => {
       console.log("WebSocket 연결이 열렸습니다.");
@@ -398,11 +543,11 @@ const BoardTemplate3 = () => {
   }, []);
 
   const sendInfoToServer = () => {
-    if (chatInput.nickname.trim() !== "" && chatInput.message.trim() !== "") {
-      const newChat = { ...chatInput, id: new Date().getTime() };
-      setChatLog((prevChatLog) => [...prevChatLog, newChat]);
-      setChatInput({ nickname: localStorage.getItem('userName'), message: "" }); // 입력 필드 초기화
-    }
+    // if (chatInput.nickname.trim() !== "" && chatInput.message.trim() !== "") {
+    //   const newChat = { ...chatInput, id: new Date().getTime() };
+    //   setChatLog((prevChatLog) => [...prevChatLog, newChat]);
+    //   setChatInput({ nickname: localStorage.getItem('userName'), message: "" }); // 입력 필드 초기화
+    // }
 
     // 서버에 데이터 전송
     if (socket && socket.readyState === WebSocket.OPEN) {
@@ -714,16 +859,16 @@ const BoardTemplate3 = () => {
     setStagePosition(newPos);
   }, []);
 
-  const resetZoom = useCallback(() => {
+  const resetZoom = () => {
     const stage = stageRef.current;
     if (!stage) {
       return;
     }
     stage.scale({ x: 1, y: 1 });
     stage.position({ x: 0, y: 0 });
-    stagePosition({ x: 0, y: 0 });
+    setStagePosition({ x: 0, y: 0 });
     setStageScale({ x: 1, y: 1 });
-  }, []);
+  };
 
   useEffect(() => {
     // 드래그 작업이 완료되었고, 상태가 변경되었다면 서버에 전송
@@ -912,10 +1057,10 @@ const BoardTemplate3 = () => {
     setWriteToggle(false);
   };
 
-  const chatToggle = () =>{
+  const chatToggle = () => {
     setChatClick(!chatClick);
-  }
-  
+  };
+
   const colorToggle = () => {
     setColorMenuToggle(!colorMenuToggle);
   };
@@ -937,34 +1082,809 @@ const BoardTemplate3 = () => {
 
   const chatLogEndRef = useRef(null);
 
-
-  // 채팅 스크롤 관련 
+  // 채팅 스크롤 관련
   useEffect(() => {
     // chatLogEndRef가 가리키는 요소로 스크롤 이동
-    chatLogEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    chatLogEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [chatLog]);
+
+  const goHome = () => {
+    const loadProject = async () => {
+      try {
+        const response = await api.delete(
+          `/api/project/close/${projectId}`
+        );
+        console.log(response);
+      } catch (error) {
+        console.error("Error fetching data: ", error);
+      }
+    };
+
+    loadProject();
+    localStorage.removeItem('projectId');
+    localStorage.removeItem('projectName');
+    navigate("/home");
+  };
+
+  // 7check 사용자 아이디어 입력창 (Write Your iDEA)
+  const [inputText, setInputText] = useState("");
+
+  // 사용자 아이디어 입력창 변경 함수
+  const handleInputTextChange = (event) => {
+    setInputText(event.target.value);
+  };
+
+  // 사용자 아이디어 입력창 최소 크기 설정: 1로 설정하여, 입력값이 없을 때도 input 보이게 함
+  const inputTextLength = inputText.length > 0 ? inputText.length * 2 : 23;
+
+  //템플릿3에 관한 요소 & 코드
+  const templateImage3 = {
+    src: "/img/template3_check7/template3Fix3.png",
+    x: 110.31092625853671,
+    y: 7.876662134569187,
+    z: -100,
+    ty: "img",
+    type: "Image",
+    width: 200,
+    height: 112.6433526829959,
+    draggable: false,
+    rotation: 0,
+    scaleX: 5.171183388521264,
+    scaleY: 5.171183388521264,
+  };
+
+  const templateInfo = [];
+
+  useEffect(() => {
+    templateInfo.push(templateImage3);
+    setImages(templateInfo);
+  }, []);
+
+  //튜토리얼을 위한 코드
+  // 튜토리얼 refs
+  const ref1 = useRef(null);
+  const ref2 = useRef(null);
+  const ref3 = useRef(null);
+  const ref4 = useRef(null);
+  const ref5 = useRef(null);
+  const ref6 = useRef(null);
+  const ref7 = useRef(null);
+  const ref8 = useRef(null);
+  const ref9 = useRef(null);
+  const ref10 = useRef(null);
+  const ref11 = useRef(null);
+  const ref12 = useRef(null);
+
+  // 튜토리얼 Number & Button
+  const [activatedNumber, setActivateNumber] = useState(0);
+  
+
+  // 튜토리얼 버튼 함수
+  const startTutorial = () => {
+    resetZoom();
+    setActivateNumber(0);
+  };
+
+  const endTutorial = () => {
+    setActivateNumber(11);
+  };
+
+  const coachList = [
+    {
+      // 튜토리얼 1. 템플릿 소개 (overview)
+      activate: activatedNumber === 0,
+      component: (
+        <div className="bg-white p-8 shadow-lg rounded-lg">
+                    <div className="flex justify-end">
+            <button
+              className="bg-blue-500 hover:bg-blue-700 text-black font-Nanum font-bold text-2xl"
+              onClick={() => endTutorial()}
+            >
+               <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={1.5}
+                stroke="currentColor"
+                className="w-6 h-6"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M6 18 18 6M6 6l12 12"
+                />
+              </svg>
+
+            </button>
+          </div>
+          <p className="text-center font-Nanum font-bold text-2xl">
+            세븐쳌 (7 Check)
+          </p>
+          <p className="text-center font-Nanum text-l mt-4 px-28">
+            아이디어 관련 7가지 체크포인트를
+          </p>
+          <p className="text-center font-Nanum text-l">
+            한가지씩 점검해보는 기법입니다.
+          </p>
+
+          <div className="flex justify-between items-center mt-8">
+               <button
+              className="bg-blue-500 hover:bg-blue-700 text-blue font-Nanum font-bold py-2 px-4 rounded shadow"
+              onClick={() => setActivateNumber(activatedNumber - 1)}
+            >
+              닫기
+
+            </button>
+            <span className="text-blue-800 font-Nanum">1 / 11</span>
+            <button
+              className="bg-blue-500 hover:bg-blue-700 text-blue font-Nanum font-bold py-2 px-4 rounded shadow"
+              onClick={() => setActivateNumber(activatedNumber + 1)}
+            >
+              다음
+
+            </button>
+          </div>
+        </div>
+      ),
+      reference: ref1,
+      tooltip: { position: "left" },
+    },
+    {
+      // 튜토리얼 2. Write Your iDEA!
+      activate: activatedNumber === 1,
+      component: (
+        <div className="bg-white p-8 shadow-lg rounded-lg">
+                    <div className="flex justify-end">
+            <button
+              className="bg-blue-500 hover:bg-blue-700 text-black font-Nanum font-bold text-2xl"
+              onClick={() => endTutorial()}
+            >
+               <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={1.5}
+                stroke="currentColor"
+                className="w-6 h-6"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M6 18 18 6M6 6l12 12"
+                />
+              </svg>
+
+            </button>
+          </div>
+          <p className="text-center font-Nanum font-bold text-2xl">
+            Write Your iDEA!
+          </p>
+          <p className="text-center font-Nanum text-l mt-4 px-16">
+            점검하고자 하는 아이디어를 입력하세요.
+          </p>
+
+          <div className="flex justify-between items-center mt-8">
+          <button
+              className="bg-blue-500 hover:bg-blue-700 text-blue font-Nanum font-bold py-2 px-4 rounded shadow"
+              onClick={() => setActivateNumber(activatedNumber - 1)}
+            >
+              이전
+
+            </button>
+            <span className="text-blue-800 font-Nanum">2 / 11</span>
+            <button
+              className="bg-blue-500 hover:bg-blue-700 text-blue font-Nanum font-bold py-2 px-4 rounded shadow"
+              onClick={() => setActivateNumber(activatedNumber + 1)}
+            >
+              다음
+
+            </button>
+          </div>
+        </div>
+      ),
+      reference: ref2,
+      tooltip: { position: "bottom" },
+    },
+    {
+      // 튜토리얼 3. 전반적인 설명
+      activate: activatedNumber === 2,
+      component: (
+        <div className="bg-white p-8 shadow-lg rounded-lg">
+                    <div className="flex justify-end">
+            <button
+              className="bg-blue-500 hover:bg-blue-700 text-black font-Nanum font-bold text-2xl"
+              onClick={() => endTutorial()}
+            >
+                <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={1.5}
+                stroke="currentColor"
+                className="w-6 h-6"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M6 18 18 6M6 6l12 12"
+                />
+              </svg>
+
+            </button>
+          </div>
+          <p className="text-center font-Nanum font-bold text-l">
+            각 카드의 예시를 참고하며
+          </p>
+          <p className="text-center font-Nanum font-bold text-2xl mt-2">
+            총 7가지를 check 해보세요.
+          </p>
+          <p className="text-center font-Nanum text-l mt-6">
+            카드 작성 순서는 자유입니다!
+          </p>
+
+          <div className="flex justify-between items-center mt-8">
+          <button
+              className="bg-blue-500 hover:bg-blue-700 text-blue font-Nanum font-bold py-2 px-4 rounded shadow"
+              onClick={() => setActivateNumber(activatedNumber - 1)}
+            >
+              이전
+
+            </button>
+            <span className="text-blue-800 font-Nanum">3 / 11</span>
+            <button
+              className="bg-blue-500 hover:bg-blue-700 text-blue font-Nanum font-bold py-2 px-4 rounded shadow"
+              onClick={() => setActivateNumber(activatedNumber + 1)}
+            >
+              다음
+
+            </button>
+          </div>
+        </div>
+      ),
+      reference: ref3,
+      tooltip: { position: "top" },
+    },
+    {
+      // 튜토리얼 4-1. 상세 설명 (축소)
+      activate: activatedNumber === 3,
+      component: (
+        <div className="bg-white p-8 shadow-lg rounded-lg">
+                    <div className="flex justify-end">
+          <button
+            className="bg-blue-500 hover:bg-blue-700 text-black font-Nanum font-bold text-2xl"
+            onClick={() => endTutorial()}
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={1.5}
+              stroke="currentColor"
+              className="w-6 h-6"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M6 18 18 6M6 6l12 12"
+              />
+            </svg>
+          </button>
+          </div>
+
+          <p className="text-center font-Nanum font-bold text-3xl text-[#ffc71d]">
+            '축소 - Reduction'
+          </p>
+          <p className="text-center font-Nanum text-l mt-4">
+            아이디어를 작게, 낮게, 짧게,
+          </p>
+          <p className="text-center font-Nanum text-l">
+            얇게, 가볍게, 생략, 분할,
+          </p>
+          <p className="text-center font-Nanum text-l">
+            제거, 단축, 단순화 해볼까요?
+          </p>
+          <p className="text-center font-Nanum text-sm mt-3">
+            ex. 전화기의 선과 안테나를 없애면 어떨까?
+          </p>
+
+          <div className="flex justify-between items-center mt-8">
+          <button
+              className="bg-blue-500 hover:bg-blue-700 text-blue font-Nanum font-bold py-2 px-4 rounded shadow"
+              onClick={() => setActivateNumber(activatedNumber - 1)}
+            >
+              이전
+
+            </button>
+            <span className="text-blue-800 font-Nanum">4 / 11</span>
+            <button
+              className="bg-blue-500 hover:bg-blue-700 text-blue font-Nanum font-bold py-2 px-4 rounded shadow"
+              onClick={() => setActivateNumber(activatedNumber + 1)}
+            >
+              다음
+
+            </button>
+          </div>
+        </div>
+      ),
+
+      reference: ref4,
+      tooltip: { position: "top" },
+    },
+    {
+      // 튜토리얼 4-2. 상세 설명 (확대)
+      activate: activatedNumber === 4,
+      component: (
+        <div className="bg-white p-8 shadow-lg rounded-lg">
+                    <div className="flex justify-end">
+            <button
+              className="bg-blue-500 hover:bg-blue-700 text-black font-Nanum font-bold text-2xl"
+              onClick={() => endTutorial()}
+            >
+               <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={1.5}
+                stroke="currentColor"
+                className="w-6 h-6"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M6 18 18 6M6 6l12 12"
+                />
+              </svg>
+
+            </button>
+          </div>
+          <p className="text-center font-Nanum font-bold text-3xl text-[#FF8C00]">
+            '확대 - Enlargement'
+          </p>
+          <p className="text-center font-Nanum text-l mt-4">
+            빈도, 강도, 크기, 가치, 재료 등을 확대하고 과장해볼까요?
+          </p>
+          <p className="text-center font-Nanum text-l">
+            크게, 길게, 넓게, 두껍게, 무겁게 해볼까요?
+          </p>
+          <p className="text-center font-Nanum text-sm mt-3">
+            ex. PC방에서 음식 메뉴와 비중을 확대하면 어떨까?
+          </p>
+
+          <div className="flex justify-between items-center mt-8">
+          <button
+              className="bg-blue-500 hover:bg-blue-700 text-blue font-Nanum font-bold py-2 px-4 rounded shadow"
+              onClick={() => setActivateNumber(activatedNumber - 1)}
+            >
+              이전
+
+            </button>
+            <span className="text-blue-800 font-Nanum">5 / 10</span>
+            <button
+              className="bg-blue-500 hover:bg-blue-700 text-blue font-Nanum font-bold py-2 px-4 rounded shadow"
+              onClick={() => setActivateNumber(activatedNumber + 1)}
+            >
+              다음
+
+            </button>
+          </div>
+        </div>
+      ),
+
+      reference: ref5,
+      tooltip: { position: "right" },
+    },
+    {
+      // 튜토리얼 4-3. 상세 설명 (수정)
+      activate: activatedNumber === 5,
+      component: (
+        <div className="bg-white p-8 shadow-lg rounded-lg">
+                    <div className="flex justify-end">
+            <button
+              className="bg-blue-500 hover:bg-blue-700 text-black font-Nanum font-bold text-2xl"
+              onClick={() => endTutorial()}
+            >
+                <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={1.5}
+                stroke="currentColor"
+                className="w-6 h-6"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M6 18 18 6M6 6l12 12"
+                />
+              </svg>
+
+            </button>
+          </div>
+          <p className="text-center font-Nanum font-bold text-3xl text-yellow-600 text-[#32CD32]">
+            '수정 - Modification'
+          </p>
+          <p className="text-center font-Nanum text-l mt-4">
+            의미, 색, 소리, 움직임, 형태, 양식 등을
+          </p>
+          <p className="text-center font-Nanum text-l">변화시켜볼까요?</p>
+          <p className="text-center font-Nanum text-sm mt-3">
+            ex. 시계의 종소리를 뻐꾸기 울음소리로 바꾸면 어떨까?
+          </p>
+
+          <div className="flex justify-between items-center mt-8">
+          <button
+              className="bg-blue-500 hover:bg-blue-700 text-blue font-Nanum font-bold py-2 px-4 rounded shadow"
+              onClick={() => setActivateNumber(activatedNumber - 1)}
+            >
+              이전
+
+            </button>
+            <span className="text-blue-800 font-Nanum">6 / 10</span>
+            <button
+              className="bg-blue-500 hover:bg-blue-700 text-blue font-Nanum font-bold py-2 px-4 rounded shadow"
+              onClick={() => setActivateNumber(activatedNumber + 1)}
+            >
+              다음
+
+            </button>
+          </div>
+        </div>
+      ),
+
+      reference: ref6,
+      tooltip: { position: "right" },
+    },
+    {
+      // 튜토리얼 4-4. 상세 설명 (대체)
+      activate: activatedNumber === 6,
+      component: (
+        <div className="bg-white p-8 shadow-lg rounded-lg">
+                    <div className="flex justify-end">
+            <button
+              className="bg-blue-500 hover:bg-blue-700 text-black font-Nanum font-bold text-2xl"
+              onClick={() => endTutorial()}
+            >
+                 <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={1.5}
+                stroke="currentColor"
+                className="w-6 h-6"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M6 18 18 6M6 6l12 12"
+                />
+              </svg>
+
+            </button>
+          </div>
+          <p className="text-center font-Nanum font-bold text-3xl text-[#4682B4]">
+            '대체 - Alternation'
+          </p>
+          <p className="text-center font-Nanum text-l mt-4">
+            대체할 방법, 물품, 사람, 재료, 장소, 과정이 있나요?
+          </p>
+          <p className="text-center font-Nanum text-l">
+            사람, 물건, 재료, 소재, 기법, 동력, 장소, 위치, 표기 방법 등을
+            대체해볼까요?
+          </p>
+          <p className="text-center font-Nanum text-sm mt-3">
+            ex. 젓가락의 재질을 나무로 바꿔보면 어떨까?
+          </p>
+
+          <div className="flex justify-between items-center mt-8">
+          <button
+              className="bg-blue-500 hover:bg-blue-700 text-blue font-Nanum font-bold py-2 px-4 rounded shadow"
+              onClick={() => setActivateNumber(activatedNumber - 1)}
+            >
+              이전
+
+            </button>
+            <span className="text-blue-800 font-Nanum">7 / 11</span>
+            <button
+              className="bg-blue-500 hover:bg-blue-700 text-blue font-Nanum font-bold py-2 px-4 rounded shadow"
+              onClick={() => setActivateNumber(activatedNumber + 1)}
+            >
+              다음
+
+            </button>
+          </div>
+        </div>
+      ),
+
+      reference: ref7,
+      tooltip: { position: "bottom" },
+    },
+    {
+      // 튜토리얼 4-5. 상세 설명 (반전)
+      activate: activatedNumber === 7,
+      component: (
+        <div className="bg-white p-8 shadow-lg rounded-lg">
+                    <div className="flex justify-end">
+            <button
+              className="bg-blue-500 hover:bg-blue-700 text-black font-Nanum font-bold text-2xl"
+              onClick={() => endTutorial()}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={1.5}
+                stroke="currentColor"
+                className="w-6 h-6"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M6 18 18 6M6 6l12 12"
+                />
+              </svg>
+
+            </button>
+          </div>
+          <p className="text-center font-Nanum font-bold text-3xl text-[#000080]">
+            '반전 - Reversion'
+          </p>
+          <p className="text-center font-Nanum text-l mt-4">
+            순서, 위치, 기능, 모양 등을 바꾸거나 재정렬 해봅시다!
+          </p>
+          <p className="text-center font-Nanum text-l">
+            앞뒤, 위아래, 좌우, 겉과 안, 역할, 순서를 바꿔볼까요?
+          </p>
+          <p className="text-center font-Nanum text-sm mt-3">
+            ex. 김밥의 김과 밥의 위치를 바꾸면 어떨까?
+          </p>
+
+          <div className="flex justify-between items-center mt-8">
+          <button
+              className="bg-blue-500 hover:bg-blue-700 text-blue font-Nanum font-bold py-2 px-4 rounded shadow"
+              onClick={() => setActivateNumber(activatedNumber - 1)}
+            >
+              이전
+
+            </button>
+            <span className="text-blue-800 font-Nanum">8 / 11</span>
+            <button
+              className="bg-blue-500 hover:bg-blue-700 text-blue font-Nanum font-bold py-2 px-4 rounded shadow"
+              onClick={() => setActivateNumber(activatedNumber + 1)}
+            >
+              다음
+
+            </button>
+          </div>
+        </div>
+      ),
+
+      reference: ref8,
+      tooltip: { position: "left" },
+    },
+    {
+      // 튜토리얼 4-6. 상세 설명 (전용)
+      activate: activatedNumber === 8,
+      component: (
+        <div className="bg-white p-8 shadow-lg rounded-lg">
+                    <div className="flex justify-end">
+            <button
+              className="bg-blue-500 hover:bg-blue-700 text-black font-Nanum font-bold text-2xl"
+              onClick={() => endTutorial()}
+            >
+                <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={1.5}
+                stroke="currentColor"
+                className="w-6 h-6"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M6 18 18 6M6 6l12 12"
+                />
+              </svg>
+
+            </button>
+          </div>
+          <p className="text-center font-Nanum font-bold text-3xl text-[#800080]">
+            '전용 - Diversion'
+          </p>
+          <p className="text-center font-Nanum text-l mt-4">
+            다른 용도를 사용하거나, 사용자를 바꿀 수 있나요?
+          </p>
+          <p className="text-center font-Nanum text-l">
+            다른 아이디어를 빌리거나 흉내 내도 좋아요!
+          </p>
+          <p className="text-center font-Nanum text-sm mt-3">
+            ex. 장갑을 실외 말고 부엌에서 사용하면 어떨까?
+          </p>
+
+          <div className="flex justify-between items-center mt-8">
+          <button
+              className="bg-blue-500 hover:bg-blue-700 text-blue font-Nanum font-bold py-2 px-4 rounded shadow"
+              onClick={() => setActivateNumber(activatedNumber - 1)}
+            >
+              이전
+
+            </button>
+            <span className="text-blue-800 font-Nanum">9 / 11</span>
+            <button
+              className="bg-blue-500 hover:bg-blue-700 text-blue font-Nanum font-bold py-2 px-4 rounded shadow"
+              onClick={() => setActivateNumber(activatedNumber + 1)}
+            >
+              다음
+
+            </button>
+          </div>
+        </div>
+      ),
+
+      reference: ref9,
+      tooltip: { position: "left" },
+    },
+    {
+      // 튜토리얼 4-6. 상세 설명 (결합)
+      activate: activatedNumber === 9,
+      component: (
+        <div className="bg-white p-8 shadow-lg rounded-lg">
+                    <div className="flex justify-end">
+            <button
+              className="bg-blue-500 hover:bg-blue-700 text-black font-Nanum font-bold text-2xl"
+              onClick={() => endTutorial()}
+            >
+               <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={1.5}
+                stroke="currentColor"
+                className="w-6 h-6"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M6 18 18 6M6 6l12 12"
+                />
+              </svg>
+
+            </button>
+          </div>
+          <p className="text-center font-Nanum font-bold text-3xl text-[#9400D3]">
+            '결합 - Combination'
+          </p>
+          <p className="text-center font-Nanum text-l mt-4">
+            다른 아이디어, 재료, 부품, 목적, 단위 등을 결합해볼까요?
+          </p>
+          <p className="text-center font-Nanum text-l">
+            랜덤 단어로 시도하고 싶다면, '랜덤 버블'을 이용해보세요!
+          </p>
+          <p className="text-center font-Nanum text-sm mt-3">
+            ex. 장갑과 모자를 합쳐서 새로운 것을 만들면 어떨까?
+          </p>
+
+          <div className="flex justify-between items-center mt-8">
+          <button
+              className="bg-blue-500 hover:bg-blue-700 text-blue font-Nanum font-bold py-2 px-4 rounded shadow"
+              onClick={() => setActivateNumber(activatedNumber - 1)}
+            >
+              이전
+
+            </button>
+            <span className="text-blue-800 font-Nanum">10 / 11</span>
+            <button
+              className="bg-blue-500 hover:bg-blue-700 text-blue font-Nanum font-bold py-2 px-4 rounded shadow"
+              onClick={() => setActivateNumber(activatedNumber + 1)}
+            >
+              다음
+
+            </button>
+          </div>
+        </div>
+      ),
+
+      reference: ref10,
+      tooltip: { position: "top" },
+    },
+    {
+      // 튜토리얼 5. 설명 마무리
+      activate: activatedNumber === 10,
+      component: (
+        <div className="bg-white p-8 shadow-lg rounded-lg">
+          <p className="text-center font-Nanum font-bold text-l">
+            작성 완료 후에는
+          </p>
+          <p className="text-center font-Nanum font-bold text-2xl mt-2">
+            전체적으로 다시 확인해보세요!
+          </p>
+          <p className="text-center font-Nanum text-l mt-4">
+            좋은 아이디어를 발견할 수 있을거에요 :D
+          </p>
+
+          <div className="flex justify-between items-center mt-8">
+          <button
+              className="bg-blue-500 hover:bg-blue-700 text-blue font-Nanum font-bold py-2 px-4 rounded shadow"
+              onClick={() => setActivateNumber(activatedNumber - 1)}
+            >
+              이전
+
+            </button>
+            <span className="text-blue-800 font-Nanum">11 / 11</span>
+            <button
+              className="bg-blue-500 hover:bg-blue-700 text-blue font-Nanum font-bold py-2 px-4 rounded shadow"
+              onClick={() => setActivateNumber(activatedNumber + 1)}
+            >
+              다음
+
+            </button>
+          </div>
+        </div>
+      ),
+
+      reference: ref11,
+      tooltip: { position: "top" },
+    },
+    {
+      // 튜토리얼 안내 : ? 클릭 시, 튜토리얼을 다시 볼 수 있음을 안내
+      activate: activatedNumber === 11,
+      component: (
+        <div className="flex bg-white p-8 shadow-lg rounded-lg">
+          <p className="text-center font-Nanum font-bold text-2xl">
+            튜토리얼 다시보기는 여기를 클릭하세요!
+          </p>
+          <button
+            className="ml-7 bg-blue-500 hover:bg-blue-700 text-blue font-Nanum font-bold py-2 px-4 rounded shadow"
+            onClick={() => setActivateNumber(activatedNumber + 1)}
+          >
+            확인
+
+          </button>
+        </div>
+      ),
+
+      reference: ref12,
+      tooltip: { position: "right" },
+    },
+  ];
+
+  const coach = coachList[activatedNumber];
 
   return (
     <div className="absolute  inset-0 h-full w-full bg-[#EFEFEF] bg-opacity-50 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px]">
-       
       {/* 왼쪽 윗 블록 */}
-      <div className='absolute top-6 left-6 pl-5 bg-white rounded-md w-[410px] h-[50px] flex items-center flex-row shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]'>
-      
+      <div className="absolute top-6 left-6 pl-5 bg-white rounded-md w-[410px] h-[50px] flex items-center flex-row shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]">
         {/* 뒤로가기 버튼 */}
-        <svg  xmlns="http://www.w3.org/2000/svg" onClick={()=>navigate("/home")}  fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 cursor-pointer">
-          <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          onClick={() => goHome()}
+          fill="none"
+          viewBox="0 0 24 24"
+          strokeWidth={1.5}
+          stroke="currentColor"
+          className="w-6 h-6 cursor-pointer"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M15.75 19.5 8.25 12l7.5-7.5"
+          />
         </svg>
 
-        <div className='ml-6 border-l-2 border-line_gray'>&ensp;</div>
+        <div className="ml-6 border-l-2 border-line_gray">&ensp;</div>
 
         {/* 서비스 로고 */}
-        <img src="/logo.svg" alt="" className='ml-4 w-8 h-8 '/>
-        <div className=' ml-3 font-Inter font-bold text-xl rotate-[-0.03deg]'>Get iDEA</div>
+        <img src="/logo.svg" alt="" className="ml-4 w-8 h-8 " />
+        <div className=" ml-3 font-Inter font-bold text-xl rotate-[-0.03deg]">
+          Get iDEA
+        </div>
 
-        <div className='ml-8 border-l-2 border-line_gray'>&ensp;</div>
+        <div className="ml-8 border-l-2 border-line_gray">&ensp;</div>
 
         {/* 프로젝트 이름 */}
-        <div className=' ml-3 font-Nanum font-medium text-center text-base rotate-[-0.03deg]'>{projectName}</div>
+        <div className=" ml-3 font-Nanum font-medium text-center text-base rotate-[-0.03deg]">
+          {projectName}
+        </div>
       </div>
 
       {/* 그리기 툴 */}
@@ -1114,7 +2034,6 @@ const BoardTemplate3 = () => {
           onClick={() => addTextBox()}
         />
 
-
         {/* 기타 툴 */}
         {/* <img src="/dots.svg" alt="" className="w-4 h-4 mt-7" /> */}
       </div>
@@ -1140,21 +2059,75 @@ const BoardTemplate3 = () => {
         </svg>
       </div>
 
+      {/* 튜토리얼 - CoachMark 라이브러리 */}
+      <CoachMark {...coach} />
+
       {/* 튜토리얼 버튼 */}
-      <div className='cursor-pointer absolute top-[530px]  hover:text-blue left-6  bg-white rounded-md w-[50px] h-[50px] flex justify-center items-center shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]' >
+      <div
+        ref={ref12}
+        className="cursor-pointer absolute top-[530px]  hover:text-blue left-6  bg-white rounded-md w-[50px] h-[50px] flex justify-center items-center shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]"
+        onClick={startTutorial}
+      >
         <svg
-          xmlns="http://www.w3.org/2000/svg" 
-          fill="none" 
-          viewBox="0 0 24 24" 
-          strokeWidth={1.5} 
-          stroke="currentColor" 
-          className="w-7 h-7">
-        <path 
-          strokeLinecap="round" 
-          strokeLinejoin="round" 
-          d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 5.25h.008v.008H12v-.008Z" />
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          strokeWidth={1.5}
+          stroke="currentColor"
+          className="w-7 h-7"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 5.25h.008v.008H12v-.008Z"
+          />
         </svg>
       </div>
+
+      {/* 튜토리얼 관련 영역 지정 */}
+      {/* <div ref={ref1} className="absolute ml-[600px] mt-[300px]" ></div> */}
+      <div
+        ref={ref1}
+        className="absolute ml-[590px] mt-[300px] h-[350px] w-[370px]"
+      ></div>
+      <div
+        ref={ref3}
+        className="absolute ml-[590px] mt-[300px] h-[350px] w-[370px]"
+      ></div>
+
+      <div
+        ref={ref4}
+        className="absolute ml-[250px] mt-[495px] h-[165px] w-[280px]"
+      ></div>
+      <div
+        ref={ref5}
+        className="absolute ml-[290px] mt-[320px] h-[165px] w-[280px]"
+      ></div>
+      <div
+        ref={ref6}
+        className="absolute ml-[330px] mt-[147px] h-[165px] w-[280px]"
+      ></div>
+      <div
+        ref={ref7}
+        className="absolute ml-[630px] mt-[98px] h-[165px] w-[280px]"
+      ></div>
+      <div
+        ref={ref8}
+        className="absolute ml-[925px] mt-[147px] h-[165px] w-[280px]"
+      ></div>
+      <div
+        ref={ref9}
+        className="absolute ml-[965px] mt-[320px] h-[165px] w-[280px]"
+      ></div>
+      <div
+        ref={ref10}
+        className="absolute ml-[1005px] mt-[495px] h-[165px] w-[280px]"
+      ></div>
+
+      <div
+        ref={ref11}
+        className="absolute ml-[590px] mt-[300px] h-[350px] w-[370px]"
+      ></div>
 
       {/* 실행취소 버튼 */}
       {/* <div
@@ -1198,55 +2171,89 @@ const BoardTemplate3 = () => {
         </svg>
       </div> */}
 
+      <div
+        className={`${
+          isVisible ? "block" : "hidden"
+        } absolute right-6 top-20 p-2.5 max-w-[200px] flex flex-col space-y-2.5`}
+      >
+        <video ref={myVideoRef} autoPlay muted className="w-full z-50" />
+        {/* 자신의 비디오 */}
+        {streams.map(({ stream, peerId }) => (
+          <Video key={peerId} stream={stream} />
+        ))}
+      </div>
 
       {/* 채팅창 */}
-      <div className={chatClick? "absolute top-20 right-10 w-[350px] p-3 z-20 justify-center container  ml-auto px-4": "invisible absolute top-20 right-10 w-80 p-7 z-20 justify-center container w-1/4 ml-auto px-4 "}>
+      <div
+        className={
+          chatClick
+            ? "absolute top-20 right-10 w-[350px] p-3 z-20 justify-center container  ml-auto px-4"
+            : "invisible absolute top-20 right-10 w-80 p-7 z-20 justify-center container w-1/4 ml-auto px-4 "
+        }
+      >
         <div className="bg-white  rounded-lg shadow-lg">
           <div className="mb-4">
-           
-            <div id="chat-log" className="h-80 overflow-auto p-4 bg-gray-200 rounded hide-scrollbar">
-              {chatLog.map((chat) => (
-                chat.nickname === localStorage.getItem('userName') ? (
+            <div
+              id="chat-log"
+              className="h-80 overflow-auto p-4 bg-gray-200 rounded hide-scrollbar"
+            >
+              {chatLog.map((chat) =>
+                chat.nickname === localStorage.getItem("userName") ? (
                   // admin인 경우의 스타일
-                  
-                  <div key={chat.id} className="flex flex-row-reverse chat-message admin-message mr-2" style={{
-                    minWidth: '30px',
-                    
-                  
-                    margin: '5px 0', // 상하 마진 추가로 이미지와 메시지 사이 간격 조정
-                    wordWrap: 'break-word',
-                  }}>
-                      <img className="rounded-full w-12 h-12 border-[1px] border-light_gray" src={localStorage.getItem("profileImage")} alt="" style={{
-                          marginRight: '10px', // 이미지와 텍스트 사이 간격
-                          
-                        }} />
-                        <div className="bg-[#5aa5ff] break-all drop-shadow-md text-sm max-w-40 min-w-12 font-Nanum px-3 rounded-lg mr-3 text-center flex justify-center items-center text-white">
-                        {chat.message}
-                        </div>
+
+                  <div
+                    key={chat.id}
+                    className="flex flex-row-reverse chat-message admin-message mr-2"
+                    style={{
+                      minWidth: "30px",
+
+                      margin: "5px 0", // 상하 마진 추가로 이미지와 메시지 사이 간격 조정
+                      wordWrap: "break-word",
+                    }}
+                  >
+                    <img
+                      className="rounded-full w-12 h-12 border-[1px] border-light_gray"
+                      src={localStorage.getItem("profileImage")}
+                      alt=""
+                      style={{
+                        marginRight: "10px", // 이미지와 텍스트 사이 간격
+                      }}
+                    />
+                    <div className="bg-[#5aa5ff] break-all drop-shadow-md text-sm max-w-40 min-w-12 font-Nanum px-3 rounded-lg mr-3 text-center flex justify-center items-center text-white">
+                      {chat.message}
+                    </div>
                   </div>
                 ) : (
                   // admin이 아닌 경우의 기본 스타일
-                  <div key={chat.id} className="flex  flex-row chat-message admin-message mr-2" style={{
-                    minWidth: '30px',
-                    
-                  
-                    margin: '5px 0', // 상하 마진 추가로 이미지와 메시지 사이 간격 조정
-                    wordWrap: 'break-word',
-                  }}>
-                      <img className="rounded-full w-12 h-12 border-[1px] border-light_gray" src={localStorage.getItem("profileImage")} alt="" style={{
-                          marginRight: '10px', // 이미지와 텍스트 사이 간격
-                        }} />
-                        <div className="bg-white break-all drop-shadow-md font-Nanum text-sm px-3 max-w-40 rounded-lg mr-3 text-center flex justify-center items-center">
-                        {chat.message}
-                        </div>
+                  <div
+                    key={chat.id}
+                    className="flex  flex-row chat-message admin-message mr-2"
+                    style={{
+                      minWidth: "30px",
+
+                      margin: "5px 0", // 상하 마진 추가로 이미지와 메시지 사이 간격 조정
+                      wordWrap: "break-word",
+                    }}
+                  >
+                    <img
+                      className="rounded-full w-12 h-12 border-[1px] border-light_gray"
+                      src={localStorage.getItem("profileImage")}
+                      alt=""
+                      style={{
+                        marginRight: "10px", // 이미지와 텍스트 사이 간격
+                      }}
+                    />
+                    <div className="bg-white break-all drop-shadow-md font-Nanum text-sm px-3 max-w-40 rounded-lg mr-3 text-center flex justify-center items-center">
+                      {chat.message}
+                    </div>
                   </div>
                 )
-              ))}
-               <div ref={chatLogEndRef} />
+              )}
+              <div ref={chatLogEndRef} />
             </div>
-             <div>
+            <div>
               <hr className="bg-gray opacity-10 mt-1"></hr>
-             </div>
+            </div>
             <div className="flex flex-row">
               <input
                 type="text"
@@ -1256,37 +2263,76 @@ const BoardTemplate3 = () => {
                 placeholder="메시지를 입력하세요"
                 className=" p-2 rounded flex w-64 h-12 text-sm focus:outline-none"
                 onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
+                  if (e.key === "Enter") {
                     e.preventDefault(); // 폼 제출을 방지
                     sendInfoToServer();
-
                   }
                 }}
               />
-              <svg className="w-6 h-6 mt-3 ml-3 cursor-pointer drop-shadow" onClick={sendInfoToServer} viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><path d="m511.6 36.86-64 415.1a32.008 32.008 0 0 1-31.65 27.147c-4.188 0-8.319-.815-12.29-2.472l-122.6-51.1-50.86 76.29C226.3 508.5 219.8 512 212.8 512c-11.5 0-20.8-9.3-20.8-20.8v-96.18c0-7.115 2.372-14.03 6.742-19.64L416 96 122.3 360.3 19.69 317.5C8.438 312.8.812 302.2.062 289.1s5.47-23.72 16.06-29.77l448-255.1c10.69-6.109 23.88-5.547 34 1.406S513.5 24.72 511.6 36.86z" fill="#bdbdbd" ></path></svg>
+              <svg
+                className="w-6 h-6 mt-3 ml-3 cursor-pointer drop-shadow"
+                onClick={sendInfoToServer}
+                viewBox="0 0 512 512"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="m511.6 36.86-64 415.1a32.008 32.008 0 0 1-31.65 27.147c-4.188 0-8.319-.815-12.29-2.472l-122.6-51.1-50.86 76.29C226.3 508.5 219.8 512 212.8 512c-11.5 0-20.8-9.3-20.8-20.8v-96.18c0-7.115 2.372-14.03 6.742-19.64L416 96 122.3 360.3 19.69 317.5C8.438 312.8.812 302.2.062 289.1s5.47-23.72 16.06-29.77l448-255.1c10.69-6.109 23.88-5.547 34 1.406S513.5 24.72 511.6 36.86z"
+                  fill="#bdbdbd"
+                ></path>
+              </svg>
             </div>
-           
-            </div>
-           
+          </div>
         </div>
       </div>
 
       {/* 오른쪽 윗 블록 */}
-      <div className='absolute top-6 right-32 justify-center bg-white rounded-md w-64 h-[50px] gap-8 flex  items-center flex-row shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]'>
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="hover:stroke-blue w-7 h-7 cursor-pointer">
-        <path strokeLinecap="round" strokeLinejoin="round" d="m15.75 10.5 4.72-4.72a.75.75 0 0 1 1.28.53v11.38a.75.75 0 0 1-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 0 0 2.25-2.25v-9a2.25 2.25 0 0 0-2.25-2.25h-9A2.25 2.25 0 0 0 2.25 7.5v9a2.25 2.25 0 0 0 2.25 2.25Z" />
+      <div className="absolute top-6 right-32 justify-center bg-white rounded-md w-64 h-[50px] gap-8 flex  items-center flex-row shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          strokeWidth={1.5}
+          stroke="currentColor"
+          className="hover:stroke-blue w-7 h-7 cursor-pointer"
+          onClick={toggleVisibility}
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="m15.75 10.5 4.72-4.72a.75.75 0 0 1 1.28.53v11.38a.75.75 0 0 1-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 0 0 2.25-2.25v-9a2.25 2.25 0 0 0-2.25-2.25h-9A2.25 2.25 0 0 0 2.25 7.5v9a2.25 2.25 0 0 0 2.25 2.25Z"
+          />
         </svg>
 
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="hover:stroke-blue w-7 h-7 cursor-pointer">
-        <path strokeLinecap="round" strokeLinejoin="round" d="M12 18.75a6 6 0 0 0 6-6v-1.5m-6 7.5a6 6 0 0 1-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 0 1-3-3V4.5a3 3 0 1 1 6 0v8.25a3 3 0 0 1-3 3Z" />
+
+        <svg
+          className="hover:stroke-blue w-7 h-7 cursor-pointer"
+          onClick={chatToggle}
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          strokeWidth={1.5}
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M8.625 9.75a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375m-13.5 3.01c0 1.6 1.123 2.994 2.707 3.227 1.087.16 2.185.283 3.293.369V21l4.184-4.183a1.14 1.14 0 0 1 .778-.332 48.294 48.294 0 0 0 5.83-.498c1.585-.233 2.708-1.626 2.708-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z"
+          />
         </svg>
 
-        <svg className="hover:stroke-blue w-7 h-7 cursor-pointer" onClick={chatToggle} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" >
-        <path strokeLinecap="round" strokeLinejoin="round" d="M8.625 9.75a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375m-13.5 3.01c0 1.6 1.123 2.994 2.707 3.227 1.087.16 2.185.283 3.293.369V21l4.184-4.183a1.14 1.14 0 0 1 .778-.332 48.294 48.294 0 0 0 5.83-.498c1.585-.233 2.708-1.626 2.708-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z" />
-        </svg>
-
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidtfh={1.5} stroke="currentColor" className="hover:stroke-blue w-7 h-7 cursor-pointer">
-        <path strokeLinecap="round" strokeLinejoin="round" d="M9 8.25H7.5a2.25 2.25 0 0 0-2.25 2.25v9a2.25 2.25 0 0 0 2.25 2.25h9a2.25 2.25 0 0 0 2.25-2.25v-9a2.25 2.25 0 0 0-2.25-2.25H15m0-3-3-3m0 0-3 3m3-3V15" />
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          strokeWidtfh={1.5}
+          stroke="currentColor"
+          className="hover:stroke-blue w-7 h-7 cursor-pointer"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M9 8.25H7.5a2.25 2.25 0 0 0-2.25 2.25v9a2.25 2.25 0 0 0 2.25 2.25h9a2.25 2.25 0 0 0 2.25-2.25v-9a2.25 2.25 0 0 0-2.25-2.25H15m0-3-3-3m0 0-3 3m3-3V15"
+          />
         </svg>
       </div>
 
@@ -1336,7 +2382,7 @@ const BoardTemplate3 = () => {
       </div>
 
       {/* 이미지 툴 */}
-    
+
       {imgMenuToggle && (
         <div className="absolute left-[80px] bottom-5">
           {" "}
@@ -1345,12 +2391,25 @@ const BoardTemplate3 = () => {
         </div>
       )}
 
+      {/* 사용자 아이디어 작성 영역 - 템플릿의 inputText 관련 */}
+      <div className="top-5 ml-[500px] absolute flex  rounded-2xl items-center bg-transparent border-none shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]">
+        <input
+          ref={ref2}
+          className="h-[70px] w-[500px] text-center text-5xl font-Nanum rounded-2xl bg-transparent border-none"
+          type="text"
+          placeholder="Write Your iDEA"
+          value={inputText}
+          onChange={handleInputTextChange}
+          maxLength={9} // 최대 글자 수를 조정할 수 있습니다.
+        />
+      </div>
+
       {/* 그리는 구역 */}
       <div className="ml-36 mt-24 h-96 w-96">
         <Stage
           ref={stageRef}
-          width={window.innerWidth*0.85}
-          height={window.innerHeight*0.85}
+          width={window.innerWidth * 0.85}
+          height={window.innerHeight * 0.85}
           draggable={!draggable}
           onWheel={zoomOnWheel}
           onMouseDown={handleMouseDown}
@@ -1360,6 +2419,18 @@ const BoardTemplate3 = () => {
           onClick={handleLayerClick}
         >
           <Layer ref={layerRef}>
+            {/* Template3 - 7Check에 대한 템플릿 정보 출력 */}
+            <TemplateImageComponent
+              src={templateImage3.src}
+              x={templateImage3.x}
+              y={templateImage3.y}
+              z={templateImage3.z}
+              width={templateImage3.width}
+              height={templateImage3.height}
+              rotation={templateImage3.rotation}
+              scaleX={templateImage3.scaleX}
+              scaleY={templateImage3.scaleY}
+            />
             {drawing && (
               <Line
                 points={currentLine}
@@ -1428,6 +2499,7 @@ const BoardTemplate3 = () => {
                 );
               }
             })}
+
             {texts.map((text, id) => (
               <TextComponent
                 key={text.id}
@@ -1448,7 +2520,8 @@ const BoardTemplate3 = () => {
               />
             ))}
 
-            {images.map((img) => (
+            {/* 이미지 띄우고 저장하는 원본 코드 */}
+            {/* {images.map((img) => (
               <ImgComponent
                 key={img.id}
                 id={img.id}
@@ -1462,7 +2535,38 @@ const BoardTemplate3 = () => {
                   handleShapeClick(img.id, e);
                 }}
               />
-            ))}
+            ))} */}
+
+            {/* {images.map((img, index) => (
+              img.id === undefined ? (
+                <TemplateImageComponent
+                  key={index}
+                  image={img}
+                  x={img.x}
+                  y={img.y}
+                  width={img.width}
+                  height={img.height}
+                  rotation={img.rotation}
+                  scaleX={img.scaleX}
+                  scaleY={img.scaleY}
+                  color={img.color}
+                />
+              ) : (
+                <ImgComponent
+                  key={img.id}
+                  id={img.id}
+                  ty={img.ty}
+                  ref={ImageRef}
+                  imageSrc={img.src}
+                  x={img.x}
+                  y={img.y}
+                  isSelected={img.id === selectedId}
+                  onSelect={(e) => {
+                    handleShapeClick(img.id, e);
+                  }}
+                />
+              )
+            ))} */}
 
             {selectedId && (
               <Transformer
@@ -1484,5 +2588,23 @@ const BoardTemplate3 = () => {
     </div>
   );
 };
+
+function Video({ stream }) {
+  const ref = useRef();
+
+  useEffect(() => {
+    if (ref.current) {
+      ref.current.srcObject = stream;
+    }
+  }, [stream]);
+
+  return (
+    <video
+      ref={ref}
+      autoPlay
+      className="w-[150px] m-2 p-2.5" // Tailwind CSS 클래스 적용
+    />
+  );
+}
 
 export default BoardTemplate3;

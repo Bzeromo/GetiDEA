@@ -23,13 +23,15 @@ const addFunction = (
   setImageCounter,
   idCounter,
   setIdCounter,
+  strokeCurrentColor,
 ) => {
   const addRectangle = (type) => {
     setIdCounter(idCounter+1);
     const newShape = {
       id: `${type}${uuidv4()}`,
       type: "Rect",
-      stroke: selectStroke,
+      stroke: strokeCurrentColor,
+      strokeWidth : 3,
       x: 50,
       y: 50,
       width: 100,
@@ -47,7 +49,8 @@ const addFunction = (
     const newShape = {
       id: `${type}${uuidv4()}`,
       type: "Circle",
-      stroke: selectStroke,
+      stroke: strokeCurrentColor,
+      strokeWidth : 3,
       x: 50,
       y: 50,
       radius: 50,
@@ -62,7 +65,8 @@ const addFunction = (
     const newShape = {
       id: `${type}${uuidv4()}`,
       type: "RegularPolygon",
-      stroke: selectStroke,
+      stroke: strokeCurrentColor,
+      strokeWidth : 3,
       x: 50,
       y: 50,
       sides: 3,
