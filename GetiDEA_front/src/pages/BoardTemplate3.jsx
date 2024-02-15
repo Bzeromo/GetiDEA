@@ -1685,8 +1685,8 @@ const BoardTemplate3 = () => {
         </div>
       )}
 
-      {/* 튜토리얼을 위한 영역 - 사용자 아이디어 작성 영역 */}
-      <div className="bottom-2 ml-[500px] absolute flex justify-center items-center rounded-2xl bg-transparent border-none shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]">
+      {/* 사용자 아이디어 작성 영역 - 템플릿의 inputText 관련 */}
+      <div className="top-5 ml-[500px] absolute flex justify-center rounded-2xl items-center bg-transparent border-none shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]">
         <input
           ref={ref2}
           className="h-[70px] min-w-[100px] max-w-[1300px] text-center text-5xl font-Nanum rounded-2xl bg-transparent border-none"
@@ -1831,7 +1831,7 @@ const BoardTemplate3 = () => {
               />
             ))} */}
 
-            {images.map((img, index) => (
+            {/* {images.map((img, index) => (
               img.id === undefined ? (
                 <TemplateImageComponent
                   key={index}
@@ -1860,7 +1860,7 @@ const BoardTemplate3 = () => {
                   }}
                 />
               )
-            ))}
+            ))} */}
 
             {selectedId && (
               <Transformer
@@ -1880,6 +1880,8 @@ const BoardTemplate3 = () => {
         </Stage>
       </div>
     </div>
+
+    
   );
 };
 

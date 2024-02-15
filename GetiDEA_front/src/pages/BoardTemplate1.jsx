@@ -1542,7 +1542,7 @@ const BoardTemplate1 = () => {
               />
             ))} */}
 
-            {images.map((img, index) => (
+            {/* {images.map((img, index) => (
               img.id === undefined ? (
                 <TemplateImageComponent
                   key={index}
@@ -1571,7 +1571,7 @@ const BoardTemplate1 = () => {
                   }}
                 />
               )
-            ))}
+            ))} */}
 
 
             {/* 원본 코드 */}
