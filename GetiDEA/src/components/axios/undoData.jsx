@@ -1,4 +1,4 @@
-import axios from "axios";
+import api from "../../api";
 
 const undoData = (
   projectId,
@@ -11,9 +11,9 @@ const undoData = (
   sendInfoToServer
 ) => {
   const undoEvent = () => {
-    axios
+    api
       .get(
-        `http://localhost:8080/api/project/rollback?projectId=${projectId}&userEmail=${userEmail}`
+        `/api/project/rollback?projectId=${projectId}&userEmail=${userEmail}`
       )
       .then((response) => {
         console.log(response);

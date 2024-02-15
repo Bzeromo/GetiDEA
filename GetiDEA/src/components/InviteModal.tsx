@@ -31,11 +31,12 @@ const InviteModal: React.FC<InviteModalProps> = ({ isOpen, closeModal ,projectId
 
    const failAlert = async() => {
     await Swal.fire({
-         text: '이미 초대된 유저입니다.',
+         text: '이미 초대한 유저입니다.',
        icon: 'error',
        confirmButtonText: '확인'
      });
    };
+
   useEffect(() => {
    
     console.log(`프로젝트 아이디 : ${projectId}`)
@@ -105,7 +106,7 @@ const InviteModal: React.FC<InviteModalProps> = ({ isOpen, closeModal ,projectId
                             <div className="space-y-2 mt-3">
                                 <h2 className="mb-1 text-2xl text-center text-Nanum  font-regular rotate-[-0.03deg]">초대하기
                                 </h2>
-                                <h2 className="mb-8 text-sm text-center text-Nanum  font-light rotate-[-0.03deg]">같이 프로젝트에 참여할 팀원들을 초대하세요
+                                <h2 className="mb-8 text-sm text-center text-Nanum font-light rotate-[-0.03deg]">같이 프로젝트에 참여할 팀원들을 초대하세요
                                 </h2>
                             </div>
 

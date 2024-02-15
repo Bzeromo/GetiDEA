@@ -72,8 +72,8 @@ const TemplateSelect: React.FC = () => {
             <div className={!isSelected[2] ? 'flex flex-col items-center cursor-pointer w-72 h-[380px] bg-white  rounded-md shadow-[rgba(0,_0,_0,_0.25)_0px_4px_15px_0px]'
             : 'flex flex-col items-center  w-72 h-[380px] bg-white  rounded-md shadow-[rgba(0,_0,_0,_0.25)_0px_4px_15px_0px] border border-[3.5px] border-main'    
         } onClick={() => select(2)}>
-            <img src="/bubbleChat.png" alt="" className='w-80 h-64 mt-4 ' />
-                <div className='font-IBM  text-lg font-normal rotate-[-0.03deg] mt-3'>아이디어 말풍선</div>
+            <img src="/bubbleChat.png" alt="" className='w-80 h-56 mt-4 ' />
+                <div className='font-IBM  text-lg font-normal rotate-[-0.03deg] '>랜덤 버블</div>
                 <div className='text-center mt-2 font-IBM text-sm rotate-[-0.03deg] text-[#666666]'>
                     원하는 주제를 중심으로 랜덤한 단어들을
                     <br/> 조합시켜 폭넓은 아이디어 구상을 하게 
@@ -91,9 +91,9 @@ const TemplateSelect: React.FC = () => {
             <img src="/six thinking hats.png" alt="" className='w-64 h-40 mt-8 ' />
                 <div className='font-IBM  text-lg font-normal rotate-[-0.03deg] mt-10'>6개의 생각하는 모자</div>
                 <div className='text-center mt-2 font-IBM text-sm rotate-[-0.03deg] text-[#666666]'>
-                여섯 가지 관점으로 역할을 나누어
-                    <br/>의도적으로 한 가지만 사고하게 함으로써 
-                    <br/>제한시간 내 아이디어를 도출하는 기법입니다.
+                6가지 색상의 모자를 활용하여
+                    <br/>각 색상에 해당하는 사고 방식에 집중함으로써
+                    <br/>아이디어를 창출하는 방법입니다. 
                 </div>
                 <div className={!isSelected[3] ? 'invisible':'visible'}>
                  <img src="/check.svg" alt="" className='ml-56 w-10 h-10'/>
@@ -106,9 +106,9 @@ const TemplateSelect: React.FC = () => {
             <img src="/7Check.png" alt="" className='w-64 h-32 mt-16 ' />
                 <div className='font-IBM  text-lg font-normal rotate-[-0.03deg] mt-10'>7 Check</div>
                 <div className='text-center mt-2 font-IBM font-normal text-sm rotate-[-0.03deg] text-[#666666]'>
-                    특정 아이디어를 분석하고 확장하는데 있어
-                    <br/>7개의 키워드를 통한 다양한 시각으로
-                    <br/>접근하는 기법입니다.
+                아이디어 관련 7가지 체크포인트를
+                    <br/>한가지씩 점검해보며
+                    <br/>다양한 시각으로 접근하는 기법입니다.
                 </div>
                 <div className={!isSelected[4] ? 'invisible':'visible'}>
                  <img src="/check.svg" alt="" className='ml-56 w-10 h-10'/>

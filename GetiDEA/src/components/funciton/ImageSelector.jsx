@@ -47,7 +47,7 @@ const ImageSelector = ({ onImageSelect }) => {
     "/img/template1_bubble_chat/bubble_chat_set_removebg.png",
     
     // template 2 : six hats 관련 이미지
-    "/img/template2_6hats/template2.png",
+    "/img/template2_6hats/template2_6hats.png",
     "/img/template2_6hats/hat1_white.svg",
     "/img/template2_6hats/hat2_red.svg",
     "/img/template2_6hats/hat3_yellow.svg",
