@@ -263,7 +263,10 @@ const BoardTemplate1 = () => {
       if (peerId) {
         const data = JSON.stringify({ peerId: peerId, projectId: projectId });
         const blob = new Blob([data], { type: "application/json" });
-        const beaconSent = navigator.sendBeacon("http://localhost:5000/unregister", blob);
+        const beaconSent = navigator.sendBeacon(
+          "http://localhost:5000/unregister",
+          blob
+        );
         console.log("Beacon sent: ", beaconSent);
       }
     };
@@ -1178,52 +1181,7 @@ const BoardTemplate1 = () => {
 
   // 튜토리얼 Number & Button
   const [activatedNumber, setActivateNumber] = useState(0);
-  const FirstButton = (
-    <button
-      className="text-blue"
-      onClick={() => setActivateNumber(activatedNumber - 1)}
-    >
-      {" "}
-      닫기{" "}
-    </button>
-  );
-  const PrevButton = (
-    <button
-      className="text-blue"
-      onClick={() => setActivateNumber(activatedNumber - 1)}
-    >
-      {" "}
-      이전{" "}
-    </button>
-  );
-  const NextButton = (
-    <button
-      className="text-blue"
-      onClick={() => setActivateNumber(activatedNumber + 1)}
-    >
-      {" "}
-      다음{" "}
-    </button>
-  );
-  const FinButton = (
-    <button
-      className="text-blue"
-      onClick={() => setActivateNumber(activatedNumber + 1)}
-    >
-      {" "}
-      완료{" "}
-    </button>
-  );
-  const TutorialCheckButton = (
-    <button
-      className="text-blue"
-      onClick={() => setActivateNumber(activatedNumber + 1)}
-    >
-      {" "}
-      확인{" "}
-    </button>
-  );
-
+ 
   // 튜토리얼 버튼 함수
   const startTutorial = () => {
     resetZoom();
@@ -1254,12 +1212,18 @@ const BoardTemplate1 = () => {
           </p>
 
           <div className="flex justify-between items-center mt-8">
-            <button className="bg-blue-500 hover:bg-blue-700 text-white font-Nanum font-bold py-2 px-4 rounded shadow">
-              {FirstButton}
+            <button
+              className="bg-blue-500 hover:bg-blue-700 text-blue font-Nanum font-bold py-2 px-4 rounded shadow"
+              onClick={() => setActivateNumber(activatedNumber - 1)}
+            >
+              닫기
             </button>
             <span className="text-blue-800 font-Nanum">1 / 4</span>
-            <button className="bg-blue-500 hover:bg-blue-700 text-white font-Nanum font-bold py-2 px-4 rounded shadow">
-              {NextButton}
+            <button
+              className="bg-blue-500 hover:bg-blue-700 text-blue font-Nanum font-bold py-2 px-4 rounded shadow"
+              onClick={() => setActivateNumber(activatedNumber + 1)}
+            >
+              다음
             </button>
           </div>
         </div>
@@ -1277,7 +1241,20 @@ const BoardTemplate1 = () => {
               className="bg-blue-500 hover:bg-blue-700 text-black font-Nanum font-bold text-2xl"
               onClick={() => endTutorial()}
             >
-              X
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={1.5}
+                stroke="currentColor"
+                className="w-6 h-6"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M6 18 18 6M6 6l12 12"
+                />
+              </svg>
             </button>
           </div>
 
@@ -1292,12 +1269,18 @@ const BoardTemplate1 = () => {
           </p>
 
           <div className="flex justify-between items-center mt-8">
-            <button className="bg-blue-500 hover:bg-blue-700 text-white font-Nanum font-bold py-2 px-4 rounded shadow">
-              {PrevButton}
+            <button
+              className="bg-blue-500 hover:bg-blue-700 text-blue font-Nanum font-bold py-2 px-4 rounded shadow"
+              onClick={() => setActivateNumber(activatedNumber - 1)}
+            >
+              이전
             </button>
             <span className="text-blue-800 font-Nanum">2 / 4</span>
-            <button className="bg-blue-500 hover:bg-blue-700 text-white font-Nanum font-bold py-2 px-4 rounded shadow">
-              {NextButton}
+            <button
+              className="bg-blue-500 hover:bg-blue-700 text-blue font-Nanum font-bold py-2 px-4 rounded shadow"
+              onClick={() => setActivateNumber(activatedNumber + 1)}
+            >
+              다음
             </button>
           </div>
         </div>
@@ -1315,7 +1298,20 @@ const BoardTemplate1 = () => {
               className="bg-blue-500 hover:bg-blue-700 text-black font-Nanum font-bold text-2xl"
               onClick={() => endTutorial()}
             >
-              X
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={1.5}
+                stroke="currentColor"
+                className="w-6 h-6"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M6 18 18 6M6 6l12 12"
+                />
+              </svg>
             </button>
           </div>
 
@@ -1327,12 +1323,18 @@ const BoardTemplate1 = () => {
           </p>
 
           <div className="flex justify-between items-center mt-8">
-            <button className="bg-blue-500 hover:bg-blue-700 text-white font-Nanum font-bold py-2 px-4 rounded shadow">
-              {PrevButton}
+            <button
+              className="bg-blue-500 hover:bg-blue-700 text-blue font-Nanum font-bold py-2 px-4 rounded shadow"
+              onClick={() => setActivateNumber(activatedNumber - 1)}
+            >
+              이전
             </button>
             <span className="text-blue-800 font-Nanum">3 / 4</span>
-            <button className="bg-blue-500 hover:bg-blue-700 text-white font-Nanum font-bold py-2 px-4 rounded shadow">
-              {NextButton}
+            <button
+              className="bg-blue-500 hover:bg-blue-700 text-blue font-Nanum font-bold py-2 px-4 rounded shadow"
+              onClick={() => setActivateNumber(activatedNumber + 1)}
+            >
+              다음
             </button>
           </div>
         </div>
@@ -1350,10 +1352,23 @@ const BoardTemplate1 = () => {
               className="bg-blue-500 hover:bg-blue-700 text-black font-Nanum font-bold text-2xl"
               onClick={() => endTutorial()}
             >
-              X
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={1.5}
+                stroke="currentColor"
+                className="w-6 h-6"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M6 18 18 6M6 6l12 12"
+                />
+              </svg>
             </button>
           </div>
-          
+
           <p className="text-center font-Nanum font-bold text-xl">
             두 단어를 결합하여
           </p>
@@ -1365,12 +1380,18 @@ const BoardTemplate1 = () => {
           </p>
 
           <div className="flex justify-between items-center mt-8">
-            <button className="bg-blue-500 hover:bg-blue-700 text-white font-Nanum font-bold py-2 px-4 rounded shadow">
-              {PrevButton}
+            <button
+              className="bg-blue-500 hover:bg-blue-700 text-blue font-Nanum font-bold py-2 px-4 rounded shadow"
+              onClick={() => setActivateNumber(activatedNumber - 1)}
+            >
+              이전
             </button>
             <span className="text-blue-800 font-Nanum">4 / 4</span>
-            <button className="bg-blue-500 hover:bg-blue-700 text-white font-Nanum font-bold py-2 px-4 rounded shadow">
-              {NextButton}
+            <button
+              className="bg-blue-500 hover:bg-blue-700 text-blue font-Nanum font-bold py-2 px-4 rounded shadow"
+              onClick={() => setActivateNumber(activatedNumber + 1)}
+            >
+              다음
             </button>
           </div>
         </div>
@@ -1408,8 +1429,11 @@ const BoardTemplate1 = () => {
           <p className="text-center font-Nanum font-bold text-2xl">
             튜토리얼 다시보기는 여기를 클릭하세요!
           </p>
-          <button className="ml-7 bg-blue-500 hover:bg-blue-700 text-white font-Nanum font-bold py-2 px-4 rounded shadow">
-            {TutorialCheckButton}
+          <button
+            className="ml-7 bg-blue-500 hover:bg-blue-700 text-blue font-Nanum font-bold py-2 px-4 rounded shadow"
+            onClick={() => setActivateNumber(activatedNumber + 1)}
+          >
+            확인
           </button>
         </div>
       ),
@@ -2254,6 +2278,5 @@ function Video({ stream }) {
     />
   );
 }
-
 
 export default BoardTemplate1;
