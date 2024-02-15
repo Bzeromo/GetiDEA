@@ -47,7 +47,7 @@ public class LocationController {
 
     @PostMapping("/invite") // 유저 초대시 로케이션 생성
     @Operation(summary = "프로젝트에 유저 초대 - 테스트 완료", description = "프로젝트에 유저 초대 -> 초대받은 유저 정보를 기반으로 location 엔티티 생성")
-    public ResponseEntity<LocationEntity> inviteUser(
+    public ResponseEntity<?> inviteUser(
             @RequestBody @Parameter(description = "초대할 userEmail, 초대 프로젝트 ID") LocationDTO data) {
         // 이 작업은 프로젝트 내부에서 실행되므로 projectId 정보가 클라이언트에 있다는 것을 가정
 
@@ -58,10 +58,13 @@ public class LocationController {
             if (userName != null) { // 사용자가 없으면 실행하지 않음
                 LocationEntity createdEntity = locationService.createLocation(data.getUserEmail(),
                     data.getProjectId(), project.get().getProjectName(), "GetIdeaMain");
+                if(createdEntity == null){
+                    return ResponseEntity.badRequest().body(new ErrorResponse("이미 초대된 사용자입니다."));
+                }
                 return ResponseEntity.ok(createdEntity);
             }
         }
-        return ResponseEntity.notFound().build();
+        return ResponseEntity.badRequest().body(new ErrorResponse("유저 초대에 실패하였습니다."));
     }
 
     @PutMapping("/move") // 프로젝트를 디폴트에서 폴더로 지정시키면 폴더 이름을 바꿔줌

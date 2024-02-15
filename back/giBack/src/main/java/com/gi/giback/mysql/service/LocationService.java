@@ -26,6 +26,10 @@ public class LocationService {
     }
 
     public LocationEntity createLocation(String userEmail, Long projectId, String projectName, String folderName) {
+        if(checkLocation(userEmail, projectId)) {
+            return null;
+        }
+
         LocationEntity locationEntity = LocationEntity.builder()
                 .userEmail(userEmail)
                 .projectId(projectId)
@@ -33,6 +37,10 @@ public class LocationService {
                 .folderName(folderName)
                 .build();
         return locationRepository.save(locationEntity);
+    }
+
+    private boolean checkLocation(String userEmail, Long projectId) {
+        return locationRepository.findByProjectIdAndUserEmail(projectId, userEmail).isPresent() ;
     }
 
     public List<LocationEntity> getLocationEntityByUserEmail(String userEmail) {
