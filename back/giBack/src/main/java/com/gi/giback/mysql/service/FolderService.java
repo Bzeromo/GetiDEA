@@ -1,6 +1,8 @@
 package com.gi.giback.mysql.service;
 
+import com.gi.giback.dto.FolderNameDTO;
 import com.gi.giback.mysql.entity.FolderEntity;
+import com.gi.giback.mysql.entity.LocationEntity;
 import com.gi.giback.mysql.repository.FolderRepository;
 import java.util.List;
 import java.util.Optional;
@@ -13,13 +15,20 @@ import org.springframework.stereotype.Service;
 public class FolderService {
 
     private final FolderRepository folderRepository;
+    private final LocationService locationService;
 
     @Autowired
-    public FolderService(FolderRepository folderRepository) {
+    public FolderService(FolderRepository folderRepository, LocationService locationService) {
         this.folderRepository = folderRepository;
+        this.locationService = locationService;
     }
 
-    public FolderEntity createFolder(FolderEntity folder) {
+    public FolderEntity createFolder(String folderName, String userEmail) {
+        FolderEntity folder = new FolderEntity();
+
+        folder.setUserEmail(userEmail);
+        folder.setFolderName(folderName);
+
         log.info("Create folder : {}", folder.getFolderName());
         try {
             return folderRepository.save(folder);
@@ -33,29 +42,59 @@ public class FolderService {
         return folderRepository.findByUserEmail(userEmail);
     }
 
-    public void deleteFolder(String userEmail, String folderName) {
-        log.info("Delete User's folder : {}", folderName);
-        folderRepository.deleteByUserEmailAndFolderName(userEmail, folderName);
+    public void deleteFolder(Long folderId) {
+
+        Optional<FolderEntity> entity = folderRepository.findFirstByFolderId(folderId);
+        if(entity.isPresent()){
+            FolderEntity folder = entity.get();
+            String userEmail = folder.getUserEmail();
+            String folderName = folder.getFolderName();
+
+            List<LocationEntity> locations = locationService.getLocationsByUserEmailAndFolderName(userEmail, folderName);
+
+            for (LocationEntity location : locations) {
+                Long pid = location.getProjectId();
+
+                locationService.deleteLocationByUserEmailAndProjectId(userEmail, pid);
+            }
+            folderRepository.deleteByUserEmailAndFolderName(userEmail, folderName);
+        }
     }
 
-    public Optional<FolderEntity> getFolderByFolderName(String folderName) {
+    public Optional<FolderEntity> getFolderByFolderName(String userEmail, String folderName) {
         log.info("Get folder : {}", folderName);
-        return folderRepository.findFirstByFolderName(folderName);
+        return folderRepository.findFirstByUserEmailAndFolderName(userEmail, folderName);
     }
 
-    public FolderEntity updateFolderName(String userEmail, String oldFolderName, String newFolderName) {
-        Optional<FolderEntity> folder = folderRepository.findFirstByUserEmailAndFolderName(userEmail, oldFolderName);
-        log.info("Update folder name : {}", newFolderName);
-        if (folder.isPresent()) {
-            FolderEntity entity = folder.get();
+    public FolderEntity updateFolderName(FolderNameDTO data, String userEmail) {
+        String newFolderName = data.getNewFolderName();
+
+        Optional<FolderEntity> folderEntity = checkFolder(userEmail, data.getBeforeFolderName());
+        if (folderEntity.isPresent()) {
+            log.info("Update folder name : {}", newFolderName);
+            FolderEntity entity = folderEntity.get();
+
+            String beforeFolderName = entity.getFolderName();
+
+            List<LocationEntity> locationEntities = locationService.getLocationsByUserEmailAndFolderName(userEmail, beforeFolderName);
+
+            for (LocationEntity location : locationEntities) {
+                location.setFolderName(newFolderName);
+                locationService.saveLocation(location);
+            }
+
             entity.setFolderName(newFolderName);
             return folderRepository.save(entity);
         }
         return null; // or throw an exception
     }
 
-    public boolean checkFolder(String userEmail, String oldFolderName) {
-        Optional<FolderEntity> folder = folderRepository.findFirstByUserEmailAndFolderName(userEmail, oldFolderName);
+    public Optional<FolderEntity> checkFolder(String userEmail, String folderName) {
+        return folderRepository.findFirstByUserEmailAndFolderName(userEmail, folderName);
+    }
+
+    public boolean checkDuplicateFolder(String userEmail, String newFolderName) {
+        Optional<FolderEntity> folder = folderRepository.findFirstByUserEmailAndFolderName(userEmail, newFolderName);
         return (folder.isPresent());
     }
 }

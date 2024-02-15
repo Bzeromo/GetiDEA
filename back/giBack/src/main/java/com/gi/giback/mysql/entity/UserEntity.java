@@ -28,7 +28,6 @@ public class UserEntity {
     @Enumerated(EnumType.STRING)
     private OAuth2Provider provider;
     private String refreshToken;
-    //private boolean isAmdin;
 
     public void passwordEncode(PasswordEncoder passwordEncoder) {
         this.password = passwordEncoder.encode(this.password);
