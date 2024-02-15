@@ -26,7 +26,7 @@ pipeline {
                 echo 'Downloading build files from Nexus Repository...'
                 script {
                     withCredentials([usernamePassword(credentialsId: NEXUS_CREDENTIALS_ID, usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
-                        sh "curl -u \$USERNAME:\$PASSWORD \$NEXUS_URL/repository/\$NEXUS_BACK_REPOSITORY/front/gifront/.env -o GetiDEA_front/.env"
+                        sh "curl -u \$USERNAME:\$PASSWORD \$NEXUS_URL/repository/\$NEXUS_BACK_REPOSITORY/front/gifront/.env -o GetiDEA/.env"
                     }
 
                     withCredentials([usernamePassword(credentialsId: NEXUS_CREDENTIALS_ID, usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
@@ -48,7 +48,7 @@ pipeline {
 //                 sh 'docker-compose -f back/giBack/compose.yml up -d'
 //             }
 //         }
-//
+
 //         stage('Check DB Services Health') {
 //                     steps {
 //                         script {
@@ -85,7 +85,7 @@ pipeline {
                 }
             }
         }
-//
+
         stage('Deploy Back Server') {
             steps {
                 echo 'Deploying project...'
@@ -94,26 +94,19 @@ pipeline {
 //                     sh 'chmod +x libs'
 //                     // 빌드 실행
 //                     sh 'java -jar libs/getidea-0.1.0.jar'
-                       sh 'whoami'
+                    sh 'whoami'
                 }
             }
         }
 
         stage('Build Frontend') {
             steps {
-//                 script {
-//                     sh '''
-//                     export NVM_DIR="$HOME/.nvm"
-//                     [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-//                     nvm use 21.6.1
-//                     '''
-//                 }
                 echo 'Building frontend...'
                 dir('/front') {
                     // 의존성 설치
 //                     sh 'yarn install'
 //                     sh 'yarn start'
-                       sh 'whoami'
+                    sh 'whoami'
                 }
             }
         }
