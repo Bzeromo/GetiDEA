@@ -1,5 +1,6 @@
 // src/api/axios.js
 import axios from 'axios';
+import Cookies from 'js-cookie';
 
 // Axios 인스턴스 생성
 const api = axios.create({
@@ -9,9 +10,12 @@ const api = axios.create({
 // 요청 인터셉터 추가
 api.interceptors.request.use(
     config => {
-        const token = localStorage.getItem('accessToken');
-        if (token) {
-            config.headers['Authorization'] = `Bearer ${token}`;
+        // const token = localStorage.getItem('accessToken');
+        // const access_token = Cookies.get('access_token');
+        const access_token = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJqdW5neW9hbndvb0BuYXZlci5jb20iLCJpYXQiOjE3MDc5NjI0OTgsInVzZXJOYW1lIjoi7KCV7Jew7JqwIiwicHJvdmlkZXIiOiJLQUtBTyIsImV4cCI6MTcwNzk2NjA5OH0.iqPoafDntKIu-PCa5UZz9J7U-mzAMBDyB0srlKbeArUJsYHkhNxq8iUt19S0LA1Ou7dWTTedKpfcAuK6ZqWlMA";
+        
+        if (access_token) {
+            config.headers['Authorization'] = `Bearer ${access_token}`;
         }
         return config;
     },

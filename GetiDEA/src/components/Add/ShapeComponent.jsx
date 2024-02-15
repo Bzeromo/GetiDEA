@@ -1,15 +1,9 @@
-import React, { useRef, useEffect, useCallback } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import {
-  Stage,
-  Layer,
   Rect,
   Circle,
   RegularPolygon,
   Transformer,
-  Line,
-  Text,
-  Arrow,
-  Image,
 } from "react-konva";
 
 const ShapeComponent = ({ shapeProps, isSelected, onSelect, onChange }) => {
@@ -17,13 +11,12 @@ const ShapeComponent = ({ shapeProps, isSelected, onSelect, onChange }) => {
     const transformerRef = useRef();
   
     useEffect(() => {
-      if (isSelected && transformerRef.current) {
+      if (isSelected) {
         // 현재 도형에 Transformer 연결
         transformerRef.current.nodes([shapeRef.current]);
-        transformerRef.current.getLayer()?.batchDraw();
+        transformerRef.current.getLayer().batchDraw();
       }
     }, [isSelected]);
-    
   
     const renderShape = () => {
       const commonProps = {
@@ -52,7 +45,7 @@ const ShapeComponent = ({ shapeProps, isSelected, onSelect, onChange }) => {
   
       switch (shapeProps.type) {
         case "Rect":
-          return <Rect {...commonProps} ref={shapeRef}/>;
+          return <Rect {...commonProps} ref={shapeRef} />;
         case "Circle":
           return <Circle {...commonProps} ref={shapeRef}/>;
         case "RegularPolygon":

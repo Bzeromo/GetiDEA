@@ -1,95 +1,115 @@
-import React, { useState, useRef, useEffect, useCallback } from "react";
-import {
-  Stage,
-  Layer,
-  Rect,
-  Circle,
-  RegularPolygon,
-  Transformer,
-  Line,
-  Text,
-  Arrow,
-  Image,
-} from "react-konva";
+import React, { useState, useRef, useEffect } from "react";
+import { Text, Transformer } from "react-konva";
 
 const TextComponent = ({
-    textProps,
-    isSelected,
-    onSelect,
-    onChange,
-    onTextEdit,
-  }) => {
-    const textRef = useRef();
-    const transformerRef = useRef();
-    const [editing, setEditing] = useState(false);
-    const [text, setText] = useState(textProps.text);
-    const [showInput, setShowInput] = useState(true);
-  
-    useEffect(() => {
-      if (isSelected) {
-        transformerRef.current.nodes([textRef.current]);
-        transformerRef.current.getLayer().batchDraw();
-      }
-      // console.log(editing);
-    }, [isSelected]);
-  
-    useEffect(() => {
-      console.log(editing);
-    }, [editing]);
-  
-    const handleDoubleClick = () => {
-      console.log("더블 클릭됨"); // 로그 추가
-      setEditing((prevEditing) => !prevEditing);
-      // console.log(editing);
-      // console.log(editing);
-    };
-  
-    const handleChange = (e) => {
-      console.log("change1");
-      setText(e.target.value);
-    };
-  
-    const handleBlur = () => {
-      console.log("change2");
-      setEditing(false);
-      if (onTextEdit) {
-        onTextEdit({ ...textProps, text });
-      }
-      onChange({ ...textProps, text }); // 변경된 텍스트를 상위 컴포넌트에 전달
-    };
-  
-    return (
-      <>
-        {showInput && (
-          <input
-            type="text"
-            value={text}
-            onChange={handleChange}
-            onBlur={handleBlur}
-            style={{
-              position: "absolute",
-              top: `${textProps.y}px`, // 확인: 정확한 위치 설정
-              left: `${textProps.x}px`, // 확인: 정확한 위치 설정
-              zIndex: "1000",
-              // 추가 스타일링이 필요한 경우 여기에 추가
-              width: "100px",
-              height: "50px",
-              backgroundColor: "black",
-            }}
-            autoFocus
-          />
-        )}
-        <Text
-          ref={textRef}
-          {...textProps}
-          text={text}
-          draggable
-          onClick={onSelect}
-          onDblClick={handleDoubleClick}
-        />
-        {isSelected && <Transformer ref={transformerRef} />}
-      </>
-    );
+  text,
+  x,
+  y,
+  onTextChange,
+  onDragEnd,
+  isSelected,
+  // setIsSelected,
+  textProps,
+  onSelect,
+  selectedId,
+  setSelectedId,
+  // transformerRef,
+}) => {
+  const [textBox, setTextBox] = useState(text);
+  const [position, setPosition] = useState({ x, y });
+  const [isEditing, setIsEditing] = useState(false);
+  const textRef = useRef(null);
+  const transformerRef = useRef(null);
+
+  useEffect(() => {
+    setTextBox(textRef.current);
+  }, []);
+
+  useEffect(() => {
+    console.log(selectedId + " selected id 테스트용");
+  }, [selectedId]);
+
+  const handleTextSelect = (id) => {
+    setSelectedId(id);
+    console.log(id);
   };
 
-  export default TextComponent;
+  useEffect(() => {
+    if (isSelected) {
+      // 현재 도형에 Transformer 연결
+      console.log(isSelected);
+      transformerRef.current.nodes([textRef.current]);
+      transformerRef.current.getLayer().batchDraw();
+    }
+  }, [isSelected]);
+
+
+  const handleDblClick = () => {
+    if (!textBox) {
+      console.error("TextBox가 아직 설정되지 않았습니다.");
+      return;
+    }
+
+    setIsEditing(true);
+
+    // 텍스트 입력을 위한 HTML 텍스트 입력 필드 생성
+    const input = document.createElement("input");
+    input.value = textProps.text;
+    input.style.position = "absolute";
+    input.style.top = textBox.absolutePosition().y + 90 + "px";
+    input.style.left = textBox.absolutePosition().x + 140 + "px";
+    input.style.width = textBox.width() + 20 + "px";
+
+    document.body.appendChild(input);
+
+    input.focus();
+
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        onTextChange(e.target.value);
+        setIsEditing(false);
+        document.body.removeChild(input);
+      }
+    });
+  };
+
+  const handleSelectedId = (id) => {
+    console.log(id + " id 테스트용"); // id 값 로깅
+    setSelectedId(id); // 상태 업데이트 호출
+    // 이 시점에서는 상태 업데이트가 아직 반영되지 않았기 때문에,
+    // 아래의 로그에서는 업데이트 이전의 selectedId 값이 출력됩니다.
+    console.log(selectedId + " selected id 테스트용");
+  };
+
+  return (
+    <>
+      <Text
+        ref={textRef}
+        {...textProps}
+        x={textProps.x}
+        y={textProps.y}
+        text={textProps.text}
+        fontSize={textProps.fontSize}
+        draggable
+        ty="Text"
+        style={{ zIndex: 100 }} // z-index 설정
+        onClick={onSelect}
+        onDblClick={isEditing ? null : handleDblClick}
+      />
+      {isSelected && (
+        <Transformer
+          ref={transformerRef}
+          boundBoxFunc={(oldBox, newBox) => {
+            // 여기서 도형의 최소 크기 제한을 설정할 수 있습니다.
+            if (newBox.width < 5 || newBox.height < 5) {
+              return oldBox;
+            }
+            return newBox;
+          }}
+        />
+      )}
+    </>
+  );
+};
+
+export default TextComponent;
