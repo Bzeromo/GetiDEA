@@ -1191,12 +1191,24 @@ const BoardTemplate3 = () => {
     setActivateNumber(0);
   };
 
+  const endTutorial = () => {
+    setActivateNumber(11);
+  };
+
   const coachList = [
     {
       // 튜토리얼 1. 템플릿 소개 (overview)
       activate: activatedNumber === 0,
       component: (
         <div className="bg-white p-8 shadow-lg rounded-lg">
+                    <div className="flex justify-end">
+            <button
+              className="bg-blue-500 hover:bg-blue-700 text-black font-Nanum font-bold text-2xl"
+              onClick={() => endTutorial()}
+            >
+              X
+            </button>
+          </div>
           <p className="text-center font-Nanum font-bold text-2xl">
             세븐쳌 (7 Check)
           </p>
@@ -1226,6 +1238,14 @@ const BoardTemplate3 = () => {
       activate: activatedNumber === 1,
       component: (
         <div className="bg-white p-8 shadow-lg rounded-lg">
+                    <div className="flex justify-end">
+            <button
+              className="bg-blue-500 hover:bg-blue-700 text-black font-Nanum font-bold text-2xl"
+              onClick={() => endTutorial()}
+            >
+              X
+            </button>
+          </div>
           <p className="text-center font-Nanum font-bold text-2xl">
             Write Your iDEA!
           </p>
@@ -1252,6 +1272,14 @@ const BoardTemplate3 = () => {
       activate: activatedNumber === 2,
       component: (
         <div className="bg-white p-8 shadow-lg rounded-lg">
+                    <div className="flex justify-end">
+            <button
+              className="bg-blue-500 hover:bg-blue-700 text-black font-Nanum font-bold text-2xl"
+              onClick={() => endTutorial()}
+            >
+              X
+            </button>
+          </div>
           <p className="text-center font-Nanum font-bold text-l">
             각 카드의 예시를 참고하며
           </p>
@@ -1317,6 +1345,14 @@ const BoardTemplate3 = () => {
       activate: activatedNumber === 4,
       component: (
         <div className="bg-white p-8 shadow-lg rounded-lg">
+                    <div className="flex justify-end">
+            <button
+              className="bg-blue-500 hover:bg-blue-700 text-black font-Nanum font-bold text-2xl"
+              onClick={() => endTutorial()}
+            >
+              X
+            </button>
+          </div>
           <p className="text-center font-Nanum font-bold text-3xl text-[#FF8C00]">
             '확대 - Enlargement'
           </p>
@@ -1350,6 +1386,14 @@ const BoardTemplate3 = () => {
       activate: activatedNumber === 5,
       component: (
         <div className="bg-white p-8 shadow-lg rounded-lg">
+                    <div className="flex justify-end">
+            <button
+              className="bg-blue-500 hover:bg-blue-700 text-black font-Nanum font-bold text-2xl"
+              onClick={() => endTutorial()}
+            >
+              X
+            </button>
+          </div>
           <p className="text-center font-Nanum font-bold text-3xl text-yellow-600 text-[#32CD32]">
             '수정 - Modification'
           </p>
@@ -1381,6 +1425,14 @@ const BoardTemplate3 = () => {
       activate: activatedNumber === 6,
       component: (
         <div className="bg-white p-8 shadow-lg rounded-lg">
+                    <div className="flex justify-end">
+            <button
+              className="bg-blue-500 hover:bg-blue-700 text-black font-Nanum font-bold text-2xl"
+              onClick={() => endTutorial()}
+            >
+              X
+            </button>
+          </div>
           <p className="text-center font-Nanum font-bold text-3xl text-[#4682B4]">
             '대체 - Alternation'
           </p>
@@ -1415,6 +1467,14 @@ const BoardTemplate3 = () => {
       activate: activatedNumber === 7,
       component: (
         <div className="bg-white p-8 shadow-lg rounded-lg">
+                    <div className="flex justify-end">
+            <button
+              className="bg-blue-500 hover:bg-blue-700 text-black font-Nanum font-bold text-2xl"
+              onClick={() => endTutorial()}
+            >
+              X
+            </button>
+          </div>
           <p className="text-center font-Nanum font-bold text-3xl text-[#000080]">
             '반전 - Reversion'
           </p>
@@ -1448,6 +1508,14 @@ const BoardTemplate3 = () => {
       activate: activatedNumber === 8,
       component: (
         <div className="bg-white p-8 shadow-lg rounded-lg">
+                    <div className="flex justify-end">
+            <button
+              className="bg-blue-500 hover:bg-blue-700 text-black font-Nanum font-bold text-2xl"
+              onClick={() => endTutorial()}
+            >
+              X
+            </button>
+          </div>
           <p className="text-center font-Nanum font-bold text-3xl text-[#800080]">
             '전용 - Diversion'
           </p>
@@ -1481,6 +1549,14 @@ const BoardTemplate3 = () => {
       activate: activatedNumber === 9,
       component: (
         <div className="bg-white p-8 shadow-lg rounded-lg">
+                    <div className="flex justify-end">
+            <button
+              className="bg-blue-500 hover:bg-blue-700 text-black font-Nanum font-bold text-2xl"
+              onClick={() => endTutorial()}
+            >
+              X
+            </button>
+          </div>
           <p className="text-center font-Nanum font-bold text-3xl text-[#9400D3]">
             '결합 - Combination'
           </p>
