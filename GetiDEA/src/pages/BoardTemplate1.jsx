@@ -77,7 +77,7 @@ const BoardTemplate1 = () => {
   const [chatClick, setChatClick] = useState(false);
   const [chatLog, setChatLog] = useState([]);
   const [chatInput, setChatInput] = useState({
-    nickname: localStorage.getItem("userName"),
+    nickname: localStorage.getItem('userName'),
     message: "",
   });
 
@@ -570,11 +570,11 @@ const BoardTemplate1 = () => {
   }, []);
 
   const sendInfoToServer = () => {
-    // if (chatInput.nickname.trim() !== "" && chatInput.message.trim() !== "") {
-    //   const newChat = { ...chatInput, id: new Date().getTime() };
-    //   setChatLog((prevChatLog) => [...prevChatLog, newChat]);
-    //   setChatInput({ nickname: localStorage.getItem('userName'), message: "" }); // 입력 필드 초기화
-    // }
+    if (chatInput.nickname.trim() !== "" && chatInput.message.trim() !== "") {
+      const newChat = { ...chatInput, id: new Date().getTime() };
+      setChatLog((prevChatLog) => [...prevChatLog, newChat]);
+      setChatInput({ nickname: localStorage.getItem('userName'), message: "" }); // 입력 필드 초기화
+    }
 
     // 서버에 데이터 전송
     if (socket && socket.readyState === WebSocket.OPEN) {
@@ -1891,7 +1891,7 @@ const BoardTemplate1 = () => {
           isVisible ? "block" : "hidden"
         } absolute right-6 top-20 p-2.5 max-w-[200px] flex flex-col space-y-2.5`}
       >
-        <video ref={myVideoRef} autoPlay muted className="w-full z-40 " />
+        <video ref={myVideoRef} autoPlay muted className="w-full z-30 " />
         {/* 자신의 비디오 */}
         {streams.map(({ stream, peerId }) => (
           <Video key={peerId} stream={stream} />
@@ -1902,7 +1902,7 @@ const BoardTemplate1 = () => {
       <div
         className={
           chatClick
-            ? "absolute top-20 right-10 w-[350px] p-3 z-20 justify-center container  ml-auto px-4"
+            ? "absolute top-20 right-10 w-[350px] p-3 z-50 justify-center container  ml-auto px-4"
             : "invisible absolute top-20 right-10 w-80 p-7 z-20 justify-center container w-1/4 ml-auto px-4 "
         }
       >
@@ -1928,7 +1928,7 @@ const BoardTemplate1 = () => {
                   >
                    
                    <div className="flex flex-col">
-                    <span className="ml-auto ">{localStorage.getItem("userName")}</span>
+                    <span className="ml-auto ">{chat.nickname}</span>
                     <div className="bg-[#5aa5ff]  break-all drop-shadow-md text-sm max-w-40 min-w-12 font-Nanum px-3 rounded-lg mr-3 text-center flex justify-center items-center text-white">
                       {chat.message}
                     </div>
@@ -1948,7 +1948,7 @@ const BoardTemplate1 = () => {
                   >
                   
                   <div className="flex flex-col">
-                    <span className="ml-auto ">{localStorage.getItem("userName")}</span>
+                    <span className="ml-auto ">{chat.nickname}</span>
                     <div className="bg-[#5aa5ff]  break-all drop-shadow-md text-sm max-w-40 min-w-12 font-Nanum px-3 rounded-lg mr-3 text-center flex justify-center items-center text-white">
                       {chat.message}
                     </div>
@@ -2048,7 +2048,7 @@ const BoardTemplate1 = () => {
   {/* 도형 서식 창 */}
 
   {selectedId !== null && (
-        <div className="absolute top-32 z-50 right-5 justify-center  bg-white rounded-md w-60 h-[500px] flex flex-col shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]">
+        <div className="absolute top-32 z-40 right-5 justify-center  bg-white rounded-md w-60 h-[500px] flex flex-col shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]">
             <div className="mt-3 ml-5 w-4/5  items-center flex  drop-shadow-md bg-white  h-12 rounded-xl">
               <span className="text-xl font-bold ml-8 font-Inter text-black">도형</span>
             </div>
