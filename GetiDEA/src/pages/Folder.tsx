@@ -114,7 +114,6 @@ import ProjectModal from '../components/ProjectModal';
 
         try {
           const response = await api.delete(`/api/folder/remove/${folderName}`);
-          console.log(response);
 
           } catch (error) {
               console.error('업로드 실패:', folderName);
@@ -159,7 +158,6 @@ import ProjectModal from '../components/ProjectModal';
         try {
           const response = await api.get(`/api/project/folder?folderName=${currentFolderName}`);
           setProjects(response.data);
-          console.log(`프로젝트 불러오기 : ${response.data.length}`);
           setIsSelected(response.data.map((project: { bookmark: boolean; }) => project.bookmark));
           setDropdownsOpen(new Array(response.data.length).fill(false));
         } catch (error) {
@@ -176,7 +174,6 @@ import ProjectModal from '../components/ProjectModal';
             const response = await api.put(`api/location/bookmark`,{
               "projectId" : projectId
             });
-           console.log(response);
 
           } catch (error) {
             console.error('Error fetching data: ', error);
@@ -190,7 +187,6 @@ import ProjectModal from '../components/ProjectModal';
         const deleting = async () => {
           try {
             const response = await api.delete(`/api/project/delete/${projectId}`);
-            console.log(response);
 
           } catch (error) {
             console.error('Error fetching data: ', error);

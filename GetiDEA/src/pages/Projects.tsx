@@ -60,7 +60,6 @@ const Projects: React.FC = () => {
   };
 
   useEffect(() => {
-    console.log(localStorage.getItem('accessToken'));
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
     
@@ -74,7 +73,6 @@ const Projects: React.FC = () => {
         setProjects(response.data);
         setIsSelected(response.data.map((project: { bookmark: any; }) => project.bookmark));
         setDropdownsOpen(new Array(response.data.length).fill(false));
-        console.log(response.data)
       } catch (error) {
         console.error('Error fetching data: ', error);
       }
@@ -120,13 +118,9 @@ const Projects: React.FC = () => {
     }
 
     const deleteProject = (projectId : number) =>{
-      console.log("dffdfdfd")
       const deleting = async () => {
         try {
-          
-          console.log(projectId);
           const response = await api.delete(`/api/project/delete/${projectId}`);
-         
         } catch (error) {
           console.error('Error fetching data: ', error);
         }

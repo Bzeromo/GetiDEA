@@ -18,7 +18,6 @@ const ProjectNameInput: React.FC = () => {
     useEffect(()=>{
         const name = location.state.folderName
         setFolderName(name);
-        console.log(`선택한 템플릿  : ${name} ${template[index]}`);
     })
 
     const navigate = useNavigate();
@@ -45,8 +44,6 @@ const ProjectNameInput: React.FC = () => {
                 "userEmail" : localStorage.getItem('userEmail'),
                 "folderName" : folderName   
             });
-            console.log("프로젝트 아이디는!!!!!!!!!!!!!!!!!!");
-            console.log(response.data.projectId);
             
             localStorage.setItem('projectId', response.data.projectId.toString());
             localStorage.setItem('projectName', projectName);

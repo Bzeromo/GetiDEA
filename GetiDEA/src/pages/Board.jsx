@@ -118,16 +118,13 @@ const WhiteBoard = () => {
       .post("/api/project/change", postData)
       .then((response) => {
         // 삭제가 성공적으로 반영되었을 때 상태 업데이트
-        console.log(response);
         setPreData((prevData) => {
           const newData = prevData.filter((item) => item.id !== selectedId);
-          console.log("Updated data:", newData);
           return newData; // 필터링된 새 데이터로 상태를 업데이트
         });
       })
       .catch((error) => {
         console.log(error);
-        // 오류 발생 시 실행할 코드
       });
   };
 
@@ -135,24 +132,16 @@ const WhiteBoard = () => {
     deleteSelected();
     PostDelete2();
     setCount((prevCount) => prevCount + 1); // 이 부분을 수정
-    // window.location.reload();
-    console.log(count); // 이 로그는 상태 업데이트가 비동기적으로 이루어지기 때문에 업데이트 이전의 값을 출력할 수 있음
     layerRef.current.batchDraw();
-    // shapeRef.current.batchDraw();
     checkPost();
-    console.log(checkDelete);
   };
 
   const undoAll = () => {
     undo();
     undoEvent();
     setCount((prevCount) => prevCount + 1); // 이 부분을 수정
-    // window.location.reload();
-    console.log(count); // 이 로그는 상태 업데이트가 비동기적으로 이루어지기 때문에 업데이트 이전의 값을 출력할 수 있음
     layerRef.current.batchDraw();
-    // shapeRef.current.batchDraw();
     checkPost();
-    console.log(checkDelete);
   };
 
   //전체 드래그 기능 구현
@@ -205,7 +194,6 @@ const WhiteBoard = () => {
 
   useEffect(() => {
      if (location.state?.projectId) {
-      console.log(location.state.projectId);
       const loadProject = async () => {
         try {
           const response = await api.get(
@@ -213,7 +201,6 @@ const WhiteBoard = () => {
           );
           setProject(response.data); // 이 시점에서 project 상태가 업데이트 됩니다.
           setProjectName(response.data.projectName);
-          console.log(response.data);
         } catch (error) {
           console.error("Error fetching data: ", error);
         }
@@ -222,16 +209,9 @@ const WhiteBoard = () => {
       loadProject();
     }
     getProjectData();
-    console.log(`|\\_/|
-|q p|   /}
-( 0 )"""\\
-|"^"\`    |
-||_/=\\\\__|
-`);
   }, [location.state]);
 
   useEffect(() => {
-    console.log("탐지 완료");
   }, [count]);
 
   useEffect(() => {
@@ -275,17 +255,10 @@ const WhiteBoard = () => {
   }, [shapes]);
 
   useEffect(() => {
-    console.log("업데이트됨" + selectedId);
     sendInfoToServer();
-    // if(layerRef.current){
-    //   layerRef.current.batchDraw();
-    //   console.log(":teststsetst")
-    // }
   }, [selectedId]);
 
   useEffect(() => {
-    // console.log(JSON.stringify(preData) + "preData 확인용");
-    console.log("checkdata");
   }, [preData]);
 
   const {
@@ -383,19 +356,16 @@ const WhiteBoard = () => {
     const socket = new WebSocket(`${process.env.REACT_APP_WEBSOCKET_URL}/${projectId}`);
 
     socket.onopen = () => {
-      console.log("WebSocket 연결이 열렸습니다.");
       setSocket(socket);
     };
 
     socket.onmessage = (event) => {
-      // console.log("서버로부터 메시지를 받았습니다:", event.data);
 
       if (event.data instanceof Blob) {
         const textDataPromise = new Response(event.data).text();
         textDataPromise
           .then((jsonData) => {
             const receivedData = JSON.parse(jsonData);
-            // updateShapes(receivedData);
             applyDataToStage(receivedData);
           })
           .catch((error) => {
@@ -502,7 +472,6 @@ const WhiteBoard = () => {
   const handleMouseDown = (e) => {
     if (e) {
       const newData = e.target.attrs;
-      // console.log(JSON.stringify(newData), "확인해볼래용");
 
       setPreData((prevData) => {
         const index = prevData.findIndex((data) => data.id === newData.id);
@@ -618,7 +587,6 @@ const WhiteBoard = () => {
 
   const handleDragEnd = async (e) => {
     if (!e || !e.target) {
-      // e 또는 e.target이 undefined인 경우
       console.error("이벤트 또는 대상 요소가 정의되지 않았습니다.");
       return;
     }
@@ -626,17 +594,9 @@ const WhiteBoard = () => {
     const ty = e.target.attrs.ty;
 
     const type = e.target.attrs.type;
-    console.log(type);
 
     const newData = e.target.attrs;
 
-    // console.log(JSON.stringify(newData))
-
-    if (!id) {
-      console.log("id 확인 " + "혹시 null인가?");
-    } else {
-      console.log("오예 성공! " + id);
-    }
 
     if (type === "Dot" || type === "Arrow" || type === "Line") {
       setLines((prevLines) =>
@@ -766,16 +726,7 @@ const WhiteBoard = () => {
     if (layerRef.current) {
       layerRef.current.batchDraw();
     }
-    console.log("이것도 탐지해봐라");
   }, [checkDelete]);
-
-  const checkObject = (shapeId, newX, newY) => {
-    console.log(shapes);
-    console.log(lines);
-    console.log(texts);
-    console.log(images);
-    console.log(drawingList);
-  };
 
   const handleColorChange = (e) => {
     setCurrentColor(e.target.value);
@@ -832,29 +783,6 @@ const WhiteBoard = () => {
     );
   };
 
-  const handleInfo = (e) => {
-    const target = e.target;
-
-    console.log(target + "test");
-
-    setShapeWidth(e.target.width);
-    setShapeHeight(e.target.height);
-  };
-
-  const handleFontSize = (e) => {
-    const newFontSize = parseInt(e.target.value, 10);
-    if (!isNaN(newFontSize)) {
-      setFontSize(newFontSize);
-      if (selectedId) {
-        setTexts(
-          texts.map((text) =>
-            text.id === selectedId ? { ...text, fontSize: newFontSize } : text
-          )
-        );
-      }
-    }
-    console.log(selectedId);
-  };
 
   const handleShapeClick = (id, e) => {
     e.cancelBubble = true;
@@ -865,7 +793,6 @@ const WhiteBoard = () => {
     setShapeWidth(target.width);
     setShapeColor(target.fill);
     setShapeStrokeColor(target.stroke);
-    console.log(id);
   };
 
   const handleLayerClick = () => {
@@ -909,7 +836,6 @@ const WhiteBoard = () => {
             y: selectedItem.y - 20,
           });
         }
-        console.log("복사");
       }
       // Ctrl+V: 붙여넣기
       else if (event.ctrlKey && event.key === "v") {
@@ -945,7 +871,6 @@ const WhiteBoard = () => {
           }
           setClipboard(null);
         }
-        console.log("붙여넣기");
       }
       // Delete: 삭제
       else if (event.key === "Delete" || (event.ctrlKey && event.key === "d")) {
@@ -967,7 +892,6 @@ const WhiteBoard = () => {
           // 선택된 항목 삭제
           deleteAll();
         }
-        console.log("잘라내기");
       }
     };
 
@@ -1033,7 +957,6 @@ const WhiteBoard = () => {
         const response = await api.delete(
           `/api/project/close/${projectId}`
         );
-        console.log(response);
       } catch (error) {
         console.error("Error fetching data: ", error);
       }

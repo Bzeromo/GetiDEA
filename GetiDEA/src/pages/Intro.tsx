@@ -41,7 +41,6 @@ const Intro: React.FC = () => {
     const select = (idx: number): void => {
       const arr: boolean[] = Array(4).fill(false);
       arr[idx] = true;
-      console.log(arr);
       setIsSelected(arr);
     };
 

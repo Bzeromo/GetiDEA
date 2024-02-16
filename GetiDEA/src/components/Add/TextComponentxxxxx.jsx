@@ -30,27 +30,20 @@ const TextComponent = ({
         transformerRef.current.nodes([textRef.current]);
         transformerRef.current.getLayer().batchDraw();
       }
-      // console.log(editing);
     }, [isSelected]);
   
     useEffect(() => {
-      console.log(editing);
     }, [editing]);
   
     const handleDoubleClick = () => {
-      console.log("더블 클릭됨"); // 로그 추가
       setEditing((prevEditing) => !prevEditing);
-      // console.log(editing);
-      // console.log(editing);
     };
   
     const handleChange = (e) => {
-      console.log("change1");
       setText(e.target.value);
     };
   
     const handleBlur = () => {
-      console.log("change2");
       setEditing(false);
       if (onTextEdit) {
         onTextEdit({ ...textProps, text });

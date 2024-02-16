@@ -73,8 +73,6 @@ const Recent: React.FC = () => {
         setIsSelected(response.data.map((project: { bookmark: any; }) => project.bookmark));
         setDropdownsOpen(new Array(response.data.length).fill(false));
 
-        console.log(`드롭다운 : ${dropdownsOpen.length}`)
-        
       } catch (error) {
         console.error('Error fetching data: ', error);
       }
@@ -90,7 +88,6 @@ const Recent: React.FC = () => {
         {
           "projectId" : projectId
         });
-        console.log(response)
       } catch (error) {
         console.error('Error fetching data: ', error);
       }

@@ -36,7 +36,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     if (storedToken) {
       setAccessToken(storedToken);
       const decoded:DecodedToken=jwtDecode(Cookies.get('access_token')??"");
-      console.log(decoded);
       localStorage.setItem('userEmail',decoded.sub??"");
       localStorage.setItem('provider',decoded.provider??"");
       localStorage.setItem('userName',decoded.userName??"");
@@ -57,7 +56,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     localStorage.removeItem('refreshToken');
     localStorage.removeItem('profileImage');
     localStorage.removeItem('provider');
-    console.log("logout");
     navigate('/');
   };
 

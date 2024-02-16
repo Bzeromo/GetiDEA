@@ -38,12 +38,10 @@ const TextComponent: React.FC<TextComponentProps> = ({
   }, []);
 
   useEffect(() => {
-    console.log(selectedId + " selected id 테스트용");
   }, [selectedId]);
 
   const handleTextSelect = (id: string) => {
     setSelectedId(id);
-    console.log(id);
   };
 
   useEffect(() => {
@@ -87,9 +85,7 @@ const TextComponent: React.FC<TextComponentProps> = ({
   };
 
   const handleSelectedId = (id: string) => {
-    console.log(id + " id 테스트용");
     setSelectedId(id);
-    console.log(selectedId + " selected id 테스트용");
   };
 
   return (

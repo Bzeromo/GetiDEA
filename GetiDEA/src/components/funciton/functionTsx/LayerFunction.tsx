@@ -15,9 +15,6 @@ const LayerFunction = ({ selectedId, layerRef }: LayerFunctionProps) => {
         layerRef.current.batchDraw();
       }
     } else if (!layerRef.current) {
-      console.log("moveToTop");
-      console.log("Selected ID:", selectedId);
-      console.log("LayerRef Current:", layerRef.current);
     } else {
       return;
     }
@@ -31,7 +28,6 @@ const LayerFunction = ({ selectedId, layerRef }: LayerFunctionProps) => {
         layerRef.current.batchDraw();
       }
     } else {
-      console.log("moveUp");
     }
   };
 
@@ -43,7 +39,6 @@ const LayerFunction = ({ selectedId, layerRef }: LayerFunctionProps) => {
         layerRef.current.batchDraw();
       }
     } else {
-      console.log("moveDown");
     }
   };
 
@@ -55,7 +50,6 @@ const LayerFunction = ({ selectedId, layerRef }: LayerFunctionProps) => {
         layerRef.current.batchDraw();
       }
     } else {
-      console.log("moveToBottom");
     }
   };
 

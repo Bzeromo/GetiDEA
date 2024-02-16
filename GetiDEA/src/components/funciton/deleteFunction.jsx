@@ -19,14 +19,12 @@ const deleteFunction = (
 
     if (Array.isArray(images)) {
       // deleteFunction 호출
-      console.log(typeof images, Array.isArray(images));
     } else {
       console.error("images is not an array" + images);
     }
 
     if (Array.isArray(texts)) {
       // deleteFunction 호출
-      console.log(typeof texts, Array.isArray(texts));
     } else {
       console.error("texts is not an array" + texts);
     }
@@ -67,12 +65,11 @@ const deleteFunction = (
         break;
       case null:
         deleteSelectedDrawing();
+        break;
       default:
         deleteSelectedDrawing();
         break;
     }
-
-    // console.log("삭제완료")ㅌ
 
     // 선택 해제
     setSelectedId(null);
@@ -81,7 +78,6 @@ const deleteFunction = (
   const deleteSelectedShape = () => {
     const newShapes = shapes.filter((shape) => shape.id !== selectedId);
     setShapes(newShapes);
-    console.log("삭제완료")
     setSelectedId(null); // 선택 해제
   };
 
@@ -104,7 +100,6 @@ const deleteFunction = (
 
   const deleteSelectedDrawing = () => {
     setDrawingList([]);
-    console.log("삭제 완료");
   };
 
   // const deleteSelectedImage = () => {

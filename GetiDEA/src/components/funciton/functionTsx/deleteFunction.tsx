@@ -19,14 +19,12 @@ const deleteFunction = (
 
     if (Array.isArray(images)) {
       // deleteFunction 호출
-      console.log(typeof images, Array.isArray(images));
     } else {
       console.error("images is not an array" + images);
     }
 
     if (Array.isArray(texts)) {
       // deleteFunction 호출
-      console.log(typeof texts, Array.isArray(texts));
     } else {
       console.error("texts is not an array" + texts);
     }
@@ -99,7 +97,6 @@ const deleteFunction = (
 
   const deleteSelectedDrawing = () => {
     setDrawingList([]);
-    console.log("삭제 완료");
   };
 
   return {

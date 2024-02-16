@@ -152,7 +152,6 @@ const addFunction = (
     };
   
     const addImage = (src: string) => {
-      console.log(`Adding image to layer: ${src}`);
       const newImage = {
         id: `image_${images.length}`,
         src,

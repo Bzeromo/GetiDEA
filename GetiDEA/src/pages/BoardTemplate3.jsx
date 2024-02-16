@@ -6,6 +6,7 @@ import URLImage from "../components/Add/URLImage";
 import { debounce } from "lodash";
 import { nanoid } from "nanoid";
 import api from "../api";
+import InviteModal from "../components/InviteModal";
 import ImgComponent from "../components/Add/ImgComponent";
 import ShapeComponent from "../components/Add/ShapeComponent";
 import LineComponent from "../components/Add/LineComponent";
@@ -104,7 +105,8 @@ const BoardTemplate3 = () => {
 
   //복사 붙여넣기용
   const [clipboard, setClipboard] = useState(null);
-
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
 
   const [shapeColor, setShapeColor] = useState("");
   const [shapeStrokeColor, setShapeStrokeColor] = useState("");
@@ -132,17 +134,13 @@ const BoardTemplate3 = () => {
     api
       .post("/api/project/change", postData)
       .then((response) => {
-        // 삭제가 성공적으로 반영되었을 때 상태 업데이트
-        console.log(response);
         setPreData((prevData) => {
           const newData = prevData.filter((item) => item.id !== selectedId);
-          console.log("Updated data:", newData);
           return newData; // 필터링된 새 데이터로 상태를 업데이트
         });
       })
       .catch((error) => {
         console.log(error);
-        // 오류 발생 시 실행할 코드
       });
   };
 
@@ -150,24 +148,16 @@ const BoardTemplate3 = () => {
     deleteSelected();
     PostDelete2();
     setCount((prevCount) => prevCount + 1); // 이 부분을 수정
-    // window.location.reload();
-    console.log(count); // 이 로그는 상태 업데이트가 비동기적으로 이루어지기 때문에 업데이트 이전의 값을 출력할 수 있음
     layerRef.current.batchDraw();
-    // shapeRef.current.batchDraw();
     checkPost();
-    console.log(checkDelete);
   };
 
   const undoAll = () => {
     undo();
     undoEvent();
     setCount((prevCount) => prevCount + 1); // 이 부분을 수정
-    // window.location.reload();
-    console.log(count); // 이 로그는 상태 업데이트가 비동기적으로 이루어지기 때문에 업데이트 이전의 값을 출력할 수 있음
     layerRef.current.batchDraw();
-    // shapeRef.current.batchDraw();
     checkPost();
-    console.log(checkDelete);
   };
 
   //전체 드래그 기능 구현
@@ -233,20 +223,12 @@ const BoardTemplate3 = () => {
         setLocalStream(stream);
 
         myPeer.on("open", (id) => {
-          console.log("My peer ID is: ", id);
           setPeerId(id);
           setIsRegistered(true);
 
           // Peer 등록
           registerPeer(id, projectId)
             .then((response) => response.json())
-            .then((data) => {
-              if (data.success) {
-                console.log("Registration successful");
-              } else {
-                console.error("Registration failed", data.message);
-              }
-            })
             .catch((err) => console.error("Error registering peer", err));
 
           fetchUsersAndConnect(myPeer, projectId, stream);
@@ -267,7 +249,6 @@ const BoardTemplate3 = () => {
         const data = JSON.stringify({ peerId: peerId, projectId: projectId });
         const blob = new Blob([data], { type: "application/json" });
         const beaconSent = navigator.sendBeacon(`${process.env.REACT_APP_PEERJS_URL}/unregister`, blob);
-        console.log("Beacon sent: ", beaconSent);
       }
     };
 
@@ -291,7 +272,6 @@ const BoardTemplate3 = () => {
     };
 
     window.addEventListener("beforeunload", handleBeforeUnload);
-    console.log("test");
 
     return () => {
       window.removeEventListener("beforeunload", handleBeforeUnload);
@@ -330,10 +310,8 @@ const BoardTemplate3 = () => {
 
       // 이미 존재하지 않는 경우에만 새 스트림 추가
       if (!alreadyExists) {
-        console.log(`Adding video stream for peerId: ${peerId}`);
         return [...prevStreams, { stream, peerId }];
       } else {
-        console.log(`Stream for peerId: ${peerId} already exists.`);
         return prevStreams;
       }
     });
@@ -342,21 +320,11 @@ const BoardTemplate3 = () => {
 
   const [preData, setPreData] = useState([]);
   useEffect(() => {
-    // if(location.state.name){
-    //   setProjectName(location.state.name);
-    // }
     setProjectName(localStorage.getItem('projectName'));
     getProjectData();
-    console.log(`|\\_/|
-|q p|   /}
-( 0 )"""\\
-|"^"\`    |
-||_/=\\\\__|
-`);
   }, []);
 
   useEffect(() => {
-    console.log("탐지 완료");
   }, [count]);
 
   useEffect(() => {
@@ -400,17 +368,10 @@ const BoardTemplate3 = () => {
   }, [shapes]);
 
   useEffect(() => {
-    console.log("업데이트됨" + selectedId);
     sendInfoToServer();
-    // if(layerRef.current){
-    //   layerRef.current.batchDraw();
-    //   console.log(":teststsetst")
-    // }
   }, [selectedId]);
 
   useEffect(() => {
-    // console.log(JSON.stringify(preData) + "preData 확인용");
-    console.log("checkdata");
   }, [preData]);
 
   const {
@@ -507,26 +468,22 @@ const BoardTemplate3 = () => {
     const socket = new WebSocket(`${process.env.REACT_APP_WEBSOCKET_URL}`);
 
     socket.onopen = () => {
-      console.log("WebSocket 연결이 열렸습니다.");
       setSocket(socket);
     };
 
     socket.onmessage = (event) => {
-      // console.log("서버로부터 메시지를 받았습니다:", event.data);
 
       if (event.data instanceof Blob) {
         const textDataPromise = new Response(event.data).text();
         textDataPromise
           .then((jsonData) => {
             const receivedData = JSON.parse(jsonData);
-            // updateShapes(receivedData);
             applyDataToStage(receivedData);
           })
           .catch((error) => {
             console.error("JSON 파싱 중 오류:", error);
           });
       } else {
-        // 이미 문자열인 경우 바로 JSON 파싱
         const receivedData = JSON.parse(event.data);
         applyDataToStage(receivedData);
       }
@@ -625,7 +582,6 @@ const BoardTemplate3 = () => {
   const handleMouseDown = (e) => {
     if (e) {
       const newData = e.target.attrs;
-      // console.log(JSON.stringify(newData), "확인해볼래용");
 
       setPreData((prevData) => {
         const index = prevData.findIndex((data) => data.id === newData.id);
@@ -741,25 +697,15 @@ const BoardTemplate3 = () => {
 
   const handleDragEnd = async (e) => {
     if (!e || !e.target) {
-      // e 또는 e.target이 undefined인 경우
-      console.error("이벤트 또는 대상 요소가 정의되지 않았습니다.");
       return;
     }
     const id = e.target.attrs.id;
     const ty = e.target.attrs.ty;
 
     const type = e.target.attrs.type;
-    console.log(type);
 
     const newData = e.target.attrs;
 
-    // console.log(JSON.stringify(newData))
-
-    if (!id) {
-      console.log("id 확인 " + "혹시 null인가?");
-    } else {
-      console.log("오예 성공! " + id);
-    }
 
     if (type === "Dot" || type === "Arrow" || type === "Line") {
       setLines((prevLines) =>
@@ -823,7 +769,6 @@ const BoardTemplate3 = () => {
 
     const rotationAngle = node.rotation();
 
-    console.log(`Rotation angle: ${rotationAngle}`);
   };
 
   const zoomOnWheel = useCallback((e) => {
@@ -889,16 +834,7 @@ const BoardTemplate3 = () => {
     if (layerRef.current) {
       layerRef.current.batchDraw();
     }
-    console.log("이것도 탐지해봐라");
   }, [checkDelete]);
-
-  const checkObject = (shapeId, newX, newY) => {
-    console.log(shapes);
-    console.log(lines);
-    console.log(texts);
-    console.log(images);
-    console.log(drawingList);
-  };
 
   const handleColorChange = (e) => {
     setCurrentColor(e.target.value);
@@ -926,13 +862,11 @@ const BoardTemplate3 = () => {
         );
       }
     }
-    console.log(selectedId);
   };
 
   const handleShapeClick = (id, e) => {
     e.cancelBubble = true;
     setSelectedId(id);
-    console.log(id);
   };
 
   const handleLayerClick = () => {
@@ -997,7 +931,6 @@ const BoardTemplate3 = () => {
             y: selectedItem.y - 20,
           });
         }
-        console.log("복사");
       }
       // Ctrl+V: 붙여넣기
       else if (event.ctrlKey && event.key === "v") {
@@ -1033,7 +966,6 @@ const BoardTemplate3 = () => {
           }
           setClipboard(null);
         }
-        console.log("붙여넣기");
       }
       // Delete: 삭제
       else if (event.key === "Delete" || (event.ctrlKey && event.key === "d")) {
@@ -1055,7 +987,6 @@ const BoardTemplate3 = () => {
           // 선택된 항목 삭제
           deleteAll();
         }
-        console.log("잘라내기");
       }
     };
 
@@ -1121,7 +1052,6 @@ const BoardTemplate3 = () => {
         const response = await api.delete(
           `/api/project/close/${projectId}`
         );
-        console.log(response);
       } catch (error) {
         console.error("Error fetching data: ", error);
       }
@@ -1140,6 +1070,12 @@ const BoardTemplate3 = () => {
   const handleInputTextChange = (event) => {
     setInputText(event.target.value);
   };
+
+  const openModal = (projectId) => {
+    setIsOpen(false);
+    setIsModalOpen(true);
+  };
+  const closeModal = () => setIsModalOpen(false);
 
   // 사용자 아이디어 입력창 최소 크기 설정: 1로 설정하여, 입력값이 없을 때도 input 보이게 함
   const inputTextLength = inputText.length > 0 ? inputText.length * 2 : 23;
@@ -1879,6 +1815,12 @@ const BoardTemplate3 = () => {
 
   return (
     <div className="absolute  inset-0 h-full w-full bg-[#EFEFEF] bg-opacity-50 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px]">
+          <InviteModal
+          isOpen={isModalOpen}
+          closeModal={closeModal}
+          projectId={projectId}
+        ></InviteModal>
+
       {/* 왼쪽 윗 블록 */}
       <div className="absolute top-6 left-6 pl-5 bg-white rounded-md w-[410px] h-[50px] flex items-center flex-row shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]">
         {/* 뒤로가기 버튼 */}

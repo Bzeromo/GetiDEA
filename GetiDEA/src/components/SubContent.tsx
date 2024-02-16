@@ -23,7 +23,6 @@ const SubContent: React.FC = () => {
       try {
         const response = await api.get(`/api/project/recent?limit=2`);
         setProjects(response.data); // userName 필드만 추출
-        console.log("dfdf")
         } catch (error) {
         console.error('Error fetching data: ', error);
       }

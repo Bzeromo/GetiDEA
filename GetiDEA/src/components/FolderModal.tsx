@@ -54,7 +54,6 @@ const FolderModal: React.FC<ProfileModalProps> = ({ isOpen, closeModal ,folders 
         const newFolders = [...folders,  folderName]
         setFolders(newFolders);
 
-        console.log('폴더 추가 후:', folders);
            showAlert();
         } catch (error) {
             console.error('업로드 실패:', error);
@@ -65,7 +64,6 @@ const FolderModal: React.FC<ProfileModalProps> = ({ isOpen, closeModal ,folders 
   };
     const close =()=> {
         closeModal();
-        console.log(localStorage.getItem('userEmail'))
         setFolderName('');
     }
 
