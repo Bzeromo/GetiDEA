@@ -27,7 +27,6 @@ const FolderNameChange: React.FC<ProfileModalProps> = ({ isOpen, closeModal ,fol
       if (folders[index]) {
         setFolderName(folders[index]);
       }
-       console.log(folders);
       },[isOpen]); 
 
     const showAlert = async() => {
@@ -57,10 +56,8 @@ const FolderNameChange: React.FC<ProfileModalProps> = ({ isOpen, closeModal ,fol
           "beforeFolderName" : folders[index],
           "newFolderName" : folderName
         }
-        console.log(folderId, folderName);
         const response = await api.patch(`/api/folder/rename`,data);
         
-        console.log('서버 응답:', response.data);
            showAlert();
         } catch (error) {
             console.error('업로드 실패:', error);
@@ -77,7 +74,6 @@ const FolderNameChange: React.FC<ProfileModalProps> = ({ isOpen, closeModal ,fol
   };
     const close =()=> {
         closeModal();
-        console.log(localStorage.getItem('userEmail'))
         setFolderName('');
     }
 

@@ -20,12 +20,9 @@ const postData = (
   layerRef,
 ) => {
   const PostSave = () => {
-    console.log(projectId);
     api
       .patch(`/api/project/merge?projectId=${projectId}`)
       .then((response) => {
-        console.log(response);
-        // console.log(response.data);
       })
       .catch((error) => {
         console.log(error);
@@ -37,7 +34,6 @@ const postData = (
       console.error("이벤트 또는 대상 요소가 정의되지 않았습니다.");
       return;
     }
-    // console.log(JSON.stringify(preData) + "이건 post 내에서 확인용");
     const filteredPreData = preData.find(
       (item) => item.id === e.target.attrs.id
     );
@@ -52,7 +48,6 @@ const postData = (
     api
       .post("/api/project/change", postData)
       .then((response) => {
-        console.log(response);
       })
       .catch((error) => {
         console.log(error);
@@ -80,10 +75,8 @@ const postData = (
     api
     .post("/api/project/change", postData)
     .then((response) => {
-      console.log(response)
     })
     .catce((error) =>{
-      console.log(error)
     })
   }
 
@@ -102,31 +95,16 @@ const postData = (
       .post("/api/project/change", postData)
       .then((response) => {
         // 삭제가 성공적으로 반영되었을 때 상태 업데이트
-        console.log(response);
         setPreData((prevData) => {
           const newData = prevData.filter((item) => item.id !== selectedId);
-          console.log("Updated data:", newData);
           return newData; // 필터링된 새 데이터로 상태를 업데이트
         });
-        // deleteSelected();
 
-        // const check = () => {
-        //   checkPost();
-        // };
-        // // check();
-        // console.log(checkDelete);
-        // console.log(typeof setCount);
-        // // setCount(prevCount => prevCount + 1);
-        // console.log(count)
       })
       .catch((error) => {
         console.log(error);
-        // 오류 발생 시 실행할 코드
       })
       .finally(() => {
-        // if (layerRef.current) {
-        //   layerRef.current.batchDraw();
-        // }
       });
   };
 

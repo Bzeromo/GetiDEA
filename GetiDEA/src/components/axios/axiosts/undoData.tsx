@@ -5,7 +5,6 @@ const undoData = (projectId: number, userEmail: string): () => void => {
     api
       .get(`/api/project/${projectId}/${userEmail}`)
       .then((response) => {
-        console.log(response);
       })
       .catch((error) => {
         console.error(error);

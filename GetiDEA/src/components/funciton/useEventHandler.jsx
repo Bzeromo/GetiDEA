@@ -103,7 +103,6 @@ const useEventHandler = (
       { points: currentLine, stroke: currentColor, strokeWidth: 5 },
     ]);
 
-    // console.log(shapes);
     sendInfoToServer();
   };
 
@@ -113,11 +112,6 @@ const useEventHandler = (
       console.error("이벤트 또는 대상 요소가 정의되지 않았습니다.");
       return;
     }
-
-    // console.log(e.target); // e.target 객체 확인
-    // console.log(typeof e.target); // e.target의 타입 확인
-    // console.log(e.target.id); // e.target의 id 속성 값 확인
-    // console.log(e.target.constructor.name);
 
     const id = e.target.id();
     const id2 = e.target.attrs.id;
@@ -130,21 +124,8 @@ const useEventHandler = (
     const newRotate = e.target.rotation();
 
     if (!id) {
-      console.log("id 확인 " + "혹시 null인가?");
     } else {
-      console.log("오예 성공! " + id);
     }
-    // console.log(id + "  id");
-    // console.log(id2 + "  id2");
-    // console.log(JSON.stringify(newData));
-    // console.log(ty + "  ty확인용");
-    // console.log(id2 + "체크해보자");
-    // console.log(newRotate);
-    console.log(type);
-
-    // console.log("newpos 확인 용" + newPos.x + "  " + newPos.y);
-
-    console.log(newData);
     if (ty === "Line" && type === "Dot") {
       setLines((prevLines) =>
         prevLines.map((lines) => {
@@ -235,7 +216,6 @@ const useEventHandler = (
 
     const rotationAngle = node.rotation();
 
-    console.log(`Rotation angle: ${rotationAngle}`);
   };
 
   const zoomOnWheel = useCallback((e) => {

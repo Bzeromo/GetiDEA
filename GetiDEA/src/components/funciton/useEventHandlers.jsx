@@ -40,9 +40,6 @@ const useEventHandlers = (
     const y = (pointer.y - stage.y()) / stage.scaleY();
 
     setCurrentLine(currentLine.concat([x, y]));
-
-    // setCurrentLine(currentLine.concat([point.x, point.y]));
-    console.log(pointer.x + "    " + pointer.y);
   };
 
   const handleMouseUp = () => {

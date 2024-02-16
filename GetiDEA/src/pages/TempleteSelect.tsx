@@ -24,7 +24,6 @@ const TemplateSelect: React.FC = () => {
        useEffect(()=>{
         const name = location.state.folderName
         setFolderName(name);
-        console.log(folderName);
     })
 
   return (

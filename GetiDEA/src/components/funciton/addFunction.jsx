@@ -181,13 +181,10 @@ const addFunction = (
       type: "Text",
       fontSize: 10,
     };
-    console.log(newText);
     setTexts([...texts, newText]);
-    console.log(texts);
   };
 
   const addImage = (src) => {
-    console.log(`Adding image to layer: ${src}`); // 이미지 추가 로그
     setIdCounter(idCounter+1);
     const newImage = {
       id: `image${uuidv4()}`,
@@ -198,7 +195,6 @@ const addFunction = (
       type: "Image",
     };
     setImages([...images, newImage]);
-    console.log(images); // 상태 업데이트 후 이미지 목록 로그
   };
 
   return {

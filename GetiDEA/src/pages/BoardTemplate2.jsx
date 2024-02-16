@@ -6,7 +6,7 @@ import URLImage from "../components/Add/URLImage";
 import { debounce } from "lodash";
 import { nanoid } from "nanoid";
 import api from "../api";
-
+import InviteModal from "../components/InviteModal";
 import ImgComponent from "../components/Add/ImgComponent";
 import ShapeComponent from "../components/Add/ShapeComponent";
 import LineComponent from "../components/Add/LineComponent";
@@ -89,6 +89,8 @@ const BoardTemplate2 = () => {
   const [currentLine, setCurrentLine] = useState([]);
   const [wholeData, setWholeData] = useState([]);
   const [checkDelete, setCheckDelete] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
 
   // ID same issue 용
   const [shapeCounter, setShapeCounter] = useState(0);
@@ -126,17 +128,13 @@ const BoardTemplate2 = () => {
     api
       .post("/api/project/change", postData)
       .then((response) => {
-        // 삭제가 성공적으로 반영되었을 때 상태 업데이트
-        console.log(response);
         setPreData((prevData) => {
           const newData = prevData.filter((item) => item.id !== selectedId);
-          console.log("Updated data:", newData);
           return newData; // 필터링된 새 데이터로 상태를 업데이트
         });
       })
       .catch((error) => {
         console.log(error);
-        // 오류 발생 시 실행할 코드
       });
   };
 
@@ -144,24 +142,16 @@ const BoardTemplate2 = () => {
     deleteSelected();
     PostDelete2();
     setCount((prevCount) => prevCount + 1); // 이 부분을 수정
-    // window.location.reload();
-    console.log(count); // 이 로그는 상태 업데이트가 비동기적으로 이루어지기 때문에 업데이트 이전의 값을 출력할 수 있음
     layerRef.current.batchDraw();
-    // shapeRef.current.batchDraw();
     checkPost();
-    console.log(checkDelete);
   };
 
   const undoAll = () => {
     undo();
     undoEvent();
     setCount((prevCount) => prevCount + 1); // 이 부분을 수정
-    // window.location.reload();
-    console.log(count); // 이 로그는 상태 업데이트가 비동기적으로 이루어지기 때문에 업데이트 이전의 값을 출력할 수 있음
     layerRef.current.batchDraw();
-    // shapeRef.current.batchDraw();
     checkPost();
-    console.log(checkDelete);
   };
 
   //전체 드래그 기능 구현
@@ -227,20 +217,12 @@ const BoardTemplate2 = () => {
         setLocalStream(stream);
 
         myPeer.on("open", (id) => {
-          console.log("My peer ID is: ", id);
           setPeerId(id);
           setIsRegistered(true);
 
           // Peer 등록
           registerPeer(id, projectId)
             .then((response) => response.json())
-            .then((data) => {
-              if (data.success) {
-                console.log("Registration successful");
-              } else {
-                console.error("Registration failed", data.message);
-              }
-            })
             .catch((err) => console.error("Error registering peer", err));
 
           fetchUsersAndConnect(myPeer, projectId, stream);
@@ -264,7 +246,6 @@ const BoardTemplate2 = () => {
           `${process.env.REACT_APP_PEERJS_URL}/unregister`,
           blob
         );
-        console.log("Beacon sent: ", beaconSent);
       }
     };
 
@@ -288,7 +269,6 @@ const BoardTemplate2 = () => {
     };
 
     window.addEventListener("beforeunload", handleBeforeUnload);
-    console.log("test");
 
     return () => {
       window.removeEventListener("beforeunload", handleBeforeUnload);
@@ -327,10 +307,8 @@ const BoardTemplate2 = () => {
 
       // 이미 존재하지 않는 경우에만 새 스트림 추가
       if (!alreadyExists) {
-        console.log(`Adding video stream for peerId: ${peerId}`);
         return [...prevStreams, { stream, peerId }];
       } else {
-        console.log(`Stream for peerId: ${peerId} already exists.`);
         return prevStreams;
       }
     });
@@ -342,16 +320,10 @@ const BoardTemplate2 = () => {
     setProjectName(localStorage.getItem('projectName'));
     
     getProjectData();
-    console.log(`|\\_/|
-|q p|   /}
-( 0 )"""\\
-|"^"\`    |
-||_/=\\\\__|
-`);
+
   }, [location.state]);
 
   useEffect(() => {
-    console.log("탐지 완료");
   }, [count]);
 
   useEffect(() => {
@@ -395,17 +367,10 @@ const BoardTemplate2 = () => {
   }, [shapes]);
 
   useEffect(() => {
-    console.log("업데이트됨" + selectedId);
     sendInfoToServer();
-    // if(layerRef.current){
-    //   layerRef.current.batchDraw();
-    //   console.log(":teststsetst")
-    // }
   }, [selectedId]);
 
   useEffect(() => {
-    // console.log(JSON.stringify(preData) + "preData 확인용");
-    console.log("checkdata");
   }, [preData]);
 
   const {
@@ -502,19 +467,16 @@ const BoardTemplate2 = () => {
     const socket = new WebSocket(`${process.env.REACT_APP_WEBSOCKET_URL}`);
 
     socket.onopen = () => {
-      console.log("WebSocket 연결이 열렸습니다.");
       setSocket(socket);
     };
 
     socket.onmessage = (event) => {
-      // console.log("서버로부터 메시지를 받았습니다:", event.data);
 
       if (event.data instanceof Blob) {
         const textDataPromise = new Response(event.data).text();
         textDataPromise
           .then((jsonData) => {
             const receivedData = JSON.parse(jsonData);
-            // updateShapes(receivedData);
             applyDataToStage(receivedData);
           })
           .catch((error) => {
@@ -620,7 +582,6 @@ const BoardTemplate2 = () => {
   const handleMouseDown = (e) => {
     if (e) {
       const newData = e.target.attrs;
-      // console.log(JSON.stringify(newData), "확인해볼래용");
 
       setPreData((prevData) => {
         const index = prevData.findIndex((data) => data.id === newData.id);
@@ -744,17 +705,8 @@ const BoardTemplate2 = () => {
     const ty = e.target.attrs.ty;
 
     const type = e.target.attrs.type;
-    console.log(type);
 
     const newData = e.target.attrs;
-
-    // console.log(JSON.stringify(newData))
-
-    if (!id) {
-      console.log("id 확인 " + "혹시 null인가?");
-    } else {
-      console.log("오예 성공! " + id);
-    }
 
     if (type === "Dot" || type === "Arrow" || type === "Line") {
       setLines((prevLines) =>
@@ -818,7 +770,6 @@ const BoardTemplate2 = () => {
 
     const rotationAngle = node.rotation();
 
-    console.log(`Rotation angle: ${rotationAngle}`);
   };
 
   const zoomOnWheel = useCallback((e) => {
@@ -884,16 +835,9 @@ const BoardTemplate2 = () => {
     if (layerRef.current) {
       layerRef.current.batchDraw();
     }
-    console.log("이것도 탐지해봐라");
   }, [checkDelete]);
 
-  const checkObject = (shapeId, newX, newY) => {
-    console.log(shapes);
-    console.log(lines);
-    console.log(texts);
-    console.log(images);
-    console.log(drawingList);
-  };
+
 
   const handleColorChange = (e) => {
     setShapeColor(e.target.value);
@@ -922,13 +866,11 @@ const BoardTemplate2 = () => {
         );
       }
     }
-    console.log(selectedId);
   };
 
   const handleShapeClick = (id, e) => {
     e.cancelBubble = true;
     setSelectedId(id);
-    console.log(id);
   };
 
   const handleLayerClick = () => {
@@ -972,7 +914,6 @@ const BoardTemplate2 = () => {
             y: selectedItem.y - 20,
           });
         }
-        console.log("복사");
       }
       // Ctrl+V: 붙여넣기
       else if (event.ctrlKey && event.key === "v") {
@@ -1008,7 +949,6 @@ const BoardTemplate2 = () => {
           }
           setClipboard(null);
         }
-        console.log("붙여넣기");
       }
       // Delete: 삭제
       else if (event.key === "Delete" || (event.ctrlKey && event.key === "d")) {
@@ -1030,7 +970,6 @@ const BoardTemplate2 = () => {
           // 선택된 항목 삭제
           deleteAll();
         }
-        console.log("잘라내기");
       }
     };
 
@@ -1118,7 +1057,6 @@ const BoardTemplate2 = () => {
         const response = await api.delete(
           `/api/project/close/${projectId}`
         );
-        console.log(response);
       } catch (error) {
         console.error("Error fetching data: ", error);
       }
@@ -1167,6 +1105,12 @@ const BoardTemplate2 = () => {
   const endTutorial = () => {
     setActivateNumber(11);
   };
+
+  const openModal = (projectId) => {
+    setIsOpen(false);
+    setIsModalOpen(true);
+  };
+  const closeModal = () => setIsModalOpen(false);
 
   const coachList = [
     {
@@ -1688,6 +1632,11 @@ const BoardTemplate2 = () => {
 
   return (
     <div className="absolute  inset-0 h-full w-full bg-[#EFEFEF] bg-opacity-50 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px]">
+       <InviteModal
+          isOpen={isModalOpen}
+          closeModal={closeModal}
+          projectId={projectId}
+        ></InviteModal>
       {/* 왼쪽 윗 블록 */}
       <div className="absolute top-6 left-6 pl-5 bg-white rounded-md w-[410px] h-[50px] flex items-center flex-row shadow-[rgba(0,_0,_0,_0.25)_0px_4px_4px_0px]">
         {/* 뒤로가기 버튼 */}

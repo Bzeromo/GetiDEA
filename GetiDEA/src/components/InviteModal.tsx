@@ -39,7 +39,6 @@ const InviteModal: React.FC<InviteModalProps> = ({ isOpen, closeModal ,projectId
 
   useEffect(() => {
    
-    console.log(`프로젝트 아이디 : ${projectId}`)
   
   }, [isOpen]);
  
@@ -47,7 +46,6 @@ const InviteModal: React.FC<InviteModalProps> = ({ isOpen, closeModal ,projectId
   const searchUsers = async () => {
     try {
         const response = await api.get<UserResponse>(`/api/user/search?userEmail=${input}`);
-        console.log(response.data);
         setUsers(response.data);
 
     } catch (error) {
@@ -62,12 +60,10 @@ const InviteModal: React.FC<InviteModalProps> = ({ isOpen, closeModal ,projectId
     //   사용자 초대
       const inviteMember = async (userEmail:string) => {
         try {
-            console.log("초대")
             const response = await api.post(`/api/location/invite`,{
                 "userEmail": userEmail,
                 "projectId": projectId
             });
-            console.log(response.data);
             showAlert();
         } catch (error) {
             failAlert();

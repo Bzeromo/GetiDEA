@@ -31,7 +31,6 @@ const Sidebar = () => {
   const select = (idx: number): void => {
       const arr: boolean[] = Array(length).fill(false);
       arr[idx] = true;
-      console.log(arr);
       setIsSelected(arr);
     };
 

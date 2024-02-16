@@ -27,7 +27,6 @@ const ProtectedRoute: React.FC<{ children: JSX.Element }> = ({ children }) => {
 
 const LoginRoute: React.FC<{ children: JSX.Element }> = ({ children }) => {
   const auth = useAuth();
-  console.log( `로그인됨? : ${auth?.isAuthenticated}`);
   return auth?.isAuthenticated ? <Navigate to="/home" replace /> : children;
 };
 const App: React.FC = () => {

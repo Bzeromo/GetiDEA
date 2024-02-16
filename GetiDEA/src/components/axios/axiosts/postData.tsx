@@ -38,11 +38,9 @@ interface PostData {
 
 const postData = (projectId: number, userEmail: string) => {
   const PostSave = () => {
-    console.log(projectId);
     api
       .patch(`/api/project/merge?projectId=${projectId}`)
       .then((response) => {
-        console.log(response);
       })
       .catch((error) => {
         console.log(error);
@@ -64,7 +62,6 @@ const postData = (projectId: number, userEmail: string) => {
     api
       .post("/api/project/changes", postData)
       .then((response) => {
-        console.log(response.data);
       })
       .catch((error) => {
         console.log(error);

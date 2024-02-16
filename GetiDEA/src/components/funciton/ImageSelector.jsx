@@ -89,7 +89,6 @@ const ImageSelector = ({ onImageSelect }) => {
           src={src}
           alt={`Option ${index}`}
           onClick={() => {
-            console.log(`Image clicked: ${src}`); // 클릭 로그
             onImageSelect(src);
           }}
           style={{

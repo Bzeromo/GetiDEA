@@ -26,53 +26,24 @@ const getData = (
         if (data && data.data) {
           const dataItems: DataItems = data.data;
 
-          console.log(data.data);
-
           Object.keys(dataItems).forEach((key) => {
             const item = dataItems[key];
 
-            console.log(key);
-            console.log(item.ty + "item 보기");
-
             switch (item.ty) {
               case "Text":
-                console.log(
-                  `Text item: `,
-                  JSON.stringify(item, (key, value) => {
-                    return value;
-                  })
-                );
                 setTexts((prevTexts) => updateArray(prevTexts, item, key));
                 break;
               case "Rect":
               case "Circle":
               case "RegularPolygon":
-                console.log(
-                  `${item.ty} item: `,
-                  JSON.stringify(item, (key, value) => {
-                    return value;
-                  })
-                );
                 setShapes((prevShapes) => updateArray(prevShapes, item, key));
                 break;
               case "Line":
               case "Dot":
               case "Arrow":
-                console.log(
-                  `${item.ty} item: `,
-                  JSON.stringify(item, (key, value) => {
-                    return value;
-                  })
-                );
                 setLines((prevLines) => updateArray(prevLines, item, key));
                 break;
               case "Image":
-                console.log(
-                  `img item: `,
-                  JSON.stringify(item, (key, value) => {
-                    return value;
-                  })
-                );
                 setImages((prevImages) => updateArray(prevImages, item, key));
                 break;
               default:

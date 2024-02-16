@@ -15,57 +15,41 @@ const getData = (
         if (response.data && response.data.data) {
           const dataItems = response.data.data;
 
-          console.log(response.data.data);
-
           Object.keys(dataItems).forEach((key) => {
             const item = dataItems[key];
 
-            // console.log(key)
-            // console.log(item.ty + "item 보기")
-
             switch (item.ty) {
               case "Text":
-                // console.log(`text item: `, JSON.stringify(item, key));
                 setTexts((prevTexts) => updateArray(prevTexts, item, key));
                 setWholeData((prevDatas) => updateArray(prevDatas, item, key));
                 break;
               case "Rect":
-                // console.log(JSON.stringify(item, key) + "Rect?");
                 setShapes((prevShapes) => updateArray(prevShapes, item, key));
                 setWholeData((prevDatas) => updateArray(prevDatas, item, key));
                 break;
               case "Circle":
-                // console.log(JSON.stringify(item, key) + "Circle?");
                 setShapes((prevShapes) => updateArray(prevShapes, item, key));
                 setWholeData((prevDatas) => updateArray(prevDatas, item, key));
                 break;
               case "RegularPolygon":
-                // console.log(
-                //   `RegularPolygon item with defaults: `,
-                //   JSON.stringify(item)
-                // );
                 setShapes((prevShapes) => updateArray(prevShapes, item, key));
                 setWholeData((prevDatas) => updateArray(prevDatas, item, key));
                 break;
               case "Line":
-                // console.log(`Line item: `, JSON.stringify(item, key));
                 setLines((prevLines) => updateArray(prevLines, item, key));
                 setWholeData((prevDatas) => updateArray(prevDatas, item, key));
                 break;
               case "Dot":
-                // console.log(`dot item: `, JSON.stringify(item, key));
                 setLines((prevLines) => updateArray(prevLines, item, key));
                 setWholeData((prevDatas) => updateArray(prevDatas, item, key));
                 break;
               case "Arrow":
-                // console.log(`arrow item: `, JSON.stringify(item, key));
                 setLines((prevLines) => updateArray(prevLines, item, key));
                 setWholeData((prevDatas) => updateArray(prevDatas, item, key));
                 break;
               case "Image":
                 setImages((prevImage) => updateArray(prevImage, item, key));
                 setWholeData((prevDatas) => updateArray(prevDatas, item, key));
-                // console.log(`img item: `, JSON.stringify(item, key));
                 break;
               default:
                 setWholeData((prevDatas) => updateArray(prevDatas, item, key));

@@ -26,18 +26,15 @@ const TextComponent = ({
   }, []);
 
   useEffect(() => {
-    console.log(selectedId + " selected id 테스트용");
   }, [selectedId]);
 
   const handleTextSelect = (id) => {
     setSelectedId(id);
-    console.log(id);
   };
 
   useEffect(() => {
     if (isSelected) {
       // 현재 도형에 Transformer 연결
-      console.log(isSelected);
       transformerRef.current.nodes([textRef.current]);
       transformerRef.current.getLayer().batchDraw();
     }
@@ -74,11 +71,9 @@ const TextComponent = ({
   };
 
   const handleSelectedId = (id) => {
-    console.log(id + " id 테스트용"); // id 값 로깅
     setSelectedId(id); // 상태 업데이트 호출
     // 이 시점에서는 상태 업데이트가 아직 반영되지 않았기 때문에,
     // 아래의 로그에서는 업데이트 이전의 selectedId 값이 출력됩니다.
-    console.log(selectedId + " selected id 테스트용");
   };
 
   return (

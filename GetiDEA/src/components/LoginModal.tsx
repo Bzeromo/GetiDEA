@@ -16,7 +16,6 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, closeModal }) => {
 
   const [searchParams] = useSearchParams();
     const accessToken = searchParams.get("access_token");
-    console.log(`토큰? : ${searchParams.get("access_token")}`)
     const refreshToken = searchParams.get("refresh_token");
   
   useEffect(() => {

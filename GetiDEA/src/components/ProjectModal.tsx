@@ -33,9 +33,7 @@ const ProjectModal: React.FC<ProfileModalProps> = ({ isOpen, closeModal,projectI
     useEffect(() => {
         const fetchData = async () => {
         try {
-            console.log(projectId);
           const response = await api.get<Project>(`/api/project/open?projectId=${projectId}`);
-          console.log(response.data);
           setProjectName(response.data.projectName);
           setThumbnail(response.data.thumbnail); 
         } catch (error) {
@@ -62,7 +60,6 @@ const ProjectModal: React.FC<ProfileModalProps> = ({ isOpen, closeModal,projectI
             "projectId" : projectId,
             "newProjectName" : projectName
         });
-            console.log('서버 응답:', response.data);
             await showAlert();  
             closeModal();
             window.location.reload();
@@ -89,15 +86,12 @@ const ProjectModal: React.FC<ProfileModalProps> = ({ isOpen, closeModal,projectI
           reader.readAsDataURL(file);
 
           const formData = new FormData();
-          console.log(file)
          
           try {
-            console.log(reader.result as string)
             await api.post('/api/image/thumbnail',{
                 "Image" : file,
                 "projectId" : projectId
             });
-            console.log("전송 완료")
             } catch (error) {
                 alert('파일 업로드 실패.');
             }

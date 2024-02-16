@@ -46,7 +46,6 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, closeModal, profile
         const fetchData = async () => {
         try {
           const response = await api.get<UserResponse>(`/api/user/search?userEmail=${localStorage.getItem('userEmail')}`);
-          console.log(response.data[0]);
           setUserName(response.data[0].userName);
           setUserEmail(response.data[0].userEmail); 
           setProfile(response.data[0].profileImage); 
@@ -60,9 +59,7 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, closeModal, profile
     // 프로필 수정 POST 요청
     const updateUserProfile = async (userInfo: ProfileJson) => {
         try {
-            console.log(userInfo);
             const response = await api.post('/api/image/userEmail/profileImage', userInfo,);
-            console.log('Update success:', response.data);
         } catch (error) {
             console.error('Update failed:', error);
         }
@@ -86,7 +83,6 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, closeModal, profile
               'Content-Type': 'text/plain' // JSON 형식의 데이터를 전송한다는 것을 명시
           }
         });
-            console.log('서버 응답:', response.data);
             await showAlert();  
             localStorage.setItem('userName',userName);
             closeModal();
@@ -115,12 +111,9 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, closeModal, profile
           reader.readAsDataURL(file);
 
           const formData = new FormData();
-          console.log(file)
           formData.append('Image', file); // 프로필 이미지 파일
           try {
-            console.log(formData)
             await api.post('/api/image/profile',formData);
-            console.log("전송 완료")
             } catch (error) {
                 alert('파일 업로드 실패.');
             }
