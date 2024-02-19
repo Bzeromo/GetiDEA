@@ -41,7 +41,29 @@
 
 ## 📌 사용 예시
 
-- ?
+### 🔷 소셜 로그인 (naver)
+
+![](resources/login.gif)
+
+### 🔷프로젝트 생성 (white board)
+
+![](resources/white_board.gif)
+
+### 🔷 탬플릿 튜토리얼 (7Check template)
+
+![](resources/tutorial.gif)
+
+### 🔷 실시간 협업 및 화상 회의
+
+![](resources/move.gif)
+
+### 🔷 프로젝트 관리 (폴더, 이름 수정, 북마크 기능)
+
+![](resources/refactor.gif)
+
+### 🔷 유저 관리 (프로필, 이름 변경 기능)
+
+![](resources/profile.gif)
 
 ***
 
@@ -51,7 +73,7 @@
 
 Type 키워드 맨 앞글자는 대문자 사용  ( ex. Feat: ~ )
 
-![img.png](img.png)
+![img.png](resources/git_convention.png)
 
 ### 🔷 Frontend Convention
 
@@ -84,38 +106,88 @@ Type 키워드 맨 앞글자는 대문자 사용  ( ex. Feat: ~ )
 
 ***
 
-## 📌 Tech Stack
-
-- ?
-
-***
-
-## 📌 ERD
-
-- ?
-
-***
-
-## 📌 API Specification
-
-- ?
-
-***
-
-## 📌 Jenkins Build
-
-- ?
-
-***
-
 ## 📌 Jira & Gerrit
 
-- ?
+### 🔷 Jira
+
+🔥 _번다운 차트_
+
+![burndown.JPG](resources/burndown.JPG)
+
+- 매일 인당 스토리 포인트 8점씩 부여하여 스케줄 관리
+- 극초반 Jira 사용 요령이 생기기 전 이외엔 모두 이상적인 그래프를 기록
+
+⏰ _타임라인_
+
+![timeline.JPG](resources/timeline.JPG)
+
+- 스프린트 일정은 대분류를 회의와 같은 공통, 기획, 프론트, 백엔드, 기타로 구분
+- 프론트엔드와 백엔드는 큰 기능 구현 및 대형 작업을 위주로 업무를 구분
+
+### 🔷 Gerrit
+
+![img.png](resources/gerrit.png)
+
+- Gitlab에 직접적인 push를 넣는 방식 대신 코드리뷰를 거쳐야만 push가 가능한 `gerrit`을 활용
+- 코드리뷰는 리뷰어를 따로 지정해두지 않고 그 때 그 때 가능한 사람을 지정하여 코드리뷰를 부탁하는 형식으로 진행됨
+
+***
+
+## 📌 Tech Stack
+
+![img.png](resources/techstack.png)
+
+### 🔷 BackEnd
+
+![](https://img.shields.io/badge/JAVA17-2F2625?style=flat-square&logoColor=white) ![](https://img.shields.io/badge/SpringBoot(3.2)-6DB33F?style=flat-square&logo=Springboot&logoColor=white) ![](https://img.shields.io/badge/Gradle(8.5)-02303A?style=flat-square&logo=gradle&logoColor=white) ![](https://img.shields.io/badge/JPA(3.2)-000000?style=flat-square&logoColor=white)
+![](https://img.shields.io/badge/Lombok-FFFFFF?style=flat-square&logoColor=white) ![](https://img.shields.io/badge/SpringSecurity(6.2)-6DB33F?style=flat-square&logo=Springsecurity&logoColor=white) ![](https://img.shields.io/badge/OAuth2%20JWT(6.2)-047AED?style=flat-square&logo=keycdn&logoColor=white) ![](https://img.shields.io/badge/Node.js(20.0.1)-339933?style=flat-square&logo=node.js&logoColor=white)
+![](https://img.shields.io/badge/Express.js(4.18.2)-000000?style=flat-square&logoColor=white) ![](https://img.shields.io/badge/Swagger(2.2)-85EA2D?style=flat-square&logo=swagger&logoColor=white)
+
+### 🔷 FrontEnd
+
+![](https://img.shields.io/badge/React(18.2)-61DAFB?style=flat-square&logo=react&logoColor=white) ![](https://img.shields.io/badge/yarn(1.22.19)-2C8EBB?style=flat-square&logo=yarn&logoColor=white) ![](https://img.shields.io/badge/TailwindCSS(3.0.2)-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white) ![](https://img.shields.io/badge/TypeScript(3.9.10)-3178C6?style=flat-square&logo=typescript&logoColor=white)
+![](https://img.shields.io/badge/JavaScript(ES6)-F7DF1E?style=flat-square&logo=javascript&logoColor=white) ![](https://img.shields.io/badge/Node.js(20.0.1)-339933?style=flat-square&logo=node.js&logoColor=white) ![](https://img.shields.io/badge/SASS-CC6699?style=flat-square&logo=sass&logoColor=white)
+![](https://img.shields.io/badge/Peer.js(1.5.2)-00AA45?style=flat-square&logo=peerlist&logoColor=white)
+
+### 🔷 DataBase
+![](https://img.shields.io/badge/MySQL(8.0)-4479A1?style=flat-square&logo=mysql&logoColor=white) ![](https://img.shields.io/badge/Redis(3.2)-DC382D?style=flat-square&logo=redis&logoColor=white) ![](https://img.shields.io/badge/MongoDB(4.2)-47A248?style=flat-square&logo=mongodb&logoColor=white) ![](https://img.shields.io/badge/AWS%20S3(1.11)-569A31?style=flat-square&logo=amazons3&logoColor=white)
+
+
+### 🔷 DevOps
+![](https://img.shields.io/badge/Jenkins-D24939?style=flat-square&logo=Jenkins&logoColor=white) ![](https://img.shields.io/badge/Sonatype%20Nexus%20Repository-1B1C30?style=flat-square&logo=sonatype&logoColor=white) ![](https://img.shields.io/badge/Gitlab-FC6D26?style=flat-square&logo=gitlab&logoColor=white) ![](https://img.shields.io/badge/Docker-2496ED?style=flat-square&logo=docker&logoColor=white)
+![](https://img.shields.io/badge/Nginx-009639?style=flat-square&logo=nginx&logoColor=white) ![](https://img.shields.io/badge/AWS%20EC2-FF9900?style=flat-square&logo=amazonec2&logoColor=white)
+
+***
+
+## 📌 ERD(DB 시각화)
+
+![](resources/erd.png)
+
+> `mongoDB`와 `redis`는 NoSQL DB이기 때문에 컬렉션 구조와 다른 데이터베이스의 테이블과 맺는 관계를 ERD로 그리는 것은 어불성설이나, 개발자의 개발 편의를 위해 시각화해두었음을 밝힌다.
+
 
 ***
 
 ## 📌 Team '선' 보고 '후' 조치
 
-- ?
+> [🔗 Team Notion](https://galvanized-citron-903.notion.site/Get-iDEA-29c9eb0938454ad2a4dfe0035eb37c72?pvs=4)
+
+👤 **팀장 이지은**
+ - `ProjectManager`, `FrontEnd`(Template 및 튜토리얼 구현)
+
+👤 **팀원 정연우**
+ - `Designer`, `FrontEnd`(Main, Login, board 페이지 기능 및 디자인 구현)
+
+👤 **팀원 강준규**
+ - `WebRTC`(peer.js), `FrontEnd`(Main, board 페이지 기능 및 디자인 구현)
+
+👤 **팀원 임현승**
+ - `BackEnd`(mysql 관련 RESTful Api 제작 등), `FrontEnd 보조`(Template 및 튜토리얼 구현)
+
+👤 **팀원 박영규**
+ - `BackEnd`(Database 설계, DB 서버 구축, WebSocket Server), `DevOps`(인프라 구축, 깃랩-젠킨스-EC2 파이프라인 구축)
+
+팀원 김범수
+ - `BackEnd`(Database 설계, Redis, MongoDB 관련 RESTful Api 제작, OAuth JWT 작업), `DevOps`(테스트 서버 지원)
 
 ![](https://capsule-render.vercel.app/api?type=waving&color=auto&height=300&section=footer)
