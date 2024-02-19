@@ -175,7 +175,7 @@ Type 키워드 맨 앞글자는 대문자 사용  ( ex. Feat: ~ )
  - `Designer`(UI), `FrontEnd`(Main, Login, board 페이지 디자인 및 기능 구현)
 
 👤 **팀원 강준규**
- - `WebRTC`(peer.js), `FrontEnd`(board 페이지 기능 구현)
+ - `WebRTC`(peer.js 화상회의), `Websocket`(문자채팅), `FrontEnd`(board 페이지 기능 구현)
 
 👤 **팀원 임현승**
  - `BackEnd`(mysql 관련 RESTful Api 제작 등), `FrontEnd 보조`(Template 및 튜토리얼 기능 구현)
