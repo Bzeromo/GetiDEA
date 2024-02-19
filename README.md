@@ -11,25 +11,29 @@
 **아이디어 기획에 어려움을 겪는 사람들을 위한 도구**로서, <br>
 팀원들과의 온라인 실시간 협업을 통해 아이디어 보드를 자유롭게 꾸밀 수 있습니다.
 
-1. **다양한 아이디어 기법을 적용한 탬플릿을 제공합니다.**
-- 
--
--
+1. **다양한 아이디어 기법을 적용한 템플릿을 제공합니다.**
+- 아이디어 시각화 뿐만 아니라 도출을 적극적으로 돕는 템플릿 제공
+- 교육학 논문 내용 기반의 변형 또는 자체 제작을 통한 차별화<br>
+(1) 화이트 보드 (White Board) : 여러분의 아이디어, 자유롭게 표현해보세요!<br>
+(2) 랜덤 버블 (Random Bubble) : 빈 화면에서 막연한 고민은 그만! 랜덤 단어의 도움을 받아보세요.<br>
+(3) 6가지 생각 모자 (6hats) : 역할모자를 쓰고 관점을 다르게 하여 분석 해보는 것은 어떨까요?<br>
+(4) 세븐쳌 (7check) : 기존에서 하나씩 체크해가면서 조금 바꿔보는 것은 어떨까요?
 
 2. **튜토리얼을 통해 아이디어 기법에 쉽게 접근할 수 있습니다.**
-- 아이디어 기법에 대한 이해가 전혀 없는 사람도 쉽게 사용할 수 있습니다.
+- 입문자 및 초보자를 위한 상세한 템플릿 튜토리얼
+- 튜토리얼을 통한 아이디어 기법에의 쉬운 접근 가능
+- 아이디어 기법에 대한 이해가 부족한 사람도 손쉽게 사용 가능
 
-3. **실시간 협업 및 소통을 지원합니다.**
+3. **실시간 협업 및 소통을 위한 보드, 문자채팅, 화상회의를 지원합니다.**
 - 화이트보드 협업
 - 실시간 문자 채팅
-- 화상 회의 및 음성 채팅
-- 화면 공유
+- 화상 회의
 
 4. **다양한 도구를 사용해 마음껏 보드를 꾸밀 수 있습니다.**
 - 다양한 도형과 도형 편집 옵션 제공
-- 텍스트 및 선으로 마음껏 생각을 표현하세요.
+- 텍스트, 선, 이미지 등으로 마음껏 생각을 표현하세요.
 
-5. **여러분의 작업물은 언제나 안전하게 보관됩니다.**
+5. **여러분의 작업물은 자동 저장되며, 언제나 안전하게 보관됩니다.**
 - 작업과 동시에 저장되는 진행사항
 - 언제든 다시 돌아와 이전의 아이디어를 살펴보세요!
 
@@ -75,21 +79,13 @@ Type 키워드 맨 앞글자는 대문자 사용  ( ex. Feat: ~ )
 
 ![img.png](resources/git_convention.png)
 
+❗ 변경 시 마다 커밋! 고칠 때는 기능별 수정사항 한번에 ❗
 ### 🔷 Frontend Convention
 
-- Feat : 새로운 기능 추가 (대부분에 사용)
-- Fix : 버그 발생 시
-- Design : UI 변경 시 (CSS)
+- Feat : 새로운 기능 추가 (대부분에 사용) ex. 홈 버튼 생성
+- Fix : 버그 발생 시 ex. 홈 버튼 클릭이 안되는 버그 수정
+- Design : UI 변경 시 (CSS) ex. 홈 버튼 좌우간격 수정
 
-❗ 변경 시 마다 커밋! 고칠 때 이왕이면 기능별 수정사항 한번에 ❗
-
-```
-(예시)
-
-- Feat: 홈 버튼 생성
-- Fix: 홈 버튼 클릭이 안되는 버그 수정
-- Design: 홈 버튼 좌우간격 수정
-```
 
 ### 🔷 Backend Convention
 
@@ -173,21 +169,21 @@ Type 키워드 맨 앞글자는 대문자 사용  ( ex. Feat: ~ )
 > [🔗 Team Notion](https://galvanized-citron-903.notion.site/Get-iDEA-29c9eb0938454ad2a4dfe0035eb37c72?pvs=4)
 
 👤 **팀장 이지은**
- - `ProjectManager`, `FrontEnd`(Template 및 튜토리얼 구현)
+ - `ProjectManager`(GIT 및 일정 등 관리), `FrontEnd`(Template 및 튜토리얼 기획, 디자인 및 기능 구현)
 
 👤 **팀원 정연우**
- - `Designer`, `FrontEnd`(Main, Login, board 페이지 기능 및 디자인 구현)
+ - `Designer`(UI), `FrontEnd`(Main, Login, board 페이지 디자인 및 기능 구현)
 
 👤 **팀원 강준규**
- - `WebRTC`(peer.js), `FrontEnd`(Main, board 페이지 기능 및 디자인 구현)
+ - `WebRTC`(peer.js), `FrontEnd`(board 페이지 기능 구현)
 
 👤 **팀원 임현승**
- - `BackEnd`(mysql 관련 RESTful Api 제작 등), `FrontEnd 보조`(Template 및 튜토리얼 구현)
+ - `BackEnd`(mysql 관련 RESTful Api 제작 등), `FrontEnd 보조`(Template 및 튜토리얼 기능 구현)
 
 👤 **팀원 박영규**
  - `BackEnd`(Database 설계, DB 서버 구축, WebSocket Server), `DevOps`(인프라 구축, 깃랩-젠킨스-EC2 파이프라인 구축)
 
-팀원 김범수
+👤 **팀원 김범수**
  - `BackEnd`(Database 설계, Redis, MongoDB 관련 RESTful Api 제작, OAuth JWT 작업), `DevOps`(테스트 서버 지원)
 
 ![](https://capsule-render.vercel.app/api?type=waving&color=auto&height=300&section=footer)
