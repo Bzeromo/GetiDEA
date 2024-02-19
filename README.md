@@ -169,13 +169,13 @@ Type 키워드 맨 앞글자는 대문자 사용  ( ex. Feat: ~ )
 > [🔗 Team Notion](https://galvanized-citron-903.notion.site/Get-iDEA-29c9eb0938454ad2a4dfe0035eb37c72?pvs=4)
 
 👤 **팀장 이지은**
- - `ProjectManager`(GIT 및 일정 등 관리), `FrontEnd`(Template 및 튜토리얼 기획, 디자인 및 기능 구현)
+ - `ProjectManager`(기획 및 GIT, Gerrit, Jira 등 활용 프로젝트 관리), `FrontEnd`(Template 및 튜토리얼 기획, 디자인 및 기능 구현)
 
 👤 **팀원 정연우**
- - `Designer`(UI), `FrontEnd`(Main, Login, board 페이지 디자인 및 기능 구현)
+ - `Designer`(UI), `FrontEnd`(Main, Login, board 등 페이지/컴포넌트 디자인 및 기능 구현)
 
 👤 **팀원 강준규**
- - `WebRTC`(peer.js 화상회의), `Websocket`(문자채팅), `FrontEnd`(board 페이지 기능 구현)
+ - `WebRTC`(peer.js 화상회의, node server 구현), `Websocket`(문자채팅, 실시간 협업기능, node server 구현), `FrontEnd`(board 페이지 기능 구현)
 
 👤 **팀원 임현승**
  - `BackEnd`(mysql 관련 RESTful Api 제작 등), `FrontEnd 보조`(Template 및 튜토리얼 기능 구현)
